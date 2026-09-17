@@ -204,9 +204,12 @@ section[id] { scroll-margin-top: 80px; }
    Adresse eines fremden Lokals, also muss sofort erkennbar sein, dass sie
    nicht dessen offizieller Auftritt ist. */
 .entwurf-hinweis { position: fixed; top: 0; left: 0; right: 0; z-index: 65; height: 38px;
-  display: flex; align-items: center; justify-content: center; gap: 6px;
+  display: flex; align-items: center; justify-content: center;
   background: #16151a; color: #fff; font-size: 13px; line-height: 1.25; padding: 0 14px;
   text-align: center; font-family: var(--body); }
+/* Der Text steht in einem eigenen Element: sonst würde das <strong> im
+   Flex-Container zu einem eigenen Kasten und der Satz bekäme Lücken. */
+.entwurf-hinweis span { display: block; }
 .entwurf-hinweis strong { font-weight: 700; }
 body.veroeffentlicht .topbar { top: 38px; }
 @media (max-width: 620px) {
@@ -914,7 +917,7 @@ ${PAGE_STYLES}
 
 ${
   veroeffentlicht
-    ? `<div class="entwurf-hinweis">Unverbindlicher Gestaltungsentwurf – <strong>nicht</strong> die offizielle Website von ${escapeHtml(name)}.</div>`
+    ? `<div class="entwurf-hinweis"><span>Unverbindlicher Gestaltungsentwurf – <strong>nicht</strong> die offizielle Website von ${escapeHtml(name)}.</span></div>`
     : ""
 }
 <header class="topbar" id="topbar">
