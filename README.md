@@ -133,10 +133,11 @@ npm run dashboard
 Danach im Browser öffnen: **http://localhost:3000**
 
 Funktionen:
-- Kennzahlen oben (Anzahl Leads gesamt, "Sehr hoch"-Priorität, ohne Website)
+- Kennzahlen oben (Leads gesamt, "Sehr hoch"-Priorität, ohne Website, erstellte Entwürfe)
 - Tabelle sortierbar per Klick auf eine Spaltenüberschrift (Standard: nach Score)
 - Filter nach Ort und Priorität, Suchfeld nach Name
 - Website-Spalte verlinkt direkt zur jeweiligen Seite
+- **Entwurf-Spalte** öffnet die generierte Landingpage des Restaurants (siehe nächster Abschnitt) – praktisch beim Termin: Lead heraussuchen, „ansehen" klicken, dem Wirt zeigen
 
 Das Dashboard liest beim Aufruf einfach die vorhandenen CSV-Dateien neu ein – lass es also nach einem neuen `npm start`-Lauf laufen, um aktuelle Daten zu sehen (Browser-Seite neu laden reicht, der Server muss nicht neu gestartet werden). Es braucht keinen API-Key und läuft komplett offline auf deinem Rechner.
 
@@ -148,7 +149,12 @@ Für den Pitch lässt sich zu jedem Lead automatisch eine fertige Beispiel-Websi
 npm run pages
 ```
 
-Die Seiten landen unter `data/landingpages/`. Öffne `data/landingpages/index.html` im Browser für die Übersicht, von dort geht es zu jedem einzelnen Entwurf.
+Die Seiten landen unter `data/landingpages/`. Es gibt zwei Wege, sie anzusehen:
+
+- **Über das Dashboard** (empfohlen): `npm run dashboard` starten und in der Spalte „Entwurf" auf „ansehen" klicken. Der Server liefert die Entwürfe unter `/entwuerfe/` gleich mit aus.
+- **Direkt im Dateisystem**: `data/landingpages/index.html` im Browser öffnen – eine Übersicht mit Vorschaubildern, von dort geht es zu jedem einzelnen Entwurf.
+
+Welcher Lead zu welchem Entwurf gehört, hält der Generator in `data/landingpages/entwuerfe.json` fest; das Dashboard liest diese Datei bei jedem Aufruf neu. Nach einem neuen `npm run pages` genügt es also, die Dashboard-Seite neu zu laden.
 
 Optionen:
 ```bash

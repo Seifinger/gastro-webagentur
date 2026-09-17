@@ -164,8 +164,20 @@ async function run() {
   const overviewPath = path.join(landingPagesDir, "index.html");
   writeFileSync(overviewPath, buildOverviewPage(entries), "utf-8");
 
+  // Zuordnung placeId -> Ordnername, damit das Dashboard den passenden
+  // Entwurf verlinken kann (Ordnernamen können durchnummeriert sein).
+  const manifest = Object.fromEntries(
+    entries.filter(({ lead }) => lead.placeId).map(({ lead, slug }) => [lead.placeId, slug]),
+  );
+  writeFileSync(
+    path.join(landingPagesDir, "entwuerfe.json"),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    "utf-8",
+  );
+
   console.log(`\n✅ ${entries.length} Landing-Page-Entwürfe erstellt.`);
-  console.log(`   Übersicht: ${overviewPath}\n`);
+  console.log(`   Übersicht: ${overviewPath}`);
+  console.log(`   Im Dashboard verlinkt (npm run dashboard)\n`);
 }
 
 run();
