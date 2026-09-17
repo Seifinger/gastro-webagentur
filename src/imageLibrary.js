@@ -63,6 +63,54 @@ export const HERO_IMAGES = {
     "photo-1546069901-ba9599a7e63c",
     "photo-1544510808-91bcbee1df55",
   ],
+  chinesisch: [
+    "photo-1523905330026-b8bd1f5f320e",
+    "photo-1496116218417-1a781b1c416c",
+    "photo-1585032226651-759b368d7246",
+    "photo-1504674900247-0877df9cc836",
+    "photo-1512058564366-18510be2db19",
+    "photo-1563245372-f21724e3856d",
+  ],
+  thailaendisch: [
+    "photo-1587040690786-b091531837a2",
+    "photo-1628432017781-49e012d769b3",
+    "photo-1618449840665-9ed506d73a34",
+    "photo-1455619452474-d2be8b1e70cd",
+    "photo-1559314809-0d155014e29e",
+    "photo-1548943487-a2e4e43b4853",
+  ],
+  vietnamesisch: [
+    "photo-1597345637412-9fd611e758f3",
+    "photo-1589570658214-002314b1520f",
+    "photo-1582878826629-29b7ad1cdc43",
+    "photo-1710532774170-9844f837ae54",
+    "photo-1677354469642-3e4fc5dbbb4a",
+    "photo-1631709497146-a239ef373cf1",
+  ],
+  japanisch: [
+    "photo-1553621042-f6e147245754",
+    "photo-1569718212165-3a8278d5f624",
+    "photo-1588166524938-1ee110d7dcef",
+    "photo-1626322751504-930506dd41ca",
+    "photo-1534422298391-e4f8c172dddb",
+    "photo-1512058564366-18510be2db19",
+  ],
+  indisch: [
+    "photo-1603894584373-5ac82b2ae398",
+    "photo-1603496987351-f84a3ba5ec85",
+    "photo-1631452180519-c014fe946bc7",
+    "photo-1565557623262-b51c2513a641",
+    "photo-1588166524941-3bf61a9c41db",
+    "photo-1631452180539-96aca7d48617",
+  ],
+  syrisch: [
+    "photo-1699728088614-7d1d4277414b",
+    "photo-1583060095186-852adde6b819",
+    "photo-1768812910769-d037b90aee77",
+    "photo-1752795646140-eb70cf30640e",
+    "photo-1530469912745-a215c6b256ea",
+    "photo-1680405531955-8b4981bb1b0c",
+  ],
 };
 
 // Die drei Bildplätze zeigen je ein bestimmtes Motiv, damit Bild und
@@ -99,6 +147,36 @@ export const INTERIOR_IMAGES = {
     "photo-1554118811-1e0d58224f24",
     "photo-1517248135467-4c7edcad34c4",
     "photo-1552566626-52f8b828add9",
+  ],
+  chinesisch: [
+    "photo-1672756214803-61e605da34fc",
+    "photo-1590846406792-0adc7f938f1d",
+    "photo-1555396273-367ea4eb4db5",
+  ],
+  thailaendisch: [
+    "photo-1746003668321-d400319650ce",
+    "photo-1590846406792-0adc7f938f1d",
+    "photo-1517248135467-4c7edcad34c4",
+  ],
+  vietnamesisch: [
+    "photo-1693822998952-b8d18c61043b",
+    "photo-1562560471-cb5b5f96c1ab",
+    "photo-1555396273-367ea4eb4db5",
+  ],
+  japanisch: [
+    "photo-1693822998952-b8d18c61043b",
+    "photo-1746003668321-d400319650ce",
+    "photo-1590846406792-0adc7f938f1d",
+  ],
+  indisch: [
+    "photo-1672756214803-61e605da34fc",
+    "photo-1562560471-cb5b5f96c1ab",
+    "photo-1517248135467-4c7edcad34c4",
+  ],
+  syrisch: [
+    "photo-1554118811-1e0d58224f24",
+    "photo-1562560471-cb5b5f96c1ab",
+    "photo-1555396273-367ea4eb4db5",
   ],
 };
 

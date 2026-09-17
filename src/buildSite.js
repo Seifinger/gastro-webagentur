@@ -7,7 +7,8 @@ import {
   themeForLead,
   imageSpecsForLead,
 } from "./landingPageGenerator.js";
-import { detectCuisine, menuForCuisine, MENUS } from "./menuCatalog.js";
+import { menuForCuisine, MENUS } from "./menuCatalog.js";
+import { ladeZuordnungen, kuecheFuerLead } from "./cuisineOverrides.js";
 import { ensureAssets } from "./imageLibrary.js";
 import { ensureFonts, fontFaceCss } from "./fontLibrary.js";
 
@@ -16,7 +17,7 @@ import { ensureFonts, fontFaceCss } from "./fontLibrary.js";
 // Entwurf ergeben – deshalb liegt die Auswahl- und Schreiblogik hier.
 
 export function parseArgs(argv) {
-  const args = { region: null, limit: null, minScore: 0, email: "", cuisine: null, kontakt: "" };
+  const args = { region: null, limit: null, minScore: 0, email: "", cuisine: null, kontakt: "", api: "" };
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === "--region") args.region = argv[++i];
     if (argv[i] === "--limit") args.limit = Number(argv[++i]);
@@ -24,6 +25,7 @@ export function parseArgs(argv) {
     if (argv[i] === "--email") args.email = argv[++i];
     if (argv[i] === "--cuisine") args.cuisine = argv[++i];
     if (argv[i] === "--kontakt") args.kontakt = argv[++i];
+    if (argv[i] === "--api") args.api = argv[++i];
   }
   return args;
 }
@@ -46,11 +48,27 @@ export function waehleLeads({ region, limit, minScore }) {
 }
 
 /**
- * Vergibt pro Lead einen eindeutigen Ordnernamen. Gleichnamige Restaurants in
- * verschiedenen Orten bekommen eine laufende Nummer angehängt.
+ * Kennung am Ordnernamen, damit die Entwürfe nicht durch Raten des
+ * Restaurantnamens gefunden werden. Sie hängt fest am Lead, die Adresse
+ * bleibt also über mehrere Läufe dieselbe – ein einmal ausgegebener
+ * QR-Code funktioniert weiter.
  */
-function uniqueSlug(name, taken) {
-  const base = slugify(name);
+export function entwurfToken(lead) {
+  const quelle = String(lead?.placeId || lead?.name || "entwurf");
+  let hash = 0;
+  for (let i = 0; i < quelle.length; i += 1) {
+    hash = (hash * 33 + quelle.charCodeAt(i)) >>> 0;
+  }
+  return hash.toString(36).padStart(7, "0").slice(-7);
+}
+
+/**
+ * Vergibt pro Lead einen eindeutigen Ordnernamen. Gleichnamige Restaurants
+ * unterscheiden sich schon durch die Kennung; bei echten Kollisionen kommt
+ * eine laufende Nummer dazu.
+ */
+function uniqueSlug(lead, taken) {
+  const base = `${slugify(lead.name)}-${entwurfToken(lead)}`;
   let slug = base;
   let counter = 2;
   while (taken.has(slug)) {
@@ -63,13 +81,15 @@ function uniqueSlug(name, taken) {
 
 export function baueEintraege(leads, cuisineOverride) {
   const taken = new Set();
+  const zuordnungen = ladeZuordnungen();
+
   return leads.map((lead) => {
-    const cuisine = cuisineOverride ?? detectCuisine(lead.name);
+    const cuisine = cuisineOverride ?? kuecheFuerLead(lead, zuordnungen);
     return {
       lead,
       cuisine,
       gestaltung: themeForLead(lead, cuisine),
-      slug: uniqueSlug(lead.name, taken),
+      slug: uniqueSlug(lead, taken),
     };
   });
 }

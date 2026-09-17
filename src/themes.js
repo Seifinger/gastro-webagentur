@@ -81,6 +81,14 @@ export const CUISINE_THEMES = {
   griechisch: "trattoria",
   cafe: "trattoria",
   asiatisch: "neoasian",
+  chinesisch: "neoasian",
+  thailaendisch: "neoasian",
+  vietnamesisch: "neoasian",
+  japanisch: "neoasian",
+  // Indisch und Syrisch stehen bewusst beim warmen Serifen-Theme: die Küchen
+  // leben von Gewürz und Gastfreundschaft, nicht von kühler Klarheit.
+  indisch: "trattoria",
+  syrisch: "trattoria",
   tuerkisch: "neoasian",
   bayerisch: "wirtshaus",
 };

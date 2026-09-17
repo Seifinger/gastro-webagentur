@@ -162,7 +162,7 @@ npm run pages -- --region "Altötting"        # nur ein Ort
 npm run pages -- --min-score 80              # nur die dringendsten Fälle
 npm run pages -- --limit 10                  # die Top 10 nach Score
 npm run pages -- --email info@restaurant.de  # Bestellungen/Reservierungen per E-Mail versendbar machen
-npm run pages -- --cuisine asiatisch         # Küche vorgeben (siehe unten)
+npm run pages -- --cuisine japanisch         # Küche vorgeben (siehe unten)
 ```
 
 ### Aufbau der Seite
@@ -193,6 +193,86 @@ Innerhalb eines Themes gibt es drei Akzentvarianten, dazu sechs Titelbilder je K
 ### Bilder und Schriften
 
 Stockfotos (Unsplash) und Schriften (Google Fonts, alle unter der SIL Open Font License) werden beim ersten Lauf **einmalig heruntergeladen** und unter `data/landingpages/assets/` abgelegt. Danach funktionieren die Entwürfe komplett offline – praktisch, wenn du sie beim Termin im Lokal auf dem Laptop zeigst und dort kein Empfang ist. Ein erneuter Lauf lädt nur noch Fehlendes nach. Schlägt der Schriften-Download fehl, greifen die Seiten auf Systemschriften zurück.
+
+### Gästestimmen
+
+Vor der Reservierung steht eine Referenzen-Sektion. Auf den Entwürfen echter Häuser bleiben die drei Plätze **bewusst leer** und zeigen nur den Aufbau – die einzige echte Sozialbestätigung dort ist die Google-Gesamtnote.
+
+Das hat zwei Gründe, die sich nicht umgehen lassen:
+
+- Google untersagt das **Speichern von Rezensionstexten**. Dauerhaft gespeichert werden darf nur die `place_id`; Bewertungen müssen live abgerufen und mit Attribution angezeigt werden. Unsere Seiten sind statische Dateien im Git – genau das wäre nicht erlaubt.
+- Rezensionen enthalten **Namen echter Gäste**. Die auf einer Entwurfsseite zu veröffentlichen, die dem Lokal nicht gehört und die niemand beauftragt hat, wäre datenschutzrechtlich nicht sauber.
+
+Erfundene Zitate unter dem echten Namen eines Hauses kommen ebenfalls nicht in Frage – sie wären als echte Bewertungen lesbar. Ein Test stellt sicher, dass das nie passiert.
+
+Die **erfundenen Beispiel-Lokale** auf der Startseite haben dagegen ausformulierte Stimmen; dort ist klar gekennzeichnet, dass das Lokal nicht existiert.
+
+Sobald ein Wirt Kunde ist, lassen sich seine echten Bewertungen sauber einbinden: per Live-Abruf beim Seitenaufruf, mit Google-Attribution und ohne Speicherung.
+
+### Welche Küchen es gibt
+
+Zwölf Stilrichtungen, jede mit eigener Beispielkarte, eigenen Farben, eigenen Bildern und eigener Bewegung im Kopfbereich:
+
+| | |
+|---|---|
+| Bayerisch | Wirtshausküche & Biergarten |
+| Italienisch | Pizza, Pasta & Antipasti |
+| Griechisch | Gyros, Grill & Meze |
+| Türkisch | Döner, Grill & Pide |
+| Syrisch | Mezze, Schawarma & Grill |
+| Chinesisch | Wok, Dim Sum & Ente |
+| Thailändisch | Curry, Wok & Street Food |
+| Vietnamesisch | Phở, Bánh Mì & Sommerrollen |
+| Japanisch | Sushi, Ramen & Izakaya |
+| Indisch | Curry, Tandoor & Biryani |
+| Asiatisch (gemischt) | für die panasiatische Nudelbar, die sich nicht genauer einordnen lässt |
+| Café | Frühstück, Kuchen & Kaffee |
+
+Die Namenserkennung prüft die genaueren Küchen zuerst: „Sushi Bar Kyoto" wird japanisch, „Kao Thai" thailändisch, „Ming Friends" chinesisch. Erst wenn nichts Genaueres passt, greift die Sammelkategorie. Ein Test hält dagegen, dass „Goldener Hirsch" oder „Zum Steer" dabei nicht versehentlich mitgerissen werden.
+
+Küchen und ihre Beschriftungen stehen an **einer** Stelle (`src/menuCatalog.js`) und werden von dort ans Dashboard geliefert. Eine neue Küche muss also nicht zusätzlich im Dropdown nachgetragen werden.
+
+### Küche im Dashboard zuordnen
+
+Die Namenserkennung liegt bei Lokalen ohne Stichwort daneben. Im Dashboard gibt es deshalb pro Lead ein Auswahlfeld für die Küche; die Zuordnung landet in `data/kuechen.json` und hat Vorrang vor der automatischen Erkennung. Von Hand gesetzte Werte sind farbig hervorgehoben. Nach einer Änderung einmal `npm run pages` laufen lassen, damit der Entwurf die neue Stilrichtung bekommt.
+
+### QR-Code und Anschreiben
+
+> **Wichtig:** Der QR-Code zeigt auf die **veröffentlichte** Adresse (`docs/` auf `main`). Ein Entwurf, der nur lokal mit `npm run pages` gebaut wurde, ist darüber noch nicht erreichbar – der QR läuft dann in eine 404-Seite. Das Dashboard weist im Pitch-Fenster darauf hin und blendet den QR-Code aus, solange der Entwurf nicht in `docs/` liegt. Vor einem Termin also: `npm run publish-site`, `docs/` committen, nach `main` pushen.
+
+
+In der Spalte **Pitch** öffnet „QR & Text" ein Fenster mit:
+
+- einem **QR-Code** auf die Demo-Adresse des Lokals – zum Zeigen auf dem Handy oder zum Ausdrucken
+- der Adresse zum Kopieren
+- einem **Anschreiben-Entwurf**, der den konkreten Befund aus der Analyse aufgreift („keine eigene Website hinterlegt", „auf dem Handy schwer zu bedienen" …)
+
+Der Text ist ein Entwurf zum Prüfen und Anpassen, kein Serienbrief. Unaufgeforderte Werbe-E-Mails an Gewerbetreibende sind in Deutschland nur eingeschränkt zulässig (§ 7 UWG) – der unproblematische Weg ist, den QR-Code beim Besuch vor Ort zu zeigen.
+
+### Bewegung beim Scrollen
+
+Unterhalb des Heros bewegt sich die Seite mit: Sektionsköpfe und Karten blenden versetzt ein, die Linie unter der Rubrik zieht sich auf, die Kette zwischen den drei Abholschritten wächst, das Akkordeon klappt weich auf und die eigenen Fotos fahren beim Scrollen langsam zurück in ihre Größe.
+
+Drei Regeln gelten dabei (`src/motion.js`):
+
+- **Nichts springt.** Animiert werden nur `transform` und `opacity` – das zeichnet der Browser ohne neues Layout. Ein Test in `test/motion.test.js` lässt keine andere Eigenschaft durch.
+- **Nichts versteckt Inhalt.** Die unsichtbaren Startwerte hängen an einer Klasse, die erst das Skript setzt. Ohne JavaScript steht die volle Seite da – auch das prüft ein Test.
+- **Bewegung ist abschaltbar.** Bei `prefers-reduced-motion: reduce` steigt das Skript sofort aus, und die Hero-Fahrt hält an, sobald der Hero aus dem Bild gescrollt ist.
+
+### Bewegung je Küche
+
+Jede Stilrichtung hat ein eigenes bewegtes Element im Hero – nicht nur andere Farben, sondern ein anderer Mechanismus:
+
+| Küche | Element |
+|---|---|
+| Italienisch | Zwei Pizzahälften, die gegeneinander drehen (wie bei L'Osteria) |
+| Bayerisch | Die Tagesempfehlung wechselt durch |
+| Asiatisch | Gerichte laufen wie auf dem Sushi-Band durchs Bild |
+| Türkisch | Der Drehspieß dreht sich weiter |
+| Griechisch | Ruhiger Bildwechsel mit langsamer Annäherung |
+| Café | Aufsteigender Dampf über der Tasse |
+
+Alles reine CSS-Animationen, ohne Bibliothek und ohne zusätzliche Anfragen. Wer im Betriebssystem „Bewegung reduzieren" eingestellt hat, bekommt das Standbild.
 
 ### Speisekarte
 
@@ -235,6 +315,41 @@ Die Seiten tragen Namen und Adresse echter Lokale, die davon nichts wissen. Desh
 - Die öffentliche Übersicht zeigt **keine** Lead-Scores und Prioritäten.
 
 Die `robots.txt` liegt zwar mit im Ordner, wird auf `github.io` aber nur im Wurzelverzeichnis der Domain ausgewertet – die Absicherung leistet hier das `noindex` im Seitenkopf. Wenn ein Wirt möchte, dass sein Entwurf verschwindet, nimm ihn aus der Auswahl und pushe neu.
+
+## Wirt-Dashboard: Tische, Reservierungen, Abholbestellungen
+
+Die Landing-Page nimmt Reservierungen und Abholbestellungen entgegen – ankommen müssen sie beim Wirt. Dafür gibt es einen zweiten, kleinen Server, der pro Betrieb läuft:
+
+```bash
+npm run wirt -- --betrieb gasthaus-zur-post
+```
+
+Danach im Browser `http://localhost:3200` öffnen. **Nicht 3000** – der Port gehört dem persönlichen Dashboard. Die beiden Server haben deshalb getrennte Umgebungsvariablen (`DASHBOARD_PORT` und `WIRT_PORT`); ein gemeinsames `PORT` hätte sonst beide auf denselben Platz geschickt. Ist ein Port belegt, sagt der Start, welcher und was zu tun ist. Die Daten liegen in `data/betrieb/<betrieb>.json` (gitignoriert). Ohne `--betrieb` wird `standard` verwendet, mit `--port` lässt sich der Port ändern.
+
+Das Dashboard hat drei Reiter:
+
+**Tischplan.** Der Wirt trägt seine Tische mit Platzzahl ein (z. B. „Tisch 4 – 6 Plätze"). Die Summe ist die Kapazität des Hauses. Genau daran prüft der Server jede Online-Reservierung: Reicht zur gewünschten Zeit der Platz nicht mehr, bekommt der Gast sofort eine ehrliche Absage mit der freien Platzzahl statt einer Bestätigung, die später zurückgenommen werden muss. Als belegt gilt ein Tisch 120 Minuten ab der Reservierungszeit.
+
+**Die Tische, nicht nur die Plätze.** Die reine Platzsumme führt in die Irre. Bei einem Vierer- und einem Zweiertisch sind sechs Plätze frei – zwei Dreiergruppen passen trotzdem nicht hinein, weil die zweite keinen Tisch mehr findet. Auf dem Papier geht es auf, im Raum steht die Gruppe. Der Server prüft deshalb zusätzlich, ob sich die gleichzeitig anwesenden Gruppen überhaupt auf die Tische verteilen lassen:
+
+- **Online** wird in dem Fall abgelehnt – der Gast liest nur, dass für seine Gruppenstärke kein Tisch mehr frei ist, nicht den Tischplan des Hauses.
+- **Von Hand** wird trotzdem eingetragen. Der Wirt am Telefon kennt seinen Raum und kann Tische zusammenstellen; ihn zu blockieren wäre anmaßend. Er bekommt aber einen Hinweis, der oben in der Reservierungsliste **stehen bleibt**, bis der Konflikt gelöst ist – eine Meldung, die nach vier Sekunden verschwindet, ist am Abend vergessen.
+
+**Reservierungen.** Online eingegangene Anfragen stehen auf „neu" und werden vom Wirt bestätigt oder abgesagt; eine Absage gibt die Plätze sofort wieder frei. Telefonisch angenommene Reservierungen trägt der Wirt über das Formular selbst ein – die gelten sofort als bestätigt und zählen genauso gegen die Kapazität, sonst wäre die Online-Verfügbarkeit falsch. Jeder Reservierung lässt sich ein Tisch zuweisen; die Auswahl zeigt nur Tische, die groß genug und zu der Zeit noch frei sind.
+
+**Bestellungen.** Eingehende Abholbestellungen zeigen Positionen, Summe und die **gewünschte** Abholzeit. Der Wirt bestätigt eine Abholzeit – entweder die gewünschte oder eine realistischere. Dazu gibt es einen fertig formulierten Text zum Vorlesen und die Telefonnummer als `tel:`-Link. Bis zur Bestätigung steht die Bestellung sichtbar auf „wartet auf Bestätigung"; auch der Gast liest auf der Landing-Page, dass die Abholzeit noch bestätigt wird.
+
+### Landing-Page an den Server anbinden
+
+Ohne Anbindung sind die Formulare eine Vorschau. Mit `--api` schicken sie echte Anfragen an den Wirt-Server:
+
+```bash
+npm run pages -- --api http://localhost:3200
+```
+
+Der Hinweis „Entwurfsansicht" verschwindet dann, weil die Anfrage wirklich beim Restaurant landet. Das gilt auch für `npm run publish-site -- --api https://...`.
+
+**Wichtig:** Das braucht einen laufenden Server. GitHub Pages liefert nur statische Dateien aus – die dort veröffentlichten Entwürfe bleiben also ohne `--api` und damit in der Vorschau-Fassung. Für einen echten Kunden läuft der Wirt-Server auf seinem eigenen Hosting (oder deinem), und die Seite zeigt auf diese Adresse.
 
 ## Tests ausführen
 

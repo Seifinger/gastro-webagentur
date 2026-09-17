@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, readdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { landingPagesDir } from "./config.js";
 import { escapeHtml } from "./landingPageGenerator.js";
@@ -89,6 +89,17 @@ async function run() {
   mkdirSync(landingPagesDir, { recursive: true });
   const entries = baueEintraege(leads, args.cuisine);
 
+  // Entwurfsordner aus früheren Läufen entfernen – sonst bleiben Seiten mit
+  // veralteter Küche oder altem Namen liegen und das Dashboard verlinkt sie
+  // womöglich weiter. Die heruntergeladenen Bilder bleiben erhalten.
+  const aktuell = new Set(entries.map((e) => e.slug));
+  for (const eintrag of readdirSync(landingPagesDir, { withFileTypes: true })) {
+    if (!eintrag.isDirectory() || eintrag.name === "assets") continue;
+    if (!aktuell.has(eintrag.name)) {
+      rmSync(path.join(landingPagesDir, eintrag.name), { recursive: true, force: true });
+    }
+  }
+
   // Bilder und Schriften einmalig laden, damit die Entwürfe beim Termin auch
   // ohne Internet funktionieren.
   const assetsDir = path.join(landingPagesDir, "assets");
@@ -97,7 +108,7 @@ async function run() {
   console.log("🔤 Prüfe Schriften ...");
   const fontCss = await ladeSchriften(path.join(assetsDir, "fonts"));
 
-  schreibeSeiten(entries, landingPagesDir, { kontaktEmail: args.email, fontCss });
+  schreibeSeiten(entries, landingPagesDir, { kontaktEmail: args.email, fontCss, apiUrl: args.api });
 
   const overviewPath = path.join(landingPagesDir, "index.html");
   writeFileSync(overviewPath, buildOverviewPage(entries), "utf-8");
