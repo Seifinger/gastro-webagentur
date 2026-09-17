@@ -215,6 +215,9 @@ Die Namenserkennung liegt bei Lokalen ohne Stichwort daneben. Im Dashboard gibt 
 
 ### QR-Code und Anschreiben
 
+> **Wichtig:** Der QR-Code zeigt auf die **veröffentlichte** Adresse (`docs/` auf `main`). Ein Entwurf, der nur lokal mit `npm run pages` gebaut wurde, ist darüber noch nicht erreichbar – der QR läuft dann in eine 404-Seite. Das Dashboard weist im Pitch-Fenster darauf hin und blendet den QR-Code aus, solange der Entwurf nicht in `docs/` liegt. Vor einem Termin also: `npm run publish-site`, `docs/` committen, nach `main` pushen.
+
+
 In der Spalte **Pitch** öffnet „QR & Text" ein Fenster mit:
 
 - einem **QR-Code** auf die Demo-Adresse des Lokals – zum Zeigen auf dem Handy oder zum Ausdrucken
@@ -222,6 +225,16 @@ In der Spalte **Pitch** öffnet „QR & Text" ein Fenster mit:
 - einem **Anschreiben-Entwurf**, der den konkreten Befund aus der Analyse aufgreift („keine eigene Website hinterlegt", „auf dem Handy schwer zu bedienen" …)
 
 Der Text ist ein Entwurf zum Prüfen und Anpassen, kein Serienbrief. Unaufgeforderte Werbe-E-Mails an Gewerbetreibende sind in Deutschland nur eingeschränkt zulässig (§ 7 UWG) – der unproblematische Weg ist, den QR-Code beim Besuch vor Ort zu zeigen.
+
+### Bewegung beim Scrollen
+
+Unterhalb des Heros bewegt sich die Seite mit: Sektionsköpfe und Karten blenden versetzt ein, die Linie unter der Rubrik zieht sich auf, die Kette zwischen den drei Abholschritten wächst, das Akkordeon klappt weich auf und die eigenen Fotos fahren beim Scrollen langsam zurück in ihre Größe.
+
+Drei Regeln gelten dabei (`src/motion.js`):
+
+- **Nichts springt.** Animiert werden nur `transform` und `opacity` – das zeichnet der Browser ohne neues Layout. Ein Test in `test/motion.test.js` lässt keine andere Eigenschaft durch.
+- **Nichts versteckt Inhalt.** Die unsichtbaren Startwerte hängen an einer Klasse, die erst das Skript setzt. Ohne JavaScript steht die volle Seite da – auch das prüft ein Test.
+- **Bewegung ist abschaltbar.** Bei `prefers-reduced-motion: reduce` steigt das Skript sofort aus, und die Hero-Fahrt hält an, sobald der Hero aus dem Bild gescrollt ist.
 
 ### Bewegung je Küche
 

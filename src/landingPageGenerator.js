@@ -2,6 +2,7 @@ import { menuForLead, menuForCuisine, highlightCandidates, detectCuisine } from 
 import { HERO_IMAGES, INTERIOR_IMAGES, TEAM_IMAGES, assetFileName } from "./imageLibrary.js";
 import { resolveTheme, THEMES, themeNameForCuisine } from "./themes.js";
 import { heroSignatur, SIGNATUR_CSS } from "./heroSignature.js";
+import { MOTION_CSS, MOTION_SCRIPT } from "./motion.js";
 import { stimmenFuer, PLATZHALTER_ERKLAERUNG } from "./testimonials.js";
 
 // Standard-Öffnungszeiten für den Entwurf. Google liefert diese Felder in
@@ -1086,6 +1087,7 @@ ${fontCss}
 }
 ${PAGE_STYLES}
 ${SIGNATUR_CSS}
+${MOTION_CSS}
 </style>
 </head>
 <body${veroeffentlicht ? ' class="veroeffentlicht"' : ""}>
@@ -1352,6 +1354,7 @@ ${renderStimmen(gestaltung.cuisine, lead, fiktiv)}
 
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${PAGE_SCRIPT}</script>
+<script>${MOTION_SCRIPT}</script>
 </body>
 </html>
 `;

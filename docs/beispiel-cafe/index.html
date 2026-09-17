@@ -309,6 +309,9 @@ textarea { resize: vertical; min-height: 90px; }
 .confirm-box.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
 .confirm-icon { width: 62px; height: 62px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
                 display: grid; place-items: center; font-size: 32px; margin: 0 auto 18px; }
+/* Abgelehnte Anfragen dürfen nicht wie Erfolg aussehen. */
+.confirm-box.hat-fehler .confirm-icon { background: #a33131; color: #fff; }
+.confirm-box.hat-fehler .confirm-summary { display: none; }
 .confirm-box h3 { font-size: 24px; margin-bottom: 12px; }
 .confirm-summary { text-align: left; background: var(--soft); border-radius: calc(var(--radius) / 1.5); padding: 17px 19px; margin: 22px 0; font-size: 15px; }
 .confirm-summary div { display: flex; justify-content: space-between; gap: 16px; padding: 3px 0; }
@@ -435,6 +438,102 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
   .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i { animation: none; }
   .sig-tafel .karte:first-child, .sig-diashow img:first-child { opacity: 1; }
+}
+
+
+/* --- Einblenden beim Scrollen ------------------------------------------ */
+/* Die Startwerte hängen an .bewegt, das erst das Skript setzt. Bleibt das
+   Skript aus, steht alles ganz normal da. */
+.bewegt .auftritt { opacity: 0; transform: translateY(22px);
+                    transition: opacity .62s cubic-bezier(.22,.61,.36,1),
+                                transform .62s cubic-bezier(.22,.61,.36,1);
+                    transition-delay: calc(var(--takt, 0) * 90ms); }
+.bewegt .auftritt.da { opacity: 1; transform: none; }
+
+/* Karten kommen eine Spur tiefer und leicht aus der Skalierung – dadurch
+   wirken sie wie hingelegt, nicht wie eingeblendet. */
+.bewegt .auftritt-karte { opacity: 0; transform: translateY(30px) scale(.985);
+                          transition: opacity .6s ease, transform .6s cubic-bezier(.22,.61,.36,1);
+                          transition-delay: calc(var(--takt, 0) * 85ms); }
+.bewegt .auftritt-karte.da { opacity: 1; transform: none; }
+
+/* --- Hero: langsame Fahrt ins Bild ------------------------------------- */
+/* 26 Sekunden für 6 % Zoom. Bewusst so langsam, dass man die Bewegung eher
+   spürt als sieht. */
+.hero-media img { animation: hero-fahrt 26s ease-in-out infinite alternate;
+                  transform-origin: 54% 48%; will-change: transform; }
+@keyframes hero-fahrt { to { transform: scale(1.06); } }
+
+/* Ist der Hero aus dem Bild gescrollt, steht die Fahrt still. Eine Animation,
+   die niemand sieht, kostet auf dem Handy trotzdem Strom. */
+.hero.ruht .hero-media img { animation-play-state: paused; will-change: auto; }
+
+/* Parallaxe über die Scroll-Timeline: kostet keinen Scroll-Handler und läuft
+   deshalb auch auf schwachen Geräten flüssig. Browser ohne Unterstützung
+   lassen es einfach weg. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
+    .hero-media { animation: hero-tiefe linear both; animation-timeline: view();
+                  animation-range: contain 0% exit 100%; }
+    @keyframes hero-tiefe { to { transform: translateY(11%); } }
+
+    .hero-inner { animation: hero-abschied linear both; animation-timeline: view();
+                  animation-range: exit 10% exit 92%; }
+    @keyframes hero-abschied { to { opacity: .12; transform: translateY(-38px); } }
+  }
+}
+
+/* --- Sektionskopf: die Linie zieht sich auf ----------------------------- */
+/* Ohne Skript steht die Linie fertig da; erst .bewegt zieht sie zurück. */
+.section-head .eyebrow { position: relative; display: inline-block; padding-bottom: 7px; }
+.section-head .eyebrow::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+                                height: 2px; background: var(--accent); transform: scaleX(1);
+                                transform-origin: left; transition: transform .7s cubic-bezier(.22,.61,.36,1) .12s; }
+.section-head.mitte .eyebrow::after { transform-origin: center; }
+.bewegt .section-head.auftritt .eyebrow::after { transform: scaleX(0); }
+.bewegt .section-head.auftritt.da .eyebrow::after { transform: scaleX(1); }
+
+/* --- Ablauf der Abholung: der Faden zwischen den Schritten -------------- */
+@media (min-width: 780px) {
+  .steps { position: relative; }
+  .step { position: relative; }
+  .step:not(:last-child)::after { content: ""; position: absolute; left: 46px; top: 19px; right: -22px;
+                                  height: 1px; background: var(--line); transform: scaleX(0);
+                                  transform-origin: left; transition: transform .8s ease .3s; }
+  .steps.da .step:not(:last-child)::after { transform: scaleX(1); }
+}
+
+/* --- Speisekarte: das Aufklappen bekommt eine Bewegung ------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  .kat[open] > .kat-body { animation: kat-auf .3s cubic-bezier(.22,.61,.36,1); }
+  @keyframes kat-auf { from { opacity: 0; transform: translateY(-9px); } }
+  .kat > summary::after { transition: transform .22s ease; }
+  .kat[open] > summary::after { transform: rotate(180deg); }
+}
+
+/* --- Eigene Fotos: ruhige Annäherung beim Scrollen ---------------------- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .foto-slot img { animation: foto-naeher linear both; animation-timeline: view();
+                     animation-range: entry 0% cover 62%; }
+    @keyframes foto-naeher { from { transform: scale(1.1); } to { transform: scale(1); } }
+  }
+}
+
+/* --- USP-Leiste: die Punkte kommen nacheinander ------------------------- */
+.bewegt .usp-list span { opacity: 0; transform: translateY(9px);
+                         transition: opacity .45s ease, transform .45s ease;
+                         transition-delay: calc(var(--takt, 0) * 80ms); }
+.bewegt .usp-list.da span { opacity: 1; transform: none; }
+
+/* --- Wer keine Bewegung will, bekommt keine ----------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .bewegt .auftritt,
+  .bewegt .auftritt-karte,
+  .bewegt .usp-list span { opacity: 1; transform: none; transition: none; }
+  .hero-media img { animation: none; }
+  .step:not(:last-child)::after,
+  .section-head .eyebrow::after { transform: scaleX(1); transition: none; }
 }
 
 </style>
@@ -894,7 +993,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 </aside>
 
 <div class="confirm-box" id="confirm" role="dialog" aria-modal="true">
-  <div class="confirm-icon" aria-hidden="true">✓</div>
+  <div class="confirm-icon" id="confirm-icon" aria-hidden="true">✓</div>
   <h3 id="confirm-title"></h3>
   <p id="confirm-text"></p>
   <div class="confirm-summary" id="confirm-summary"></div>
@@ -914,7 +1013,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   </div>
 </footer>
 
-<script>window.PAGE_DATA = {"name":"Café Morgenrot","kontaktEmail":""};</script>
+<script>window.PAGE_DATA = {"name":"Café Morgenrot","kontaktEmail":"","apiUrl":""};</script>
 <script>
 (function () {
   var data = window.PAGE_DATA;
@@ -1015,9 +1114,11 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
     if (!byId("confirm").classList.contains("open")) byId("overlay").classList.remove("open");
   }
 
-  function showConfirm(title, text, rows, mailto) {
+  function showConfirm(title, text, rows, mailto, fehler) {
     byId("confirm-title").textContent = title;
     byId("confirm-text").textContent = text;
+    byId("confirm-icon").textContent = fehler ? "!" : "\u2713";
+    byId("confirm").className = fehler ? "confirm-box hat-fehler" : "confirm-box";
 
     var box = byId("confirm-summary");
     box.innerHTML = "";
@@ -1076,6 +1177,51 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
     return prefix + "-" + String(Math.floor(1000 + Math.random() * 9000));
   }
 
+  /**
+   * Schickt die Anfrage an das Lokal. Ohne hinterlegte Adresse bleibt es beim
+   * Entwurf – dann wird nichts übertragen und die Bestätigung ist nur Ansicht.
+   */
+  function sende(pfad, nutzlast, knopf) {
+    if (!data.apiUrl) return Promise.resolve({ demo: true });
+
+    knopf.disabled = true;
+    var alterText = knopf.textContent;
+    knopf.textContent = "Wird gesendet \u2026";
+
+    return fetch(data.apiUrl + pfad, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nutzlast)
+    })
+      .then(function (antwort) {
+        return antwort.json().then(function (ergebnis) {
+          if (!antwort.ok || ergebnis.ok === false) {
+            throw new Error(ergebnis.fehler || "Die Anfrage konnte nicht angenommen werden.");
+          }
+          return ergebnis;
+        });
+      })
+      .catch(function (fehler) {
+        // Auch ein Netzwerkabbruch darf nicht als Erfolg durchgehen.
+        throw new Error(fehler.message === "Failed to fetch"
+          ? "Wir konnten das Lokal gerade nicht erreichen. Bitte rufen Sie kurz an."
+          : fehler.message);
+      })
+      .then(function (ergebnis) {
+        knopf.disabled = false;
+        knopf.textContent = alterText;
+        return ergebnis;
+      }, function (fehler) {
+        knopf.disabled = false;
+        knopf.textContent = alterText;
+        throw fehler;
+      });
+  }
+
+  function zeigeFehler(text) {
+    showConfirm("Das hat nicht geklappt", text, [], "", true);
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function (button) {
       button.addEventListener("click", function () {
@@ -1130,22 +1276,45 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
         "\nTelefon: " + form.elements.telefon.value +
         (form.elements.hinweis.value ? "\nHinweis: " + form.elements.hinweis.value : "");
 
-      showConfirm(
-        "Bestellung aufgenommen",
-        "Wir bereiten Ihr Essen frisch zu. Bitte holen Sie es zur gew\u00E4hlten Zeit bei uns ab.",
-        [
-          ["Bestellnummer", nummer],
-          ["Abholung", zeit],
-          ["Positionen", String(anzahl())],
-          ["Gesamt", euro(total())],
-        ],
-        mailtoLink("Abholbestellung " + nummer + " \u2013 " + data.name, body)
-      );
+      var positionen = lines().map(function (line) {
+        return { name: line.name, menge: line.menge, preis: line.preis };
+      });
+      var summe = euro(total());
+      var stueck = String(anzahl());
 
-      cart = {};
-      renderCart();
-      form.reset();
-      closeDrawer();
+      sende("/oeffentlich/bestellung", {
+        positionen: positionen,
+        abholzeit: zeit,
+        name: form.elements.name.value,
+        telefon: form.elements.telefon.value,
+        hinweis: form.elements.hinweis.value
+      }, byId("order-submit")).then(function (ergebnis) {
+        // Die Abholzeit ist zun\u00E4chst nur ein Wunsch: ob sie machbar ist,
+        // best\u00E4tigt die K\u00FCche.
+        var echteNummer = ergebnis.demo ? nummer : ergebnis.bestellung.nummer;
+        var text = ergebnis.demo
+          ? "Wir bereiten Ihr Essen frisch zu. Bitte holen Sie es zur gew\u00E4hlten Zeit bei uns ab."
+          : "Ihre Bestellung liegt in der K\u00FCche. Die Abholzeit best\u00E4tigen wir Ihnen gleich \u2013 falls es knapp wird, melden wir uns telefonisch.";
+
+        showConfirm(
+          ergebnis.demo ? "Bestellung aufgenommen" : "Bestellung eingegangen",
+          text,
+          [
+            ["Bestellnummer", echteNummer],
+            [ergebnis.demo ? "Abholung" : "Abholung (gew\u00FCnscht)", zeit],
+            ["Positionen", stueck],
+            ["Gesamt", summe],
+          ],
+          mailtoLink("Abholbestellung " + echteNummer + " \u2013 " + data.name, body)
+        );
+
+        cart = {};
+        renderCart();
+        form.reset();
+        closeDrawer();
+      }).catch(function (fehler) {
+        zeigeFehler(fehler.message);
+      });
     });
 
     byId("reservation-form").addEventListener("submit", function (event) {
@@ -1164,24 +1333,121 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
         (form.elements.email.value ? "\nE-Mail: " + form.elements.email.value : "") +
         (form.elements.wunsch.value ? "\nWunsch: " + form.elements.wunsch.value : "");
 
-      showConfirm(
-        "Tisch reserviert",
-        "Vielen Dank! Ihre Reservierung liegt uns vor \u2013 wir freuen uns auf Ihren Besuch.",
-        [
-          ["Reservierungsnr.", nummer],
-          ["Datum", datum],
-          ["Uhrzeit", form.elements.uhrzeit.value],
-          ["Personen", form.elements.personen.value],
-        ],
-        mailtoLink("Tischreservierung " + nummer + " \u2013 " + data.name, body)
-      );
+      var uhrzeit = form.elements.uhrzeit.value;
+      var personenText = form.elements.personen.value;
+      // "4 Personen" -> 4, damit das Lokal eine Zahl bekommt.
+      var personenZahl = parseInt(personenText, 10) || 1;
 
-      form.reset();
-      dateInput.value = iso;
+      sende("/oeffentlich/reservierung", {
+        datum: form.elements.datum.value,
+        uhrzeit: uhrzeit,
+        personen: personenZahl,
+        name: form.elements.name.value,
+        telefon: form.elements.telefon.value,
+        email: form.elements.email.value,
+        wunsch: form.elements.wunsch.value
+      }, form.querySelector("button[type=submit]")).then(function (ergebnis) {
+        showConfirm(
+          ergebnis.demo ? "Tisch reserviert" : "Anfrage eingegangen",
+          ergebnis.demo
+            ? "Vielen Dank! Ihre Reservierung liegt uns vor \u2013 wir freuen uns auf Ihren Besuch."
+            : "Vielen Dank! Wir haben Ihren Tisch vorgemerkt und best\u00E4tigen Ihnen die Reservierung in K\u00FCrze.",
+          [
+            ["Reservierungsnr.", nummer],
+            ["Datum", datum],
+            ["Uhrzeit", uhrzeit],
+            ["Personen", personenText],
+          ],
+          mailtoLink("Tischreservierung " + nummer + " \u2013 " + data.name, body)
+        );
+
+        form.reset();
+        dateInput.value = iso;
+      }).catch(function (fehler) {
+        zeigeFehler(fehler.message);
+      });
     });
 
     renderCart();
   });
+})();
+</script>
+<script>
+(function () {
+  var ruhig = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (ruhig.matches) return;
+
+  // Browser ohne IntersectionObserver zeigen einfach die fertige Seite.
+  if (!("IntersectionObserver" in window)) return;
+
+  var GRUPPEN = [
+    [".section-head", "auftritt"],
+    [".hl-card", "auftritt-karte"],
+    [".foto-slot", "auftritt-karte"],
+    [".stimme", "auftritt-karte"],
+    [".step", "auftritt"],
+    [".reserve-grid > *", "auftritt"],
+    [".contact-grid > *", "auftritt"],
+    [".kat", "auftritt"]
+  ];
+
+  var beobachtet = [];
+  GRUPPEN.forEach(function (gruppe) {
+    var knoten = document.querySelectorAll(gruppe[0]);
+    // Der Takt zählt innerhalb einer Reihe, nicht über die ganze Seite –
+    // sonst wartet man unten ewig auf die letzte Karte.
+    var eltern = null;
+    var zaehler = 0;
+    Array.prototype.forEach.call(knoten, function (el) {
+      if (el.parentElement !== eltern) { eltern = el.parentElement; zaehler = 0; }
+      el.classList.add(gruppe[1]);
+      el.style.setProperty("--takt", String(Math.min(zaehler, 5)));
+      zaehler += 1;
+      beobachtet.push(el);
+    });
+  });
+
+  // Die USP-Leiste und die Schrittkette schalten als Ganzes.
+  Array.prototype.forEach.call(document.querySelectorAll(".usp-list"), function (liste) {
+    Array.prototype.forEach.call(liste.children, function (el, i) {
+      el.style.setProperty("--takt", String(i));
+    });
+    beobachtet.push(liste);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".steps"), function (el) {
+    beobachtet.push(el);
+  });
+
+  if (beobachtet.length === 0) return;
+  document.documentElement.classList.add("bewegt");
+
+  // Hero-Fahrt anhalten, sobald der Hero durch ist.
+  var hero = document.querySelector(".hero");
+  if (hero) {
+    new IntersectionObserver(function (eintraege) {
+      hero.classList.toggle("ruht", !eintraege[0].isIntersecting);
+    }, { threshold: 0 }).observe(hero);
+  }
+
+  var beobachter = new IntersectionObserver(function (eintraege) {
+    eintraege.forEach(function (eintrag) {
+      if (!eintrag.isIntersecting) return;
+      eintrag.target.classList.add("da");
+      // Einmal sichtbar, immer sichtbar. Inhalt, der beim Zurückscrollen
+      // wieder verschwindet, ist eine Spielerei und keine Gestaltung.
+      beobachter.unobserve(eintrag.target);
+    });
+  }, { rootMargin: "0px 0px -12% 0px", threshold: 0.12 });
+
+  beobachtet.forEach(function (el) { beobachter.observe(el); });
+
+  // Stellt jemand die Bewegung mitten im Besuch ab, wird sofort alles gezeigt.
+  var aus = function () {
+    if (!ruhig.matches) return;
+    beobachter.disconnect();
+    beobachtet.forEach(function (el) { el.classList.add("da"); });
+  };
+  if (ruhig.addEventListener) ruhig.addEventListener("change", aus);
 })();
 </script>
 </body>

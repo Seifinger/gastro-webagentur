@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import QRCode from "qrcode";
 import { readAllLeads } from "./csvImport.js";
-import { landingPagesDir, siteBaseUrl, absenderName } from "./config.js";
+import { landingPagesDir, docsDir, siteBaseUrl, absenderName } from "./config.js";
 import {
   ladeZuordnungen,
   speichereZuordnung,
@@ -61,6 +61,11 @@ function leadsMitZusatz() {
     .map((lead) => {
       const slug = manifest[lead.placeId];
       const demoUrl = slug ? `${siteBaseUrl}/${slug}/` : "";
+      // Ein Entwurf ist erst dann per QR-Code erreichbar, wenn er auch im
+      // veröffentlichten Ordner liegt. Sonst schickt der QR den Wirt auf
+      // eine 404-Seite – vor seinen Augen, mitten im Gespräch.
+      const veroeffentlicht =
+        Boolean(slug) && existsSync(path.join(docsDir, slug, "index.html"));
 
       return {
         ...lead,
@@ -68,6 +73,7 @@ function leadsMitZusatz() {
         kuecheManuell: Boolean(zuordnungen[lead.placeId]),
         entwurf: slug ? `${ENTWURF_PREFIX}${slug}/` : "",
         demoUrl,
+        veroeffentlicht,
         anschreiben: anschreiben(lead, demoUrl, absenderName),
       };
     })
