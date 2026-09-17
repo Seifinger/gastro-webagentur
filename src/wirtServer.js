@@ -14,6 +14,8 @@ import {
   setzeBestellungStatus,
   freiePlaetze,
   gesamtPlaetze,
+  tischKonflikte,
+  tischVerteilung,
 } from "./betriebStore.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -93,6 +95,8 @@ function uebersicht() {
     bestellungen: daten.bestellungen.sort((a, b) => b.eingegangen.localeCompare(a.eingegangen)),
     offeneReservierungen: daten.reservierungen.filter((r) => r.status === "neu").length,
     offeneBestellungen: daten.bestellungen.filter((b) => b.status === "neu").length,
+    // Zeitpunkte, an denen die Plätze zwar reichen, die Tische aber nicht.
+    tischKonflikte: tischKonflikte(daten),
     heute,
   };
 }
@@ -138,10 +142,21 @@ const server = createServer(async (req, res) => {
 
       if (pathname === "/oeffentlich/verfuegbarkeit") {
         const stand = ladeBetrieb(slug);
+        const personen = Number(daten.personen) || 0;
+        // Ein Tisch muss nicht nur rechnerisch, sondern tatsächlich frei sein.
+        const passt =
+          personen > 0
+            ? !tischVerteilung(stand, daten.datum, daten.uhrzeit, { zusatz: personen })
+            : true;
+
         json(
           res,
           200,
-          { ok: true, frei: Math.max(0, freiePlaetze(stand, daten.datum, daten.uhrzeit)) },
+          {
+            ok: true,
+            frei: Math.max(0, freiePlaetze(stand, daten.datum, daten.uhrzeit)),
+            tischFrei: passt,
+          },
           CORS,
         );
         return;

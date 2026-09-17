@@ -105,6 +105,18 @@
            opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: 92vw; }
   #toast.sichtbar { opacity: 1; transform: translate(-50%, 0); }
   #toast.fehlerhaft { background: var(--danger); }
+  #toast.warnend { background: #b45309; }
+
+  /* Tischverteilung geht nicht auf: bleibt stehen, bis der Wirt es löst.
+     Ein Hinweis, der nach vier Sekunden verschwindet, ist am Abend vergessen. */
+  .warnbox { display: none; margin: 0 0 18px; border-radius: 10px; overflow: hidden;
+             border: 1px solid #fcd34d; background: #fffbeb; }
+  .warnbox.sichtbar { display: block; }
+  .warnbox h3 { margin: 0; padding: 12px 16px; font-size: .92rem; color: #78350f;
+                background: #fef3c7; display: flex; align-items: center; gap: 9px; }
+  .warnbox ul { margin: 0; padding: 12px 16px 14px 34px; color: #78350f; font-size: .88rem; line-height: 1.5; }
+  .warnbox li + li { margin-top: 7px; }
+  .warnbox .wann { font-weight: 700; }
 </style>
 </head>
 <body>
@@ -137,6 +149,10 @@
       </div>
 
       <div class="balken" id="auslastung"></div>
+      <div class="warnbox" id="tisch-warnung">
+        <h3><span aria-hidden="true">⚠️</span> Die Tische gehen nicht auf</h3>
+        <ul></ul>
+      </div>
       <div id="res-liste"></div>
 
       <form class="formular" id="manuell-form">
@@ -193,12 +209,13 @@ function esc(wert) {
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-function melde(text, fehlerhaft = false) {
+function melde(text, fehlerhaft = false, warnend = false) {
   const t = document.getElementById("toast");
   t.textContent = text;
-  t.className = "sichtbar" + (fehlerhaft ? " fehlerhaft" : "");
+  t.className = "sichtbar" + (fehlerhaft ? " fehlerhaft" : warnend ? " warnend" : "");
   clearTimeout(t._z);
-  t._z = setTimeout(() => (t.className = ""), 4200);
+  // Eine Warnung braucht länger als eine Bestätigung.
+  t._z = setTimeout(() => (t.className = ""), warnend ? 8000 : 4200);
 }
 
 async function ruf(pfad, daten) {
@@ -353,6 +370,29 @@ function renderTischplan() {
     </table>`;
 }
 
+/* ---------- Tischverteilung ---------- */
+
+/**
+ * Die Platzsumme kann aufgehen und die Tischverteilung trotzdem nicht: bei
+ * einem Vierer- und einem Zweiertisch sind sechs Plätze frei, zwei Dreier-
+ * gruppen passen aber nicht hinein. Der Server rechnet das aus, hier steht
+ * es so lange, bis es gelöst ist.
+ */
+function renderTischWarnung() {
+  const box = document.getElementById("tisch-warnung");
+  const konflikte = stand.tischKonflikte ?? [];
+
+  box.classList.toggle("sichtbar", konflikte.length > 0);
+  if (konflikte.length === 0) return;
+
+  box.querySelector("ul").innerHTML = konflikte
+    .map(
+      (k) =>
+        `<li><span class="wann">${esc(datumDeutsch(k.datum))}, ${esc(k.uhrzeit)}</span> – ${esc(k.wirtText)}</li>`,
+    )
+    .join("");
+}
+
 /* ---------- Laden und Ereignisse ---------- */
 
 async function lade() {
@@ -365,6 +405,7 @@ async function lade() {
   if (!document.getElementById("tag").value) document.getElementById("tag").value = stand.heute;
   if (!document.getElementById("m-datum").value) document.getElementById("m-datum").value = stand.heute;
 
+  renderTischWarnung();
   renderReservierungen();
   renderBestellungen();
   renderTischplan();
@@ -432,7 +473,7 @@ document.addEventListener("change", async (e) => {
 document.getElementById("manuell-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   try {
-    await ruf("/api/reservierung", {
+    const ergebnis = await ruf("/api/reservierung", {
       datum: document.getElementById("m-datum").value,
       uhrzeit: document.getElementById("m-uhrzeit").value,
       personen: Number(document.getElementById("m-personen").value),
@@ -445,7 +486,15 @@ document.getElementById("manuell-form").addEventListener("submit", async (e) => 
     document.getElementById("m-wunsch").value = "";
     document.getElementById("tag").value = document.getElementById("m-datum").value;
     await lade();
-    melde("Reservierung eingetragen.");
+
+    if (ergebnis.reservierung?.warnung) {
+      // Eingetragen wird trotzdem – der Wirt kennt seinen Raum und kann
+      // Tische zusammenstellen. Übersehen soll er es aber nicht.
+      document.getElementById("tisch-warnung").scrollIntoView({ behavior: "smooth", block: "center" });
+      melde("Eingetragen – aber die Tische gehen nicht auf, siehe Hinweis oben.", false, true);
+    } else {
+      melde("Reservierung eingetragen.");
+    }
   } catch (fehler) {
     melde(fehler.message, true);
   }

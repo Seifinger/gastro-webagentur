@@ -119,9 +119,102 @@ export function freiePlaetze(daten, datum, uhrzeit, { ignoriereId } = {}) {
   return gesamtPlaetze(daten) - belegt;
 }
 
+
+/**
+ * Passen diese Gruppen gleichzeitig an diese Tische? Eine Gruppe bekommt
+ * genau einen Tisch, Tische werden hier nicht zusammengestellt.
+ *
+ * Gibt die Gruppengrößen zurück, für die kein Tisch übrig bleibt – eine
+ * leere Liste heißt also: geht auf.
+ *
+ * Das Verfahren ist absichtlich einfach und trotzdem exakt: größte Gruppe
+ * zuerst, und die bekommt den kleinsten Tisch, auf dem sie noch Platz hat.
+ * Weil ein Tisch, der eine große Gruppe fasst, jede kleinere erst recht
+ * fasst, lässt sich damit nichts besser verteilen – Raten oder Durchprobieren
+ * wäre hier nur teurer, nicht klüger.
+ */
+export function unverteilbareGruppen(tische, gruppen) {
+  const frei = tische.map((t) => Number(t.plaetze)).sort((a, b) => a - b);
+  const offen = [];
+
+  for (const gruppe of [...gruppen].sort((a, b) => b - a)) {
+    const index = frei.findIndex((plaetze) => plaetze >= gruppe);
+    if (index === -1) offen.push(gruppe);
+    else frei.splice(index, 1);
+  }
+
+  return offen;
+}
+
+/**
+ * Die Gruppengrößen, die zu einem Zeitpunkt gleichzeitig im Haus sind.
+ */
+function gruppenZurZeit(daten, datum, uhrzeit, { ignoriereId } = {}) {
+  return daten.reservierungen
+    .filter((r) => r.id !== ignoriereId)
+    .filter((r) => r.status !== "abgesagt")
+    .filter((r) => r.datum === datum && ueberschneidetSich(r.uhrzeit, uhrzeit))
+    .map((r) => Number(r.personen || 0));
+}
+
+/**
+ * Prüft die Tischverteilung zu einem Zeitpunkt – inklusive einer noch nicht
+ * gespeicherten Reservierung (zusatz).
+ *
+ * Genau hier liegt der Fall, den die reine Platzsumme durchgehen lässt: bei
+ * einem Vierer- und einem Zweiertisch sind sechs Plätze frei, zwei Dreier-
+ * gruppen passen trotzdem nicht hinein. Auf dem Papier geht es auf, im Raum
+ * steht die zweite Gruppe.
+ */
+export function tischVerteilung(daten, datum, uhrzeit, { ignoriereId, zusatz } = {}) {
+  const gruppen = gruppenZurZeit(daten, datum, uhrzeit, { ignoriereId });
+  if (zusatz) gruppen.push(Number(zusatz));
+
+  const offen = unverteilbareGruppen(daten.tische, gruppen);
+  if (offen.length === 0) return null;
+
+  const groesster = Math.max(...daten.tische.map((t) => Number(t.plaetze)), 0);
+  const liste = offen.join(" und ");
+
+  return {
+    offen,
+    // Für den Wirt: nennt das Problem und den einzigen Ausweg, den er hat.
+    wirtText:
+      `Die Plätze reichen zwar, aber nicht die Tische: für ${offen.length === 1 ? "eine Gruppe" : `${offen.length} Gruppen`} ` +
+      `(${liste} Personen) bleibt um ${uhrzeit} kein passender Tisch frei. ` +
+      (Math.max(...offen) > groesster
+        ? `Der größte Tisch im Haus hat ${groesster} Plätze.`
+        : "Das geht nur, wenn Sie Tische zusammenstellen."),
+    // Für den Gast: sagt ab, ohne den Tischplan auszuplaudern.
+    gastText: `Für ${zusatz} Personen haben wir um ${uhrzeit} leider keinen passenden Tisch mehr frei.`,
+  };
+}
+
+/**
+ * Alle Zeitpunkte, an denen die Tischverteilung nicht aufgeht. Das Dashboard
+ * zeigt das als stehenden Hinweis – ein Problem, das nur einmal im
+ * Speichern-Dialog aufblitzt, ist am nächsten Tag vergessen.
+ */
+export function tischKonflikte(daten) {
+  const gesehen = new Set();
+  const konflikte = [];
+
+  for (const r of daten.reservierungen) {
+    if (r.status === "abgesagt") continue;
+    const schluessel = `${r.datum} ${r.uhrzeit}`;
+    if (gesehen.has(schluessel)) continue;
+    gesehen.add(schluessel);
+
+    const problem = tischVerteilung(daten, r.datum, r.uhrzeit);
+    if (problem) konflikte.push({ datum: r.datum, uhrzeit: r.uhrzeit, ...problem });
+  }
+
+  return konflikte.sort((a, b) => `${a.datum}${a.uhrzeit}`.localeCompare(`${b.datum}${b.uhrzeit}`));
+}
+
 /* ---------- Reservierungen ---------- */
 
-function pruefeReservierung(daten, eingabe, { ignoriereId } = {}) {
+function pruefeReservierung(daten, eingabe, { ignoriereId, quelle } = {}) {
   const personen = Number(eingabe.personen);
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(eingabe.datum ?? ""))) {
@@ -148,12 +241,26 @@ function pruefeReservierung(daten, eingabe, { ignoriereId } = {}) {
     );
   }
 
-  return personen;
+  // Die Platzsumme kann aufgehen und die Tischverteilung trotzdem nicht.
+  const verteilung = tischVerteilung(daten, eingabe.datum, eingabe.uhrzeit, {
+    ignoriereId,
+    zusatz: personen,
+  });
+
+  if (verteilung && quelle !== "manuell") {
+    // Online wird abgelehnt: bestätigen, was im Raum nicht steht, ist die
+    // Zusage, die der Wirt am Abend zurücknehmen muss.
+    throw new Error(verteilung.gastText);
+  }
+
+  // Der Wirt am Telefon kennt seinen Raum und kann Tische zusammenstellen.
+  // Ihn zu blockieren wäre anmaßend – gewarnt werden muss er trotzdem.
+  return { personen, warnung: verteilung ? verteilung.wirtText : "" };
 }
 
 export function legeReservierungAn(slug, eingabe, quelle = "online") {
   return aendere(slug, (daten) => {
-    const personen = pruefeReservierung(daten, eingabe);
+    const { personen, warnung } = pruefeReservierung(daten, eingabe, { quelle });
 
     const reservierung = {
       id: randomUUID(),
@@ -172,7 +279,9 @@ export function legeReservierungAn(slug, eingabe, quelle = "online") {
     };
 
     daten.reservierungen.push(reservierung);
-    return reservierung;
+    // Die Warnung hängt nicht an der Reservierung – sie gilt der Lage im
+    // Raum, nicht dieser einen Gruppe, und löst sich mit jeder Absage auf.
+    return { ...reservierung, warnung };
   });
 }
 
