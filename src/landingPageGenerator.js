@@ -828,6 +828,7 @@ export function buildLandingPage(lead, options = {}) {
   // direkt auf Unsplash – sonst läge das Bildmaterial im Repository.
   const bildUrl = options.bildUrl ?? ((id, role) => `${assets}/${assetFileName(id, role)}`);
   const veroeffentlicht = options.veroeffentlicht ?? false;
+  const fiktiv = options.fiktiv ?? false;
 
   const name = lead.name || "Ihr Restaurant";
   const ort = lead.ort || "";
@@ -917,7 +918,11 @@ ${PAGE_STYLES}
 
 ${
   veroeffentlicht
-    ? `<div class="entwurf-hinweis"><span>Unverbindlicher Gestaltungsentwurf – <strong>nicht</strong> die offizielle Website von ${escapeHtml(name)}.</span></div>`
+    ? `<div class="entwurf-hinweis"><span>${
+        fiktiv
+          ? "Beispielseite – dieses Lokal ist <strong>frei erfunden</strong>."
+          : `Unverbindlicher Gestaltungsentwurf – <strong>nicht</strong> die offizielle Website von ${escapeHtml(name)}.`
+      }</span></div>`
     : ""
 }
 <header class="topbar" id="topbar">

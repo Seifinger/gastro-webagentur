@@ -4,6 +4,8 @@ import { docsDir } from "./config.js";
 import { escapeHtml } from "./landingPageGenerator.js";
 import { remoteImageUrl } from "./imageLibrary.js";
 import { menuForCuisine } from "./menuCatalog.js";
+import { themeForLead } from "./landingPageGenerator.js";
+import { DEMO_LEADS } from "./demoLeads.js";
 import {
   parseArgs,
   pruefeKueche,
@@ -14,9 +16,8 @@ import {
 } from "./buildSite.js";
 
 const HINWEIS =
-  "Unverbindliche Gestaltungsentwürfe. Die gezeigten Lokale sind keine Kunden und haben " +
-  "diese Seiten weder beauftragt noch freigegeben. Gerichte, Preise, Öffnungszeiten und " +
-  "Fotos sind Platzhalter.";
+  "Alle hier gezeigten Lokale sind frei erfunden – es sind Beispielseiten, keine Kunden. " +
+  "Gerichte, Preise, Öffnungszeiten und Fotos sind Platzhalter.";
 
 function kontaktZeile(kontakt) {
   if (!kontakt) return "";
@@ -81,7 +82,7 @@ function buildShowcasePage(entries, kontakt) {
   <header>
     <h1>Website-Entwürfe für Gastronomie</h1>
     <p class="intro">Beispielseiten mit Online-Reservierung, Abholbestellung und vollständiger Speisekarte –
-       jede in wenigen Minuten erzeugt und auf das jeweilige Lokal zugeschnitten.</p>
+       jede auf ihre Küche zugeschnitten, vom Wirtshaus bis zur Sushi-Bar.</p>
     ${kontaktZeile(kontakt)}
     <p class="disclaimer">${escapeHtml(HINWEIS)}</p>
   </header>
@@ -121,18 +122,30 @@ async function run() {
   console.log("\n🔤 Prüfe Schriften ...");
   const fontCss = await ladeSchriften(path.join(docsDir, "assets", "fonts"));
 
-  schreibeSeiten(entries, docsDir, {
+  const gemeinsam = {
     kontaktEmail: args.email,
     fontCss,
     veroeffentlicht: true,
     // Bilder kommen im Netz direkt von Unsplash, damit das Repository nicht
     // um mehrere Megabyte Stockfotos wächst.
     bildUrl: remoteImageUrl,
-  });
+  };
 
-  for (const entry of entries) entry.menu = menuForCuisine(entry.cuisine);
+  // Echte Leads: veröffentlicht, aber von nirgendwo verlinkt. Nur wer den
+  // QR-Code oder Link bekommen hat, findet den Entwurf.
+  schreibeSeiten(entries, docsDir, gemeinsam);
 
-  writeFileSync(path.join(docsDir, "index.html"), buildShowcasePage(entries, args.kontakt), "utf-8");
+  // Erfundene Lokale: das, was auf der Startseite steht.
+  const demoEntries = DEMO_LEADS.map((lead) => ({
+    lead,
+    cuisine: lead.kueche,
+    gestaltung: themeForLead(lead, lead.kueche),
+    slug: `beispiel-${lead.kueche}`,
+    menu: menuForCuisine(lead.kueche),
+  }));
+  schreibeSeiten(demoEntries, docsDir, { ...gemeinsam, fiktiv: true });
+
+  writeFileSync(path.join(docsDir, "index.html"), buildShowcasePage(demoEntries, args.kontakt), "utf-8");
   writeFileSync(path.join(docsDir, ".nojekyll"), "", "utf-8");
   writeFileSync(
     path.join(docsDir, "robots.txt"),

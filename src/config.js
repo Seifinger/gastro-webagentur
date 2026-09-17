@@ -21,3 +21,13 @@ export const landingPagesDir = path.join(__dirname, "..", "data", "landingpages"
 // Von GitHub Pages ausgeliefert. Der Ordner wird bei jedem Lauf komplett neu
 // erzeugt, damit abgewählte Entwürfe auch wirklich offline gehen.
 export const docsDir = path.join(__dirname, "..", "docs");
+
+// Basis der veröffentlichten Entwürfe – gebraucht für QR-Codes und die
+// Anschreiben im Dashboard. Über SITE_BASE_URL in der .env überschreibbar,
+// falls du später eine eigene Domain nutzt.
+export const siteBaseUrl = (
+  process.env.SITE_BASE_URL || "https://seifinger.github.io/gastro-webagentur"
+).replace(/\/+$/, "");
+
+// Grußformel der Anschreiben-Entwürfe im Dashboard.
+export const absenderName = process.env.ABSENDER_NAME || "";

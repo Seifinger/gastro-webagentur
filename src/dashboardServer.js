@@ -2,8 +2,16 @@ import { createServer } from "node:http";
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import QRCode from "qrcode";
 import { readAllLeads } from "./csvImport.js";
-import { landingPagesDir } from "./config.js";
+import { landingPagesDir, siteBaseUrl, absenderName } from "./config.js";
+import {
+  ladeZuordnungen,
+  speichereZuordnung,
+  kuecheFuerLead,
+  KUECHEN,
+} from "./cuisineOverrides.js";
+import { anschreiben } from "./outreach.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dashboardHtmlPath = path.join(__dirname, "..", "public", "dashboard.html");
@@ -21,6 +29,7 @@ const MIME_TYPES = {
   ".png": "image/png",
   ".webp": "image/webp",
   ".svg": "image/svg+xml",
+  ".woff2": "font/woff2",
   ".ico": "image/x-icon",
 };
 
@@ -44,6 +53,27 @@ function readManifest() {
   }
 }
 
+function leadsMitZusatz() {
+  const manifest = readManifest();
+  const zuordnungen = ladeZuordnungen();
+
+  return readAllLeads()
+    .map((lead) => {
+      const slug = manifest[lead.placeId];
+      const demoUrl = slug ? `${siteBaseUrl}/${slug}/` : "";
+
+      return {
+        ...lead,
+        kueche: kuecheFuerLead(lead, zuordnungen),
+        kuecheManuell: Boolean(zuordnungen[lead.placeId]),
+        entwurf: slug ? `${ENTWURF_PREFIX}${slug}/` : "",
+        demoUrl,
+        anschreiben: anschreiben(lead, demoUrl, absenderName),
+      };
+    })
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+}
+
 /**
  * Löst einen /entwuerfe/-Pfad auf eine Datei im Entwurfsordner auf.
  * Gibt null zurück, wenn der Pfad aus dem Ordner herausführt – sonst könnte
@@ -64,8 +94,30 @@ function resolveEntwurfFile(pathname) {
   return type ? { datei, type } : null;
 }
 
-const server = createServer((req, res) => {
-  const { pathname } = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
+function sendeJson(res, status, daten) {
+  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
+  res.end(JSON.stringify(daten));
+}
+
+function leseKoerper(req) {
+  return new Promise((resolve, reject) => {
+    let roh = "";
+    req.on("data", (teil) => {
+      roh += teil;
+      // Das Dashboard schickt nur winzige Nachrichten; alles andere brechen
+      // wir ab, statt Speicher vollaufen zu lassen.
+      if (roh.length > 10_000) reject(new Error("Anfrage zu groß"));
+    });
+    req.on("end", () => resolve(roh));
+    req.on("error", reject);
+  });
+}
+
+const server = createServer(async (req, res) => {
+  const { pathname, searchParams } = new URL(
+    req.url,
+    `http://${req.headers.host ?? "localhost"}`,
+  );
 
   if (pathname === "/" || pathname === "/index.html") {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
@@ -74,16 +126,36 @@ const server = createServer((req, res) => {
   }
 
   if (pathname === "/api/leads") {
-    const manifest = readManifest();
-    const leads = readAllLeads()
-      .map((lead) => ({
-        ...lead,
-        entwurf: manifest[lead.placeId] ? `${ENTWURF_PREFIX}${manifest[lead.placeId]}/` : "",
-      }))
-      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    sendeJson(res, 200, { kuechen: KUECHEN, leads: leadsMitZusatz() });
+    return;
+  }
 
-    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
-    res.end(JSON.stringify(leads));
+  if (pathname === "/api/kueche" && req.method === "POST") {
+    try {
+      const { placeId, kueche } = JSON.parse(await leseKoerper(req));
+      speichereZuordnung(placeId, kueche ?? "");
+      sendeJson(res, 200, { ok: true });
+    } catch (error) {
+      sendeJson(res, 400, { ok: false, fehler: error.message });
+    }
+    return;
+  }
+
+  if (pathname === "/api/qr") {
+    const ziel = searchParams.get("url");
+    if (!ziel || !ziel.startsWith(siteBaseUrl)) {
+      sendeJson(res, 400, { fehler: "Unerwartete Adresse" });
+      return;
+    }
+
+    const svg = await QRCode.toString(ziel, {
+      type: "svg",
+      margin: 1,
+      width: 280,
+      errorCorrectionLevel: "M",
+    });
+    res.writeHead(200, { "Content-Type": "image/svg+xml; charset=utf-8" });
+    res.end(svg);
     return;
   }
 

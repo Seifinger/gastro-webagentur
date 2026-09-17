@@ -73,6 +73,66 @@
   }
   a.entwurf:hover { background: #1d4ed8; }
 
+  select.kueche {
+    padding: 4px 8px; border: 1px solid var(--border); border-radius: 7px;
+    font-size: 0.82rem; background: var(--card); color: var(--text); font-family: inherit;
+  }
+  select.kueche.manuell { border-color: var(--accent); font-weight: 600; }
+  th.nosort { cursor: default; }
+
+  button.pitch {
+    padding: 4px 11px; border: 1px solid var(--border); border-radius: 999px;
+    background: var(--card); color: var(--text); font-size: 0.8rem; font-weight: 600;
+    font-family: inherit; cursor: pointer; white-space: nowrap;
+  }
+  button.pitch:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Pitch-Fenster */
+  #pitch { position: fixed; inset: 0; z-index: 100; display: none; }
+  #pitch.offen { display: block; }
+  #pitch-hintergrund { position: absolute; inset: 0; background: rgba(20,24,32,.55); }
+  .pitch-box {
+    position: relative; margin: 4vh auto; width: min(760px, calc(100% - 32px));
+    max-height: 92vh; overflow-y: auto; background: var(--card);
+    border-radius: 14px; box-shadow: 0 30px 70px -28px rgba(0,0,0,.5); padding: 26px 28px 30px;
+  }
+  .pitch-kopf { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+  .pitch-kopf h2 { margin: 0; font-size: 1.25rem; }
+  .pitch-kopf p { margin: 3px 0 0; font-size: .85rem; color: var(--muted); }
+  .pitch-zu { margin-left: auto; border: none; background: transparent; font-size: 1.6rem;
+              line-height: 1; cursor: pointer; color: var(--muted); padding: 0 4px; }
+  .pitch-raster { display: grid; gap: 22px; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .pitch-raster { grid-template-columns: 280px 1fr; } }
+  .qr-feld { text-align: center; }
+  .qr-feld img { width: 100%; max-width: 240px; background: #fff; border: 1px solid var(--border);
+                 border-radius: 10px; padding: 8px; }
+  .qr-feld p { font-size: .8rem; color: var(--muted); margin: 10px 0 0; }
+  .pitch-block { margin-bottom: 16px; }
+  .pitch-block label { display: block; font-size: .78rem; font-weight: 700; text-transform: uppercase;
+                       letter-spacing: .05em; color: var(--muted); margin-bottom: 6px; }
+  .pitch-zeile { display: flex; gap: 8px; }
+  .pitch-zeile input, .pitch-block textarea {
+    flex: 1; width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px;
+    font-family: inherit; font-size: .88rem; background: #fbfcfd; color: var(--text);
+  }
+  .pitch-block textarea { min-height: 230px; resize: vertical; line-height: 1.5; }
+  .pitch-zeile button, .kopier-knopf {
+    padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);
+    font-family: inherit; font-size: .82rem; font-weight: 600; cursor: pointer; white-space: nowrap; color: var(--text);
+  }
+  .pitch-zeile button:hover, .kopier-knopf:hover { border-color: var(--accent); color: var(--accent); }
+  .pitch-fuss { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 4px; }
+  .pitch-fuss a { padding: 9px 16px; border-radius: 8px; background: var(--accent); color: #fff;
+                  text-decoration: none; font-size: .85rem; font-weight: 600; }
+  .pitch-fuss a.sekundaer { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+  .pitch-recht { margin: 18px 0 0; padding: 11px 14px; background: #fff8e7; border-left: 3px solid #ca8a04;
+                 border-radius: 6px; font-size: .8rem; color: #6b5b23; }
+
+  #toast { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px); z-index: 120;
+           background: #1f2430; color: #fff; padding: 11px 18px; border-radius: 9px; font-size: .86rem;
+           opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; max-width: 90vw; }
+  #toast.sichtbar { opacity: 1; transform: translate(-50%, 0); }
+
   .controls {
     display: flex;
     gap: 10px;
@@ -166,7 +226,9 @@
         <th data-key="priorität">Priorität</th>
         <th data-key="score">Score</th>
         <th data-key="name">Name</th>
+        <th data-key="kueche">Küche</th>
         <th data-key="entwurf">Entwurf</th>
+        <th class="nosort">Pitch</th>
         <th data-key="ort">Ort</th>
         <th data-key="adresse">Adresse</th>
         <th data-key="telefon">Telefon</th>
@@ -185,10 +247,95 @@
   </div>
 </div>
 
+<div id="pitch">
+  <div id="pitch-hintergrund"></div>
+  <div class="pitch-box">
+    <div class="pitch-kopf">
+      <div>
+        <h2 id="pitch-titel"></h2>
+        <p>QR-Code zum Zeigen oder Ausdrucken, dazu ein Anschreiben-Entwurf zum Kopieren.</p>
+      </div>
+      <button class="pitch-zu" id="pitch-schliessen" type="button" aria-label="Schließen">×</button>
+    </div>
+
+    <div class="pitch-raster">
+      <div class="qr-feld">
+        <img id="pitch-qr" alt="QR-Code zum Entwurf">
+        <p>Abscannen führt direkt zum Entwurf – ideal, um ihn dem Wirt aufs eigene Handy zu geben.</p>
+      </div>
+
+      <div>
+        <div class="pitch-block">
+          <label for="pitch-url">Adresse des Entwurfs</label>
+          <div class="pitch-zeile">
+            <input id="pitch-url" type="text" readonly>
+            <button type="button" data-kopieren="pitch-url">Kopieren</button>
+          </div>
+        </div>
+
+        <div class="pitch-block">
+          <label for="pitch-betreff">Betreff</label>
+          <div class="pitch-zeile">
+            <input id="pitch-betreff" type="text">
+            <button type="button" data-kopieren="pitch-betreff">Kopieren</button>
+          </div>
+        </div>
+
+        <div class="pitch-block">
+          <label for="pitch-text">Anschreiben</label>
+          <textarea id="pitch-text"></textarea>
+          <div class="pitch-fuss" style="margin-top:10px">
+            <button class="kopier-knopf" type="button" data-kopieren="pitch-text">Text kopieren</button>
+            <a id="pitch-mail" class="sekundaer" href="#">Im Mailprogramm öffnen</a>
+            <a id="pitch-oeffnen" href="#" target="_blank" rel="noopener">Entwurf öffnen</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="pitch-recht">
+      Der Text ist ein Entwurf zum Prüfen und Anpassen, kein Serienbrief. Unaufgeforderte Werbe-E-Mails
+      an Gewerbetreibende sind in Deutschland nur eingeschränkt zulässig (§ 7 UWG) – der sichere Weg ist,
+      den QR-Code beim Besuch vor Ort zu zeigen.
+    </p>
+  </div>
+</div>
+
+<div id="toast"></div>
+
 <script>
 let allLeads = [];
+let kuechen = [];
 let sortKey = "score";
 let sortDir = -1;
+
+// Restaurantnamen kommen von Google und landen im HTML - ohne Maskierung
+// würde ein Name mit spitzen Klammern die Tabelle zerlegen.
+function esc(wert) {
+  return String(wert ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+const KUECHEN_LABEL = {
+  bayerisch: "Bayerisch",
+  italienisch: "Italienisch",
+  asiatisch: "Asiatisch",
+  griechisch: "Griechisch",
+  tuerkisch: "Türkisch",
+  cafe: "Café",
+};
+
+function kuecheSelect(lead) {
+  const optionen = kuechen
+    .map((k) => `<option value="${esc(k)}"${k === lead.kueche ? " selected" : ""}>${esc(KUECHEN_LABEL[k] ?? k)}</option>`)
+    .join("");
+  const titel = lead.kuecheManuell ? "Von Hand gesetzt" : "Automatisch aus dem Namen erkannt";
+  return `<select class="kueche${lead.kuecheManuell ? " manuell" : ""}" data-placeid="${esc(lead.placeId)}" title="${titel}">${optionen}</select>`;
+}
 
 const priorityOrder = ["Sehr hoch (keine Website)", "Sehr hoch", "Hoch", "Mittel", "Niedrig", "Zu prüfen (Website nicht erreichbar)"];
 
@@ -279,12 +426,14 @@ function applyFiltersAndRender() {
     <tr>
       <td><span class="badge ${priorityClass(l.priorität)}">${l.priorität || "-"}</span></td>
       <td>${l.score ?? "-"}</td>
-      <td>${l.name || ""}</td>
-      <td>${l.entwurf ? `<a class="entwurf" href="${l.entwurf}" target="_blank" rel="noopener">ansehen</a>` : "-"}</td>
-      <td>${l.ort || ""}</td>
-      <td>${l.adresse || ""}</td>
-      <td>${l.telefon || ""}</td>
-      <td>${l.website ? `<a href="${l.website}" target="_blank" rel="noopener">öffnen</a>` : "-"}</td>
+      <td>${esc(l.name)}</td>
+      <td>${kuecheSelect(l)}</td>
+      <td>${l.entwurf ? `<a class="entwurf" href="${esc(l.entwurf)}" target="_blank" rel="noopener">ansehen</a>` : "-"}</td>
+      <td>${l.demoUrl ? `<button class="pitch" data-pitch="${esc(l.placeId)}">QR &amp; Text</button>` : "-"}</td>
+      <td>${esc(l.ort)}</td>
+      <td>${esc(l.adresse)}</td>
+      <td>${esc(l.telefon)}</td>
+      <td>${l.website ? `<a href="${esc(l.website)}" target="_blank" rel="noopener">öffnen</a>` : "-"}</td>
       <td>${yn(l.hatBestellfunktion)}</td>
       <td>${yn(l.hatReservierungsfunktion)}</td>
       <td>${yn(l.mobilFreundlich)}</td>
@@ -307,14 +456,99 @@ document.querySelectorAll("th[data-key]").forEach((th) => {
   document.getElementById(id).addEventListener("input", applyFiltersAndRender);
 });
 
-fetch("/api/leads")
-  .then((r) => r.json())
-  .then((leads) => {
-    allLeads = leads;
-    renderStats(leads);
-    populateFilters(leads);
-    applyFiltersAndRender();
+// Küche ändern: speichern und neu laden, damit Theme-Hinweis und
+// Anschreiben sofort zum neuen Wert passen.
+document.getElementById("tbody").addEventListener("change", async (event) => {
+  const select = event.target.closest("select.kueche");
+  if (!select) return;
+
+  select.disabled = true;
+  try {
+    const antwort = await fetch("/api/kueche", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ placeId: select.dataset.placeid, kueche: select.value }),
+    });
+    if (!antwort.ok) throw new Error((await antwort.json()).fehler ?? "Fehler");
+    await ladeLeads();
+    zeigeHinweis("Küche gespeichert. Für die neue Stilrichtung noch \"npm run pages\" ausführen.");
+  } catch (fehler) {
+    zeigeHinweis(`Konnte nicht gespeichert werden: ${fehler.message}`);
+    select.disabled = false;
+  }
+});
+
+document.getElementById("tbody").addEventListener("click", (event) => {
+  const knopf = event.target.closest("button.pitch");
+  if (knopf) oeffnePitch(knopf.dataset.pitch);
+});
+
+function zeigeHinweis(text) {
+  const box = document.getElementById("toast");
+  box.textContent = text;
+  box.classList.add("sichtbar");
+  clearTimeout(box._timer);
+  box._timer = setTimeout(() => box.classList.remove("sichtbar"), 4000);
+}
+
+function oeffnePitch(placeId) {
+  const lead = allLeads.find((l) => l.placeId === placeId);
+  if (!lead) return;
+
+  document.getElementById("pitch-titel").textContent = lead.name || "Entwurf";
+  document.getElementById("pitch-url").value = lead.demoUrl;
+  document.getElementById("pitch-qr").src = `/api/qr?url=${encodeURIComponent(lead.demoUrl)}`;
+  document.getElementById("pitch-betreff").value = lead.anschreiben.betreff;
+  document.getElementById("pitch-text").value = lead.anschreiben.text;
+  document.getElementById("pitch-oeffnen").href = lead.demoUrl;
+
+  const mailto = `mailto:?subject=${encodeURIComponent(lead.anschreiben.betreff)}&body=${encodeURIComponent(lead.anschreiben.text)}`;
+  document.getElementById("pitch-mail").href = mailto;
+
+  document.getElementById("pitch").classList.add("offen");
+}
+
+function schliessePitch() {
+  document.getElementById("pitch").classList.remove("offen");
+}
+
+document.getElementById("pitch-schliessen").addEventListener("click", schliessePitch);
+document.getElementById("pitch-hintergrund").addEventListener("click", schliessePitch);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") schliessePitch(); });
+
+document.querySelectorAll("[data-kopieren]").forEach((knopf) => {
+  knopf.addEventListener("click", async () => {
+    const feld = document.getElementById(knopf.dataset.kopieren);
+    try {
+      await navigator.clipboard.writeText(feld.value);
+      const alt = knopf.textContent;
+      knopf.textContent = "Kopiert";
+      setTimeout(() => { knopf.textContent = alt; }, 1500);
+    } catch {
+      feld.select();
+      zeigeHinweis("Kopieren nicht erlaubt – Text ist markiert, bitte Strg+C drücken.");
+    }
   });
+});
+
+let filterGefuellt = false;
+
+function ladeLeads() {
+  return fetch("/api/leads")
+    .then((r) => r.json())
+    .then((daten) => {
+      kuechen = daten.kuechen;
+      allLeads = daten.leads;
+      renderStats(allLeads);
+      if (!filterGefuellt) {
+        populateFilters(allLeads);
+        filterGefuellt = true;
+      }
+      applyFiltersAndRender();
+    });
+}
+
+ladeLeads();
 </script>
 
 </body>
