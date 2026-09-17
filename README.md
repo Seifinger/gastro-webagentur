@@ -165,27 +165,40 @@ npm run pages -- --email info@restaurant.de  # Bestellungen/Reservierungen per E
 npm run pages -- --cuisine asiatisch         # Küche vorgeben (siehe unten)
 ```
 
-Was jede erzeugte Seite kann:
-- **Bild-Hero** mit dem Namen des Lokals, der echten Google-Bewertung und zwei Handlungsaufforderungen
-- **„Unsere Highlights"** – ein bebilderter Auszug aus der Karte (3, 4 oder 6 Gerichte), jedes direkt vorbestellbar
-- **Abholung vorbestellen** – Warenkorb mit Mengen, Abholzeit und live berechneter Summe
-- **Tisch reservieren** – Datum, Uhrzeit, Personenzahl, Kontaktdaten, mit Pflichtfeldprüfung
-- **Kontakt & Anfahrt** – Telefonnummer als Direktwahl-Link, Adresse mit Route-planen-Link zu Google Maps
-- Mobilfreundlich, ohne externe Abhängigkeiten – eine HTML-Datei pro Restaurant
+### Aufbau der Seite
 
-### Jede Seite sieht anders aus
+Die Reihenfolge folgt dem Bestellweg, nicht dem Erzählbedürfnis des Wirts:
 
-Damit die Entwürfe nicht wie ein Baukasten wirken, leitet der Generator **aus dem Lead selbst** ein festes Erscheinungsbild ab – Farbpalette, Schriftart, Hero-Layout (Vollbild links, Vollbild zentriert oder geteilt), Titelbild und Auswahl der Highlights. Derselbe Lead ergibt immer denselben Entwurf, verschiedene Lokale sehen unterschiedlich aus (bei den aktuell 62 Leads ergeben sich 55 verschiedene Designs).
+1. **Hero** – im ersten Bildschirm auf dem Handy stehen ohne Scrollen: Hintergrundbild, Konzept („Holzofenpizza & frische Pasta"), Ort, Name, die echte Google-Bewertung direkt unter der Überschrift und eine hyper-lokale Zeile („… – direkt am Stadtplatz in Tüßling.").
+2. **USP-Leiste** – drei kurze Badges statt Fließtext, je nach Küche z. B. „Heiß aus dem Steinofen" oder „Abholung in 20 Minuten".
+3. **Unsere Highlights** – bebilderter Auszug aus der Karte (3, 4 oder 6 Gerichte), jedes direkt vorbestellbar, dazu der Ablauf der Abholung in drei Schritten.
+4. **Ganze Speisekarte** als aufklappbares Akkordeon, direkt im HTML statt als PDF – auf dem Handy lesbar ohne Zoomen und für Google indexierbar. Jedes Gericht ist bestellbar.
+5. **Drei Bildplätze** für die eigenen Fotos des Wirts: Außenansicht, Team hinter der Theke, Bestseller-Gericht. Jeder Platz ist beschriftet und als Platzhalter markiert – der Entwurf ist damit gleichzeitig die Foto-Aufgabenliste.
+6. **Reservierung**, **Kontakt & Anfahrt** (Telefon als Direktwahl-Link, Adresse mit Route-planen-Link).
 
-### Bilder
+Dazu auf dem Handy eine **feste Aktionsleiste am unteren Rand** mit „Bestellen" und „Reservieren", die immer sichtbar bleibt. „Bestellen" springt bei leerem Warenkorb zur Karte und zeigt sonst die aktuelle Summe.
 
-Die Stockfotos (Unsplash) werden beim ersten Lauf **einmalig heruntergeladen** und unter `data/landingpages/assets/` abgelegt. Danach funktionieren die Entwürfe komplett offline – praktisch, wenn du sie beim Termin im Lokal auf dem Laptop zeigst und dort kein Empfang ist. Ein erneuter Lauf lädt nur noch fehlende Bilder nach.
+### Drei Themes statt Zufallsfarben
+
+Die Küche bestimmt die Gestaltungswelt, das Layout bleibt gleich:
+
+| Theme | Küchen | Anmutung |
+|---|---|---|
+| **Trattoria** | italienisch, griechisch, Café | Warme Erdtöne, Playfair Display als Serifenschrift, gemütlich-rustikal |
+| **Neo-Asian** | asiatisch, türkisch | Dunkler Hintergrund, kräftige Akzente (Neonrot, Gold, Orange), Montserrat in Versalien, urbaner Streetfood-Look |
+| **Wirtshaus** | bayerisch | Helles Holz mit Waldgrün, Dunkelrot oder Braun, Merriweather, bodenständig |
+
+Innerhalb eines Themes gibt es drei Akzentvarianten, dazu sechs Titelbilder je Küche – zwei benachbarte Wirtshäuser sehen also trotz gleichem Theme unterschiedlich aus. Die Zuordnung hängt fest am Lead: derselbe Lead ergibt immer denselben Entwurf.
+
+### Bilder und Schriften
+
+Stockfotos (Unsplash) und Schriften (Google Fonts, alle unter der SIL Open Font License) werden beim ersten Lauf **einmalig heruntergeladen** und unter `data/landingpages/assets/` abgelegt. Danach funktionieren die Entwürfe komplett offline – praktisch, wenn du sie beim Termin im Lokal auf dem Laptop zeigst und dort kein Empfang ist. Ein erneuter Lauf lädt nur noch Fehlendes nach. Schlägt der Schriften-Download fehl, greifen die Seiten auf Systemschriften zurück.
 
 ### Speisekarte
 
 Die Karte wird **anhand des Restaurantnamens** gewählt (Pizzeria → italienisch, Döner → türkisch, Gasthof → bayerisch usw.); ohne passendes Stichwort ist bayerisch der Standard. Liegt der Generator daneben – etwa bei einem Thai-Lokal namens „Klabwong" – gib die Küche mit `--cuisine` vor. Möglich sind: `bayerisch`, `italienisch`, `asiatisch`, `griechisch`, `tuerkisch`, `cafe`.
 
-Gezeigt wird bewusst nur ein **Auszug** der Karte, nicht das vollständige Menü. Gerichte, Preise, Öffnungszeiten und Fotos sind Platzhalter und auf der Seite auch als solche gekennzeichnet – sie werden vor einer Veröffentlichung durch die echten Angaben und Aufnahmen des Wirts ersetzt.
+Gerichte, Preise, Öffnungszeiten und Fotos sind Platzhalter und auf der Seite auch als solche gekennzeichnet – sie werden vor einer Veröffentlichung durch die echten Angaben und Aufnahmen des Wirts ersetzt.
 
 ## Tests ausführen
 

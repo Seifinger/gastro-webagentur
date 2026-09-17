@@ -56,6 +56,8 @@ export const MENUS = {
   bayerisch: {
     label: "Bayerische Wirtshausküche",
     tagline: "Bodenständig, ehrlich und frisch aus der Region",
+    konzept: "Wirtshausküche & Biergarten",
+    usps: ["Abholung in 20 Minuten", "Fleisch vom Metzger im Ort", "Direkt beim Wirt, ohne Vermittlungsgebühr"],
     geschichte:
       "Seit Generationen kochen wir, was hier wächst: Fleisch vom Metzger im Ort, Fisch aus heimischer Zucht und Bier aus der Region. Kein Schnickschnack – dafür Portionen, die satt machen.",
     kategorien: [
@@ -91,6 +93,8 @@ export const MENUS = {
   italienisch: {
     label: "Italienische Küche",
     tagline: "Frische Pasta, Holzofenpizza und echtes Dolce Vita",
+    konzept: "Holzofenpizza & frische Pasta",
+    usps: ["Heiß aus dem Steinofen", "Teig ruht 48 Stunden", "Direkt bei uns, ohne Vermittlungsgebühr"],
     geschichte:
       "Unser Teig ruht 48 Stunden, die Soßen kochen wir jeden Morgen frisch, und der Holzofen läuft, seit wir aufgesperrt haben. Rezepte aus Kalabrien – Zutaten, wo immer es geht, von hier.",
     kategorien: [
@@ -128,6 +132,8 @@ export const MENUS = {
   asiatisch: {
     label: "Asiatische Küche",
     tagline: "Frisch im Wok gebraten, aromatisch gewürzt",
+    konzept: "Sushi, Wok & Bowls",
+    usps: ["Erst auf Bestellung im Wok", "Abholung in 20 Minuten", "Direkt bei uns, ohne Vermittlungsgebühr"],
     geschichte:
       "Jedes Gericht kommt erst in den Wok, wenn Sie es bestellen – bei voller Hitze, in unter drei Minuten. So bleibt das Gemüse knackig und die Aromen frisch.",
     kategorien: [
@@ -161,6 +167,8 @@ export const MENUS = {
   griechisch: {
     label: "Griechische Küche",
     tagline: "Mediterrane Gastfreundschaft, wie am Meer",
+    konzept: "Gyros, Grill & Meze",
+    usps: ["Vom Holzkohlegrill", "Abholung in 20 Minuten", "Direkt bei uns, ohne Vermittlungsgebühr"],
     geschichte:
       "Bei uns wird über offener Flamme gegrillt, das Olivenöl kommt von der Familie aus dem Peloponnes, und niemand geht hungrig nach Hause. Kalí óreksi!",
     kategorien: [
@@ -194,6 +202,8 @@ export const MENUS = {
   tuerkisch: {
     label: "Türkische Spezialitäten",
     tagline: "Frisch vom Grill, täglich hausgemacht",
+    konzept: "Döner, Grill & Hausgemachtes",
+    usps: ["Drehspieß täglich frisch geschichtet", "Abholung in 15 Minuten", "Direkt bei uns, ohne Vermittlungsgebühr"],
     geschichte:
       "Der Drehspieß wird jeden Morgen von Hand geschichtet, das Fladenbrot backen wir selbst, und die Soßen rühren wir frisch an – so, wie man es aus Istanbul kennt.",
     kategorien: [
@@ -227,6 +237,8 @@ export const MENUS = {
   cafe: {
     label: "Café & Frühstück",
     tagline: "Hausgemachter Kuchen und gemütliche Stunden",
+    konzept: "Frühstück, Kuchen & Kaffee",
+    usps: ["Täglich frisch gebacken", "Kaffee aus regionaler Rösterei", "Alles auch zum Mitnehmen"],
     geschichte:
       "Bei uns wird jeden Morgen gebacken – und der Kaffee kommt von einer kleinen Rösterei zwei Orte weiter. Bleiben Sie, so lange Sie mögen.",
     kategorien: [
@@ -274,9 +286,18 @@ export function menuForLead(lead) {
  * Highlights-Sektion.
  */
 export function highlightCandidates(menu) {
-  return menu.kategorien.flatMap((kategorie) =>
+  return menu.kategorien.flatMap((kategorie, katIndex) =>
     kategorie.gerichte
-      .filter((gericht) => gericht.bild)
-      .map((gericht) => ({ ...gericht, kategorie: kategorie.name })),
+      .map((gericht, gerichtIndex) => ({ ...gericht, kategorie: kategorie.name, id: `${katIndex}-${gerichtIndex}` }))
+      .filter((gericht) => gericht.bild),
   );
+}
+
+/**
+ * Stabile Kennung je Gericht. Highlights und vollständige Karte zeigen
+ * teilweise dieselben Gerichte – über die gemeinsame Kennung landen sie im
+ * Warenkorb in einer Zeile statt in zweien.
+ */
+export function gerichtId(katIndex, gerichtIndex) {
+  return `${katIndex}-${gerichtIndex}`;
 }

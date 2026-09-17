@@ -12,14 +12,15 @@ export const IMAGE_ROLES = {
 };
 
 // Je Küche sechs Titelmotive: bei über 70 Leads bekommen sonst mehrere
-// Nachbarlokale dasselbe Bild.
+// Nachbarlokale dasselbe Bild. Bewusst Gerichte und gedeckte Tische statt
+// leerer Innenräume – im Hero verkauft das Essen, nicht die Einrichtung.
 export const HERO_IMAGES = {
   bayerisch: [
     "photo-1528605248644-14dd04022da1",
     "photo-1558030006-450675393462",
-    "photo-1552566626-52f8b828add9",
     "photo-1432139555190-58524dae6a55",
     "photo-1599921841143-819065a55cc6",
+    "photo-1544025162-d76694265947",
     "photo-1414235077428-338989a2e8c0",
   ],
   italienisch: [
@@ -28,7 +29,7 @@ export const HERO_IMAGES = {
     "photo-1513104890138-7c749659a591",
     "photo-1551892374-ecf8754cf8b0",
     "photo-1565299624946-b28f40a0ae38",
-    "photo-1517248135467-4c7edcad34c4",
+    "photo-1551183053-bf91a1d81141",
   ],
   asiatisch: [
     "photo-1569718212165-3a8278d5f624",
@@ -36,7 +37,7 @@ export const HERO_IMAGES = {
     "photo-1553621042-f6e147245754",
     "photo-1559314809-0d155014e29e",
     "photo-1512058564366-18510be2db19",
-    "photo-1590846406792-0adc7f938f1d",
+    "photo-1585032226651-759b368d7246",
   ],
   griechisch: [
     "photo-1540189549336-e6e99c3679fe",
@@ -44,7 +45,7 @@ export const HERO_IMAGES = {
     "photo-1559339352-11d035aa65de",
     "photo-1529006557810-274b9b2fc783",
     "photo-1544025162-d76694265947",
-    "photo-1592861956120-e524fc739696",
+    "photo-1561651823-34feb02250e4",
   ],
   tuerkisch: [
     "photo-1599487488170-d11ec9c172f0",
@@ -52,7 +53,7 @@ export const HERO_IMAGES = {
     "photo-1561651823-34feb02250e4",
     "photo-1544025162-d76694265947",
     "photo-1466978913421-dad2ebd01d17",
-    "photo-1554118811-1e0d58224f24",
+    "photo-1528605248644-14dd04022da1",
   ],
   cafe: [
     "photo-1495474472287-4d71bcdd2085",
@@ -64,51 +65,46 @@ export const HERO_IMAGES = {
   ],
 };
 
-// Fünf Motive je Küche; die Collage zeigt drei davon in wechselnder Reihenfolge.
-export const AMBIENTE_IMAGES = {
+// Die drei Bildplätze zeigen je ein bestimmtes Motiv, damit Bild und
+// Beschriftung zusammenpassen: das Haus, das Team und der Bestseller.
+
+// Platz 1 "Unser Haus": Innen- und Außenansichten.
+export const INTERIOR_IMAGES = {
   bayerisch: [
     "photo-1552566626-52f8b828add9",
-    "photo-1414235077428-338989a2e8c0",
-    "photo-1428515613728-6b4607e44363",
     "photo-1528605248644-14dd04022da1",
-    "photo-1592861956120-e524fc739696",
+    "photo-1555396273-367ea4eb4db5",
   ],
   italienisch: [
     "photo-1517248135467-4c7edcad34c4",
-    "photo-1414235077428-338989a2e8c0",
+    "photo-1552566626-52f8b828add9",
     "photo-1555396273-367ea4eb4db5",
-    "photo-1428515613728-6b4607e44363",
-    "photo-1592861956120-e524fc739696",
   ],
   asiatisch: [
     "photo-1590846406792-0adc7f938f1d",
     "photo-1517248135467-4c7edcad34c4",
-    "photo-1428515613728-6b4607e44363",
     "photo-1555396273-367ea4eb4db5",
-    "photo-1414235077428-338989a2e8c0",
   ],
   griechisch: [
     "photo-1559339352-11d035aa65de",
-    "photo-1414235077428-338989a2e8c0",
-    "photo-1592861956120-e524fc739696",
-    "photo-1528605248644-14dd04022da1",
-    "photo-1466978913421-dad2ebd01d17",
+    "photo-1552566626-52f8b828add9",
+    "photo-1554118811-1e0d58224f24",
   ],
   tuerkisch: [
     "photo-1554118811-1e0d58224f24",
-    "photo-1466978913421-dad2ebd01d17",
-    "photo-1592861956120-e524fc739696",
-    "photo-1428515613728-6b4607e44363",
-    "photo-1559339352-11d035aa65de",
+    "photo-1555396273-367ea4eb4db5",
+    "photo-1590846406792-0adc7f938f1d",
   ],
   cafe: [
     "photo-1554118811-1e0d58224f24",
-    "photo-1509440159596-0249088772ff",
-    "photo-1592861956120-e524fc739696",
-    "photo-1414235077428-338989a2e8c0",
-    "photo-1495474472287-4d71bcdd2085",
+    "photo-1517248135467-4c7edcad34c4",
+    "photo-1552566626-52f8b828add9",
   ],
 };
+
+// Platz 2 "Ihr Team": Küche im Betrieb. Der Platz ist als Platzhalter
+// gekennzeichnet und wird ohnehin durch ein Foto des Wirts ersetzt.
+export const TEAM_IMAGES = ["photo-1428515613728-6b4607e44363"];
 
 export function assetFileName(id, role) {
   return `${id}-${role}.jpg`;

@@ -37,10 +37,19 @@ test("jede Karte liefert genug bebilderte Gerichte für die Highlights", () => {
 
     assert.ok(kandidaten.length >= 3, `${name} hat nur ${kandidaten.length} bebilderte Gerichte`);
     assert.ok(
-      kandidaten.every((g) => g.bild && g.kategorie),
-      `${name}: Kandidat ohne Bild oder Kategorie`,
+      kandidaten.every((g) => g.bild && g.kategorie && /^\d+-\d+$/.test(g.id)),
+      `${name}: Kandidat ohne Bild, Kategorie oder Kennung`,
     );
     assert.ok(menu.geschichte, `${name} hat keinen Beschreibungstext`);
+  }
+});
+
+test("jede Karte hat Konzept-Zeile und USP-Badges", () => {
+  for (const [name, menu] of Object.entries(MENUS)) {
+    assert.ok(menu.konzept, `${name} hat keine Konzept-Zeile`);
+    assert.ok(menu.konzept.length <= 40, `${name}: Konzept-Zeile zu lang für den Hero`);
+    assert.equal(menu.usps.length, 3, `${name} hat nicht genau 3 USP-Badges`);
+    assert.ok(menu.usps.every((u) => u.length <= 46), `${name}: USP zu lang für die Leiste`);
   }
 });
 

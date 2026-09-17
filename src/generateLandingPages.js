@@ -11,6 +11,7 @@ import {
 } from "./landingPageGenerator.js";
 import { detectCuisine, menuForCuisine, MENUS } from "./menuCatalog.js";
 import { ensureAssets, assetFileName } from "./imageLibrary.js";
+import { ensureFonts, fontFaceCss } from "./fontLibrary.js";
 
 function parseArgs(argv) {
   const args = { region: null, limit: null, minScore: 0, email: "", cuisine: null };
@@ -53,16 +54,16 @@ function uniqueSlug(name, taken) {
 function buildOverviewPage(entries) {
   const cards = entries
     .map(
-      ({ lead, slug, cuisine, theme }) => `
+      ({ lead, slug, cuisine, gestaltung }) => `
       <a class="card" href="./${escapeHtml(slug)}/index.html">
-        <div class="thumb" style="--tint:${theme.palette.tint}">
-          <img src="./assets/${assetFileName(theme.heroImage, "hero")}" alt="" loading="lazy">
-          <span class="score" style="background:${theme.palette.accent}">${escapeHtml(String(lead.score ?? "–"))}</span>
+        <div class="thumb" style="--tint:${gestaltung.theme.tint}">
+          <img src="./assets/${assetFileName(gestaltung.heroImage, "hero")}" alt="" loading="lazy">
+          <span class="score" style="background:${gestaltung.theme.accent}">${escapeHtml(String(lead.score ?? "–"))}</span>
         </div>
         <div class="body">
           <strong>${escapeHtml(lead.name)}</strong>
           <span class="meta">${escapeHtml(lead.ort ?? "")} · ${escapeHtml(cuisine)}</span>
-          <span class="meta">${escapeHtml(lead.priorität ?? "")}</span>
+          <span class="meta">Theme: ${escapeHtml(gestaltung.theme.label)} / ${escapeHtml(gestaltung.theme.varianteName)}</span>
         </div>
       </a>`,
     )
@@ -129,22 +130,38 @@ async function run() {
 
   const entries = leads.map((lead) => {
     const cuisine = args.cuisine ?? detectCuisine(lead.name);
-    return { lead, cuisine, theme: themeForLead(lead, cuisine) };
+    return { lead, cuisine, gestaltung: themeForLead(lead, cuisine) };
   });
 
-  // Bilder einmalig in einen gemeinsamen Ordner laden, damit die Entwürfe
-  // später auch ohne Internet funktionieren.
-  const specs = entries.flatMap(({ lead, cuisine }) => imageSpecsForLead(lead, cuisine));
+  // Bilder und Schriften einmalig in einen gemeinsamen Ordner laden, damit die
+  // Entwürfe später auch ohne Internet funktionieren.
   const assetsDir = path.join(landingPagesDir, "assets");
+  const fontsDir = path.join(assetsDir, "fonts");
+
   console.log("\n📷 Prüfe Bildmaterial ...");
-  const { geladen, fehlgeschlagen } = await ensureAssets(specs, assetsDir);
+  const specs = entries.flatMap(({ lead, cuisine }) => imageSpecsForLead(lead, cuisine));
+  const bilder = await ensureAssets(specs, assetsDir);
   console.log(
-    geladen > 0 ? `   ${geladen} Bild(er) geladen.` : "   Alle Bilder bereits vorhanden.",
+    bilder.geladen > 0 ? `   ${bilder.geladen} Bild(er) geladen.` : "   Alle Bilder bereits vorhanden.",
   );
-  if (fehlgeschlagen.length > 0) {
-    console.log(`   ⚠️  ${fehlgeschlagen.length} Bild(er) nicht geladen:`);
-    fehlgeschlagen.forEach((zeile) => console.log(`      ${zeile}`));
+  if (bilder.fehlgeschlagen.length > 0) {
+    console.log(`   ⚠️  ${bilder.fehlgeschlagen.length} Bild(er) nicht geladen:`);
+    bilder.fehlgeschlagen.forEach((zeile) => console.log(`      ${zeile}`));
   }
+
+  console.log("🔤 Prüfe Schriften ...");
+  const schriften = await ensureFonts(fontsDir);
+  console.log(
+    schriften.geladen > 0
+      ? `   ${schriften.geladen} Schriftdatei(en) geladen.`
+      : "   Alle Schriften bereits vorhanden.",
+  );
+  if (schriften.fehlgeschlagen.length > 0) {
+    console.log(`   ⚠️  ${schriften.fehlgeschlagen.length} Schrift(en) nicht geladen – die Entwürfe nutzen Systemschriften.`);
+    schriften.fehlgeschlagen.forEach((zeile) => console.log(`      ${zeile}`));
+  }
+
+  const fontCss = fontFaceCss(fontsDir, "../assets/fonts");
 
   const taken = new Set();
   for (const entry of entries) {
@@ -152,8 +169,9 @@ async function run() {
 
     const html = buildLandingPage(entry.lead, {
       menu: menuForCuisine(entry.cuisine),
-      theme: entry.theme,
+      gestaltung: entry.gestaltung,
       kontaktEmail: args.email,
+      fontCss,
     });
 
     const dir = path.join(landingPagesDir, entry.slug);

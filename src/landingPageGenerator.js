@@ -1,5 +1,6 @@
 import { menuForLead, menuForCuisine, highlightCandidates, detectCuisine } from "./menuCatalog.js";
-import { HERO_IMAGES, AMBIENTE_IMAGES, assetFileName } from "./imageLibrary.js";
+import { HERO_IMAGES, INTERIOR_IMAGES, TEAM_IMAGES, assetFileName } from "./imageLibrary.js";
+import { resolveTheme, THEMES, themeNameForCuisine } from "./themes.js";
 
 // Standard-Öffnungszeiten für den Entwurf. Google liefert diese Felder in
 // unserer Suchabfrage nicht mit, deshalb sind es bewusst Platzhalter, die auf
@@ -10,31 +11,11 @@ export const DEFAULT_OPENING_HOURS = [
   { tage: "Sonntag & Feiertage", zeiten: "11:30 – 21:00" },
 ];
 
-const PALETTES = {
-  terracotta: { accent: "#b4451f", dark: "#8d3416", gold: "#c1872c", tint: "#2a1a12", tintRgb: "42,26,18", soft: "#faf3ec" },
-  wald: { accent: "#4a6741", dark: "#35502e", gold: "#c9a227", tint: "#1b261a", tintRgb: "27,38,26", soft: "#f1f5ef" },
-  wein: { accent: "#8c2f39", dark: "#6d222b", gold: "#c9a227", tint: "#251215", tintRgb: "37,18,21", soft: "#faf1f1" },
-  azur: { accent: "#1f5f8b", dark: "#164764", gold: "#d8a33a", tint: "#0f2230", tintRgb: "15,34,48", soft: "#eef4f8" },
-  kupfer: { accent: "#a35a24", dark: "#80441a", gold: "#d8a33a", tint: "#2b1a0e", tintRgb: "43,26,14", soft: "#fbf3ea" },
-  anthrazit: { accent: "#a83232", dark: "#832626", gold: "#c99a3a", tint: "#1b1919", tintRgb: "27,25,25", soft: "#f5f2f2" },
-};
-
-// Pro Küche mehrere stimmige Paletten, damit zwei Nachbarlokale nicht gleich aussehen.
-const CUISINE_PALETTES = {
-  bayerisch: ["wald", "kupfer", "terracotta"],
-  italienisch: ["terracotta", "wein", "wald"],
-  asiatisch: ["anthrazit", "kupfer", "wein"],
-  griechisch: ["azur", "terracotta", "wald"],
-  tuerkisch: ["kupfer", "wein", "anthrazit"],
-  cafe: ["kupfer", "wald", "terracotta"],
-};
-
-const HERO_LAYOUTS = ["vollbild-links", "vollbild-mitte", "geteilt"];
-
-const FONT_STACKS = [
-  'Georgia, "Iowan Old Style", "Times New Roman", serif',
-  '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif',
-  '"Hoefler Text", Baskerville, Garamond, Georgia, serif',
+// Die drei Bildplätze, die der Wirt später mit eigenen Handyfotos füllt.
+export const FOTO_SLOTS = [
+  { titel: "Unser Haus", hinweis: "Außenansicht – damit Gäste Sie von der Straße aus erkennen" },
+  { titel: "Ihr Team", hinweis: "Ein Gesicht hinter der Theke schafft mehr Vertrauen als jedes Stockfoto" },
+  { titel: "Unser Bestseller", hinweis: "Das meistbestellte Gericht, ehrlich fotografiert" },
 ];
 
 function hashText(text) {
@@ -46,33 +27,27 @@ function hashText(text) {
 }
 
 /**
- * Leitet aus dem Lead ein festes, aber pro Restaurant unterschiedliches
- * Erscheinungsbild ab – gleicher Lead ergibt immer dasselbe Design.
+ * Leitet aus dem Lead das Erscheinungsbild ab: Die Küche bestimmt das Theme,
+ * der Lead die Akzentvariante und die Bildauswahl. Gleicher Lead ergibt
+ * immer denselben Entwurf.
  */
 export function themeForLead(lead, cuisineOverride) {
   const cuisine = cuisineOverride ?? detectCuisine(lead?.name);
   const seed = hashText(String(lead?.placeId || lead?.name || "restaurant"));
-  const paletteNames = CUISINE_PALETTES[cuisine] ?? CUISINE_PALETTES.bayerisch;
 
   const heroPool = HERO_IMAGES[cuisine] ?? HERO_IMAGES.bayerisch;
-  const ambientePool = AMBIENTE_IMAGES[cuisine] ?? AMBIENTE_IMAGES.bayerisch;
-  // Unbedingt >>> statt >>: der Hash nutzt den vollen 32-Bit-Bereich, ein
-  // vorzeichenbehafteter Shift ergäbe negative Indizes.
-  const ambienteStart = (seed >>> 9) % ambientePool.length;
+  const interiorPool = INTERIOR_IMAGES[cuisine] ?? INTERIOR_IMAGES.bayerisch;
 
   return {
     cuisine,
     seed,
-    paletteName: paletteNames[seed % paletteNames.length],
-    palette: PALETTES[paletteNames[seed % paletteNames.length]],
-    heroLayout: HERO_LAYOUTS[(seed >>> 3) % HERO_LAYOUTS.length],
-    fontStack: FONT_STACKS[(seed >>> 6) % FONT_STACKS.length],
+    themeName: themeNameForCuisine(cuisine),
+    theme: resolveTheme(cuisine, seed % THEMES[themeNameForCuisine(cuisine)].varianten.length),
+    // Unbedingt >>> statt >>: der Hash nutzt den vollen 32-Bit-Bereich, ein
+    // vorzeichenbehafteter Shift ergäbe negative Indizes.
     heroImage: heroPool[(seed >>> 12) % heroPool.length],
-    // Die Collage zeigt drei Motive – welche drei, hängt am Lead.
-    ambienteImages: Array.from(
-      { length: 3 },
-      (_, i) => ambientePool[(ambienteStart + i) % ambientePool.length],
-    ),
+    hausBild: interiorPool[(seed >>> 9) % interiorPool.length],
+    teamBild: TEAM_IMAGES[(seed >>> 15) % TEAM_IMAGES.length],
   };
 }
 
@@ -113,6 +88,42 @@ function formatCount(value) {
   return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
+/**
+ * Holt die Straße aus der Google-Adresse und schreibt die üblichen
+ * Abkürzungen aus: "Stadtpl. 15, 84453 Mühldorf, Germany" -> "Stadtplatz".
+ */
+export function strasseAusAdresse(adresse) {
+  const ersterTeil = String(adresse ?? "").split(",")[0].trim();
+  if (!ersterTeil) return "";
+
+  // "Münchener Str." ist ein eigenes Wort und wird großgeschrieben,
+  // "Bahnhofstr." hängt am Namen und bleibt klein.
+  return ersterTeil
+    .replace(/\s+\d+\s*[a-zA-Z]?$/, "")
+    .replace(/(\s)str\.$/i, "$1Straße")
+    .replace(/str\.$/i, "straße")
+    .replace(/(\s)pl\.$/i, "$1Platz")
+    .replace(/pl\.$/i, "platz")
+    .trim();
+}
+
+/**
+ * Baut den Ortsbezug für die Schlagzeile. Ohne brauchbare Straße bleibt es
+ * beim Ort – lieber allgemein als grammatisch falsch.
+ */
+export function ortsbezug(adresse, ort) {
+  const strasse = strasseAusAdresse(adresse);
+  const inOrt = ort ? ` in ${ort}` : "";
+
+  if (strasse) {
+    if (/platz$/i.test(strasse)) return `direkt am ${strasse}${inOrt}`;
+    if (/(straße|strasse|gasse|allee)$/i.test(strasse)) return `in der ${strasse}${inOrt}`;
+    if (/(weg|ring|damm|markt|berg|feld)$/i.test(strasse)) return `am ${strasse}${inOrt}`;
+  }
+
+  return ort ? `mitten in ${ort}` : "";
+}
+
 function timeSlots(startMinutes, endMinutes, stepMinutes) {
   const slots = [];
   for (let m = startMinutes; m <= endMinutes; m += stepMinutes) {
@@ -138,11 +149,14 @@ const PICKUP_SLOTS = [
  * in den gemeinsamen Asset-Ordner.
  */
 export function imageSpecsForLead(lead, cuisineOverride) {
-  const theme = themeForLead(lead, cuisineOverride);
+  const gestaltung = themeForLead(lead, cuisineOverride);
   const menu = cuisineOverride ? menuForCuisine(cuisineOverride) : menuForLead(lead);
-  const specs = [{ id: theme.heroImage, role: "hero" }];
+  const specs = [
+    { id: gestaltung.heroImage, role: "hero" },
+    { id: gestaltung.hausBild, role: "ambiente" },
+    { id: gestaltung.teamBild, role: "ambiente" },
+  ];
 
-  for (const bild of theme.ambienteImages) specs.push({ id: bild, role: "ambiente" });
   for (const gericht of highlightCandidates(menu)) specs.push({ id: gericht.bild, role: "gericht" });
 
   const seen = new Set();
@@ -161,195 +175,208 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--body);
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
-h1, h2, h3 { font-family: var(--display); line-height: 1.14; margin: 0; font-weight: 600; }
+h1, h2, h3 {
+  font-family: var(--display);
+  text-transform: var(--display-transform);
+  letter-spacing: var(--display-tracking);
+  line-height: 1.14; margin: 0; font-weight: 700;
+}
 p { margin: 0; }
 a { color: inherit; }
 img { display: block; max-width: 100%; }
 .wrap { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 20px; }
-.section { padding: 92px 0; }
-.section-head { max-width: 660px; margin-bottom: 46px; }
+.section { padding: 84px 0; }
+/* Die Kopfzeile liegt fest über der Seite – ohne diesen Abstand verdeckt sie
+   die Überschrift des angesprungenen Abschnitts. */
+section[id] { scroll-margin-top: 80px; }
+.section-head { max-width: 680px; margin-bottom: 44px; }
 .section-head.mitte { margin-left: auto; margin-right: auto; text-align: center; }
 .eyebrow { text-transform: uppercase; letter-spacing: .18em; font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 14px; }
-.section-head h2 { font-size: clamp(30px, 4.6vw, 44px); margin-bottom: 16px; }
+.section-head h2 { font-size: clamp(28px, 4.4vw, 42px); margin-bottom: 16px; }
 .section-head p { color: var(--ink-soft); font-size: 18px; }
 
 /* Kopfzeile: liegt transparent über dem Hero und wird beim Scrollen fest */
 .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 40; transition: background .28s ease, box-shadow .28s ease; }
-/* Abdunkelung, damit die helle Navigation auch über hellen Fotos lesbar bleibt */
 .topbar::before { content: ""; position: absolute; inset: 0; pointer-events: none; transition: opacity .28s ease;
-                  background: linear-gradient(180deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.12) 70%, transparent 100%); }
+                  background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.14) 70%, transparent 100%); }
 .topbar.scrolled::before { opacity: 0; }
-.topbar-inner { position: relative; }
-.topbar-inner { display: flex; align-items: center; gap: 18px; height: 74px; }
-.brand { font-family: var(--display); font-size: 20px; font-weight: 600; margin-right: auto; color: #fff;
-         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .28s ease; }
+.topbar-inner { position: relative; display: flex; align-items: center; gap: 18px; height: 70px; }
+.brand { font-family: var(--display); text-transform: var(--display-transform); font-size: 19px; font-weight: 700; margin-right: auto;
+         color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .28s ease; }
 .topnav { display: none; gap: 26px; font-size: 15px; }
-.topnav a { text-decoration: none; color: rgba(255,255,255,.88); transition: color .28s ease; }
+.topnav a { text-decoration: none; color: rgba(255,255,255,.9); }
 .topnav a:hover { color: #fff; }
 @media (min-width: 940px) { .topnav { display: flex; } }
-.topbar.scrolled { background: rgba(255,253,250,.95); backdrop-filter: blur(12px); box-shadow: 0 1px 0 var(--line); }
+.topbar.scrolled { background: var(--surface); box-shadow: 0 1px 0 var(--line); }
 .topbar.scrolled .brand { color: var(--ink); }
 .topbar.scrolled .topnav a { color: var(--ink-soft); }
 .topbar.scrolled .topnav a:hover { color: var(--accent); }
+.topbar .btn { display: none; }
+@media (min-width: 700px) { .topbar .btn { display: inline-flex; } }
 
 /* Buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 14px 26px; border-radius: 999px; border: 1px solid transparent;
   font-size: 15px; font-weight: 600; font-family: inherit; text-decoration: none;
-  cursor: pointer; transition: transform .12s ease, background .16s ease, box-shadow .16s ease, color .16s ease;
+  cursor: pointer; transition: transform .12s ease, background .16s ease, color .16s ease;
 }
 .btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 12px 26px -14px rgba(0,0,0,.65); }
+.btn-primary { background: var(--accent); color: var(--on-accent); }
 .btn-primary:hover { background: var(--accent-dark); }
 .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-.btn-light { background: #fff; color: var(--tint); }
-.btn-light:hover { background: #f3ece4; }
-.btn-outline-light { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.55); }
-.btn-outline-light:hover { background: rgba(255,255,255,.18); border-color: #fff; }
+.btn-light { background: #fff; color: #1a1a1a; }
+.btn-light:hover { background: #ece5db; }
+.btn-outline-light { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.6); }
+.btn-outline-light:hover { background: rgba(255,255,255,.2); border-color: #fff; }
 .btn-block { width: 100%; }
 .btn[disabled] { opacity: .5; cursor: not-allowed; }
 
-/* Hero */
-.hero { position: relative; color: #fff; background: var(--tint); overflow: hidden; }
+/* Hero: auf dem Handy muss alles Wichtige ohne Scrollen sichtbar sein */
+.hero { position: relative; color: #fff; background: var(--tint); overflow: hidden;
+        min-height: 100vh; min-height: 100svh; display: flex; align-items: flex-end; }
+@media (min-width: 900px) { .hero { min-height: 88vh; align-items: center; } }
 .hero-media { position: absolute; inset: 0; }
 .hero-media img { width: 100%; height: 100%; object-fit: cover; }
-.hero-overlay { position: absolute; inset: 0; }
-.hero-inner { position: relative; z-index: 2; width: 100%; max-width: 1140px; margin: 0 auto; padding: 170px 20px 120px; }
-.hero h1 { font-size: clamp(40px, 7.2vw, 74px); letter-spacing: -.015em; }
-.hero-kicker { text-transform: uppercase; letter-spacing: .22em; font-size: 12px; font-weight: 700; color: var(--gold); margin-bottom: 20px; }
-.hero-sub { margin-top: 22px; font-size: clamp(17px, 2.2vw, 20px); color: rgba(255,255,255,.86); }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
-.rating { display: inline-flex; align-items: center; gap: 10px; margin-top: 32px; font-size: 15px; color: rgba(255,255,255,.86); }
-.stars { color: var(--gold); letter-spacing: 2px; font-size: 17px; }
-
-.hero-vollbild-links .hero-overlay {
-  background: linear-gradient(95deg, rgba(var(--tint-rgb), .95) 0%, rgba(var(--tint-rgb), .88) 38%, rgba(var(--tint-rgb), .55) 66%, rgba(var(--tint-rgb), .22) 100%);
+.hero-overlay { position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(var(--tint-rgb), .55) 0%, rgba(var(--tint-rgb), .40) 34%, rgba(var(--tint-rgb), .92) 100%); }
+@media (min-width: 900px) {
+  .hero-overlay { background: linear-gradient(95deg, rgba(var(--tint-rgb), .93) 0%, rgba(var(--tint-rgb), .84) 40%, rgba(var(--tint-rgb), .45) 72%, rgba(var(--tint-rgb), .2) 100%); }
 }
-.hero-vollbild-links .hero-inner > * { max-width: 620px; }
+.hero-inner { position: relative; z-index: 2; width: 100%; max-width: 1140px; margin: 0 auto; padding: 100px 20px 116px; }
+@media (min-width: 900px) { .hero-inner { padding: 140px 20px 120px; } .hero-inner > * { max-width: 640px; } }
+.hero-kicker { text-transform: uppercase; letter-spacing: .2em; font-size: 12px; font-weight: 700; color: var(--gold); margin-bottom: 16px; }
+.hero h1 { font-size: clamp(34px, 8.4vw, 70px); }
+.hero-sub { margin-top: 16px; font-size: clamp(16px, 2.2vw, 20px); color: rgba(255,255,255,.88); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+@media (max-width: 899px) { .hero-actions { display: none; } }
+.rating { display: inline-flex; align-items: center; gap: 9px; margin-top: 14px; font-size: 15px; color: rgba(255,255,255,.92); flex-wrap: wrap; }
+.stars { color: var(--gold); letter-spacing: 2px; font-size: 16px; }
 
-.hero-vollbild-mitte .hero-overlay {
-  background: linear-gradient(180deg, rgba(var(--tint-rgb), .62) 0%, rgba(var(--tint-rgb), .80) 100%);
-}
-.hero-vollbild-mitte .hero-inner { text-align: center; }
-.hero-vollbild-mitte .hero-inner > * { max-width: 760px; margin-left: auto; margin-right: auto; }
-.hero-vollbild-mitte .hero-actions, .hero-vollbild-mitte .rating { justify-content: center; }
-
-.hero-geteilt { display: grid; grid-template-columns: 1fr; }
-.hero-geteilt .hero-overlay { display: none; }
-.hero-geteilt .hero-media { position: relative; inset: auto; min-height: 340px; }
-/* Gestapelt liegt das Bild über dem Text, die Kopfzeile überdeckt es – der
-   Textblock braucht dann keinen Platz für die Kopfzeile. */
-.hero-geteilt .hero-inner { max-width: none; padding: 56px clamp(20px, 5vw, 66px) 72px; display: flex; flex-direction: column; justify-content: center; }
-@media (min-width: 940px) {
-  .hero-geteilt { grid-template-columns: 1.05fr 1fr; }
-  .hero-geteilt .hero-media { min-height: 620px; order: 2; }
-  .hero-geteilt .hero-inner { padding: 150px clamp(28px, 4vw, 64px) 110px; }
-}
+/* USP-Leiste */
+.usp-strip { background: var(--accent); color: var(--on-accent); }
+.usp-list { display: flex; flex-wrap: wrap; gap: 10px 30px; justify-content: center; padding: 18px 0; font-size: 15px; font-weight: 600; }
+.usp-list span { display: inline-flex; align-items: center; gap: 9px; }
 
 /* Highlights */
-.hl-grid { display: grid; gap: 26px; grid-template-columns: 1fr; }
+.hl-grid { display: grid; gap: 24px; grid-template-columns: 1fr; }
 @media (min-width: 680px) { .hl-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1000px) { .hl-grid.spalten-3 { grid-template-columns: repeat(3, 1fr); } }
-.hl-card {
-  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
-  display: flex; flex-direction: column; transition: transform .18s ease, box-shadow .18s ease;
-}
-.hl-card:hover { transform: translateY(-4px); box-shadow: 0 24px 46px -26px rgba(40,24,12,.5); }
+.hl-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+           display: flex; flex-direction: column; transition: transform .18s ease; }
+.hl-card:hover { transform: translateY(-4px); }
 .hl-media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--soft); }
 .hl-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
 .hl-card:hover .hl-media img { transform: scale(1.05); }
-.hl-kat { position: absolute; left: 14px; top: 14px; background: rgba(var(--tint-rgb), .86); color: #fff;
+.hl-kat { position: absolute; left: 13px; top: 13px; background: rgba(var(--tint-rgb), .88); color: #fff;
           font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 11px; border-radius: 999px; }
-.hl-body { padding: 22px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.hl-name { font-family: var(--display); font-size: 21px; font-weight: 600; }
+.hl-body { padding: 21px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.hl-name { font-size: 20px; }
 .hl-desc { color: var(--ink-soft); font-size: 15px; flex: 1; }
-.hl-foot { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
-.hl-preis { font-size: 19px; font-weight: 600; font-family: var(--display); margin-right: auto; }
-.veg { display: inline-block; font-size: 11px; font-weight: 700; color: var(--success); border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
-.add-btn {
-  display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px;
-  border: 1px solid var(--accent); background: transparent; color: var(--accent);
-  font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .16s ease, color .16s ease;
-}
-.add-btn:hover { background: var(--accent); color: #fff; }
-.karte-hinweis { margin-top: 40px; text-align: center; color: var(--ink-soft); font-size: 15px; }
+.hl-foot { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+.hl-preis { font-size: 19px; font-weight: 700; font-family: var(--display); margin-right: auto; }
+.veg { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
+.add-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px;
+           border: 1px solid var(--accent); background: transparent; color: var(--accent);
+           font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .16s ease, color .16s ease; }
+.add-btn:hover { background: var(--accent); color: var(--on-accent); }
 
 /* Ablauf der Abholung */
-.steps { display: grid; gap: 22px; grid-template-columns: 1fr; margin-top: 56px; }
+.steps { display: grid; gap: 22px; grid-template-columns: 1fr; margin-top: 52px; }
 @media (min-width: 780px) { .steps { grid-template-columns: repeat(3, 1fr); } }
-.step { display: flex; gap: 16px; align-items: flex-start; }
-.step-n { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff;
-          display: grid; place-items: center; font-weight: 700; font-size: 16px; }
-.step h3 { font-size: 18px; margin-bottom: 4px; }
+.step { display: flex; gap: 15px; align-items: flex-start; }
+.step-n { flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+          display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+.step h3 { font-size: 17px; margin-bottom: 4px; }
 .step p { color: var(--ink-soft); font-size: 15px; }
 
-/* Ambiente */
-.amb-section { background: var(--soft); }
-.amb-grid { display: grid; gap: 34px; grid-template-columns: 1fr; align-items: center; }
-@media (min-width: 900px) { .amb-grid { grid-template-columns: 1fr 1.1fr; gap: 56px; } }
-.amb-collage { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.amb-collage img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
-.amb-collage .gross { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
-.amb-collage .klein { aspect-ratio: 1 / 1; }
-.amb-quote { margin-top: 28px; padding-left: 20px; border-left: 3px solid var(--accent); font-family: var(--display); font-size: 19px; line-height: 1.5; }
-.amb-quote span { display: block; margin-top: 8px; font-family: inherit; font-size: 14px; color: var(--ink-soft); font-style: normal; }
+/* Speisekarte als Akkordeon */
+.karte-section { background: var(--soft); }
+.kat { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-bottom: 14px; overflow: hidden; }
+.kat > summary { list-style: none; cursor: pointer; padding: 20px 22px; display: flex; align-items: center; gap: 14px;
+                 font-family: var(--display); text-transform: var(--display-transform); font-size: 20px; font-weight: 700; }
+.kat > summary::-webkit-details-marker { display: none; }
+.kat > summary::after { content: "+"; margin-left: auto; font-family: var(--body); font-size: 24px; line-height: 1; color: var(--accent); font-weight: 400; }
+.kat[open] > summary::after { content: "–"; }
+.kat > summary:hover { color: var(--accent); }
+.kat-anzahl { font-family: var(--body); text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+.kat-body { padding: 0 22px 8px; }
+.gericht { display: flex; align-items: flex-start; gap: 16px; padding: 15px 0; border-top: 1px solid var(--line); }
+.gericht-body { flex: 1; min-width: 0; }
+.gericht-name { font-weight: 600; }
+.gericht-desc { color: var(--ink-soft); font-size: 15px; margin-top: 2px; }
+.gericht-seite { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.gericht-preis { font-weight: 600; white-space: nowrap; }
+.mini-add { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--accent); background: transparent;
+            color: var(--accent); font-size: 20px; line-height: 1; cursor: pointer; transition: background .16s ease, color .16s ease; }
+.mini-add:hover { background: var(--accent); color: var(--on-accent); }
+
+/* Bildplätze für die eigenen Fotos */
+.foto-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .foto-grid { grid-template-columns: repeat(3, 1fr); } }
+.foto-slot { position: relative; border-radius: var(--radius); overflow: hidden; background: var(--soft); }
+.foto-slot img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+.foto-text { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 18px 18px; color: #fff;
+             background: linear-gradient(180deg, transparent, rgba(0,0,0,.82)); }
+.foto-text strong { font-family: var(--display); text-transform: var(--display-transform); font-size: 19px; display: block; }
+.foto-text span { font-size: 13px; color: rgba(255,255,255,.82); display: block; margin-top: 4px; }
+.foto-badge { position: absolute; right: 12px; top: 12px; font-size: 11px; font-weight: 700; color: #fff;
+              background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.45); border-radius: 999px; padding: 3px 10px; }
 
 /* Formulare */
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 34px; box-shadow: 0 22px 50px -32px rgba(40,24,12,.45); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
 .field-grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
 @media (min-width: 680px) { .field-grid { grid-template-columns: 1fr 1fr; } }
 .field { display: flex; flex-direction: column; gap: 7px; }
 .field-wide { grid-column: 1 / -1; }
-label { font-size: 14px; font-weight: 600; }
+label { font-size: 14px; font-weight: 600; color: var(--ink); }
 input, select, textarea {
   font-family: inherit; font-size: 16px; color: var(--ink);
-  padding: 13px 15px; border: 1px solid var(--line); border-radius: 11px; background: #fff; width: 100%;
+  padding: 13px 15px; border: 1px solid var(--line); border-radius: calc(var(--radius) / 2); background: var(--bg); width: 100%;
 }
 input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
-textarea { resize: vertical; min-height: 92px; }
+textarea { resize: vertical; min-height: 90px; }
 .hint { font-size: 13px; color: var(--ink-soft); font-weight: 400; }
 .error { font-size: 13px; color: var(--accent); display: none; }
 .field.invalid .error { display: block; }
 .field.invalid input, .field.invalid select { border-color: var(--accent); }
-.reserve-section { background: var(--tint); color: #fff; }
-.reserve-section .section-head p { color: rgba(255,255,255,.75); }
-.reserve-section .eyebrow { color: var(--gold); }
-.reserve-grid { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: start; }
-@media (min-width: 960px) { .reserve-grid { grid-template-columns: .85fr 1.15fr; gap: 56px; } }
-.reserve-pluspunkte { list-style: none; margin: 26px 0 0; padding: 0; }
-.reserve-pluspunkte li { display: flex; gap: 12px; padding: 11px 0; color: rgba(255,255,255,.85); font-size: 15px; }
-.reserve-pluspunkte .k { color: var(--gold); font-weight: 700; }
-.panel label { color: var(--ink); }
+.reserve-section { background: var(--soft); }
+.reserve-grid { display: grid; gap: 36px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 960px) { .reserve-grid { grid-template-columns: .85fr 1.15fr; gap: 54px; } }
+.reserve-pluspunkte { list-style: none; margin: 24px 0 0; padding: 0; }
+.reserve-pluspunkte li { display: flex; gap: 12px; padding: 10px 0; color: var(--ink-soft); font-size: 15px; }
+.reserve-pluspunkte .k { color: var(--accent); font-weight: 700; }
 
 /* Warenkorb */
-.cart-fab {
-  position: fixed; right: 20px; bottom: 20px; z-index: 50;
-  display: none; align-items: center; gap: 12px;
-  padding: 15px 24px; border: none; border-radius: 999px;
-  background: var(--accent); color: #fff; font-family: inherit; font-size: 15px; font-weight: 600;
-  cursor: pointer; box-shadow: 0 18px 36px -14px rgba(0,0,0,.7);
-}
+.cart-fab { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: none; align-items: center; gap: 12px;
+            padding: 15px 24px; border: none; border-radius: 999px; background: var(--accent); color: var(--on-accent);
+            font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 18px 36px -14px rgba(0,0,0,.7); }
 .cart-fab.visible { display: inline-flex; }
-.cart-count { background: rgba(255,255,255,.25); border-radius: 999px; padding: 1px 9px; font-size: 13px; }
-.overlay { position: fixed; inset: 0; background: rgba(20, 13, 8, .6); z-index: 60; opacity: 0; pointer-events: none; transition: opacity .22s ease; }
+@media (max-width: 899px) { .cart-fab, .cart-fab.visible { display: none; } }
+.cart-count { background: rgba(255,255,255,.28); border-radius: 999px; padding: 1px 9px; font-size: 13px; }
+
+/* Feste Aktionsleiste auf dem Handy */
+.mobilebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
+             display: grid; grid-template-columns: 1.25fr 1fr; gap: 10px;
+             padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+             background: var(--surface); border-top: 1px solid var(--line); }
+.mobilebar .btn { padding: 14px 10px; font-size: 15px; }
+@media (min-width: 900px) { .mobilebar { display: none; } }
+@media (max-width: 899px) { body { padding-bottom: 78px; } }
+
+.overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .62); z-index: 60; opacity: 0; pointer-events: none; transition: opacity .22s ease; }
 .overlay.open { opacity: 1; pointer-events: auto; }
-.drawer {
-  position: fixed; top: 0; right: 0; bottom: 0; z-index: 70;
-  width: min(440px, 100%); background: var(--bg);
-  display: flex; flex-direction: column;
-  transform: translateX(100%); transition: transform .28s ease;
-  box-shadow: -20px 0 50px -30px rgba(0,0,0,.6);
-}
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 70; width: min(440px, 100%); background: var(--bg);
+          display: flex; flex-direction: column; transform: translateX(100%); transition: transform .28s ease; }
 .drawer.open { transform: translateX(0); }
 .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 22px; border-bottom: 1px solid var(--line); }
-.drawer-head h3 { font-size: 21px; }
+.drawer-head h3 { font-size: 20px; }
 .icon-btn { border: none; background: transparent; font-size: 27px; line-height: 1; cursor: pointer; color: var(--ink-soft); padding: 4px 8px; }
 .drawer-body { flex: 1; overflow-y: auto; padding: 22px; }
 .drawer-foot { padding: 22px; border-top: 1px solid var(--line); background: var(--surface); }
@@ -358,41 +385,39 @@ textarea { resize: vertical; min-height: 92px; }
 .cart-line-name { font-size: 15px; font-weight: 600; }
 .cart-line-price { font-size: 14px; color: var(--ink-soft); }
 .qty { display: flex; align-items: center; gap: 4px; }
-.qty button { width: 31px; height: 31px; border-radius: 9px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-size: 17px; line-height: 1; color: var(--accent); }
+.qty button { width: 31px; height: 31px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-size: 17px; line-height: 1; color: var(--accent); }
 .qty span { min-width: 26px; text-align: center; font-weight: 600; font-size: 15px; }
 .cart-empty { text-align: center; color: var(--ink-soft); padding: 40px 10px; }
-.totals { display: flex; justify-content: space-between; font-size: 21px; font-weight: 600; margin-bottom: 16px; font-family: var(--display); }
+.totals { display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; margin-bottom: 16px; font-family: var(--display); }
 .drawer .field-grid { grid-template-columns: 1fr; }
 
 /* Bestätigung */
-.confirm-box {
-  position: fixed; z-index: 80; left: 50%; top: 50%; transform: translate(-50%, -46%);
-  width: min(490px, calc(100% - 32px)); max-height: 86vh; overflow-y: auto;
-  background: var(--surface); border-radius: 20px; padding: 36px 32px;
-  box-shadow: 0 30px 70px -30px rgba(0,0,0,.6); text-align: center;
-  opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease;
-}
+.confirm-box { position: fixed; z-index: 80; left: 50%; top: 50%; transform: translate(-50%, -46%);
+               width: min(490px, calc(100% - 32px)); max-height: 86vh; overflow-y: auto;
+               background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 34px 30px;
+               text-align: center; opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
 .confirm-box.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
-.confirm-icon { width: 64px; height: 64px; border-radius: 50%; background: #e7f4ec; color: var(--success); display: grid; place-items: center; font-size: 33px; margin: 0 auto 18px; }
-.confirm-box h3 { font-size: 25px; margin-bottom: 12px; }
-.confirm-summary { text-align: left; background: var(--soft); border-radius: 13px; padding: 17px 19px; margin: 22px 0; font-size: 15px; }
+.confirm-icon { width: 62px; height: 62px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
+                display: grid; place-items: center; font-size: 32px; margin: 0 auto 18px; }
+.confirm-box h3 { font-size: 24px; margin-bottom: 12px; }
+.confirm-summary { text-align: left; background: var(--soft); border-radius: calc(var(--radius) / 1.5); padding: 17px 19px; margin: 22px 0; font-size: 15px; }
 .confirm-summary div { display: flex; justify-content: space-between; gap: 16px; padding: 3px 0; }
 .confirm-summary .label { color: var(--ink-soft); }
 .demo-note { font-size: 13px; color: var(--ink-soft); margin-top: 16px; }
 
 /* Kontakt */
-.contact-grid { display: grid; gap: 34px; grid-template-columns: 1fr; }
-@media (min-width: 860px) { .contact-grid { grid-template-columns: 1fr 1fr; gap: 56px; } }
+.contact-grid { display: grid; gap: 32px; grid-template-columns: 1fr; }
+@media (min-width: 860px) { .contact-grid { grid-template-columns: 1fr 1fr; gap: 54px; } }
 .contact-list { list-style: none; margin: 0; padding: 0; }
 .contact-list li { display: flex; gap: 15px; padding: 16px 0; border-bottom: 1px solid var(--line); }
-.contact-list .k { font-size: 21px; }
+.contact-list .k { font-size: 20px; }
 .contact-list a { color: var(--accent); }
 .hours-row { display: flex; justify-content: space-between; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
 .hours-row span:first-child { color: var(--ink-soft); }
 .placeholder-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; margin-left: 10px; vertical-align: middle; }
 
-footer { background: var(--tint); color: rgba(255,255,255,.72); padding: 52px 0; font-size: 14px; }
-footer strong { color: #fff; font-family: var(--display); font-size: 17px; }
+footer { background: var(--tint); color: rgba(255,255,255,.72); padding: 48px 0; font-size: 14px; }
+footer strong { color: #fff; font-family: var(--display); text-transform: var(--display-transform); font-size: 17px; }
 .footer-note { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; line-height: 1.6; }
 `;
 
@@ -422,7 +447,7 @@ const PAGE_SCRIPT = `
     if (current.length === 0) {
       var empty = document.createElement("p");
       empty.className = "cart-empty";
-      empty.textContent = "Noch nichts ausgew\\u00E4hlt. St\\u00F6bern Sie in unseren Highlights.";
+      empty.textContent = "Noch nichts ausgew\\u00E4hlt. St\\u00F6bern Sie in unserer Karte.";
       list.appendChild(empty);
     } else {
       current.forEach(function (line) {
@@ -469,6 +494,7 @@ const PAGE_SCRIPT = `
     byId("fab-count").textContent = String(anzahl());
     byId("order-submit").disabled = current.length === 0;
     byId("cart-fab").className = current.length === 0 ? "cart-fab" : "cart-fab visible";
+    byId("bar-order").textContent = current.length === 0 ? "Bestellen" : "Bestellen \\u00B7 " + euro(total());
   }
 
   function changeQty(id, delta) {
@@ -572,6 +598,10 @@ const PAGE_SCRIPT = `
     onScroll();
 
     byId("cart-fab").addEventListener("click", openDrawer);
+    byId("bar-order").addEventListener("click", function () {
+      if (lines().length === 0) byId("karte").scrollIntoView({ behavior: "smooth" });
+      else openDrawer();
+    });
     byId("drawer-close").addEventListener("click", closeDrawer);
     byId("overlay").addEventListener("click", function () { closeDrawer(); closeConfirm(); });
     byId("confirm-close").addEventListener("click", closeConfirm);
@@ -663,7 +693,7 @@ const PAGE_SCRIPT = `
 
 function renderHighlights(highlights, assets) {
   return highlights
-    .map((gericht, index) => {
+    .map((gericht) => {
       const veg = gericht.vegetarisch ? '<span class="veg">vegetarisch</span>' : "";
       return `
       <article class="hl-card">
@@ -677,7 +707,7 @@ function renderHighlights(highlights, assets) {
           <div class="hl-foot">
             <span class="hl-preis">${formatPrice(gericht.preis)}</span>
             ${veg}
-            <button class="add-btn" type="button" data-add="hl-${index}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}">
+            <button class="add-btn" type="button" data-add="${gericht.id}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}">
               <span aria-hidden="true">+</span> Vorbestellen
             </button>
           </div>
@@ -687,17 +717,75 @@ function renderHighlights(highlights, assets) {
     .join("");
 }
 
-function renderRatingBadge(lead) {
+/**
+ * Die vollständige Karte als aufklappbare Liste – direkt im HTML statt als
+ * PDF, damit sie auf dem Handy lesbar ist und Google sie indexieren kann.
+ */
+function renderMenuAccordion(menu) {
+  return menu.kategorien
+    .map((kategorie, katIndex) => {
+      const gerichte = kategorie.gerichte
+        .map((gericht, gerichtIndex) => {
+          const veg = gericht.vegetarisch ? ' <span class="veg">vegetarisch</span>' : "";
+          return `
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">${escapeHtml(gericht.name)}${veg}</div>
+              <div class="gericht-desc">${escapeHtml(gericht.beschreibung)}</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">${formatPrice(gericht.preis)}</span>
+              <button class="mini-add" type="button" data-add="${katIndex}-${gerichtIndex}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}" aria-label="${escapeHtml(gericht.name)} vorbestellen">+</button>
+            </div>
+          </div>`;
+        })
+        .join("");
+
+      return `
+      <details class="kat"${katIndex === 0 ? " open" : ""}>
+        <summary>${escapeHtml(kategorie.name)} <span class="kat-anzahl">${kategorie.gerichte.length} Gerichte</span></summary>
+        <div class="kat-body">${gerichte}</div>
+      </details>`;
+    })
+    .join("");
+}
+
+/**
+ * Die drei Bildplätze: Haus, Team und Bestseller. Jeder zeigt ein Motiv, das
+ * zur Beschriftung passt, damit der Wirt sofort sieht, welches eigene Foto
+ * dort hingehört.
+ */
+function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, assets) {
+  const dateien = [
+    assetFileName(hausBild, "ambiente"),
+    assetFileName(teamBild, "ambiente"),
+    bestsellerBild ? assetFileName(bestsellerBild, "gericht") : assetFileName(hausBild, "ambiente"),
+  ];
+
+  return FOTO_SLOTS.map(
+    ({ titel, hinweis }, index) => `
+      <figure class="foto-slot" style="margin:0">
+        <img src="${assets}/${dateien[index]}" alt="" loading="lazy">
+        <span class="foto-badge">Platzhalter</span>
+        <figcaption class="foto-text">
+          <strong>${escapeHtml(titel)}</strong>
+          <span>${escapeHtml(hinweis)}</span>
+        </figcaption>
+      </figure>`,
+  ).join("");
+}
+
+function renderRating(lead) {
   if (!lead.rating) return "";
   const rounded = Math.round(Number(lead.rating));
   const stars = "★".repeat(rounded) + "☆".repeat(Math.max(0, 5 - rounded));
   const count = lead.anzahlBewertungen
-    ? ` · ${formatCount(lead.anzahlBewertungen)} Google-Bewertungen`
+    ? ` (${formatCount(lead.anzahlBewertungen)} Bewertungen)`
     : "";
   return `
     <div class="rating">
       <span class="stars" aria-hidden="true">${stars}</span>
-      <span>${String(lead.rating).replace(".", ",")} von 5${count}</span>
+      <span><strong>${String(lead.rating).replace(".", ",")}/5</strong> auf Google${count}</span>
     </div>`;
 }
 
@@ -706,17 +794,19 @@ function optionList(values) {
 }
 
 /**
- * Baut eine eigenständige HTML-Landingpage für einen Lead: Bild-Hero,
- * Highlights aus der Karte mit Abholbestellung und Tischreservierung.
- * Farben, Schrift, Hero-Layout und Motive ergeben sich fest aus dem Lead,
- * damit nicht alle Entwürfe gleich aussehen.
+ * Baut eine eigenständige HTML-Landingpage für einen Lead. Aufbau folgt dem
+ * Bestellweg: Hero mit Konzept, Ort und Bewertung ohne Scrollen, feste
+ * Aktionsleiste auf dem Handy, bebilderte Highlights, vollständige Karte zum
+ * Aufklappen, dann Reservierung und Kontakt.
  */
 export function buildLandingPage(lead, options = {}) {
   const menu = options.menu ?? menuForLead(lead);
-  const theme = options.theme ?? themeForLead(lead);
+  const gestaltung = options.gestaltung ?? themeForLead(lead);
+  const t = gestaltung.theme;
   const openingHours = options.öffnungszeiten ?? DEFAULT_OPENING_HOURS;
   const kontaktEmail = options.kontaktEmail ?? "";
   const assets = options.assetsPath ?? "../assets";
+  const fontCss = options.fontCss ?? "";
 
   const name = lead.name || "Ihr Restaurant";
   const ort = lead.ort || "";
@@ -727,11 +817,12 @@ export function buildLandingPage(lead, options = {}) {
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(adresse)}`
     : "";
 
-  // Aus der vollen Karte wird bewusst nur ein Auszug gezeigt.
+  const lage = ortsbezug(adresse, ort);
+  const schlagzeile = lage ? `${menu.tagline} – ${lage}.` : `${menu.tagline}.`;
+
+  // Aus der vollen Karte wird für die Highlights nur ein Auszug bebildert.
   const kandidaten = highlightCandidates(menu);
-  const start = theme.seed % Math.max(1, kandidaten.length);
-  // 6, 4 oder 3 Kacheln füllen das Raster restlos – eine einzelne Kachel in
-  // der letzten Reihe sieht nach Fehler aus.
+  const start = gestaltung.seed % Math.max(1, kandidaten.length);
   const anzahlHighlights =
     [6, 4, 3].find((n) => n <= kandidaten.length) ?? kandidaten.length;
   const highlights = Array.from(
@@ -765,45 +856,38 @@ export function buildLandingPage(lead, options = {}) {
     )
     .join("");
 
-  const heroContent = `
-    <div class="hero-kicker">${escapeHtml(menu.label)}${ort ? ` · ${escapeHtml(ort)}` : ""}</div>
-    <h1>${escapeHtml(name)}</h1>
-    <p class="hero-sub">${escapeHtml(menu.tagline)}. Reservieren Sie Ihren Tisch in unter einer Minute – oder bestellen Sie Ihr Essen bequem zur Abholung vor.</p>
-    <div class="hero-actions">
-      <a class="btn btn-light" href="#reservierung">Tisch reservieren</a>
-      <a class="btn btn-outline-light" href="#highlights">Zur Abholung bestellen</a>
-    </div>
-    ${renderRatingBadge(lead)}`;
-
-  const ratingQuote = lead.rating
-    ? `<blockquote class="amb-quote">„Wir kommen immer wieder gern hierher.“
-         <span>Gäste bewerten uns mit ${String(lead.rating).replace(".", ",")} von 5 Sternen auf Google.</span>
-       </blockquote>`
-    : "";
+  const uspBadges = (menu.usps ?? [])
+    .map((usp) => `<span><span aria-hidden="true">✓</span> ${escapeHtml(usp)}</span>`)
+    .join("");
 
   return `<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${escapeHtml(name)}${ort ? ` – ${escapeHtml(ort)}` : ""}</title>
-<meta name="description" content="${escapeHtml(`${name}${ort ? ` in ${ort}` : ""} – ${menu.tagline}. Jetzt Tisch reservieren oder Essen zur Abholung vorbestellen.`)}">
+<title>${escapeHtml(name)}${ort ? ` – ${escapeHtml(menu.konzept ?? "Restaurant")} in ${escapeHtml(ort)}` : ""}</title>
+<meta name="description" content="${escapeHtml(`${name}${ort ? ` in ${ort}` : ""}: ${menu.konzept ?? menu.label}. ${schlagzeile} Jetzt Tisch reservieren oder zur Abholung vorbestellen.`)}">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
 <style>
+${fontCss}
 :root {
-  --ink: #1d1613;
-  --ink-soft: #625349;
-  --bg: #fffdfa;
-  --surface: #ffffff;
-  --line: #ebe1d6;
-  --success: #2f7d55;
-  --accent: ${theme.palette.accent};
-  --accent-dark: ${theme.palette.dark};
-  --gold: ${theme.palette.gold};
-  --tint: ${theme.palette.tint};
-  --tint-rgb: ${theme.palette.tintRgb};
-  --soft: ${theme.palette.soft};
-  --display: ${theme.fontStack};
+  --bg: ${t.bg};
+  --surface: ${t.surface};
+  --soft: ${t.soft};
+  --ink: ${t.ink};
+  --ink-soft: ${t.inkSoft};
+  --line: ${t.line};
+  --accent: ${t.accent};
+  --accent-dark: ${t.accentDark};
+  --on-accent: ${t.onAccent};
+  --gold: ${t.gold};
+  --tint: ${t.tint};
+  --tint-rgb: ${t.tintRgb};
+  --display: ${t.display};
+  --body: ${t.body};
+  --display-transform: ${t.displayTransform};
+  --display-tracking: ${t.displayTracking};
+  --radius: ${t.radius};
 }
 ${PAGE_STYLES}
 </style>
@@ -815,7 +899,7 @@ ${PAGE_STYLES}
     <div class="brand">${escapeHtml(name)}</div>
     <nav class="topnav">
       <a href="#highlights">Highlights</a>
-      <a href="#ambiente">Bei uns</a>
+      <a href="#karte">Speisekarte</a>
       <a href="#reservierung">Reservierung</a>
       <a href="#kontakt">Kontakt</a>
     </nav>
@@ -823,25 +907,36 @@ ${PAGE_STYLES}
   </div>
 </header>
 
-<section class="hero hero-${theme.heroLayout}">
+<section class="hero">
   <div class="hero-media">
-    <img src="${assets}/${assetFileName(theme.heroImage, "hero")}" alt="${escapeHtml(name)}">
+    <img src="${assets}/${assetFileName(gestaltung.heroImage, "hero")}" alt="${escapeHtml(name)}">
   </div>
   <div class="hero-overlay"></div>
-  <div class="hero-inner">${heroContent}</div>
+  <div class="hero-inner">
+    <div class="hero-kicker">${escapeHtml(menu.konzept ?? menu.label)}${ort ? ` · in ${escapeHtml(ort)}` : ""}</div>
+    <h1>${escapeHtml(name)}</h1>
+    ${renderRating(lead)}
+    <p class="hero-sub">${escapeHtml(schlagzeile)}</p>
+    <div class="hero-actions">
+      <a class="btn btn-light" href="#karte">Zur Abholung bestellen</a>
+      <a class="btn btn-outline-light" href="#reservierung">Tisch reservieren</a>
+    </div>
+  </div>
+</section>
+
+<section class="usp-strip">
+  <div class="wrap"><div class="usp-list">${uspBadges}</div></div>
 </section>
 
 <section class="section" id="highlights">
   <div class="wrap">
     <div class="section-head mitte">
       <div class="eyebrow">Unsere Highlights</div>
-      <h2>Das essen unsere Gäste am liebsten</h2>
-      <p>Ein Auszug aus unserer Karte – alles frisch zubereitet. Zum Abholen einfach vorbestellen und zur Wunschzeit mitnehmen.</p>
+      <h2>Das bestellen unsere Gäste am liebsten</h2>
+      <p>Alles frisch zubereitet. Zum Abholen einfach vorbestellen und zur Wunschzeit mitnehmen.</p>
     </div>
 
     <div class="hl-grid ${spalten}">${renderHighlights(highlights, assets)}</div>
-
-    <p class="karte-hinweis">Das ist nur ein Auszug. Die vollständige Karte finden Sie bei uns im Haus.</p>
 
     <div class="steps">
       <div class="step">
@@ -860,21 +955,32 @@ ${PAGE_STYLES}
   </div>
 </section>
 
-<section class="section amb-section" id="ambiente">
+<section class="section karte-section" id="karte">
   <div class="wrap">
-    <div class="amb-grid">
-      <div>
-        <div class="eyebrow">Bei uns</div>
-        <h2 style="font-size:clamp(28px,4.2vw,40px);margin-bottom:18px">${escapeHtml(menu.label)}, wie sie sein soll</h2>
-        <p style="color:var(--ink-soft);font-size:17px">${escapeHtml(menu.geschichte)}</p>
-        ${ratingQuote}
-      </div>
-      <div class="amb-collage">
-        <img class="gross" src="${assets}/${assetFileName(theme.ambienteImages[0], "ambiente")}" alt="Bei ${escapeHtml(name)}" loading="lazy">
-        <img class="klein" src="${assets}/${assetFileName(theme.ambienteImages[1], "ambiente")}" alt="" loading="lazy">
-        <img class="klein" src="${assets}/${assetFileName(theme.ambienteImages[2], "ambiente")}" alt="" loading="lazy">
-      </div>
+    <div class="section-head mitte">
+      <div class="eyebrow">Speisekarte</div>
+      <h2>Unsere ganze Karte</h2>
+      <p>Kategorie antippen zum Aufklappen. Jedes Gericht lässt sich direkt zur Abholung vorbestellen.</p>
     </div>
+    ${renderMenuAccordion(menu)}
+  </div>
+</section>
+
+<section class="section" id="ambiente">
+  <div class="wrap">
+    <div class="section-head mitte">
+      <div class="eyebrow">Bei uns</div>
+      <h2>${escapeHtml(menu.konzept ?? menu.label)}${ort ? ` in ${escapeHtml(ort)}` : ""}</h2>
+      <p>${escapeHtml(menu.geschichte)}</p>
+    </div>
+    <div class="foto-grid">${renderFotoSlots(
+      {
+        hausBild: gestaltung.hausBild,
+        teamBild: gestaltung.teamBild,
+        bestsellerBild: highlights[0]?.bild,
+      },
+      assets,
+    )}</div>
   </div>
 </section>
 
@@ -883,8 +989,8 @@ ${PAGE_STYLES}
     <div class="reserve-grid">
       <div>
         <div class="eyebrow">Reservierung</div>
-        <h2 style="font-size:clamp(30px,4.6vw,44px);margin-bottom:16px">Tisch reservieren</h2>
-        <p style="color:rgba(255,255,255,.78);font-size:18px">Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
+        <h2 style="font-size:clamp(28px,4.4vw,42px);margin-bottom:16px">Tisch reservieren</h2>
+        <p style="color:var(--ink-soft);font-size:18px">Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
         <ul class="reserve-pluspunkte">
           <li><span class="k">✓</span><span>Rund um die Uhr buchbar, auch außerhalb der Öffnungszeiten</span></li>
           <li><span class="k">✓</span><span>Sofortige Bestätigung, ganz ohne Anruf</span></li>
@@ -949,7 +1055,7 @@ ${PAGE_STYLES}
     <div class="contact-grid">
       <ul class="contact-list">${kontaktZeilen}</ul>
       <div>
-        <h3 style="font-size:21px;margin-bottom:12px">Öffnungszeiten<span class="placeholder-badge">Platzhalter</span></h3>
+        <h3 style="font-size:20px;margin-bottom:12px">Öffnungszeiten<span class="placeholder-badge">Platzhalter</span></h3>
         ${hoursRows}
       </div>
     </div>
@@ -961,6 +1067,11 @@ ${PAGE_STYLES}
   <span class="cart-count" id="fab-count">0</span>
   <span id="fab-total">0,00 €</span>
 </button>
+
+<div class="mobilebar" id="mobilebar">
+  <button class="btn btn-primary" id="bar-order" type="button">Bestellen</button>
+  <a class="btn btn-ghost" href="#reservierung">Reservieren</a>
+</div>
 
 <div class="overlay" id="overlay"></div>
 
@@ -977,7 +1088,7 @@ ${PAGE_STYLES}
           <label for="ord-abholzeit">Abholzeit</label>
           <select id="ord-abholzeit" name="abholzeit" required>
             <option value="">Bitte wählen</option>
-            <option>So schnell wie möglich (ca. 30 Min.)</option>
+            <option>So schnell wie möglich (ca. 20 Min.)</option>
             ${optionList(PICKUP_SLOTS)}
           </select>
           <span class="error">Bitte wählen Sie eine Abholzeit.</span>
