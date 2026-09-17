@@ -28,7 +28,8 @@ function parseFlag(argv, name, standard) {
 
 const argv = process.argv.slice(2);
 const slug = parseFlag(argv, "--betrieb", process.env.BETRIEB || "mein-lokal");
-const port = Number(parseFlag(argv, "--port", process.env.PORT || 3200));
+// Bewusst nicht PORT: das gehört dem persönlichen Dashboard auf 3000.
+const port = Number(parseFlag(argv, "--port", process.env.WIRT_PORT || 3200));
 
 /**
  * Die öffentlichen Endpunkte nimmt jeder Gast an, der die Seite offen hat.
@@ -223,6 +224,19 @@ const server = createServer(async (req, res) => {
 
   res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
   res.end("Nicht gefunden");
+});
+
+
+// Ein belegter Port ist der häufigste Stolperstein beim Start. Die Meldung
+// von Node ("EADDRINUSE") sagt nicht, was zu tun ist – diese hier schon.
+server.on("error", (fehler) => {
+  if (fehler.code === "EADDRINUSE") {
+    console.log(`\n⚠️  Port ${port} ist schon belegt – dort läuft bereits etwas.`);
+    console.log(`   Anderen Port wählen:  npm run wirt -- --port ${port + 1}\n`);
+    process.exitCode = 1;
+    return;
+  }
+  throw fehler;
 });
 
 server.listen(port, () => {

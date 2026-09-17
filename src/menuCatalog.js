@@ -13,12 +13,58 @@ const CUISINE_RULES = [
       "roma", "toscana", "vesuvio", "milano", "venezia", "sapori",
     ],
   },
+  // Die spezielleren Küchen stehen vor "asiatisch": ein "Sushi Bar Kyoto"
+  // soll japanisch werden und nicht in der Sammelkategorie landen. Die Regeln
+  // werden der Reihe nach geprüft, die erste passende gewinnt.
+  {
+    cuisine: "japanisch",
+    keywords: [
+      "sushi", "japan", "ramen", "sakura", "kyoto", "tokio", "tokyo", "osaka",
+      "izakaya", "teriyaki", "wasabi", "nippon", "yakitori", "maki",
+    ],
+  },
+  {
+    cuisine: "thailaendisch",
+    keywords: [
+      "thai", "bangkok", "siam", "chiang", "phuket", "krabi", "isaan",
+      "lemongras", "lemongrass", "wong",
+    ],
+  },
+  {
+    cuisine: "vietnamesisch",
+    keywords: [
+      "vietnam", "saigon", "hanoi", "pho ", "phở", "bánh", "banh mi",
+      "mekong", "viet", "hoi an", "da nang",
+    ],
+  },
+  {
+    cuisine: "indisch",
+    keywords: [
+      "indi", "tandoor", "curry", "masala", "bombay", "mumbai", "delhi",
+      "punjab", "goa", "taj", "maharaja", "namaste", "himalaya", "ganesha",
+    ],
+  },
+  {
+    cuisine: "chinesisch",
+    keywords: [
+      "china", "chines", "peking", "beijing", "shanghai", "szechuan",
+      "sichuan", "kanton", "canton", "mandarin", "dragon", "bambus",
+      "lotus", "panda", "dim sum", "ming", "jade", "wan tan", "drache",
+    ],
+  },
+  {
+    cuisine: "syrisch",
+    keywords: [
+      "syri", "damaskus", "damascus", "aleppo", "halab", "levante",
+      "schawarma", "shawarma", "hummus", "falafel", "orient", "beirut",
+      "libanes", "cedar", "zeder",
+    ],
+  },
+  // Sammelkategorie für alles, was sich nicht genauer einordnen lässt –
+  // die panasiatische Nudelbar gibt es ja wirklich.
   {
     cuisine: "asiatisch",
-    keywords: [
-      "asia", "china", "chines", "thai", "sushi", "wok", "bambus", "lotus",
-      "mongol", "vietnam", "panda", "saigon", "bangkok",
-    ],
+    keywords: ["asia", "asien", "mongol", "fusion", "bowl", "noodle", "nudelbar"],
   },
   {
     cuisine: "griechisch",
@@ -268,7 +314,264 @@ export const MENUS = {
       },
     ],
   },
+
+  chinesisch: {
+    label: "Chinesische Küche",
+    tagline: "Aus dem Wok, bei voller Hitze",
+    konzept: "Wok, Dim Sum & Ente",
+    usps: ["Erst auf Bestellung im Wok", "Abholung in 20 Minuten", "Direkt bei uns, ohne Vermittlungsgebühr"],
+    geschichte:
+      "Der Wok steht bei über 300 Grad. Was hineinkommt, ist in zwei Minuten fertig – deshalb wird bei uns erst gebraten, wenn Sie bestellt haben. Die Teigtaschen falten wir jeden Morgen von Hand.",
+    kategorien: [
+      {
+        name: "Dim Sum & Vorspeisen",
+        gerichte: [
+          { name: "Jiaozi (8 Stück)", beschreibung: "Teigtaschen mit Schwein und Chinakohl, dazu Chili-Essig", preis: 8.9, bild: "photo-1523905330026-b8bd1f5f320e" },
+          { name: "Gedämpfte Gemüsetaschen (6 Stück)", beschreibung: "Shiitake, Frühlingszwiebel, Ingwer", preis: 7.9, vegetarisch: true, bild: "photo-1496116218417-1a781b1c416c" },
+          { name: "Wan-Tan-Suppe", beschreibung: "Klare Brühe, gefüllte Teigtaschen, Frühlingszwiebel", preis: 6.5 },
+          { name: "Sesam-Gurken", beschreibung: "Eingelegt mit Knoblauch und Reisessig", preis: 5.5, vegetarisch: true },
+        ],
+      },
+      {
+        name: "Aus dem Wok",
+        gerichte: [
+          { name: "Rindfleisch Szechuan", beschreibung: "Scharf, mit Paprika, Bambus und Szechuanpfeffer", preis: 17.5, bild: "photo-1504674900247-0877df9cc836" },
+          { name: "Hähnchen Gong Bao", beschreibung: "Erdnüsse, getrocknete Chili, Frühlingszwiebel", preis: 15.9 },
+          { name: "Mapo Tofu", beschreibung: "Seidentofu in scharfer Bohnensoße", preis: 13.5, vegetarisch: true },
+          { name: "Gebratener Reis mit Ei und Gemüse", beschreibung: "Mit Erbsen, Karotten und Frühlingszwiebel", preis: 11.9, vegetarisch: true, bild: "photo-1512058564366-18510be2db19" },
+        ],
+      },
+      {
+        name: "Ente & Nudeln",
+        gerichte: [
+          { name: "Knusprige Ente auf Mie-Nudeln", beschreibung: "Mit Pak Choi und Austernsoße", preis: 19.9, bild: "photo-1585032226651-759b368d7246" },
+          { name: "Gebratene Nudeln Chow Mein", beschreibung: "Mit Hähnchen, Sojasprossen und Sesam", preis: 14.5 },
+          { name: "Gebackene Banane", beschreibung: "Mit Honig und Sesam", preis: 6.5, vegetarisch: true },
+        ],
+      },
+    ],
+  },
+
+  thailaendisch: {
+    label: "Thailändische Küche",
+    tagline: "Scharf, sauer, süß und salzig – alles in einem Gericht",
+    konzept: "Curry, Wok & Street Food",
+    usps: ["Schärfe nach Wunsch", "Abholung in 20 Minuten", "Direkt bei uns, ohne Vermittlungsgebühr"],
+    geschichte:
+      "Unsere Currypasten stampfen wir selbst im Mörser – Zitronengras, Galgant, Kaffirlimette. Sagen Sie uns einfach, wie scharf Sie es mögen; wir kochen von mild bis thailändisch-scharf.",
+    kategorien: [
+      {
+        name: "Suppen & Salate",
+        gerichte: [
+          { name: "Tom Yum Goong", beschreibung: "Scharf-saure Garnelensuppe mit Zitronengras und Pilzen", preis: 8.9, bild: "photo-1455619452474-d2be8b1e70cd" },
+          { name: "Tom Kha Gai", beschreibung: "Kokosmilchsuppe mit Hähnchen und Galgant", preis: 8.5 },
+          { name: "Som Tam", beschreibung: "Grüner Papayasalat mit Erdnüssen und Limette", preis: 9.5, vegetarisch: true },
+        ],
+      },
+      {
+        name: "Curry",
+        gerichte: [
+          { name: "Grünes Curry mit Hähnchen", beschreibung: "Kokosmilch, Thai-Auberginen, Basilikum", preis: 15.5, bild: "photo-1587040690786-b091531837a2" },
+          { name: "Rotes Curry mit Ente", beschreibung: "Ananas, Tomate, Kokosmilch", preis: 18.9, bild: "photo-1628432017781-49e012d769b3" },
+          { name: "Massaman Curry mit Rind", beschreibung: "Mild, mit Kartoffel, Erdnuss und Zimt", preis: 17.5, bild: "photo-1618449840665-9ed506d73a34" },
+          { name: "Gemüsecurry gelb", beschreibung: "Kurkuma, Kokosmilch, Saisongemüse", preis: 13.5, vegetarisch: true },
+        ],
+      },
+      {
+        name: "Wok & Dessert",
+        gerichte: [
+          { name: "Pad Thai mit Hähnchen", beschreibung: "Reisnudeln, Ei, Erdnüsse, Limette", preis: 14.5, bild: "photo-1559314809-0d155014e29e" },
+          { name: "Pad Krapao", beschreibung: "Hackfleisch mit Thai-Basilikum und Spiegelei", preis: 14.9 },
+          { name: "Mango mit Klebreis", beschreibung: "Mit Kokossoße und Sesam", preis: 7.5, vegetarisch: true },
+        ],
+      },
+    ],
+  },
+
+  vietnamesisch: {
+    label: "Vietnamesische Küche",
+    tagline: "Leicht, frisch und mit viel Kräutern",
+    konzept: "Phở, Bánh Mì & Sommerrollen",
+    usps: ["Brühe zieht 12 Stunden", "Abholung in 20 Minuten", "Direkt bei uns, ohne Vermittlungsgebühr"],
+    geschichte:
+      "Die Brühe für unser Phở köchelt zwölf Stunden mit Rinderknochen, geröstetem Ingwer, Sternanis und Zimt. Das lässt sich nicht beschleunigen – deshalb setzen wir sie jeden Abend für den nächsten Tag an.",
+    kategorien: [
+      {
+        name: "Vorspeisen",
+        gerichte: [
+          { name: "Sommerrollen (3 Stück)", beschreibung: "Reispapier, Garnele, Minze, Erdnusssoße", preis: 7.9 },
+          { name: "Sommerrollen vegetarisch (3 Stück)", beschreibung: "Tofu, Mango, Koriander", preis: 7.5, vegetarisch: true },
+          { name: "Frittierte Frühlingsrollen (4 Stück)", beschreibung: "Mit Glasnudeln und Nước-Chấm-Dip", preis: 6.9 },
+        ],
+      },
+      {
+        name: "Phở & Suppen",
+        gerichte: [
+          { name: "Phở Bò", beschreibung: "Rinderbrühe, Reisbandnudeln, Rinderfilet, Thai-Basilikum", preis: 15.5, bild: "photo-1597345637412-9fd611e758f3" },
+          { name: "Phở Gà", beschreibung: "Hühnerbrühe, Reisbandnudeln, Hähnchen, Frühlingszwiebel", preis: 14.5, bild: "photo-1589570658214-002314b1520f" },
+          { name: "Phở Chay", beschreibung: "Gemüsebrühe mit Tofu und Pilzen", preis: 13.5, vegetarisch: true, bild: "photo-1582878826629-29b7ad1cdc43" },
+        ],
+      },
+      {
+        name: "Bánh Mì & Bowls",
+        gerichte: [
+          { name: "Bánh Mì mit Schweinebauch", beschreibung: "Baguette, eingelegtes Gemüse, Koriander, Chili", preis: 9.9, bild: "photo-1710532774170-9844f837ae54" },
+          { name: "Bánh Mì mit Zitronengras-Tofu", beschreibung: "Baguette, Gurke, eingelegte Karotte", preis: 8.9, vegetarisch: true, bild: "photo-1677354469642-3e4fc5dbbb4a" },
+          { name: "Bún Bowl mit gegrilltem Schwein", beschreibung: "Reisnudeln, Kräuter, Erdnüsse, Fischsoßen-Dressing", preis: 14.9 },
+          { name: "Vietnamesischer Eiskaffee", beschreibung: "Mit gesüßter Kondensmilch", preis: 4.5, vegetarisch: true },
+        ],
+      },
+    ],
+  },
+
+  japanisch: {
+    label: "Japanische Küche",
+    tagline: "Ruhig zubereitet, klar im Geschmack",
+    konzept: "Sushi, Ramen & Izakaya",
+    usps: ["Fisch täglich frisch", "Abholung in 20 Minuten", "Direkt bei uns, ohne Vermittlungsgebühr"],
+    geschichte:
+      "Reis, Fisch, Zeit – mehr braucht gutes Sushi nicht. Unser Reis wird jeden Mittag frisch gewürzt und ist nach vier Stunden verbraucht. Was übrig bleibt, kommt nicht am nächsten Tag zurück auf die Karte.",
+    kategorien: [
+      {
+        name: "Vorspeisen",
+        gerichte: [
+          { name: "Edamame", beschreibung: "Mit Meersalz", preis: 5.5, vegetarisch: true },
+          { name: "Gyoza (5 Stück)", beschreibung: "Gebratene Teigtaschen mit Schwein und Kohl", preis: 7.9, bild: "photo-1588166524938-1ee110d7dcef" },
+          { name: "Miso-Suppe", beschreibung: "Mit Tofu, Wakame und Frühlingszwiebel", preis: 4.5, vegetarisch: true },
+        ],
+      },
+      {
+        name: "Sushi",
+        gerichte: [
+          { name: "Sushi-Box (12 Stück)", beschreibung: "Gemischte Auswahl, mit Wasabi und Ingwer", preis: 18.9, bild: "photo-1553621042-f6e147245754" },
+          { name: "Nigiri Lachs (2 Stück)", beschreibung: "Auf handgeformtem Reis", preis: 5.5 },
+          { name: "Maki Avocado-Gurke (6 Stück)", beschreibung: "Mit Sesam", preis: 6.5, vegetarisch: true },
+          { name: "Chirashi-Schale", beschreibung: "Sushireis mit Sashimi und eingelegtem Gemüse", preis: 21.5 },
+        ],
+      },
+      {
+        name: "Ramen & Warmes",
+        gerichte: [
+          { name: "Shoyu-Ramen", beschreibung: "Sojabrühe, Ei, Chashu-Schwein, Frühlingszwiebel", preis: 14.9, bild: "photo-1569718212165-3a8278d5f624" },
+          { name: "Miso-Ramen vegetarisch", beschreibung: "Mit Mais, Pilzen und Sesamöl", preis: 13.5, vegetarisch: true },
+          { name: "Katsu Curry", beschreibung: "Paniertes Hähnchen, japanische Currysoße, Reis", preis: 16.5 },
+          { name: "Mochi-Eis (3 Stück)", beschreibung: "Matcha, Mango, Sesam", preis: 6.5, vegetarisch: true },
+        ],
+      },
+    ],
+  },
+
+  indisch: {
+    label: "Indische Küche",
+    tagline: "Gewürze, die am Morgen geröstet werden",
+    konzept: "Curry, Tandoor & Biryani",
+    usps: ["Gewürze täglich frisch geröstet", "Abholung in 20 Minuten", "Direkt bei uns, ohne Vermittlungsgebühr"],
+    geschichte:
+      "Wir rösten unsere Gewürze jeden Morgen und mahlen sie danach – fertige Currypulver kommen uns nicht ins Haus. Der Tandoor-Ofen läuft ab elf Uhr, das Naan kommt direkt von der Ofenwand auf Ihren Teller.",
+    kategorien: [
+      {
+        name: "Vorspeisen",
+        gerichte: [
+          { name: "Samosa (2 Stück)", beschreibung: "Mit Kartoffel, Erbsen und Kreuzkümmel", preis: 6.5, vegetarisch: true },
+          { name: "Onion Bhaji", beschreibung: "Zwiebelringe im Kichererbsenteig, Minz-Chutney", preis: 6.9, vegetarisch: true },
+          { name: "Linsensuppe Dal Shorba", beschreibung: "Mit Koriander und Ingwer", preis: 5.9, vegetarisch: true },
+        ],
+      },
+      {
+        name: "Curry",
+        gerichte: [
+          { name: "Butter Chicken", beschreibung: "Tomate, Sahne, Kardamom – mild", preis: 16.5, bild: "photo-1603894584373-5ac82b2ae398" },
+          { name: "Chicken Tikka Masala", beschreibung: "Aus dem Tandoor, in würziger Tomatensoße", preis: 16.9, bild: "photo-1603496987351-f84a3ba5ec85" },
+          { name: "Lamm Rogan Josh", beschreibung: "Kaschmirische Art, mit Joghurt und Chili", preis: 19.5, bild: "photo-1631452180519-c014fe946bc7" },
+          { name: "Palak Paneer", beschreibung: "Spinat mit hausgemachtem Frischkäse", preis: 14.5, vegetarisch: true, bild: "photo-1588166524941-3bf61a9c41db" },
+          { name: "Chana Masala", beschreibung: "Kichererbsen mit Tomate und Kreuzkümmel", preis: 13.5, vegetarisch: true },
+        ],
+      },
+      {
+        name: "Tandoor, Biryani & Beilagen",
+        gerichte: [
+          { name: "Chicken Biryani", beschreibung: "Basmati mit Safran, Röstzwiebeln und Raita", preis: 16.9, bild: "photo-1565557623262-b51c2513a641" },
+          { name: "Tandoori-Hähnchen (halb)", beschreibung: "Über Nacht in Joghurt und Gewürzen eingelegt", preis: 17.5 },
+          { name: "Naan mit Knoblauch", beschreibung: "Frisch aus dem Tandoor", preis: 3.9, vegetarisch: true },
+          { name: "Mango-Lassi", beschreibung: "Joghurtgetränk, gekühlt", preis: 4.5, vegetarisch: true },
+        ],
+      },
+    ],
+  },
+
+  syrisch: {
+    label: "Syrische Küche",
+    tagline: "Mezze, Grill und Gastfreundschaft aus Aleppo und Damaskus",
+    konzept: "Mezze, Schawarma & Grill",
+    usps: ["Alles frisch am Tag zubereitet", "Abholung in 20 Minuten", "Direkt bei uns, ohne Vermittlungsgebühr"],
+    geschichte:
+      "Bei uns wird geteilt: Mezze kommen in die Mitte, jeder nimmt sich. Der Hummus wird morgens gestampft, das Fladenbrot backen wir selbst, und der Schawarma-Spieß dreht sich von mittags bis abends.",
+    kategorien: [
+      {
+        name: "Mezze",
+        gerichte: [
+          { name: "Hummus", beschreibung: "Kichererbsen, Tahini, Zitrone, Olivenöl", preis: 6.5, vegetarisch: true, bild: "photo-1752795646140-eb70cf30640e" },
+          { name: "Mutabbal", beschreibung: "Auberginencreme mit Tahini und Granatapfel", preis: 6.9, vegetarisch: true },
+          { name: "Falafel (6 Stück)", beschreibung: "Mit Sesamsoße und eingelegtem Gemüse", preis: 7.5, vegetarisch: true, bild: "photo-1768812910769-d037b90aee77" },
+          { name: "Tabouleh", beschreibung: "Petersiliensalat mit Bulgur, Tomate und Minze", preis: 6.5, vegetarisch: true },
+          { name: "Fattoush", beschreibung: "Salat mit geröstetem Fladenbrot und Sumach", preis: 6.9, vegetarisch: true },
+        ],
+      },
+      {
+        name: "Vom Spieß & Grill",
+        gerichte: [
+          { name: "Schawarma vom Kalb", beschreibung: "Im Fladenbrot mit Tahini, Gurke und Tomate", preis: 11.9, bild: "photo-1699728088614-7d1d4277414b" },
+          { name: "Schawarma-Teller", beschreibung: "Mit Reis, Salat und Knoblauchcreme", preis: 16.5, bild: "photo-1583060095186-852adde6b819" },
+          { name: "Kafta vom Grill", beschreibung: "Hackspieße mit Petersilie und Zwiebel", preis: 15.9 },
+          { name: "Shish Taouk", beschreibung: "Marinierte Hähnchenspieße mit Knoblauchcreme", preis: 15.5 },
+        ],
+      },
+      {
+        name: "Süßes",
+        gerichte: [
+          { name: "Baklava (3 Stück)", beschreibung: "Blätterteig mit Pistazien und Zuckersirup", preis: 5.9, vegetarisch: true },
+          { name: "Halawet el Jibn", beschreibung: "Käseröllchen mit Sahne und Rosenwasser", preis: 6.5, vegetarisch: true },
+          { name: "Arabischer Mokka", beschreibung: "Mit Kardamom", preis: 3.5, vegetarisch: true },
+        ],
+      },
+    ],
+  },
 };
+
+/**
+ * Kurze Namen für das Auswahlfeld im Dashboard. Sie stehen hier neben den
+ * Karten, damit eine neue Küche nicht an zwei Stellen nachgetragen werden
+ * muss – vergisst man die zweite, steht im Dropdown plötzlich
+ * "thailaendisch" statt "Thailändisch".
+ */
+export const KUECHEN_LABEL = {
+  bayerisch: "Bayerisch",
+  italienisch: "Italienisch",
+  griechisch: "Griechisch",
+  tuerkisch: "Türkisch",
+  syrisch: "Syrisch",
+  chinesisch: "Chinesisch",
+  thailaendisch: "Thailändisch",
+  vietnamesisch: "Vietnamesisch",
+  japanisch: "Japanisch",
+  indisch: "Indisch",
+  asiatisch: "Asiatisch (gemischt)",
+  cafe: "Café",
+};
+
+/**
+ * Küchen in der Reihenfolge, in der sie im Dashboard stehen sollen: erst die
+ * häufigen, dann die asiatischen als Block, zuletzt die Sammelkategorie.
+ */
+export function kuechenAuswahl() {
+  const reihenfolge = Object.keys(KUECHEN_LABEL).filter((wert) => MENUS[wert]);
+  // Eine Küche ohne Eintrag in der Liste soll trotzdem wählbar sein.
+  const rest = Object.keys(MENUS).filter((wert) => !reihenfolge.includes(wert));
+  return [...reihenfolge, ...rest].map((wert) => ({
+    wert,
+    label: KUECHEN_LABEL[wert] ?? wert,
+  }));
+}
 
 /**
  * Liefert die Beispielkarte zu einer Küche (mit bayerischem Fallback).

@@ -162,7 +162,7 @@ npm run pages -- --region "Altötting"        # nur ein Ort
 npm run pages -- --min-score 80              # nur die dringendsten Fälle
 npm run pages -- --limit 10                  # die Top 10 nach Score
 npm run pages -- --email info@restaurant.de  # Bestellungen/Reservierungen per E-Mail versendbar machen
-npm run pages -- --cuisine asiatisch         # Küche vorgeben (siehe unten)
+npm run pages -- --cuisine japanisch         # Küche vorgeben (siehe unten)
 ```
 
 ### Aufbau der Seite
@@ -208,6 +208,29 @@ Erfundene Zitate unter dem echten Namen eines Hauses kommen ebenfalls nicht in F
 Die **erfundenen Beispiel-Lokale** auf der Startseite haben dagegen ausformulierte Stimmen; dort ist klar gekennzeichnet, dass das Lokal nicht existiert.
 
 Sobald ein Wirt Kunde ist, lassen sich seine echten Bewertungen sauber einbinden: per Live-Abruf beim Seitenaufruf, mit Google-Attribution und ohne Speicherung.
+
+### Welche Küchen es gibt
+
+Zwölf Stilrichtungen, jede mit eigener Beispielkarte, eigenen Farben, eigenen Bildern und eigener Bewegung im Kopfbereich:
+
+| | |
+|---|---|
+| Bayerisch | Wirtshausküche & Biergarten |
+| Italienisch | Pizza, Pasta & Antipasti |
+| Griechisch | Gyros, Grill & Meze |
+| Türkisch | Döner, Grill & Pide |
+| Syrisch | Mezze, Schawarma & Grill |
+| Chinesisch | Wok, Dim Sum & Ente |
+| Thailändisch | Curry, Wok & Street Food |
+| Vietnamesisch | Phở, Bánh Mì & Sommerrollen |
+| Japanisch | Sushi, Ramen & Izakaya |
+| Indisch | Curry, Tandoor & Biryani |
+| Asiatisch (gemischt) | für die panasiatische Nudelbar, die sich nicht genauer einordnen lässt |
+| Café | Frühstück, Kuchen & Kaffee |
+
+Die Namenserkennung prüft die genaueren Küchen zuerst: „Sushi Bar Kyoto" wird japanisch, „Kao Thai" thailändisch, „Ming Friends" chinesisch. Erst wenn nichts Genaueres passt, greift die Sammelkategorie. Ein Test hält dagegen, dass „Goldener Hirsch" oder „Zum Steer" dabei nicht versehentlich mitgerissen werden.
+
+Küchen und ihre Beschriftungen stehen an **einer** Stelle (`src/menuCatalog.js`) und werden von dort ans Dashboard geliefert. Eine neue Küche muss also nicht zusätzlich im Dropdown nachgetragen werden.
 
 ### Küche im Dashboard zuordnen
 
@@ -301,7 +324,7 @@ Die Landing-Page nimmt Reservierungen und Abholbestellungen entgegen – ankomme
 npm run wirt -- --betrieb gasthaus-zur-post
 ```
 
-Danach im Browser `http://localhost:3200` öffnen. Die Daten liegen in `data/betrieb/<betrieb>.json` (gitignoriert). Ohne `--betrieb` wird `standard` verwendet, mit `--port` lässt sich der Port ändern.
+Danach im Browser `http://localhost:3200` öffnen. **Nicht 3000** – der Port gehört dem persönlichen Dashboard. Die beiden Server haben deshalb getrennte Umgebungsvariablen (`DASHBOARD_PORT` und `WIRT_PORT`); ein gemeinsames `PORT` hätte sonst beide auf denselben Platz geschickt. Ist ein Port belegt, sagt der Start, welcher und was zu tun ist. Die Daten liegen in `data/betrieb/<betrieb>.json` (gitignoriert). Ohne `--betrieb` wird `standard` verwendet, mit `--port` lässt sich der Port ändern.
 
 Das Dashboard hat drei Reiter:
 

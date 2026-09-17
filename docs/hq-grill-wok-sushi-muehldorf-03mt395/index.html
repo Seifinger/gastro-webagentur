@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HQ - Grill | Wok | Sushi - Mühldorf – Sushi, Wok &amp; Bowls in Mühldorf am Inn</title>
-<meta name="description" content="HQ - Grill | Wok | Sushi - Mühldorf in Mühldorf am Inn: Sushi, Wok &amp; Bowls. Frisch im Wok gebraten, aromatisch gewürzt – direkt am Stadtplatz in Mühldorf am Inn. Jetzt Tisch reservieren oder zur Abholung vorbestellen.">
+<title>HQ - Grill | Wok | Sushi - Mühldorf – Sushi, Ramen &amp; Izakaya in Mühldorf am Inn</title>
+<meta name="description" content="HQ - Grill | Wok | Sushi - Mühldorf in Mühldorf am Inn: Sushi, Ramen &amp; Izakaya. Ruhig zubereitet, klar im Geschmack – direkt am Stadtplatz in Mühldorf am Inn. Jetzt Tisch reservieren oder zur Abholung vorbestellen.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
 <meta name="robots" content="noindex, nofollow">
 <style>
@@ -433,10 +433,65 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   .sig-tasse { right: -4%; top: 13%; transform: none; width: 44vw; opacity: .55; }
 }
 
+/* Chinesisch: der Drehteller in der Tischmitte, wie beim Essen in der Runde */
+.sig-drehteller { right: 2%; top: 50%; transform: translateY(-50%);
+                  width: clamp(250px, 40vw, 440px); aspect-ratio: 1; }
+/* Nur ein Rand, keine graue Fläche: über einem Foto wird die sonst schnell
+   zu Schlieren. Die Schalen sollen die Form tragen, nicht die Scheibe. */
+.sig-drehteller .teller { position: absolute; inset: 0; border-radius: 50%;
+                          box-shadow: inset 0 0 0 1px rgba(255,255,255,.22),
+                                      inset 0 0 60px -20px rgba(0,0,0,.55);
+                          animation: sig-drehteller 44s linear infinite; }
+.sig-drehteller .schale { position: absolute; width: 40%; aspect-ratio: 1; border-radius: 50%;
+                          overflow: hidden;
+                          box-shadow: 0 16px 30px -12px rgba(0,0,0,.85), 0 0 0 3px rgba(255,255,255,.14);
+                          left: 50%; top: 50%; }
+/* Drei Schalen im Kreis, jede auf ihrem Platz. Die Gegendrehung hält die
+   Bilder aufrecht, sonst stünde das Essen zwischendurch auf dem Kopf. */
+/* Der Abstand zur Mitte ist in Vielfachen der Schale angegeben: bei 33 %
+   Schalengröße liegt der Rand des Tellers bei gut einer Schalenbreite. */
+.sig-drehteller .schale:nth-child(1) { transform: translate(-50%, -50%) rotate(0deg) translateY(-76%) rotate(0deg); }
+.sig-drehteller .schale:nth-child(2) { transform: translate(-50%, -50%) rotate(120deg) translateY(-76%) rotate(-120deg); }
+.sig-drehteller .schale:nth-child(3) { transform: translate(-50%, -50%) rotate(240deg) translateY(-76%) rotate(-240deg); }
+.sig-drehteller img { width: 100%; height: 100%; object-fit: cover;
+                      animation: sig-drehteller-zurueck 44s linear infinite; }
+@keyframes sig-drehteller { to { transform: rotate(360deg); } }
+@keyframes sig-drehteller-zurueck { to { transform: rotate(-360deg); } }
+@media (max-width: 899px) {
+  .sig-drehteller { right: -14%; top: 11%; transform: none; width: 60vw; opacity: .5; }
+}
+
+/* Vietnamesisch: die Schale Phở, über der der Dampf steht */
+.sig-schale { right: 5%; top: 50%; transform: translateY(-50%);
+              width: clamp(220px, 32vw, 380px); aspect-ratio: 1; }
+.sig-schale .napf { position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
+                    box-shadow: 0 28px 62px -26px rgba(0,0,0,.8); }
+.sig-schale img { width: 100%; height: 100%; object-fit: cover;
+                  animation: sig-schale-atmen 14s ease-in-out infinite alternate; }
+@keyframes sig-schale-atmen { to { transform: scale(1.07); } }
+.sig-schale .dampf { position: absolute; left: 50%; top: -14%; width: 52%; height: 54%;
+                     transform: translateX(-50%); }
+.sig-schale .dampf i { position: absolute; bottom: 0; width: 26px; height: 26px; border-radius: 50%;
+                       background: rgba(255,255,255,.62); filter: blur(11px); opacity: 0;
+                       animation: sig-schale-dampf 6.5s ease-in infinite; }
+.sig-schale .dampf i:nth-child(1) { left: 8%; }
+.sig-schale .dampf i:nth-child(2) { left: 40%; animation-delay: 2.1s; }
+.sig-schale .dampf i:nth-child(3) { left: 68%; animation-delay: 4.2s; }
+@keyframes sig-schale-dampf {
+  0% { opacity: 0; transform: translateY(0) scale(.6); }
+  22% { opacity: .7; }
+  100% { opacity: 0; transform: translateY(-130px) scale(2.1); }
+}
+@media (max-width: 899px) {
+  .sig-schale { right: -6%; top: 12%; transform: none; width: 48vw; opacity: .55; }
+}
+
 /* Wer Bewegung im System abgestellt hat, bekommt das Standbild. */
 @media (prefers-reduced-motion: reduce) {
   .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
-  .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i { animation: none; }
+  .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i,
+  .sig-drehteller .teller, .sig-drehteller img,
+  .sig-schale img, .sig-schale .dampf i { animation: none; }
   .sig-tafel .karte:first-child, .sig-diashow img:first-child { opacity: 1; }
 }
 
@@ -556,19 +611,19 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 
 <section class="hero">
   <div class="hero-media">
-    <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?w=1800&amp;h=1000&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="HQ - Grill | Wok | Sushi - Mühldorf">
+    <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1800&amp;h=1000&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="HQ - Grill | Wok | Sushi - Mühldorf">
   </div>
   <div class="hero-overlay"></div>
-  <div class="sig sig-band" aria-hidden="true"><div class="band"><img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1559314809-0d155014e29e?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1559314809-0d155014e29e?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""></div></div>
+  <div class="sig sig-band" aria-hidden="true"><div class="band"><img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1588166524938-1ee110d7dcef?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1588166524938-1ee110d7dcef?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""><img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""></div></div>
   <div class="hero-inner">
-    <div class="hero-kicker">Sushi, Wok &amp; Bowls · in Mühldorf am Inn</div>
+    <div class="hero-kicker">Sushi, Ramen &amp; Izakaya · in Mühldorf am Inn</div>
     <h1>HQ - Grill | Wok | Sushi - Mühldorf</h1>
     
     <div class="rating">
       <span class="stars" aria-hidden="true">★★★★★</span>
       <span><strong>4,7/5</strong> auf Google (986 Bewertungen)</span>
     </div>
-    <p class="hero-sub">Frisch im Wok gebraten, aromatisch gewürzt – direkt am Stadtplatz in Mühldorf am Inn.</p>
+    <p class="hero-sub">Ruhig zubereitet, klar im Geschmack – direkt am Stadtplatz in Mühldorf am Inn.</p>
     <div class="hero-actions">
       <a class="btn btn-light" href="#karte">Zur Abholung bestellen</a>
       <a class="btn btn-outline-light" href="#reservierung">Tisch reservieren</a>
@@ -577,7 +632,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 </section>
 
 <section class="usp-strip">
-  <div class="wrap"><div class="usp-list"><span><span aria-hidden="true">✓</span> Erst auf Bestellung im Wok</span><span><span aria-hidden="true">✓</span> Abholung in 20 Minuten</span><span><span aria-hidden="true">✓</span> Direkt bei uns, ohne Vermittlungsgebühr</span></div></div>
+  <div class="wrap"><div class="usp-list"><span><span aria-hidden="true">✓</span> Fisch täglich frisch</span><span><span aria-hidden="true">✓</span> Abholung in 20 Minuten</span><span><span aria-hidden="true">✓</span> Direkt bei uns, ohne Vermittlungsgebühr</span></div></div>
 </section>
 
 <section class="section" id="highlights">
@@ -591,8 +646,42 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
     <div class="hl-grid spalten-3">
       <article class="hl-card">
         <div class="hl-media">
+          <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Shoyu-Ramen" loading="lazy">
+          <span class="hl-kat">Ramen &amp; Warmes</span>
+        </div>
+        <div class="hl-body">
+          <h3 class="hl-name">Shoyu-Ramen</h3>
+          <p class="hl-desc">Sojabrühe, Ei, Chashu-Schwein, Frühlingszwiebel</p>
+          <div class="hl-foot">
+            <span class="hl-preis">14,90 €</span>
+            
+            <button class="add-btn" type="button" data-add="2-0" data-name="Shoyu-Ramen" data-preis="14.9">
+              <span aria-hidden="true">+</span> Vorbestellen
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="hl-card">
+        <div class="hl-media">
+          <img src="https://images.unsplash.com/photo-1588166524938-1ee110d7dcef?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Gyoza (5 Stück)" loading="lazy">
+          <span class="hl-kat">Vorspeisen</span>
+        </div>
+        <div class="hl-body">
+          <h3 class="hl-name">Gyoza (5 Stück)</h3>
+          <p class="hl-desc">Gebratene Teigtaschen mit Schwein und Kohl</p>
+          <div class="hl-foot">
+            <span class="hl-preis">7,90 €</span>
+            
+            <button class="add-btn" type="button" data-add="0-1" data-name="Gyoza (5 Stück)" data-preis="7.9">
+              <span aria-hidden="true">+</span> Vorbestellen
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="hl-card">
+        <div class="hl-media">
           <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Sushi-Box (12 Stück)" loading="lazy">
-          <span class="hl-kat">Sushi &amp; Dessert</span>
+          <span class="hl-kat">Sushi</span>
         </div>
         <div class="hl-body">
           <h3 class="hl-name">Sushi-Box (12 Stück)</h3>
@@ -600,92 +689,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
           <div class="hl-foot">
             <span class="hl-preis">18,90 €</span>
             
-            <button class="add-btn" type="button" data-add="2-0" data-name="Sushi-Box (12 Stück)" data-preis="18.9">
-              <span aria-hidden="true">+</span> Vorbestellen
-            </button>
-          </div>
-        </div>
-      </article>
-      <article class="hl-card">
-        <div class="hl-media">
-          <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Ramen-Suppe" loading="lazy">
-          <span class="hl-kat">Vorspeisen</span>
-        </div>
-        <div class="hl-body">
-          <h3 class="hl-name">Ramen-Suppe</h3>
-          <p class="hl-desc">Mit Ei, Garnelen und Frühlingszwiebeln</p>
-          <div class="hl-foot">
-            <span class="hl-preis">12,90 €</span>
-            
-            <button class="add-btn" type="button" data-add="0-1" data-name="Ramen-Suppe" data-preis="12.9">
-              <span aria-hidden="true">+</span> Vorbestellen
-            </button>
-          </div>
-        </div>
-      </article>
-      <article class="hl-card">
-        <div class="hl-media">
-          <img src="https://images.unsplash.com/photo-1559314809-0d155014e29e?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Pad Thai mit Hähnchen" loading="lazy">
-          <span class="hl-kat">Aus dem Wok</span>
-        </div>
-        <div class="hl-body">
-          <h3 class="hl-name">Pad Thai mit Hähnchen</h3>
-          <p class="hl-desc">Reisnudeln, Erdnüsse, Limette</p>
-          <div class="hl-foot">
-            <span class="hl-preis">14,50 €</span>
-            
-            <button class="add-btn" type="button" data-add="1-0" data-name="Pad Thai mit Hähnchen" data-preis="14.5">
-              <span aria-hidden="true">+</span> Vorbestellen
-            </button>
-          </div>
-        </div>
-      </article>
-      <article class="hl-card">
-        <div class="hl-media">
-          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Rindfleisch Szechuan" loading="lazy">
-          <span class="hl-kat">Aus dem Wok</span>
-        </div>
-        <div class="hl-body">
-          <h3 class="hl-name">Rindfleisch Szechuan</h3>
-          <p class="hl-desc">Scharf, mit Paprika und Bambus</p>
-          <div class="hl-foot">
-            <span class="hl-preis">16,50 €</span>
-            
-            <button class="add-btn" type="button" data-add="1-1" data-name="Rindfleisch Szechuan" data-preis="16.5">
-              <span aria-hidden="true">+</span> Vorbestellen
-            </button>
-          </div>
-        </div>
-      </article>
-      <article class="hl-card">
-        <div class="hl-media">
-          <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Gebratener Reis mit Gemüse" loading="lazy">
-          <span class="hl-kat">Aus dem Wok</span>
-        </div>
-        <div class="hl-body">
-          <h3 class="hl-name">Gebratener Reis mit Gemüse</h3>
-          <p class="hl-desc">Mit Ei, Erbsen und Karotten</p>
-          <div class="hl-foot">
-            <span class="hl-preis">11,90 €</span>
-            <span class="veg">vegetarisch</span>
-            <button class="add-btn" type="button" data-add="1-2" data-name="Gebratener Reis mit Gemüse" data-preis="11.9">
-              <span aria-hidden="true">+</span> Vorbestellen
-            </button>
-          </div>
-        </div>
-      </article>
-      <article class="hl-card">
-        <div class="hl-media">
-          <img src="https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Gebratene Nudeln mit Ente" loading="lazy">
-          <span class="hl-kat">Aus dem Wok</span>
-        </div>
-        <div class="hl-body">
-          <h3 class="hl-name">Gebratene Nudeln mit Ente</h3>
-          <p class="hl-desc">Knusprige Entenbrust, Mie-Nudeln, Pak Choi</p>
-          <div class="hl-foot">
-            <span class="hl-preis">19,50 €</span>
-            
-            <button class="add-btn" type="button" data-add="1-3" data-name="Gebratene Nudeln mit Ente" data-preis="19.5">
+            <button class="add-btn" type="button" data-add="1-0" data-name="Sushi-Box (12 Stück)" data-preis="18.9">
               <span aria-hidden="true">+</span> Vorbestellen
             </button>
           </div>
@@ -722,81 +726,37 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
         <div class="kat-body">
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Frühlingsrollen (4 Stück) <span class="veg">vegetarisch</span></div>
-              <div class="gericht-desc">Mit süß-saurer Soße</div>
-            </div>
-            <div class="gericht-seite">
-              <span class="gericht-preis">6,90 €</span>
-              <button class="mini-add" type="button" data-add="0-0" data-name="Frühlingsrollen (4 Stück)" data-preis="6.9" aria-label="Frühlingsrollen (4 Stück) vorbestellen">+</button>
-            </div>
-          </div>
-          <div class="gericht">
-            <div class="gericht-body">
-              <div class="gericht-name">Ramen-Suppe</div>
-              <div class="gericht-desc">Mit Ei, Garnelen und Frühlingszwiebeln</div>
-            </div>
-            <div class="gericht-seite">
-              <span class="gericht-preis">12,90 €</span>
-              <button class="mini-add" type="button" data-add="0-1" data-name="Ramen-Suppe" data-preis="12.9" aria-label="Ramen-Suppe vorbestellen">+</button>
-            </div>
-          </div>
-          <div class="gericht">
-            <div class="gericht-body">
               <div class="gericht-name">Edamame <span class="veg">vegetarisch</span></div>
               <div class="gericht-desc">Mit Meersalz</div>
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">5,50 €</span>
-              <button class="mini-add" type="button" data-add="0-2" data-name="Edamame" data-preis="5.5" aria-label="Edamame vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="0-0" data-name="Edamame" data-preis="5.5" aria-label="Edamame vorbestellen">+</button>
+            </div>
+          </div>
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">Gyoza (5 Stück)</div>
+              <div class="gericht-desc">Gebratene Teigtaschen mit Schwein und Kohl</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">7,90 €</span>
+              <button class="mini-add" type="button" data-add="0-1" data-name="Gyoza (5 Stück)" data-preis="7.9" aria-label="Gyoza (5 Stück) vorbestellen">+</button>
+            </div>
+          </div>
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">Miso-Suppe <span class="veg">vegetarisch</span></div>
+              <div class="gericht-desc">Mit Tofu, Wakame und Frühlingszwiebel</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">4,50 €</span>
+              <button class="mini-add" type="button" data-add="0-2" data-name="Miso-Suppe" data-preis="4.5" aria-label="Miso-Suppe vorbestellen">+</button>
             </div>
           </div></div>
       </details>
       <details class="kat">
-        <summary>Aus dem Wok <span class="kat-anzahl">4 Gerichte</span></summary>
-        <div class="kat-body">
-          <div class="gericht">
-            <div class="gericht-body">
-              <div class="gericht-name">Pad Thai mit Hähnchen</div>
-              <div class="gericht-desc">Reisnudeln, Erdnüsse, Limette</div>
-            </div>
-            <div class="gericht-seite">
-              <span class="gericht-preis">14,50 €</span>
-              <button class="mini-add" type="button" data-add="1-0" data-name="Pad Thai mit Hähnchen" data-preis="14.5" aria-label="Pad Thai mit Hähnchen vorbestellen">+</button>
-            </div>
-          </div>
-          <div class="gericht">
-            <div class="gericht-body">
-              <div class="gericht-name">Rindfleisch Szechuan</div>
-              <div class="gericht-desc">Scharf, mit Paprika und Bambus</div>
-            </div>
-            <div class="gericht-seite">
-              <span class="gericht-preis">16,50 €</span>
-              <button class="mini-add" type="button" data-add="1-1" data-name="Rindfleisch Szechuan" data-preis="16.5" aria-label="Rindfleisch Szechuan vorbestellen">+</button>
-            </div>
-          </div>
-          <div class="gericht">
-            <div class="gericht-body">
-              <div class="gericht-name">Gebratener Reis mit Gemüse <span class="veg">vegetarisch</span></div>
-              <div class="gericht-desc">Mit Ei, Erbsen und Karotten</div>
-            </div>
-            <div class="gericht-seite">
-              <span class="gericht-preis">11,90 €</span>
-              <button class="mini-add" type="button" data-add="1-2" data-name="Gebratener Reis mit Gemüse" data-preis="11.9" aria-label="Gebratener Reis mit Gemüse vorbestellen">+</button>
-            </div>
-          </div>
-          <div class="gericht">
-            <div class="gericht-body">
-              <div class="gericht-name">Gebratene Nudeln mit Ente</div>
-              <div class="gericht-desc">Knusprige Entenbrust, Mie-Nudeln, Pak Choi</div>
-            </div>
-            <div class="gericht-seite">
-              <span class="gericht-preis">19,50 €</span>
-              <button class="mini-add" type="button" data-add="1-3" data-name="Gebratene Nudeln mit Ente" data-preis="19.5" aria-label="Gebratene Nudeln mit Ente vorbestellen">+</button>
-            </div>
-          </div></div>
-      </details>
-      <details class="kat">
-        <summary>Sushi &amp; Dessert <span class="kat-anzahl">2 Gerichte</span></summary>
+        <summary>Sushi <span class="kat-anzahl">4 Gerichte</span></summary>
         <div class="kat-body">
           <div class="gericht">
             <div class="gericht-body">
@@ -805,17 +765,81 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">18,90 €</span>
-              <button class="mini-add" type="button" data-add="2-0" data-name="Sushi-Box (12 Stück)" data-preis="18.9" aria-label="Sushi-Box (12 Stück) vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="1-0" data-name="Sushi-Box (12 Stück)" data-preis="18.9" aria-label="Sushi-Box (12 Stück) vorbestellen">+</button>
             </div>
           </div>
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Gebackene Banane <span class="veg">vegetarisch</span></div>
-              <div class="gericht-desc">Mit Honig und Vanilleeis</div>
+              <div class="gericht-name">Nigiri Lachs (2 Stück)</div>
+              <div class="gericht-desc">Auf handgeformtem Reis</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">5,50 €</span>
+              <button class="mini-add" type="button" data-add="1-1" data-name="Nigiri Lachs (2 Stück)" data-preis="5.5" aria-label="Nigiri Lachs (2 Stück) vorbestellen">+</button>
+            </div>
+          </div>
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">Maki Avocado-Gurke (6 Stück) <span class="veg">vegetarisch</span></div>
+              <div class="gericht-desc">Mit Sesam</div>
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">6,50 €</span>
-              <button class="mini-add" type="button" data-add="2-1" data-name="Gebackene Banane" data-preis="6.5" aria-label="Gebackene Banane vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="1-2" data-name="Maki Avocado-Gurke (6 Stück)" data-preis="6.5" aria-label="Maki Avocado-Gurke (6 Stück) vorbestellen">+</button>
+            </div>
+          </div>
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">Chirashi-Schale</div>
+              <div class="gericht-desc">Sushireis mit Sashimi und eingelegtem Gemüse</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">21,50 €</span>
+              <button class="mini-add" type="button" data-add="1-3" data-name="Chirashi-Schale" data-preis="21.5" aria-label="Chirashi-Schale vorbestellen">+</button>
+            </div>
+          </div></div>
+      </details>
+      <details class="kat">
+        <summary>Ramen &amp; Warmes <span class="kat-anzahl">4 Gerichte</span></summary>
+        <div class="kat-body">
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">Shoyu-Ramen</div>
+              <div class="gericht-desc">Sojabrühe, Ei, Chashu-Schwein, Frühlingszwiebel</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">14,90 €</span>
+              <button class="mini-add" type="button" data-add="2-0" data-name="Shoyu-Ramen" data-preis="14.9" aria-label="Shoyu-Ramen vorbestellen">+</button>
+            </div>
+          </div>
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">Miso-Ramen vegetarisch <span class="veg">vegetarisch</span></div>
+              <div class="gericht-desc">Mit Mais, Pilzen und Sesamöl</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">13,50 €</span>
+              <button class="mini-add" type="button" data-add="2-1" data-name="Miso-Ramen vegetarisch" data-preis="13.5" aria-label="Miso-Ramen vegetarisch vorbestellen">+</button>
+            </div>
+          </div>
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">Katsu Curry</div>
+              <div class="gericht-desc">Paniertes Hähnchen, japanische Currysoße, Reis</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">16,50 €</span>
+              <button class="mini-add" type="button" data-add="2-2" data-name="Katsu Curry" data-preis="16.5" aria-label="Katsu Curry vorbestellen">+</button>
+            </div>
+          </div>
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">Mochi-Eis (3 Stück) <span class="veg">vegetarisch</span></div>
+              <div class="gericht-desc">Matcha, Mango, Sesam</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">6,50 €</span>
+              <button class="mini-add" type="button" data-add="2-3" data-name="Mochi-Eis (3 Stück)" data-preis="6.5" aria-label="Mochi-Eis (3 Stück) vorbestellen">+</button>
             </div>
           </div></div>
       </details>
@@ -826,12 +850,12 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   <div class="wrap">
     <div class="section-head mitte">
       <div class="eyebrow">Bei uns</div>
-      <h2>Sushi, Wok &amp; Bowls in Mühldorf am Inn</h2>
-      <p>Jedes Gericht kommt erst in den Wok, wenn Sie es bestellen – bei voller Hitze, in unter drei Minuten. So bleibt das Gemüse knackig und die Aromen frisch.</p>
+      <h2>Sushi, Ramen &amp; Izakaya in Mühldorf am Inn</h2>
+      <p>Reis, Fisch, Zeit – mehr braucht gutes Sushi nicht. Unser Reis wird jeden Mittag frisch gewürzt und ist nach vier Stunden verbraucht. Was übrig bleibt, kommt nicht am nächsten Tag zurück auf die Karte.</p>
     </div>
     <div class="foto-grid">
       <figure class="foto-slot" style="margin:0">
-        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=900&amp;h=700&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=900&amp;h=700&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="" loading="lazy">
         <span class="foto-badge">Platzhalter</span>
         <figcaption class="foto-text">
           <strong>Unser Haus</strong>
@@ -847,7 +871,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
         </figcaption>
       </figure>
       <figure class="foto-slot" style="margin:0">
-        <img src="https://images.unsplash.com/photo-1553621042-f6e147245754?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="" loading="lazy">
         <span class="foto-badge">Platzhalter</span>
         <figcaption class="foto-text">
           <strong>Unser Bestseller</strong>

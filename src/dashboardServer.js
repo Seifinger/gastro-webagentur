@@ -9,8 +9,8 @@ import {
   ladeZuordnungen,
   speichereZuordnung,
   kuecheFuerLead,
-  KUECHEN,
 } from "./cuisineOverrides.js";
+import { kuechenAuswahl } from "./menuCatalog.js";
 import { anschreiben } from "./outreach.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -33,10 +33,13 @@ const MIME_TYPES = {
   ".ico": "image/x-icon",
 };
 
+// Jeder Server hat seine eigene Variable. Ein gemeinsames PORT hieße, dass
+// das Wirt-Dashboard auf 3000 landet, sobald man es einmal gesetzt hat – und
+// dann streiten sich zwei Server um denselben Platz.
 function parsePort(argv) {
   const flagIndex = argv.indexOf("--port");
   if (flagIndex !== -1) return Number(argv[flagIndex + 1]);
-  return Number(process.env.PORT) || 3000;
+  return Number(process.env.DASHBOARD_PORT) || 3000;
 }
 
 const port = parsePort(process.argv.slice(2));
@@ -132,7 +135,7 @@ const server = createServer(async (req, res) => {
   }
 
   if (pathname === "/api/leads") {
-    sendeJson(res, 200, { kuechen: KUECHEN, leads: leadsMitZusatz() });
+    sendeJson(res, 200, { kuechen: kuechenAuswahl(), leads: leadsMitZusatz() });
     return;
   }
 
@@ -180,6 +183,19 @@ const server = createServer(async (req, res) => {
 
   res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
   res.end("Nicht gefunden");
+});
+
+
+// Ein belegter Port ist der häufigste Stolperstein beim Start. Die Meldung
+// von Node ("EADDRINUSE") sagt nicht, was zu tun ist – diese hier schon.
+server.on("error", (fehler) => {
+  if (fehler.code === "EADDRINUSE") {
+    console.log(`\n⚠️  Port ${port} ist schon belegt – dort läuft bereits etwas.`);
+    console.log(`   Anderen Port wählen:  npm run dashboard -- --port ${port + 1}\n`);
+    process.exitCode = 1;
+    return;
+  }
+  throw fehler;
 });
 
 server.listen(port, () => {

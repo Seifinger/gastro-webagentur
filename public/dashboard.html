@@ -329,18 +329,11 @@ function esc(wert) {
     .replace(/'/g, "&#39;");
 }
 
-const KUECHEN_LABEL = {
-  bayerisch: "Bayerisch",
-  italienisch: "Italienisch",
-  asiatisch: "Asiatisch",
-  griechisch: "Griechisch",
-  tuerkisch: "Türkisch",
-  cafe: "Café",
-};
-
+// Werte und Beschriftungen kommen vom Server, damit eine neue Küche nicht
+// zusätzlich hier nachgetragen werden muss.
 function kuecheSelect(lead) {
   const optionen = kuechen
-    .map((k) => `<option value="${esc(k)}"${k === lead.kueche ? " selected" : ""}>${esc(KUECHEN_LABEL[k] ?? k)}</option>`)
+    .map((k) => `<option value="${esc(k.wert)}"${k.wert === lead.kueche ? " selected" : ""}>${esc(k.label)}</option>`)
     .join("");
   const titel = lead.kuecheManuell ? "Von Hand gesetzt" : "Automatisch aus dem Namen erkannt";
   return `<select class="kueche${lead.kuecheManuell ? " manuell" : ""}" data-placeid="${esc(lead.placeId)}" title="${titel}">${optionen}</select>`;

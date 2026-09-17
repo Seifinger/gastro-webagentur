@@ -107,10 +107,65 @@ const SIGNATUR_CSS = `
   .sig-tasse { right: -4%; top: 13%; transform: none; width: 44vw; opacity: .55; }
 }
 
+/* Chinesisch: der Drehteller in der Tischmitte, wie beim Essen in der Runde */
+.sig-drehteller { right: 2%; top: 50%; transform: translateY(-50%);
+                  width: clamp(250px, 40vw, 440px); aspect-ratio: 1; }
+/* Nur ein Rand, keine graue Fläche: über einem Foto wird die sonst schnell
+   zu Schlieren. Die Schalen sollen die Form tragen, nicht die Scheibe. */
+.sig-drehteller .teller { position: absolute; inset: 0; border-radius: 50%;
+                          box-shadow: inset 0 0 0 1px rgba(255,255,255,.22),
+                                      inset 0 0 60px -20px rgba(0,0,0,.55);
+                          animation: sig-drehteller 44s linear infinite; }
+.sig-drehteller .schale { position: absolute; width: 40%; aspect-ratio: 1; border-radius: 50%;
+                          overflow: hidden;
+                          box-shadow: 0 16px 30px -12px rgba(0,0,0,.85), 0 0 0 3px rgba(255,255,255,.14);
+                          left: 50%; top: 50%; }
+/* Drei Schalen im Kreis, jede auf ihrem Platz. Die Gegendrehung hält die
+   Bilder aufrecht, sonst stünde das Essen zwischendurch auf dem Kopf. */
+/* Der Abstand zur Mitte ist in Vielfachen der Schale angegeben: bei 33 %
+   Schalengröße liegt der Rand des Tellers bei gut einer Schalenbreite. */
+.sig-drehteller .schale:nth-child(1) { transform: translate(-50%, -50%) rotate(0deg) translateY(-76%) rotate(0deg); }
+.sig-drehteller .schale:nth-child(2) { transform: translate(-50%, -50%) rotate(120deg) translateY(-76%) rotate(-120deg); }
+.sig-drehteller .schale:nth-child(3) { transform: translate(-50%, -50%) rotate(240deg) translateY(-76%) rotate(-240deg); }
+.sig-drehteller img { width: 100%; height: 100%; object-fit: cover;
+                      animation: sig-drehteller-zurueck 44s linear infinite; }
+@keyframes sig-drehteller { to { transform: rotate(360deg); } }
+@keyframes sig-drehteller-zurueck { to { transform: rotate(-360deg); } }
+@media (max-width: 899px) {
+  .sig-drehteller { right: -14%; top: 11%; transform: none; width: 60vw; opacity: .5; }
+}
+
+/* Vietnamesisch: die Schale Phở, über der der Dampf steht */
+.sig-schale { right: 5%; top: 50%; transform: translateY(-50%);
+              width: clamp(220px, 32vw, 380px); aspect-ratio: 1; }
+.sig-schale .napf { position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
+                    box-shadow: 0 28px 62px -26px rgba(0,0,0,.8); }
+.sig-schale img { width: 100%; height: 100%; object-fit: cover;
+                  animation: sig-schale-atmen 14s ease-in-out infinite alternate; }
+@keyframes sig-schale-atmen { to { transform: scale(1.07); } }
+.sig-schale .dampf { position: absolute; left: 50%; top: -14%; width: 52%; height: 54%;
+                     transform: translateX(-50%); }
+.sig-schale .dampf i { position: absolute; bottom: 0; width: 26px; height: 26px; border-radius: 50%;
+                       background: rgba(255,255,255,.62); filter: blur(11px); opacity: 0;
+                       animation: sig-schale-dampf 6.5s ease-in infinite; }
+.sig-schale .dampf i:nth-child(1) { left: 8%; }
+.sig-schale .dampf i:nth-child(2) { left: 40%; animation-delay: 2.1s; }
+.sig-schale .dampf i:nth-child(3) { left: 68%; animation-delay: 4.2s; }
+@keyframes sig-schale-dampf {
+  0% { opacity: 0; transform: translateY(0) scale(.6); }
+  22% { opacity: .7; }
+  100% { opacity: 0; transform: translateY(-130px) scale(2.1); }
+}
+@media (max-width: 899px) {
+  .sig-schale { right: -6%; top: 12%; transform: none; width: 48vw; opacity: .55; }
+}
+
 /* Wer Bewegung im System abgestellt hat, bekommt das Standbild. */
 @media (prefers-reduced-motion: reduce) {
   .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
-  .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i { animation: none; }
+  .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i,
+  .sig-drehteller .teller, .sig-drehteller img,
+  .sig-schale img, .sig-schale .dampf i { animation: none; }
   .sig-tafel .karte:first-child, .sig-diashow img:first-child { opacity: 1; }
 }
 `;
@@ -144,7 +199,9 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
       </div>`;
   }
 
-  if (cuisine === "asiatisch") {
+  // Das Sushi-Band gehört zu Japan, wird aber auch von der panasiatischen
+  // Sammelkategorie genutzt – dort passt nichts Genaueres.
+  if (cuisine === "asiatisch" || cuisine === "japanisch") {
     if (gerichte.length < 3) return "";
     const bilder = gerichte.slice(0, 5);
     // Doppelt ausgeben, damit der Umlauf ohne Sprung schließt.
@@ -154,7 +211,29 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
     return `<div class="sig sig-band" aria-hidden="true"><div class="band">${kette}</div></div>`;
   }
 
-  if (cuisine === "tuerkisch") {
+  // Der Drehteller in der Tischmitte: drei Schalen, die langsam vorbeiziehen.
+  if (cuisine === "chinesisch") {
+    if (gerichte.length < 3) return "";
+    const schalen = gerichte
+      .slice(0, 3)
+      .map((g) => `<div class="schale"><img src="${esc(bild(g.bild, "gericht", bildUrl))}" alt=""></div>`)
+      .join("");
+    return `<div class="sig sig-drehteller" aria-hidden="true"><div class="teller">${schalen}</div></div>`;
+  }
+
+  // Die dampfende Schale Phở.
+  if (cuisine === "vietnamesisch") {
+    const suppe = esc(ausKategorie(/phở|pho|suppe/i, "photo-1597345637412-9fd611e758f3"));
+    return `
+      <div class="sig sig-schale" aria-hidden="true">
+        <div class="napf"><img src="${suppe}" alt=""></div>
+        <div class="dampf"><i></i><i></i><i></i></div>
+      </div>`;
+  }
+
+  // Schawarma und Döner drehen sich am selben Spieß – ein eigener Mechanismus
+  // wäre hier erfunden, nicht gefunden.
+  if (cuisine === "tuerkisch" || cuisine === "syrisch") {
     const spiess = esc(ausKategorie(/spieß|spiess|grill/i, "photo-1529006557810-274b9b2fc783"));
     return `
       <div class="sig sig-spiess" aria-hidden="true">
@@ -162,7 +241,9 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
       </div>`;
   }
 
-  if (cuisine === "bayerisch") {
+  // Die wechselnde Tagesempfehlung – bei der indischen Karte trägt sie die
+  // Currys, beim Wirtshaus den Braten.
+  if (cuisine === "bayerisch" || cuisine === "indisch") {
     if (gerichte.length < 3) return "";
     const karten = gerichte
       .slice(0, 3)
@@ -177,7 +258,7 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
     return `<div class="sig sig-tafel" aria-hidden="true">${karten}</div>`;
   }
 
-  if (cuisine === "griechisch") {
+  if (cuisine === "griechisch" || cuisine === "thailaendisch") {
     if (gerichte.length < 3) return "";
     const bilder = gerichte
       .slice(0, 3)

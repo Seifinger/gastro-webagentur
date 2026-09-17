@@ -5,15 +5,58 @@ import {
   menuForCuisine,
   menuForLead,
   highlightCandidates,
+  kuechenAuswahl,
   MENUS,
 } from "../src/menuCatalog.js";
 
 test("detectCuisine erkennt die Küche am Restaurantnamen", () => {
   assert.equal(detectCuisine("Pizzeria Tropea"), "italienisch");
   assert.equal(detectCuisine("Döneria Neuötting"), "tuerkisch");
-  assert.equal(detectCuisine("China Restaurant Lotus"), "asiatisch");
+  assert.equal(detectCuisine("China Restaurant Lotus"), "chinesisch");
   assert.equal(detectCuisine("Taverna Akropolis"), "griechisch");
   assert.equal(detectCuisine("Café Kirchplatz"), "cafe");
+});
+
+test("detectCuisine trennt die asiatischen Küchen", () => {
+  // Der Grund für die Aufteilung: ein Sushi-Lokal soll keine Wok-Karte
+  // bekommen und ein Thai kein Sushi.
+  assert.equal(detectCuisine("Sushi Bar Kyoto"), "japanisch");
+  assert.equal(detectCuisine("Kao Thai Restaurant"), "thailaendisch");
+  assert.equal(detectCuisine("Saigon Bistro"), "vietnamesisch");
+  assert.equal(detectCuisine("Restaurant Miss Hoi An"), "vietnamesisch");
+  assert.equal(detectCuisine("China Restaurant Peking"), "chinesisch");
+  assert.equal(detectCuisine("Ming Friends"), "chinesisch");
+  assert.equal(detectCuisine("Taj Mahal"), "indisch");
+  assert.equal(detectCuisine("Damaskus Grill"), "syrisch");
+
+  // Wo der Name nichts Genaueres hergibt, bleibt die Sammelkategorie.
+  assert.equal(detectCuisine("Asia Wok Express"), "asiatisch");
+  assert.equal(detectCuisine("Nakama Rolls & Bowls"), "asiatisch");
+});
+
+test("die Aufteilung reißt keine bayerischen Namen mit", () => {
+  // "Goldener Hirsch" oder "Zum Steer" dürfen nicht plötzlich chinesisch
+  // werden, nur weil ein Stichwort zu grob gefasst ist.
+  for (const name of [
+    "Goldener Hirsch",
+    "Gasthof zum Steer",
+    "Wuhrmühle",
+    "Jettenbacher Hof",
+    "Sportheim Tüßling",
+    "Brauerei Gasthof Bräu im Moos",
+  ]) {
+    assert.equal(detectCuisine(name), "bayerisch", `${name} sollte bayerisch bleiben`);
+  }
+});
+
+test("jede Küche hat eine Beschriftung fürs Dashboard", () => {
+  const auswahl = kuechenAuswahl();
+  assert.equal(auswahl.length, Object.keys(MENUS).length);
+  for (const { wert, label } of auswahl) {
+    assert.ok(MENUS[wert], `${wert} hat keine Karte`);
+    // Der rohe Schlüssel als Beschriftung wäre der vergessene Nachtrag.
+    assert.notEqual(label, wert, `${wert} hat keine eigene Beschriftung`);
+  }
 });
 
 test("detectCuisine ignoriert Groß-/Kleinschreibung", () => {

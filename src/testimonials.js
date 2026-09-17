@@ -38,6 +38,36 @@ export const STIMMEN = {
     { text: "Adana war schön scharf, so wie versprochen. Preis-Leistung stimmt hier einfach.", autor: "Stefan G.", wann: "vor 2 Wochen" },
     { text: "Auch spätabends noch freundlich und zügig. Habe noch nie länger als eine Viertelstunde gewartet.", autor: "Lisa D.", wann: "vor 1 Monat" },
   ],
+  chinesisch: [
+    { text: "Die Jiaozi sind offensichtlich von Hand gefaltet – ungleichmäßig und genau deshalb gut. Nachbestellt haben wir trotzdem.", autor: "Daniel P.", wann: "vor 1 Woche" },
+    { text: "Habe nach der Schärfe beim Szechuan gefragt und eine ehrliche Antwort bekommen statt Verkaufsgerede. Es war scharf.", autor: "Nina S.", wann: "vor 1 Monat" },
+    { text: "Die knusprige Ente ist ihren Preis wert. Hole sie alle zwei Wochen ab, sie ist nie durchgeweicht angekommen.", autor: "Kerstin M.", wann: "vor 2 Wochen" },
+  ],
+  thailaendisch: [
+    { text: "Auf mittelscharf bestellt und genau das bekommen. Man merkt, dass die Currypaste nicht aus dem Glas kommt.", autor: "Tobias E.", wann: "vor 2 Wochen" },
+    { text: "Tom Yum war so sauer und scharf, wie sie sein soll – nicht auf deutschen Geschmack abgemildert. Danke dafür.", autor: "Anja W.", wann: "vor 1 Monat" },
+    { text: "Der Mango-Klebreis ist ein eigener Grund herzukommen. Kinder bekommen ihr Pad Thai ganz ohne Chili.", autor: "Markus L.", wann: "vor 3 Wochen" },
+  ],
+  vietnamesisch: [
+    { text: "Die Brühe schmeckt nach zwölf Stunden und nicht nach Brühwürfel. Das ist selten geworden.", autor: "Christian F.", wann: "vor 1 Woche" },
+    { text: "Sommerrollen sind frisch gerollt und nicht vorbereitet im Kühlregal gelegen. Man sieht den Unterschied sofort.", autor: "Meike B.", wann: "vor 2 Wochen" },
+    { text: "Bánh Mì zum Mitnehmen in der Mittagspause – in fünf Minuten fertig und unterwegs nicht matschig geworden.", autor: "Sven K.", wann: "vor 1 Monat" },
+  ],
+  japanisch: [
+    { text: "Der Reis ist gut gewürzt und noch warm, das machen die wenigsten richtig. Beim Lachs sieht man den Schnitt.", autor: "Verena M.", wann: "vor 1 Woche" },
+    { text: "Ramen mit Ei, das innen noch cremig ist. Die Brühe habe ich ausgetrunken, was selten vorkommt.", autor: "Philipp R.", wann: "vor 3 Wochen" },
+    { text: "Als Vegetarierin bekomme ich hier mehr als die übliche Gurkenrolle. Die Miso-Ramen sind vollwertig.", autor: "Katharina D.", wann: "vor 1 Monat" },
+  ],
+  indisch: [
+    { text: "Man riecht beim Reinkommen, dass die Gewürze frisch geröstet werden. Das Butter Chicken ist mild, aber nicht langweilig.", autor: "Florian S.", wann: "vor 2 Wochen" },
+    { text: "Naan kommt heiß aus dem Tandoor an den Tisch, nicht lauwarm aus der Wärmelampe. Riesiger Unterschied.", autor: "Simone H.", wann: "vor 1 Woche" },
+    { text: "Die vegetarische Auswahl ist keine Beilagenliste, sondern eine eigene Karte. Palak Paneer war hervorragend.", autor: "Robert A.", wann: "vor 1 Monat" },
+  ],
+  syrisch: [
+    { text: "Wir haben zu fünft Mezze bestellt und uns durchprobiert. Der Hummus ist cremiger als alles, was ich kenne.", autor: "Lena V.", wann: "vor 2 Wochen" },
+    { text: "Das Fladenbrot wird hier wirklich selbst gebacken, man bekommt es warm nachgereicht ohne zu fragen.", autor: "Yannick T.", wann: "vor 1 Woche" },
+    { text: "Schawarma vom Kalb ist saftig und nicht trocken vom Warmhalten. Dazu Tee aufs Haus, jedes Mal.", autor: "Birgit O.", wann: "vor 1 Monat" },
+  ],
   cafe: [
     { text: "Kuchen wechselt täglich und ist nie zu süß. Der Apfelkuchen mit Sahne ist mein Standardbesuch geworden.", autor: "Renate S.", wann: "vor 2 Wochen" },
     { text: "Kann hier stundenlang mit dem Laptop sitzen, ohne dass jemand komisch schaut. Kaffee ist richtig gut.", autor: "Jonas T.", wann: "vor 1 Woche" },
