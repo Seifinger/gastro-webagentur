@@ -17,15 +17,15 @@ export function toLead(place, region) {
 }
 
 /**
- * Entfernt Duplikate (z.B. wenn sich Suchregionen überschneiden) anhand der placeId
- * und sortiert Leads ohne Website nach oben (= höchste Priorität für den Pitch).
+ * Entfernt Duplikate (z.B. wenn sich Suchregionen überschneiden) anhand der placeId.
+ * Die Priorisierung selbst übernimmt scoring.js, nachdem die Websites geprüft wurden.
  */
-export function dedupeAndPrioritize(leads) {
+export function dedupeLeads(leads) {
   const seen = new Map();
   for (const lead of leads) {
     if (lead.placeId && !seen.has(lead.placeId)) {
       seen.set(lead.placeId, lead);
     }
   }
-  return [...seen.values()].sort((a, b) => Number(a.hatWebsite) - Number(b.hatWebsite));
+  return [...seen.values()];
 }

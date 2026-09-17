@@ -4,7 +4,13 @@ Lead-Generierung für die Restaurant-Web-Agentur: findet Gaststätten in einer R
 
 ## Was macht das Skript?
 
-Es durchsucht über die **Google Places API** die konfigurierten Orte (`data/regions.json`, aktuell: Mühldorf am Inn, Altötting, Tüßling, Kraiburg am Inn) nach Restaurants und speichert das Ergebnis als CSV-Datei unter `data/output/`. Restaurants **ohne** hinterlegte Website werden dabei ganz oben in der Liste einsortiert – das sind die vielversprechendsten Leads für den Pitch.
+Es durchsucht über die **Google Places API** die konfigurierten Orte (`data/regions.json`, aktuell: Mühldorf am Inn, Altötting, Tüßling, Kraiburg am Inn) nach Restaurants und speichert das Ergebnis als CSV-Datei unter `data/output/`.
+
+Für jedes gefundene Restaurant prüft das Skript zusätzlich automatisch:
+- Hat es **gar keine** Website? → automatisch höchste Priorität.
+- Falls es eine Website hat: Wird dort tatsächlich **online bestellt oder reserviert** (z. B. über GloriaFood, Lieferando, OpenTable, Quandoo, ...)? Ist sie **mobilfreundlich**? Wirkt sie anhand der Jahreszahl im Footer **veraltet**? Läuft sie über **HTTPS**?
+
+Aus diesen Merkmalen berechnet das Skript einen **Score von 0–100** (siehe unten) und sortiert alle Leads danach – die dringlichsten Fälle stehen ganz oben in der CSV.
 
 > **Wichtiger Hinweis:** Die Nutzungsbedingungen der Google Maps Platform schränken ein, wie lange Ortsdaten gespeichert und wofür sie verwendet werden dürfen (u. a. kein Aufbau von Mailinglisten für unaufgeforderte Werbung). Nutze die exportierten Listen deshalb ausschließlich als **interne Recherche-/Priorisierungshilfe** für den persönlichen Besuch vor Ort – nicht für Massen-Mailings oder die Weitergabe der Rohdaten an Dritte.
 
@@ -59,6 +65,11 @@ node src/index.js --region "Mühldorf am Inn" --limit 5
 - `--region` – sucht nur in dem angegebenen Ort statt in allen aus `data/regions.json`.
 - `--limit` – begrenzt die Ergebnisliste auf die ersten N Leads (nach Priorisierung).
 - `--pages` – Anzahl der Ergebnisseiten je Ort (Standard: 1 = bis zu 20 Treffer; max. sinnvoll: 3 = bis zu 60 Treffer, kostet aber mehr Anfragen).
+- `--skip-website-check` – überspringt die Website-Prüfung (schneller, aber ohne Score-Differenzierung bei bestehenden Websites).
+
+Die Website-Prüfung ruft für jedes Restaurant mit hinterlegter Website deren Seite auf (5 gleichzeitig) – das dauert bei vielen Treffern spürbar länger als die reine Google-Suche (grob 1 Sekunde pro Website).
+
+> **Hinweis zu Cloud-Sessions:** Läuft dieses Skript in einer Umgebung mit eingeschränktem Netzwerkzugriff (z. B. manche Claude-Code-Cloud-Sessions mit Allowlist-Richtlinie), können Website-Abrufe mit "Host not in allowlist" fehlschlagen – das ist keine echte Nichterreichbarkeit der Restaurant-Website, sondern eine Einschränkung der jeweiligen Session. Auf deinem eigenen Rechner (normales Heim-/Büro-Internet) tritt das nicht auf.
 
 ### 7. Ergebnis ansehen
 Nach dem Lauf findest du für jeden Ort eine CSV-Datei unter `data/output/`, z. B. `leads-mühldorf-am-inn-2026-09-17.csv`. Öffne sie in Excel/Numbers/Google Sheets. Spalten:
@@ -69,13 +80,47 @@ Nach dem Lauf findest du für jeden Ort eine CSV-Datei unter `data/output/`, z. 
 | `adresse` | Adresse laut Google |
 | `telefon` | Telefonnummer (falls hinterlegt) |
 | `website` | Website-URL (falls vorhanden) |
-| `hatWebsite` | `true`/`false` – Hauptkriterium für die Priorisierung |
+| `hatWebsite` | `true`/`false` |
+| `score` | 0–100, siehe Scoring-System unten – **danach ist die Liste sortiert** |
+| `priorität` | Lesbares Label: "Sehr hoch", "Hoch", "Mittel", "Niedrig", oder "Zu prüfen" |
+| `websiteErreichbar` | `true`/`false` – ob die Website beim Check erreichbar war |
+| `hatBestellfunktion` | `true`/`false` – Bestellhinweis auf der Seite gefunden |
+| `hatReservierungsfunktion` | `true`/`false` – Reservierungshinweis auf der Seite gefunden |
+| `mobilFreundlich` | `true`/`false` – Viewport-Tag für mobile Darstellung gefunden |
+| `wirktVeraltet` | `true`/`false` – alte Jahreszahl (© ...) im Footer gefunden |
 | `rating` | Google-Bewertung |
 | `anzahlBewertungen` | Anzahl Bewertungen |
 | `placeId` | Interne Google-ID (für Debugging) |
 | `ort` | Suchregion |
 
-Restaurants ohne Website stehen ganz oben – das sind deine heißesten Leads für Phase 3 (Vor-Ort-Pitch).
+Die Liste ist automatisch nach `score` absteigend sortiert – ganz oben stehen deine heißesten Leads für Phase 3 (Vor-Ort-Pitch).
+
+## Scoring-System
+
+**Keine Website hinterlegt → immer Score 100** ("Sehr hoch (keine Website)"). Das ist der stärkste Pitch-Fall.
+
+**Website vorhanden** → Start bei 0 Punkten, dann Minuspunkte je fehlendem Merkmal:
+
+| Merkmal fehlt | Punkte |
+|---|---|
+| Keine Bestellfunktion erkannt | +25 |
+| Keine Reservierungsfunktion erkannt | +20 |
+| Nicht mobilfreundlich | +25 |
+| Wirkt veraltet (alte Jahreszahl im Footer) | +20 |
+| Kein HTTPS | +10 |
+
+(Maximal 100 Punkte, wenn eine bestehende Website praktisch nichts davon bietet.)
+
+| Score | Priorität |
+|---|---|
+| 80–100 | Sehr hoch |
+| 50–79 | Hoch |
+| 25–49 | Mittel |
+| 0–24 | Niedrig |
+
+War die Website beim Check nicht erreichbar (Timeout, Fehler, Seite offline), bekommt der Lead die Priorität **"Zu prüfen"** statt eines Scores – das kann an einer echten toten Website liegen (dann eigentlich ein sehr guter Lead!) oder nur an einem Netzwerkproblem. Schau dir diese Fälle manuell an.
+
+Die Erkennung von Bestell-/Reservierungsfunktionen basiert auf gängigen Stichwörtern und bekannten Anbietern (GloriaFood, Lieferando, OpenTable, Quandoo, Resmio, ...) im HTML-Text der Seite – sie ersetzt keine manuelle Prüfung, gibt dir aber eine gute erste Sortierung. Die Gewichtungen stehen zentral in `src/scoring.js` und lassen sich dort leicht anpassen.
 
 ## Tests ausführen
 
@@ -86,5 +131,4 @@ npm test
 
 ## Geplante Erweiterungen (nicht Teil dieser ersten Version)
 
-- Automatische Erkennung "veraltet wirkender" Websites (z. B. fehlende Mobile-Optimierung) – aktuell markiert das Skript nur "hat Website" vs. "keine Website"; ob eine vorhandene Website veraltet wirkt, musst du aktuell noch manuell in der CSV beurteilen.
 - Demo-Ordner-Generierung (Phase 2 des Businessplans).

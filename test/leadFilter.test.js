@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { toLead, dedupeAndPrioritize } from "../src/leadFilter.js";
+import { toLead, dedupeLeads } from "../src/leadFilter.js";
 
 test("toLead markiert fehlende Website korrekt", () => {
   const place = {
@@ -32,16 +32,16 @@ test("toLead erkennt vorhandene Website", () => {
   assert.equal(lead.website, "https://bella-vista.example.com");
 });
 
-test("dedupeAndPrioritize entfernt Duplikate und sortiert 'ohne Website' nach oben", () => {
+test("dedupeLeads entfernt Duplikate anhand der placeId", () => {
   const leads = [
     { placeId: "1", hatWebsite: true, name: "Mit Website" },
     { placeId: "2", hatWebsite: false, name: "Ohne Website" },
     { placeId: "1", hatWebsite: true, name: "Mit Website (Duplikat)" },
   ];
 
-  const result = dedupeAndPrioritize(leads);
+  const result = dedupeLeads(leads);
 
   assert.equal(result.length, 2);
-  assert.equal(result[0].name, "Ohne Website");
-  assert.equal(result[1].name, "Mit Website");
+  assert.equal(result[0].name, "Mit Website");
+  assert.equal(result[1].name, "Ohne Website");
 });
