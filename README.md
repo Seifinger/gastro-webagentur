@@ -152,20 +152,34 @@ Die Seiten landen unter `data/landingpages/`. Öffne `data/landingpages/index.ht
 
 Optionen:
 ```bash
-npm run pages -- --region "Altötting"      # nur ein Ort
-npm run pages -- --min-score 80            # nur die dringendsten Fälle
-npm run pages -- --limit 10                # die Top 10 nach Score
+npm run pages -- --region "Altötting"        # nur ein Ort
+npm run pages -- --min-score 80              # nur die dringendsten Fälle
+npm run pages -- --limit 10                  # die Top 10 nach Score
 npm run pages -- --email info@restaurant.de  # Bestellungen/Reservierungen per E-Mail versendbar machen
+npm run pages -- --cuisine asiatisch         # Küche vorgeben (siehe unten)
 ```
 
 Was jede erzeugte Seite kann:
+- **Bild-Hero** mit dem Namen des Lokals, der echten Google-Bewertung und zwei Handlungsaufforderungen
+- **„Unsere Highlights"** – ein bebilderter Auszug aus der Karte (3, 4 oder 6 Gerichte), jedes direkt vorbestellbar
+- **Abholung vorbestellen** – Warenkorb mit Mengen, Abholzeit und live berechneter Summe
 - **Tisch reservieren** – Datum, Uhrzeit, Personenzahl, Kontaktdaten, mit Pflichtfeldprüfung
-- **Abholung vorbestellen** – Gerichte in den Warenkorb legen, Menge ändern, Abholzeit wählen, Gesamtsumme live berechnet
 - **Kontakt & Anfahrt** – Telefonnummer als Direktwahl-Link, Adresse mit Route-planen-Link zu Google Maps
-- Echte Google-Bewertung des Restaurants im Kopfbereich
-- Mobilfreundlich, ohne externe Abhängigkeiten – eine einzige HTML-Datei pro Restaurant
+- Mobilfreundlich, ohne externe Abhängigkeiten – eine HTML-Datei pro Restaurant
 
-Die **Speisekarte wird anhand des Restaurantnamens passend gewählt** (Pizzeria → italienisch, Döner → türkisch, Gasthof → bayerisch usw.). Gerichte, Preise und Öffnungszeiten sind bewusst Platzhalter und auf der Seite auch als solche gekennzeichnet – sie werden vor einer Veröffentlichung durch die echten Angaben des Wirts ersetzt.
+### Jede Seite sieht anders aus
+
+Damit die Entwürfe nicht wie ein Baukasten wirken, leitet der Generator **aus dem Lead selbst** ein festes Erscheinungsbild ab – Farbpalette, Schriftart, Hero-Layout (Vollbild links, Vollbild zentriert oder geteilt), Titelbild und Auswahl der Highlights. Derselbe Lead ergibt immer denselben Entwurf, verschiedene Lokale sehen unterschiedlich aus (bei den aktuell 62 Leads ergeben sich 55 verschiedene Designs).
+
+### Bilder
+
+Die Stockfotos (Unsplash) werden beim ersten Lauf **einmalig heruntergeladen** und unter `data/landingpages/assets/` abgelegt. Danach funktionieren die Entwürfe komplett offline – praktisch, wenn du sie beim Termin im Lokal auf dem Laptop zeigst und dort kein Empfang ist. Ein erneuter Lauf lädt nur noch fehlende Bilder nach.
+
+### Speisekarte
+
+Die Karte wird **anhand des Restaurantnamens** gewählt (Pizzeria → italienisch, Döner → türkisch, Gasthof → bayerisch usw.); ohne passendes Stichwort ist bayerisch der Standard. Liegt der Generator daneben – etwa bei einem Thai-Lokal namens „Klabwong" – gib die Küche mit `--cuisine` vor. Möglich sind: `bayerisch`, `italienisch`, `asiatisch`, `griechisch`, `tuerkisch`, `cafe`.
+
+Gezeigt wird bewusst nur ein **Auszug** der Karte, nicht das vollständige Menü. Gerichte, Preise, Öffnungszeiten und Fotos sind Platzhalter und auf der Seite auch als solche gekennzeichnet – sie werden vor einer Veröffentlichung durch die echten Angaben und Aufnahmen des Wirts ersetzt.
 
 ## Tests ausführen
 

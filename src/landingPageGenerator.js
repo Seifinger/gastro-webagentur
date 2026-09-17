@@ -1,13 +1,80 @@
-import { menuForLead } from "./menuCatalog.js";
+import { menuForLead, menuForCuisine, highlightCandidates, detectCuisine } from "./menuCatalog.js";
+import { HERO_IMAGES, AMBIENTE_IMAGES, assetFileName } from "./imageLibrary.js";
 
 // Standard-Öffnungszeiten für den Entwurf. Google liefert diese Felder in
-// unserer Suchabfrage nicht mit, deshalb sind es bewusst Platzhalter, die im
-// Footer der Seite auch als solche gekennzeichnet werden.
+// unserer Suchabfrage nicht mit, deshalb sind es bewusst Platzhalter, die auf
+// der Seite auch als solche gekennzeichnet werden.
 export const DEFAULT_OPENING_HOURS = [
   { tage: "Montag – Donnerstag", zeiten: "11:30 – 14:00 & 17:00 – 22:00" },
   { tage: "Freitag – Samstag", zeiten: "11:30 – 14:00 & 17:00 – 23:00" },
   { tage: "Sonntag & Feiertage", zeiten: "11:30 – 21:00" },
 ];
+
+const PALETTES = {
+  terracotta: { accent: "#b4451f", dark: "#8d3416", gold: "#c1872c", tint: "#2a1a12", tintRgb: "42,26,18", soft: "#faf3ec" },
+  wald: { accent: "#4a6741", dark: "#35502e", gold: "#c9a227", tint: "#1b261a", tintRgb: "27,38,26", soft: "#f1f5ef" },
+  wein: { accent: "#8c2f39", dark: "#6d222b", gold: "#c9a227", tint: "#251215", tintRgb: "37,18,21", soft: "#faf1f1" },
+  azur: { accent: "#1f5f8b", dark: "#164764", gold: "#d8a33a", tint: "#0f2230", tintRgb: "15,34,48", soft: "#eef4f8" },
+  kupfer: { accent: "#a35a24", dark: "#80441a", gold: "#d8a33a", tint: "#2b1a0e", tintRgb: "43,26,14", soft: "#fbf3ea" },
+  anthrazit: { accent: "#a83232", dark: "#832626", gold: "#c99a3a", tint: "#1b1919", tintRgb: "27,25,25", soft: "#f5f2f2" },
+};
+
+// Pro Küche mehrere stimmige Paletten, damit zwei Nachbarlokale nicht gleich aussehen.
+const CUISINE_PALETTES = {
+  bayerisch: ["wald", "kupfer", "terracotta"],
+  italienisch: ["terracotta", "wein", "wald"],
+  asiatisch: ["anthrazit", "kupfer", "wein"],
+  griechisch: ["azur", "terracotta", "wald"],
+  tuerkisch: ["kupfer", "wein", "anthrazit"],
+  cafe: ["kupfer", "wald", "terracotta"],
+};
+
+const HERO_LAYOUTS = ["vollbild-links", "vollbild-mitte", "geteilt"];
+
+const FONT_STACKS = [
+  'Georgia, "Iowan Old Style", "Times New Roman", serif',
+  '"Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif',
+  '"Hoefler Text", Baskerville, Garamond, Georgia, serif',
+];
+
+function hashText(text) {
+  let hash = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+  }
+  return hash;
+}
+
+/**
+ * Leitet aus dem Lead ein festes, aber pro Restaurant unterschiedliches
+ * Erscheinungsbild ab – gleicher Lead ergibt immer dasselbe Design.
+ */
+export function themeForLead(lead, cuisineOverride) {
+  const cuisine = cuisineOverride ?? detectCuisine(lead?.name);
+  const seed = hashText(String(lead?.placeId || lead?.name || "restaurant"));
+  const paletteNames = CUISINE_PALETTES[cuisine] ?? CUISINE_PALETTES.bayerisch;
+
+  const heroPool = HERO_IMAGES[cuisine] ?? HERO_IMAGES.bayerisch;
+  const ambientePool = AMBIENTE_IMAGES[cuisine] ?? AMBIENTE_IMAGES.bayerisch;
+  // Unbedingt >>> statt >>: der Hash nutzt den vollen 32-Bit-Bereich, ein
+  // vorzeichenbehafteter Shift ergäbe negative Indizes.
+  const ambienteStart = (seed >>> 9) % ambientePool.length;
+
+  return {
+    cuisine,
+    seed,
+    paletteName: paletteNames[seed % paletteNames.length],
+    palette: PALETTES[paletteNames[seed % paletteNames.length]],
+    heroLayout: HERO_LAYOUTS[(seed >>> 3) % HERO_LAYOUTS.length],
+    fontStack: FONT_STACKS[(seed >>> 6) % FONT_STACKS.length],
+    heroImage: heroPool[(seed >>> 12) % heroPool.length],
+    // Die Collage zeigt drei Motive – welche drei, hängt am Lead.
+    ambienteImages: Array.from(
+      { length: 3 },
+      (_, i) => ambientePool[(ambienteStart + i) % ambientePool.length],
+    ),
+  };
+}
 
 export function slugify(value) {
   return String(value ?? "")
@@ -66,21 +133,29 @@ const PICKUP_SLOTS = [
   ...timeSlots(17 * 60, 21 * 60 + 30, 15),
 ];
 
+/**
+ * Sammelt alle Bilder, die eine Seite braucht – die CLI lädt sie damit vorab
+ * in den gemeinsamen Asset-Ordner.
+ */
+export function imageSpecsForLead(lead, cuisineOverride) {
+  const theme = themeForLead(lead, cuisineOverride);
+  const menu = cuisineOverride ? menuForCuisine(cuisineOverride) : menuForLead(lead);
+  const specs = [{ id: theme.heroImage, role: "hero" }];
+
+  for (const bild of theme.ambienteImages) specs.push({ id: bild, role: "ambiente" });
+  for (const gericht of highlightCandidates(menu)) specs.push({ id: gericht.bild, role: "gericht" });
+
+  const seen = new Set();
+  return specs.filter(({ id, role }) => {
+    const key = `${id}-${role}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 const PAGE_STYLES = `
 *, *::before, *::after { box-sizing: border-box; }
-:root {
-  --ink: #1d1613;
-  --ink-soft: #5f5148;
-  --bg: #fffdfa;
-  --surface: #ffffff;
-  --line: #ece2d7;
-  --accent: #b4451f;
-  --accent-dark: #8d3416;
-  --gold: #c1872c;
-  --success: #2f7d55;
-  --shadow: 0 18px 40px -22px rgba(45, 26, 14, .45);
-  --radius: 16px;
-}
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
@@ -88,97 +163,146 @@ body {
   color: var(--ink);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 17px;
-  line-height: 1.6;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
-h1, h2, h3 { font-family: Georgia, "Iowan Old Style", "Times New Roman", serif; line-height: 1.15; margin: 0; font-weight: 600; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.14; margin: 0; font-weight: 600; }
 p { margin: 0; }
 a { color: inherit; }
-img { max-width: 100%; }
-.wrap { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 20px; }
-.section { padding: 72px 0; }
-.section-head { max-width: 640px; margin-bottom: 40px; }
-.eyebrow { text-transform: uppercase; letter-spacing: .16em; font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
-.section-head h2 { font-size: clamp(28px, 4.5vw, 40px); margin-bottom: 14px; }
-.section-head p { color: var(--ink-soft); }
+img { display: block; max-width: 100%; }
+.wrap { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+.section { padding: 92px 0; }
+.section-head { max-width: 660px; margin-bottom: 46px; }
+.section-head.mitte { margin-left: auto; margin-right: auto; text-align: center; }
+.eyebrow { text-transform: uppercase; letter-spacing: .18em; font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 14px; }
+.section-head h2 { font-size: clamp(30px, 4.6vw, 44px); margin-bottom: 16px; }
+.section-head p { color: var(--ink-soft); font-size: 18px; }
 
-/* Kopfzeile */
-.topbar {
-  position: sticky; top: 0; z-index: 40;
-  background: rgba(255, 253, 250, .92);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--line);
-}
-.topbar-inner { display: flex; align-items: center; gap: 18px; height: 66px; }
-.brand { font-family: Georgia, serif; font-size: 19px; font-weight: 600; margin-right: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.topnav { display: none; gap: 24px; font-size: 15px; }
-.topnav a { text-decoration: none; color: var(--ink-soft); }
-.topnav a:hover { color: var(--accent); }
-@media (min-width: 900px) { .topnav { display: flex; } }
+/* Kopfzeile: liegt transparent über dem Hero und wird beim Scrollen fest */
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 40; transition: background .28s ease, box-shadow .28s ease; }
+/* Abdunkelung, damit die helle Navigation auch über hellen Fotos lesbar bleibt */
+.topbar::before { content: ""; position: absolute; inset: 0; pointer-events: none; transition: opacity .28s ease;
+                  background: linear-gradient(180deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.12) 70%, transparent 100%); }
+.topbar.scrolled::before { opacity: 0; }
+.topbar-inner { position: relative; }
+.topbar-inner { display: flex; align-items: center; gap: 18px; height: 74px; }
+.brand { font-family: var(--display); font-size: 20px; font-weight: 600; margin-right: auto; color: #fff;
+         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color .28s ease; }
+.topnav { display: none; gap: 26px; font-size: 15px; }
+.topnav a { text-decoration: none; color: rgba(255,255,255,.88); transition: color .28s ease; }
+.topnav a:hover { color: #fff; }
+@media (min-width: 940px) { .topnav { display: flex; } }
+.topbar.scrolled { background: rgba(255,253,250,.95); backdrop-filter: blur(12px); box-shadow: 0 1px 0 var(--line); }
+.topbar.scrolled .brand { color: var(--ink); }
+.topbar.scrolled .topnav a { color: var(--ink-soft); }
+.topbar.scrolled .topnav a:hover { color: var(--accent); }
 
 /* Buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 13px 22px; border-radius: 999px; border: 1px solid transparent;
+  padding: 14px 26px; border-radius: 999px; border: 1px solid transparent;
   font-size: 15px; font-weight: 600; font-family: inherit; text-decoration: none;
-  cursor: pointer; transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+  cursor: pointer; transition: transform .12s ease, background .16s ease, box-shadow .16s ease, color .16s ease;
 }
 .btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 10px 24px -12px rgba(180, 69, 31, .8); }
+.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 12px 26px -14px rgba(0,0,0,.65); }
 .btn-primary:hover { background: var(--accent-dark); }
 .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-.btn-light { background: #fff; color: var(--ink); }
-.btn-outline-light { background: transparent; color: #fff; border-color: rgba(255,255,255,.5); }
-.btn-outline-light:hover { border-color: #fff; }
+.btn-light { background: #fff; color: var(--tint); }
+.btn-light:hover { background: #f3ece4; }
+.btn-outline-light { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.55); }
+.btn-outline-light:hover { background: rgba(255,255,255,.18); border-color: #fff; }
 .btn-block { width: 100%; }
 .btn[disabled] { opacity: .5; cursor: not-allowed; }
 
 /* Hero */
-.hero { position: relative; color: #fff; overflow: hidden; background: #2a1a12; }
-.hero::before {
-  content: ""; position: absolute; inset: 0;
-  background:
-    radial-gradient(900px 420px at 15% 0%, rgba(193, 135, 44, .38), transparent 62%),
-    radial-gradient(760px 480px at 88% 22%, rgba(180, 69, 31, .5), transparent 60%),
-    linear-gradient(165deg, #3a2317 0%, #23150e 100%);
+.hero { position: relative; color: #fff; background: var(--tint); overflow: hidden; }
+.hero-media { position: absolute; inset: 0; }
+.hero-media img { width: 100%; height: 100%; object-fit: cover; }
+.hero-overlay { position: absolute; inset: 0; }
+.hero-inner { position: relative; z-index: 2; width: 100%; max-width: 1140px; margin: 0 auto; padding: 170px 20px 120px; }
+.hero h1 { font-size: clamp(40px, 7.2vw, 74px); letter-spacing: -.015em; }
+.hero-kicker { text-transform: uppercase; letter-spacing: .22em; font-size: 12px; font-weight: 700; color: var(--gold); margin-bottom: 20px; }
+.hero-sub { margin-top: 22px; font-size: clamp(17px, 2.2vw, 20px); color: rgba(255,255,255,.86); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+.rating { display: inline-flex; align-items: center; gap: 10px; margin-top: 32px; font-size: 15px; color: rgba(255,255,255,.86); }
+.stars { color: var(--gold); letter-spacing: 2px; font-size: 17px; }
+
+.hero-vollbild-links .hero-overlay {
+  background: linear-gradient(95deg, rgba(var(--tint-rgb), .95) 0%, rgba(var(--tint-rgb), .88) 38%, rgba(var(--tint-rgb), .55) 66%, rgba(var(--tint-rgb), .22) 100%);
 }
-.hero-inner { position: relative; padding: 92px 20px 100px; }
-.hero-inner > * { max-width: 700px; }
-.hero h1 { font-size: clamp(38px, 7vw, 66px); letter-spacing: -.01em; }
-.hero-kicker { text-transform: uppercase; letter-spacing: .2em; font-size: 12px; font-weight: 700; color: var(--gold); margin-bottom: 18px; }
-.hero-sub { margin-top: 20px; font-size: clamp(17px, 2.4vw, 20px); color: rgba(255,255,255,.82); max-width: 520px; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
-.rating { display: inline-flex; align-items: center; gap: 10px; margin-top: 30px; font-size: 15px; color: rgba(255,255,255,.85); }
-.stars { color: var(--gold); letter-spacing: 2px; }
+.hero-vollbild-links .hero-inner > * { max-width: 620px; }
 
-/* Vorteile */
-.usp-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
-@media (min-width: 780px) { .usp-grid { grid-template-columns: repeat(3, 1fr); } }
-.usp-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); }
-.usp-card h3 { font-size: 20px; margin-bottom: 10px; }
-.usp-card p { color: var(--ink-soft); font-size: 15px; }
-.usp-icon { font-size: 26px; margin-bottom: 14px; display: block; }
+.hero-vollbild-mitte .hero-overlay {
+  background: linear-gradient(180deg, rgba(var(--tint-rgb), .62) 0%, rgba(var(--tint-rgb), .80) 100%);
+}
+.hero-vollbild-mitte .hero-inner { text-align: center; }
+.hero-vollbild-mitte .hero-inner > * { max-width: 760px; margin-left: auto; margin-right: auto; }
+.hero-vollbild-mitte .hero-actions, .hero-vollbild-mitte .rating { justify-content: center; }
 
-/* Speisekarte */
-.menu-cat { margin-bottom: 48px; }
-.menu-cat h3 { font-size: 24px; padding-bottom: 12px; border-bottom: 2px solid var(--line); margin-bottom: 8px; }
-.dish { display: flex; align-items: flex-start; gap: 18px; padding: 20px 0; border-bottom: 1px solid var(--line); }
-.dish-body { flex: 1; min-width: 0; }
-.dish-name { font-weight: 600; font-size: 17px; }
-.dish-desc { color: var(--ink-soft); font-size: 15px; margin-top: 3px; }
-.veg { display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 700; color: var(--success); border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; vertical-align: middle; }
-.dish-side { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-.dish-price { font-weight: 600; white-space: nowrap; }
+.hero-geteilt { display: grid; grid-template-columns: 1fr; }
+.hero-geteilt .hero-overlay { display: none; }
+.hero-geteilt .hero-media { position: relative; inset: auto; min-height: 340px; }
+/* Gestapelt liegt das Bild über dem Text, die Kopfzeile überdeckt es – der
+   Textblock braucht dann keinen Platz für die Kopfzeile. */
+.hero-geteilt .hero-inner { max-width: none; padding: 56px clamp(20px, 5vw, 66px) 72px; display: flex; flex-direction: column; justify-content: center; }
+@media (min-width: 940px) {
+  .hero-geteilt { grid-template-columns: 1.05fr 1fr; }
+  .hero-geteilt .hero-media { min-height: 620px; order: 2; }
+  .hero-geteilt .hero-inner { padding: 150px clamp(28px, 4vw, 64px) 110px; }
+}
+
+/* Highlights */
+.hl-grid { display: grid; gap: 26px; grid-template-columns: 1fr; }
+@media (min-width: 680px) { .hl-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .hl-grid.spalten-3 { grid-template-columns: repeat(3, 1fr); } }
+.hl-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+  display: flex; flex-direction: column; transition: transform .18s ease, box-shadow .18s ease;
+}
+.hl-card:hover { transform: translateY(-4px); box-shadow: 0 24px 46px -26px rgba(40,24,12,.5); }
+.hl-media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--soft); }
+.hl-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.hl-card:hover .hl-media img { transform: scale(1.05); }
+.hl-kat { position: absolute; left: 14px; top: 14px; background: rgba(var(--tint-rgb), .86); color: #fff;
+          font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 11px; border-radius: 999px; }
+.hl-body { padding: 22px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.hl-name { font-family: var(--display); font-size: 21px; font-weight: 600; }
+.hl-desc { color: var(--ink-soft); font-size: 15px; flex: 1; }
+.hl-foot { display: flex; align-items: center; gap: 14px; margin-top: 10px; }
+.hl-preis { font-size: 19px; font-weight: 600; font-family: var(--display); margin-right: auto; }
+.veg { display: inline-block; font-size: 11px; font-weight: 700; color: var(--success); border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
 .add-btn {
-  width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line);
-  background: var(--surface); color: var(--accent); font-size: 22px; line-height: 1;
-  cursor: pointer; transition: background .12s ease, color .12s ease, border-color .12s ease;
+  display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px;
+  border: 1px solid var(--accent); background: transparent; color: var(--accent);
+  font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .16s ease, color .16s ease;
 }
-.add-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+.add-btn:hover { background: var(--accent); color: #fff; }
+.karte-hinweis { margin-top: 40px; text-align: center; color: var(--ink-soft); font-size: 15px; }
+
+/* Ablauf der Abholung */
+.steps { display: grid; gap: 22px; grid-template-columns: 1fr; margin-top: 56px; }
+@media (min-width: 780px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+.step { display: flex; gap: 16px; align-items: flex-start; }
+.step-n { flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff;
+          display: grid; place-items: center; font-weight: 700; font-size: 16px; }
+.step h3 { font-size: 18px; margin-bottom: 4px; }
+.step p { color: var(--ink-soft); font-size: 15px; }
+
+/* Ambiente */
+.amb-section { background: var(--soft); }
+.amb-grid { display: grid; gap: 34px; grid-template-columns: 1fr; align-items: center; }
+@media (min-width: 900px) { .amb-grid { grid-template-columns: 1fr 1.1fr; gap: 56px; } }
+.amb-collage { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.amb-collage img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+.amb-collage .gross { grid-column: 1 / -1; aspect-ratio: 16 / 9; }
+.amb-collage .klein { aspect-ratio: 1 / 1; }
+.amb-quote { margin-top: 28px; padding-left: 20px; border-left: 3px solid var(--accent); font-family: var(--display); font-size: 19px; line-height: 1.5; }
+.amb-quote span { display: block; margin-top: 8px; font-family: inherit; font-size: 14px; color: var(--ink-soft); font-style: normal; }
 
 /* Formulare */
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px; box-shadow: var(--shadow); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 34px; box-shadow: 0 22px 50px -32px rgba(40,24,12,.45); }
 .field-grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
 @media (min-width: 680px) { .field-grid { grid-template-columns: 1fr 1fr; } }
 .field { display: flex; flex-direction: column; gap: 7px; }
@@ -186,84 +310,90 @@ img { max-width: 100%; }
 label { font-size: 14px; font-weight: 600; }
 input, select, textarea {
   font-family: inherit; font-size: 16px; color: var(--ink);
-  padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px;
-  background: #fff; width: 100%;
+  padding: 13px 15px; border: 1px solid var(--line); border-radius: 11px; background: #fff; width: 100%;
 }
 input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
-textarea { resize: vertical; min-height: 90px; }
-.hint { font-size: 13px; color: var(--ink-soft); }
+textarea { resize: vertical; min-height: 92px; }
+.hint { font-size: 13px; color: var(--ink-soft); font-weight: 400; }
 .error { font-size: 13px; color: var(--accent); display: none; }
 .field.invalid .error { display: block; }
 .field.invalid input, .field.invalid select { border-color: var(--accent); }
-.reserve-section { background: #f9f2ea; }
+.reserve-section { background: var(--tint); color: #fff; }
+.reserve-section .section-head p { color: rgba(255,255,255,.75); }
+.reserve-section .eyebrow { color: var(--gold); }
+.reserve-grid { display: grid; gap: 40px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 960px) { .reserve-grid { grid-template-columns: .85fr 1.15fr; gap: 56px; } }
+.reserve-pluspunkte { list-style: none; margin: 26px 0 0; padding: 0; }
+.reserve-pluspunkte li { display: flex; gap: 12px; padding: 11px 0; color: rgba(255,255,255,.85); font-size: 15px; }
+.reserve-pluspunkte .k { color: var(--gold); font-weight: 700; }
+.panel label { color: var(--ink); }
 
 /* Warenkorb */
 .cart-fab {
   position: fixed; right: 20px; bottom: 20px; z-index: 50;
   display: none; align-items: center; gap: 12px;
-  padding: 14px 22px; border: none; border-radius: 999px;
+  padding: 15px 24px; border: none; border-radius: 999px;
   background: var(--accent); color: #fff; font-family: inherit; font-size: 15px; font-weight: 600;
-  cursor: pointer; box-shadow: 0 16px 34px -14px rgba(180, 69, 31, .9);
+  cursor: pointer; box-shadow: 0 18px 36px -14px rgba(0,0,0,.7);
 }
 .cart-fab.visible { display: inline-flex; }
 .cart-count { background: rgba(255,255,255,.25); border-radius: 999px; padding: 1px 9px; font-size: 13px; }
-.overlay { position: fixed; inset: 0; background: rgba(28, 18, 12, .55); z-index: 60; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+.overlay { position: fixed; inset: 0; background: rgba(20, 13, 8, .6); z-index: 60; opacity: 0; pointer-events: none; transition: opacity .22s ease; }
 .overlay.open { opacity: 1; pointer-events: auto; }
 .drawer {
   position: fixed; top: 0; right: 0; bottom: 0; z-index: 70;
-  width: min(430px, 100%); background: var(--bg);
+  width: min(440px, 100%); background: var(--bg);
   display: flex; flex-direction: column;
-  transform: translateX(100%); transition: transform .26s ease;
+  transform: translateX(100%); transition: transform .28s ease;
   box-shadow: -20px 0 50px -30px rgba(0,0,0,.6);
 }
 .drawer.open { transform: translateX(0); }
-.drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 20px; border-bottom: 1px solid var(--line); }
-.drawer-head h3 { font-size: 20px; }
-.icon-btn { border: none; background: transparent; font-size: 26px; line-height: 1; cursor: pointer; color: var(--ink-soft); padding: 4px 8px; }
-.drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
-.drawer-foot { padding: 20px; border-top: 1px solid var(--line); background: var(--surface); }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 22px; border-bottom: 1px solid var(--line); }
+.drawer-head h3 { font-size: 21px; }
+.icon-btn { border: none; background: transparent; font-size: 27px; line-height: 1; cursor: pointer; color: var(--ink-soft); padding: 4px 8px; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 22px; }
+.drawer-foot { padding: 22px; border-top: 1px solid var(--line); background: var(--surface); }
 .cart-line { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .cart-line-body { flex: 1; min-width: 0; }
 .cart-line-name { font-size: 15px; font-weight: 600; }
 .cart-line-price { font-size: 14px; color: var(--ink-soft); }
 .qty { display: flex; align-items: center; gap: 4px; }
-.qty button { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-size: 17px; line-height: 1; color: var(--accent); }
+.qty button { width: 31px; height: 31px; border-radius: 9px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-size: 17px; line-height: 1; color: var(--accent); }
 .qty span { min-width: 26px; text-align: center; font-weight: 600; font-size: 15px; }
 .cart-empty { text-align: center; color: var(--ink-soft); padding: 40px 10px; }
-.totals { display: flex; justify-content: space-between; font-size: 20px; font-weight: 600; margin-bottom: 16px; font-family: Georgia, serif; }
+.totals { display: flex; justify-content: space-between; font-size: 21px; font-weight: 600; margin-bottom: 16px; font-family: var(--display); }
 .drawer .field-grid { grid-template-columns: 1fr; }
 
 /* Bestätigung */
 .confirm-box {
   position: fixed; z-index: 80; left: 50%; top: 50%; transform: translate(-50%, -46%);
-  width: min(480px, calc(100% - 32px)); max-height: 84vh; overflow-y: auto;
-  background: var(--surface); border-radius: var(--radius); padding: 34px 30px;
+  width: min(490px, calc(100% - 32px)); max-height: 86vh; overflow-y: auto;
+  background: var(--surface); border-radius: 20px; padding: 36px 32px;
   box-shadow: 0 30px 70px -30px rgba(0,0,0,.6); text-align: center;
   opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease;
 }
 .confirm-box.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
-.confirm-icon { width: 62px; height: 62px; border-radius: 50%; background: #e7f4ec; color: var(--success); display: grid; place-items: center; font-size: 32px; margin: 0 auto 18px; }
-.confirm-box h3 { font-size: 24px; margin-bottom: 12px; }
-.confirm-summary { text-align: left; background: #faf6f1; border-radius: 12px; padding: 16px 18px; margin: 20px 0; font-size: 15px; }
+.confirm-icon { width: 64px; height: 64px; border-radius: 50%; background: #e7f4ec; color: var(--success); display: grid; place-items: center; font-size: 33px; margin: 0 auto 18px; }
+.confirm-box h3 { font-size: 25px; margin-bottom: 12px; }
+.confirm-summary { text-align: left; background: var(--soft); border-radius: 13px; padding: 17px 19px; margin: 22px 0; font-size: 15px; }
 .confirm-summary div { display: flex; justify-content: space-between; gap: 16px; padding: 3px 0; }
 .confirm-summary .label { color: var(--ink-soft); }
 .demo-note { font-size: 13px; color: var(--ink-soft); margin-top: 16px; }
 
 /* Kontakt */
-.contact-grid { display: grid; gap: 30px; grid-template-columns: 1fr; }
-@media (min-width: 820px) { .contact-grid { grid-template-columns: 1fr 1fr; } }
+.contact-grid { display: grid; gap: 34px; grid-template-columns: 1fr; }
+@media (min-width: 860px) { .contact-grid { grid-template-columns: 1fr 1fr; gap: 56px; } }
 .contact-list { list-style: none; margin: 0; padding: 0; }
-.contact-list li { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); }
-.contact-list .k { font-size: 22px; }
+.contact-list li { display: flex; gap: 15px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.contact-list .k { font-size: 21px; }
 .contact-list a { color: var(--accent); }
-.hours-row { display: flex; justify-content: space-between; gap: 20px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.hours-row { display: flex; justify-content: space-between; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
 .hours-row span:first-child { color: var(--ink-soft); }
-.placeholder-badge { display: inline-block; font-size: 12px; font-weight: 700; color: var(--gold); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; margin-left: 8px; vertical-align: middle; }
+.placeholder-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; margin-left: 10px; vertical-align: middle; }
 
-footer { background: #23150e; color: rgba(255,255,255,.7); padding: 46px 0; font-size: 14px; }
-footer strong { color: #fff; }
-.footer-note { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.15); font-size: 13px; }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+footer { background: var(--tint); color: rgba(255,255,255,.72); padding: 52px 0; font-size: 14px; }
+footer strong { color: #fff; font-family: var(--display); font-size: 17px; }
+.footer-note { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; line-height: 1.6; }
 `;
 
 const PAGE_SCRIPT = `
@@ -292,7 +422,7 @@ const PAGE_SCRIPT = `
     if (current.length === 0) {
       var empty = document.createElement("p");
       empty.className = "cart-empty";
-      empty.textContent = "Noch nichts ausgew\\u00E4hlt. St\\u00F6bern Sie in der Speisekarte.";
+      empty.textContent = "Noch nichts ausgew\\u00E4hlt. St\\u00F6bern Sie in unseren Highlights.";
       list.appendChild(empty);
     } else {
       current.forEach(function (line) {
@@ -406,8 +536,10 @@ const PAGE_SCRIPT = `
       var input = form.elements[name];
       var field = input.closest(".field");
       var valid = String(input.value).trim().length > 0;
-      if (field) field.className = valid ? "field" + (field.classList.contains("field-wide") ? " field-wide" : "")
-                                         : "field invalid" + (field.classList.contains("field-wide") ? " field-wide" : "");
+      if (field) {
+        var wide = field.classList.contains("field-wide") ? " field-wide" : "";
+        field.className = (valid ? "field" : "field invalid") + wide;
+      }
       if (!valid && ok) { input.focus(); ok = false; }
     });
     return ok;
@@ -430,6 +562,14 @@ const PAGE_SCRIPT = `
         addToCart(button.getAttribute("data-add"), button.getAttribute("data-name"), Number(button.getAttribute("data-preis")));
       });
     });
+
+    var topbar = byId("topbar");
+    function onScroll() {
+      if (window.scrollY > 40) topbar.classList.add("scrolled");
+      else topbar.classList.remove("scrolled");
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
 
     byId("cart-fab").addEventListener("click", openDrawer);
     byId("drawer-close").addEventListener("click", closeDrawer);
@@ -521,34 +661,28 @@ const PAGE_SCRIPT = `
 })();
 `;
 
-function renderMenu(menu) {
-  return menu.kategorien
-    .map((kategorie, katIndex) => {
-      const dishes = kategorie.gerichte
-        .map((gericht, dishIndex) => {
-          const id = `${katIndex}-${dishIndex}`;
-          const veg = gericht.vegetarisch
-            ? '<span class="veg">vegetarisch</span>'
-            : "";
-          return `
-          <div class="dish">
-            <div class="dish-body">
-              <div class="dish-name">${escapeHtml(gericht.name)}${veg}</div>
-              <div class="dish-desc">${escapeHtml(gericht.beschreibung)}</div>
-            </div>
-            <div class="dish-side">
-              <span class="dish-price">${formatPrice(gericht.preis)}</span>
-              <button class="add-btn" type="button" data-add="${id}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}" aria-label="${escapeHtml(gericht.name)} zur Abholbestellung hinzufügen">+</button>
-            </div>
-          </div>`;
-        })
-        .join("");
-
+function renderHighlights(highlights, assets) {
+  return highlights
+    .map((gericht, index) => {
+      const veg = gericht.vegetarisch ? '<span class="veg">vegetarisch</span>' : "";
       return `
-      <div class="menu-cat">
-        <h3>${escapeHtml(kategorie.name)}</h3>
-        ${dishes}
-      </div>`;
+      <article class="hl-card">
+        <div class="hl-media">
+          <img src="${assets}/${assetFileName(gericht.bild, "gericht")}" alt="${escapeHtml(gericht.name)}" loading="lazy">
+          <span class="hl-kat">${escapeHtml(gericht.kategorie)}</span>
+        </div>
+        <div class="hl-body">
+          <h3 class="hl-name">${escapeHtml(gericht.name)}</h3>
+          <p class="hl-desc">${escapeHtml(gericht.beschreibung)}</p>
+          <div class="hl-foot">
+            <span class="hl-preis">${formatPrice(gericht.preis)}</span>
+            ${veg}
+            <button class="add-btn" type="button" data-add="hl-${index}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}">
+              <span aria-hidden="true">+</span> Vorbestellen
+            </button>
+          </div>
+        </div>
+      </article>`;
     })
     .join("");
 }
@@ -572,14 +706,17 @@ function optionList(values) {
 }
 
 /**
- * Baut eine eigenständige HTML-Landingpage für einen Lead: Speisekarte,
- * Abholbestellung mit Warenkorb und Tischreservierung – alles in einer Datei,
- * ohne externe Abhängigkeiten.
+ * Baut eine eigenständige HTML-Landingpage für einen Lead: Bild-Hero,
+ * Highlights aus der Karte mit Abholbestellung und Tischreservierung.
+ * Farben, Schrift, Hero-Layout und Motive ergeben sich fest aus dem Lead,
+ * damit nicht alle Entwürfe gleich aussehen.
  */
 export function buildLandingPage(lead, options = {}) {
   const menu = options.menu ?? menuForLead(lead);
+  const theme = options.theme ?? themeForLead(lead);
   const openingHours = options.öffnungszeiten ?? DEFAULT_OPENING_HOURS;
   const kontaktEmail = options.kontaktEmail ?? "";
+  const assets = options.assetsPath ?? "../assets";
 
   const name = lead.name || "Ihr Restaurant";
   const ort = lead.ort || "";
@@ -589,6 +726,19 @@ export function buildLandingPage(lead, options = {}) {
   const mapsUrl = adresse
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(adresse)}`
     : "";
+
+  // Aus der vollen Karte wird bewusst nur ein Auszug gezeigt.
+  const kandidaten = highlightCandidates(menu);
+  const start = theme.seed % Math.max(1, kandidaten.length);
+  // 6, 4 oder 3 Kacheln füllen das Raster restlos – eine einzelne Kachel in
+  // der letzten Reihe sieht nach Fehler aus.
+  const anzahlHighlights =
+    [6, 4, 3].find((n) => n <= kandidaten.length) ?? kandidaten.length;
+  const highlights = Array.from(
+    { length: anzahlHighlights },
+    (_, i) => kandidaten[(start + i) % kandidaten.length],
+  );
+  const spalten = anzahlHighlights % 3 === 0 ? "spalten-3" : "";
 
   const pageData = jsonForScript({ name, kontaktEmail });
 
@@ -615,6 +765,22 @@ export function buildLandingPage(lead, options = {}) {
     )
     .join("");
 
+  const heroContent = `
+    <div class="hero-kicker">${escapeHtml(menu.label)}${ort ? ` · ${escapeHtml(ort)}` : ""}</div>
+    <h1>${escapeHtml(name)}</h1>
+    <p class="hero-sub">${escapeHtml(menu.tagline)}. Reservieren Sie Ihren Tisch in unter einer Minute – oder bestellen Sie Ihr Essen bequem zur Abholung vor.</p>
+    <div class="hero-actions">
+      <a class="btn btn-light" href="#reservierung">Tisch reservieren</a>
+      <a class="btn btn-outline-light" href="#highlights">Zur Abholung bestellen</a>
+    </div>
+    ${renderRatingBadge(lead)}`;
+
+  const ratingQuote = lead.rating
+    ? `<blockquote class="amb-quote">„Wir kommen immer wieder gern hierher.“
+         <span>Gäste bewerten uns mit ${String(lead.rating).replace(".", ",")} von 5 Sternen auf Google.</span>
+       </blockquote>`
+    : "";
+
   return `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -622,119 +788,154 @@ export function buildLandingPage(lead, options = {}) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(name)}${ort ? ` – ${escapeHtml(ort)}` : ""}</title>
 <meta name="description" content="${escapeHtml(`${name}${ort ? ` in ${ort}` : ""} – ${menu.tagline}. Jetzt Tisch reservieren oder Essen zur Abholung vorbestellen.`)}">
-<style>${PAGE_STYLES}</style>
+<style>
+:root {
+  --ink: #1d1613;
+  --ink-soft: #625349;
+  --bg: #fffdfa;
+  --surface: #ffffff;
+  --line: #ebe1d6;
+  --success: #2f7d55;
+  --accent: ${theme.palette.accent};
+  --accent-dark: ${theme.palette.dark};
+  --gold: ${theme.palette.gold};
+  --tint: ${theme.palette.tint};
+  --tint-rgb: ${theme.palette.tintRgb};
+  --soft: ${theme.palette.soft};
+  --display: ${theme.fontStack};
+}
+${PAGE_STYLES}
+</style>
 </head>
 <body>
 
-<header class="topbar">
+<header class="topbar" id="topbar">
   <div class="wrap topbar-inner">
     <div class="brand">${escapeHtml(name)}</div>
     <nav class="topnav">
-      <a href="#karte">Speisekarte</a>
+      <a href="#highlights">Highlights</a>
+      <a href="#ambiente">Bei uns</a>
       <a href="#reservierung">Reservierung</a>
-      <a href="#kontakt">Kontakt &amp; Anfahrt</a>
+      <a href="#kontakt">Kontakt</a>
     </nav>
     <a class="btn btn-primary" href="#reservierung">Tisch reservieren</a>
   </div>
 </header>
 
-<section class="hero">
-  <div class="wrap hero-inner">
-    <div class="hero-kicker">${escapeHtml(menu.label)}${ort ? ` · ${escapeHtml(ort)}` : ""}</div>
-    <h1>${escapeHtml(name)}</h1>
-    <p class="hero-sub">${escapeHtml(menu.tagline)}. Reservieren Sie Ihren Tisch in unter einer Minute – oder bestellen Sie Ihr Essen bequem zur Abholung vor.</p>
-    <div class="hero-actions">
-      <a class="btn btn-light" href="#reservierung">Tisch reservieren</a>
-      <a class="btn btn-outline-light" href="#karte">Zur Abholung bestellen</a>
+<section class="hero hero-${theme.heroLayout}">
+  <div class="hero-media">
+    <img src="${assets}/${assetFileName(theme.heroImage, "hero")}" alt="${escapeHtml(name)}">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-inner">${heroContent}</div>
+</section>
+
+<section class="section" id="highlights">
+  <div class="wrap">
+    <div class="section-head mitte">
+      <div class="eyebrow">Unsere Highlights</div>
+      <h2>Das essen unsere Gäste am liebsten</h2>
+      <p>Ein Auszug aus unserer Karte – alles frisch zubereitet. Zum Abholen einfach vorbestellen und zur Wunschzeit mitnehmen.</p>
     </div>
-    ${renderRatingBadge(lead)}
+
+    <div class="hl-grid ${spalten}">${renderHighlights(highlights, assets)}</div>
+
+    <p class="karte-hinweis">Das ist nur ein Auszug. Die vollständige Karte finden Sie bei uns im Haus.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div><h3>Aussuchen</h3><p>Gerichte antippen und in den Warenkorb legen.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div><h3>Abholzeit wählen</h3><p>Sie bestimmen, wann Ihr Essen fertig sein soll.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div><h3>Abholen &amp; zahlen</h3><p>Kein Warten, keine Vorkasse – bezahlt wird bei uns.</p></div>
+      </div>
+    </div>
   </div>
 </section>
 
-<section class="section">
+<section class="section amb-section" id="ambiente">
   <div class="wrap">
-    <div class="usp-grid">
-      <div class="usp-card">
-        <span class="usp-icon" aria-hidden="true">🍽️</span>
-        <h3>Tisch online reservieren</h3>
-        <p>Rund um die Uhr buchbar – auch dann, wenn bei uns gerade niemand ans Telefon gehen kann.</p>
+    <div class="amb-grid">
+      <div>
+        <div class="eyebrow">Bei uns</div>
+        <h2 style="font-size:clamp(28px,4.2vw,40px);margin-bottom:18px">${escapeHtml(menu.label)}, wie sie sein soll</h2>
+        <p style="color:var(--ink-soft);font-size:17px">${escapeHtml(menu.geschichte)}</p>
+        ${ratingQuote}
       </div>
-      <div class="usp-card">
-        <span class="usp-icon" aria-hidden="true">🥡</span>
-        <h3>Vorbestellen &amp; abholen</h3>
-        <p>Stellen Sie Ihre Bestellung zusammen, wählen Sie eine Abholzeit – ohne Warten vor Ort.</p>
-      </div>
-      <div class="usp-card">
-        <span class="usp-icon" aria-hidden="true">📱</span>
-        <h3>Auf jedem Gerät</h3>
-        <p>Am Handy genauso schnell wie am Rechner. Keine App, kein Konto, keine Umwege.</p>
+      <div class="amb-collage">
+        <img class="gross" src="${assets}/${assetFileName(theme.ambienteImages[0], "ambiente")}" alt="Bei ${escapeHtml(name)}" loading="lazy">
+        <img class="klein" src="${assets}/${assetFileName(theme.ambienteImages[1], "ambiente")}" alt="" loading="lazy">
+        <img class="klein" src="${assets}/${assetFileName(theme.ambienteImages[2], "ambiente")}" alt="" loading="lazy">
       </div>
     </div>
-  </div>
-</section>
-
-<section class="section" id="karte">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow">Speisekarte</div>
-      <h2>Unsere Gerichte</h2>
-      <p>Alles frisch zubereitet. Tippen Sie auf das Plus, um ein Gericht zur Abholbestellung hinzuzufügen.</p>
-    </div>
-    ${renderMenu(menu)}
   </div>
 </section>
 
 <section class="section reserve-section" id="reservierung">
   <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow">Reservierung</div>
-      <h2>Tisch reservieren</h2>
-      <p>Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
-    </div>
-    <form class="panel" id="reservation-form" novalidate>
-      <div class="field-grid">
-        <div class="field">
-          <label for="res-datum">Datum</label>
-          <input type="date" id="res-datum" name="datum" required>
-          <span class="error">Bitte wählen Sie ein Datum.</span>
-        </div>
-        <div class="field">
-          <label for="res-uhrzeit">Uhrzeit</label>
-          <select id="res-uhrzeit" name="uhrzeit" required>
-            <option value="">Bitte wählen</option>
-            ${optionList(RESERVATION_SLOTS)}
-          </select>
-          <span class="error">Bitte wählen Sie eine Uhrzeit.</span>
-        </div>
-        <div class="field">
-          <label for="res-personen">Personen</label>
-          <select id="res-personen" name="personen" required>
-            <option value="">Bitte wählen</option>
-            ${optionList(["1 Person", "2 Personen", "3 Personen", "4 Personen", "5 Personen", "6 Personen", "7 Personen", "8 Personen", "Mehr als 8 Personen"])}
-          </select>
-          <span class="error">Bitte wählen Sie die Personenzahl.</span>
-        </div>
-        <div class="field">
-          <label for="res-name">Name</label>
-          <input type="text" id="res-name" name="name" autocomplete="name" required>
-          <span class="error">Bitte geben Sie Ihren Namen an.</span>
-        </div>
-        <div class="field">
-          <label for="res-telefon">Telefon</label>
-          <input type="tel" id="res-telefon" name="telefon" autocomplete="tel" required>
-          <span class="error">Bitte geben Sie eine Telefonnummer an.</span>
-        </div>
-        <div class="field">
-          <label for="res-email">E-Mail <span class="hint">(optional)</span></label>
-          <input type="email" id="res-email" name="email" autocomplete="email">
-        </div>
-        <div class="field field-wide">
-          <label for="res-wunsch">Anmerkungen <span class="hint">(optional)</span></label>
-          <textarea id="res-wunsch" name="wunsch" placeholder="Kinderstuhl, Allergien, Tisch am Fenster ..."></textarea>
-        </div>
+    <div class="reserve-grid">
+      <div>
+        <div class="eyebrow">Reservierung</div>
+        <h2 style="font-size:clamp(30px,4.6vw,44px);margin-bottom:16px">Tisch reservieren</h2>
+        <p style="color:rgba(255,255,255,.78);font-size:18px">Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
+        <ul class="reserve-pluspunkte">
+          <li><span class="k">✓</span><span>Rund um die Uhr buchbar, auch außerhalb der Öffnungszeiten</span></li>
+          <li><span class="k">✓</span><span>Sofortige Bestätigung, ganz ohne Anruf</span></li>
+          <li><span class="k">✓</span><span>Sonderwünsche wie Kinderstuhl oder Allergien direkt mitteilen</span></li>
+        </ul>
       </div>
-      <button class="btn btn-primary btn-block" type="submit" style="margin-top:22px">Reservierung anfragen</button>
-    </form>
+
+      <form class="panel" id="reservation-form" novalidate>
+        <div class="field-grid">
+          <div class="field">
+            <label for="res-datum">Datum</label>
+            <input type="date" id="res-datum" name="datum" required>
+            <span class="error">Bitte wählen Sie ein Datum.</span>
+          </div>
+          <div class="field">
+            <label for="res-uhrzeit">Uhrzeit</label>
+            <select id="res-uhrzeit" name="uhrzeit" required>
+              <option value="">Bitte wählen</option>
+              ${optionList(RESERVATION_SLOTS)}
+            </select>
+            <span class="error">Bitte wählen Sie eine Uhrzeit.</span>
+          </div>
+          <div class="field">
+            <label for="res-personen">Personen</label>
+            <select id="res-personen" name="personen" required>
+              <option value="">Bitte wählen</option>
+              ${optionList(["1 Person", "2 Personen", "3 Personen", "4 Personen", "5 Personen", "6 Personen", "7 Personen", "8 Personen", "Mehr als 8 Personen"])}
+            </select>
+            <span class="error">Bitte wählen Sie die Personenzahl.</span>
+          </div>
+          <div class="field">
+            <label for="res-name">Name</label>
+            <input type="text" id="res-name" name="name" autocomplete="name" required>
+            <span class="error">Bitte geben Sie Ihren Namen an.</span>
+          </div>
+          <div class="field">
+            <label for="res-telefon">Telefon</label>
+            <input type="tel" id="res-telefon" name="telefon" autocomplete="tel" required>
+            <span class="error">Bitte geben Sie eine Telefonnummer an.</span>
+          </div>
+          <div class="field">
+            <label for="res-email">E-Mail <span class="hint">(optional)</span></label>
+            <input type="email" id="res-email" name="email" autocomplete="email">
+          </div>
+          <div class="field field-wide">
+            <label for="res-wunsch">Anmerkungen <span class="hint">(optional)</span></label>
+            <textarea id="res-wunsch" name="wunsch" placeholder="Kinderstuhl, Allergien, Tisch am Fenster ..."></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" style="margin-top:24px">Reservierung anfragen</button>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -747,7 +948,7 @@ export function buildLandingPage(lead, options = {}) {
     <div class="contact-grid">
       <ul class="contact-list">${kontaktZeilen}</ul>
       <div>
-        <h3 style="font-size:20px;margin-bottom:10px">Öffnungszeiten<span class="placeholder-badge">Platzhalter</span></h3>
+        <h3 style="font-size:21px;margin-bottom:12px">Öffnungszeiten<span class="placeholder-badge">Platzhalter</span></h3>
         ${hoursRows}
       </div>
     </div>
@@ -795,7 +996,7 @@ export function buildLandingPage(lead, options = {}) {
           <textarea id="ord-hinweis" name="hinweis" placeholder="Allergien, Sonderwünsche ..."></textarea>
         </div>
       </div>
-      <div class="drawer-foot" style="margin:22px -20px -20px">
+      <div class="drawer-foot" style="margin:24px -22px -22px">
         <div class="totals"><span>Gesamt</span><span id="cart-total">0,00 €</span></div>
         <button class="btn btn-primary btn-block" id="order-submit" type="submit">Abholung verbindlich bestellen</button>
         <p class="hint" style="margin-top:10px;text-align:center">Bezahlung bei Abholung, bar oder mit Karte.</p>
@@ -818,7 +1019,9 @@ export function buildLandingPage(lead, options = {}) {
   <div class="wrap">
     <strong>${escapeHtml(name)}</strong>${adresse ? ` · ${escapeHtml(adresse)}` : ""}${telefon ? ` · ${escapeHtml(telefon)}` : ""}
     <div class="footer-note">
-      Unverbindlicher Gestaltungsentwurf. Speisekarte, Preise und Öffnungszeiten sind Platzhalter und werden vor der Veröffentlichung durch die echten Angaben des Hauses ersetzt.
+      Unverbindlicher Gestaltungsentwurf. Gerichte, Preise und Öffnungszeiten sind Platzhalter,
+      die Fotos stammen aus einer Stockbild-Datenbank (Unsplash). Vor einer Veröffentlichung werden
+      beide durch die echten Angaben und Aufnahmen des Hauses ersetzt.
     </div>
   </div>
 </footer>

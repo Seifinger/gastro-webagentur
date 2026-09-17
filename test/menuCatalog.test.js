@@ -1,6 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { detectCuisine, menuForCuisine, menuForLead, MENUS } from "../src/menuCatalog.js";
+import {
+  detectCuisine,
+  menuForCuisine,
+  menuForLead,
+  highlightCandidates,
+  MENUS,
+} from "../src/menuCatalog.js";
 
 test("detectCuisine erkennt die Küche am Restaurantnamen", () => {
   assert.equal(detectCuisine("Pizzeria Tropea"), "italienisch");
@@ -23,6 +29,19 @@ test("detectCuisine nimmt bayerisch als Standard für unbekannte Namen", () => {
 
 test("menuForCuisine fällt bei unbekannter Küche auf die bayerische Karte zurück", () => {
   assert.equal(menuForCuisine("marsianisch"), MENUS.bayerisch);
+});
+
+test("jede Karte liefert genug bebilderte Gerichte für die Highlights", () => {
+  for (const [name, menu] of Object.entries(MENUS)) {
+    const kandidaten = highlightCandidates(menu);
+
+    assert.ok(kandidaten.length >= 3, `${name} hat nur ${kandidaten.length} bebilderte Gerichte`);
+    assert.ok(
+      kandidaten.every((g) => g.bild && g.kategorie),
+      `${name}: Kandidat ohne Bild oder Kategorie`,
+    );
+    assert.ok(menu.geschichte, `${name} hat keinen Beschreibungstext`);
+  }
 });
 
 test("menuForLead liefert eine vollständige Karte mit Preisen", () => {
