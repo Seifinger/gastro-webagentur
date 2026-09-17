@@ -8,6 +8,7 @@
     "start": "node src/index.js",
     "dashboard": "node src/dashboardServer.js",
     "pages": "node src/generateLandingPages.js",
+    "publish-site": "node src/publishSite.js",
     "test": "node --test test/*.test.js"
   },
   "dependencies": {

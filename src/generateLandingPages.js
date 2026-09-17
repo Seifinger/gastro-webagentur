@@ -1,55 +1,17 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { landingPagesDir } from "./config.js";
-import { readAllLeads } from "./csvImport.js";
+import { escapeHtml } from "./landingPageGenerator.js";
+import { assetFileName } from "./imageLibrary.js";
 import {
-  buildLandingPage,
-  slugify,
-  escapeHtml,
-  themeForLead,
-  imageSpecsForLead,
-} from "./landingPageGenerator.js";
-import { detectCuisine, menuForCuisine, MENUS } from "./menuCatalog.js";
-import { ensureAssets, assetFileName } from "./imageLibrary.js";
-import { ensureFonts, fontFaceCss } from "./fontLibrary.js";
-
-function parseArgs(argv) {
-  const args = { region: null, limit: null, minScore: 0, email: "", cuisine: null };
-  for (let i = 0; i < argv.length; i += 1) {
-    if (argv[i] === "--region") args.region = argv[++i];
-    if (argv[i] === "--limit") args.limit = Number(argv[++i]);
-    if (argv[i] === "--min-score") args.minScore = Number(argv[++i]);
-    if (argv[i] === "--email") args.email = argv[++i];
-    if (argv[i] === "--cuisine") args.cuisine = argv[++i];
-  }
-  return args;
-}
-
-function selectLeads(leads, { region, limit, minScore }) {
-  let selected = leads
-    .filter((lead) => (region ? lead.ort === region : true))
-    .filter((lead) => (lead.score ?? 0) >= minScore)
-    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
-
-  if (limit) selected = selected.slice(0, limit);
-  return selected;
-}
-
-/**
- * Vergibt pro Lead einen eindeutigen Ordnernamen. Gleichnamige Restaurants in
- * verschiedenen Orten bekommen eine laufende Nummer angehängt.
- */
-function uniqueSlug(name, taken) {
-  const base = slugify(name);
-  let slug = base;
-  let counter = 2;
-  while (taken.has(slug)) {
-    slug = `${base}-${counter}`;
-    counter += 1;
-  }
-  taken.add(slug);
-  return slug;
-}
+  parseArgs,
+  pruefeKueche,
+  waehleLeads,
+  baueEintraege,
+  ladeBilder,
+  ladeSchriften,
+  schreibeSeiten,
+} from "./buildSite.js";
 
 function buildOverviewPage(entries) {
   const cards = entries
@@ -98,7 +60,7 @@ function buildOverviewPage(entries) {
 <body>
 <div class="wrap">
   <h1>Landing-Page-Entwürfe</h1>
-  <p class="lead">${entries.length} Entwürfe, sortiert nach Lead-Score. Jede Seite hat ein eigenes Farb- und Layout-Thema, Highlights aus der Karte, Abholbestellung und Tischreservierung.</p>
+  <p class="lead">${entries.length} Entwürfe, sortiert nach Lead-Score. Jede Seite hat ein Theme passend zur Küche, Highlights aus der Karte, Abholbestellung und Tischreservierung.</p>
   <div class="grid">${cards}</div>
 </div>
 </body>
@@ -109,16 +71,14 @@ function buildOverviewPage(entries) {
 async function run() {
   const args = parseArgs(process.argv.slice(2));
 
-  if (args.cuisine && !MENUS[args.cuisine]) {
-    console.log(
-      `\nUnbekannte Küche "${args.cuisine}". Möglich sind: ${Object.keys(MENUS).join(", ")}\n`,
-    );
+  const fehler = pruefeKueche(args.cuisine);
+  if (fehler) {
+    console.log(`\n${fehler}\n`);
     process.exitCode = 1;
     return;
   }
 
-  const leads = selectLeads(readAllLeads(), args);
-
+  const leads = waehleLeads(args);
   if (leads.length === 0) {
     console.log(
       "\nKeine passenden Leads gefunden. Erst 'npm start' ausführen oder die Filter lockern.\n",
@@ -127,57 +87,17 @@ async function run() {
   }
 
   mkdirSync(landingPagesDir, { recursive: true });
+  const entries = baueEintraege(leads, args.cuisine);
 
-  const entries = leads.map((lead) => {
-    const cuisine = args.cuisine ?? detectCuisine(lead.name);
-    return { lead, cuisine, gestaltung: themeForLead(lead, cuisine) };
-  });
-
-  // Bilder und Schriften einmalig in einen gemeinsamen Ordner laden, damit die
-  // Entwürfe später auch ohne Internet funktionieren.
+  // Bilder und Schriften einmalig laden, damit die Entwürfe beim Termin auch
+  // ohne Internet funktionieren.
   const assetsDir = path.join(landingPagesDir, "assets");
-  const fontsDir = path.join(assetsDir, "fonts");
-
   console.log("\n📷 Prüfe Bildmaterial ...");
-  const specs = entries.flatMap(({ lead, cuisine }) => imageSpecsForLead(lead, cuisine));
-  const bilder = await ensureAssets(specs, assetsDir);
-  console.log(
-    bilder.geladen > 0 ? `   ${bilder.geladen} Bild(er) geladen.` : "   Alle Bilder bereits vorhanden.",
-  );
-  if (bilder.fehlgeschlagen.length > 0) {
-    console.log(`   ⚠️  ${bilder.fehlgeschlagen.length} Bild(er) nicht geladen:`);
-    bilder.fehlgeschlagen.forEach((zeile) => console.log(`      ${zeile}`));
-  }
-
+  await ladeBilder(entries, assetsDir);
   console.log("🔤 Prüfe Schriften ...");
-  const schriften = await ensureFonts(fontsDir);
-  console.log(
-    schriften.geladen > 0
-      ? `   ${schriften.geladen} Schriftdatei(en) geladen.`
-      : "   Alle Schriften bereits vorhanden.",
-  );
-  if (schriften.fehlgeschlagen.length > 0) {
-    console.log(`   ⚠️  ${schriften.fehlgeschlagen.length} Schrift(en) nicht geladen – die Entwürfe nutzen Systemschriften.`);
-    schriften.fehlgeschlagen.forEach((zeile) => console.log(`      ${zeile}`));
-  }
+  const fontCss = await ladeSchriften(path.join(assetsDir, "fonts"));
 
-  const fontCss = fontFaceCss(fontsDir, "../assets/fonts");
-
-  const taken = new Set();
-  for (const entry of entries) {
-    entry.slug = uniqueSlug(entry.lead.name, taken);
-
-    const html = buildLandingPage(entry.lead, {
-      menu: menuForCuisine(entry.cuisine),
-      gestaltung: entry.gestaltung,
-      kontaktEmail: args.email,
-      fontCss,
-    });
-
-    const dir = path.join(landingPagesDir, entry.slug);
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(path.join(dir, "index.html"), html, "utf-8");
-  }
+  schreibeSeiten(entries, landingPagesDir, { kontaktEmail: args.email, fontCss });
 
   const overviewPath = path.join(landingPagesDir, "index.html");
   writeFileSync(overviewPath, buildOverviewPage(entries), "utf-8");

@@ -200,6 +200,20 @@ section[id] { scroll-margin-top: 80px; }
 .section-head h2 { font-size: clamp(28px, 4.4vw, 42px); margin-bottom: 16px; }
 .section-head p { color: var(--ink-soft); font-size: 18px; }
 
+/* Hinweisleiste der veröffentlichten Fassung: Die Seite trägt Namen und
+   Adresse eines fremden Lokals, also muss sofort erkennbar sein, dass sie
+   nicht dessen offizieller Auftritt ist. */
+.entwurf-hinweis { position: fixed; top: 0; left: 0; right: 0; z-index: 65; height: 38px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  background: #16151a; color: #fff; font-size: 13px; line-height: 1.25; padding: 0 14px;
+  text-align: center; font-family: var(--body); }
+.entwurf-hinweis strong { font-weight: 700; }
+body.veroeffentlicht .topbar { top: 38px; }
+@media (max-width: 620px) {
+  .entwurf-hinweis { height: 48px; font-size: 12px; }
+  body.veroeffentlicht .topbar { top: 48px; }
+}
+
 /* Kopfzeile: liegt transparent über dem Hero und wird beim Scrollen fest */
 .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 40; transition: background .28s ease, box-shadow .28s ease; }
 .topbar::before { content: ""; position: absolute; inset: 0; pointer-events: none; transition: opacity .28s ease;
@@ -691,14 +705,14 @@ const PAGE_SCRIPT = `
 })();
 `;
 
-function renderHighlights(highlights, assets) {
+function renderHighlights(highlights, bildUrl) {
   return highlights
     .map((gericht) => {
       const veg = gericht.vegetarisch ? '<span class="veg">vegetarisch</span>' : "";
       return `
       <article class="hl-card">
         <div class="hl-media">
-          <img src="${assets}/${assetFileName(gericht.bild, "gericht")}" alt="${escapeHtml(gericht.name)}" loading="lazy">
+          <img src="${escapeHtml(bildUrl(gericht.bild, "gericht"))}" alt="${escapeHtml(gericht.name)}" loading="lazy">
           <span class="hl-kat">${escapeHtml(gericht.kategorie)}</span>
         </div>
         <div class="hl-body">
@@ -755,17 +769,17 @@ function renderMenuAccordion(menu) {
  * zur Beschriftung passt, damit der Wirt sofort sieht, welches eigene Foto
  * dort hingehört.
  */
-function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, assets) {
-  const dateien = [
-    assetFileName(hausBild, "ambiente"),
-    assetFileName(teamBild, "ambiente"),
-    bestsellerBild ? assetFileName(bestsellerBild, "gericht") : assetFileName(hausBild, "ambiente"),
+function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl) {
+  const quellen = [
+    bildUrl(hausBild, "ambiente"),
+    bildUrl(teamBild, "ambiente"),
+    bestsellerBild ? bildUrl(bestsellerBild, "gericht") : bildUrl(hausBild, "ambiente"),
   ];
 
   return FOTO_SLOTS.map(
     ({ titel, hinweis }, index) => `
       <figure class="foto-slot" style="margin:0">
-        <img src="${assets}/${dateien[index]}" alt="" loading="lazy">
+        <img src="${escapeHtml(quellen[index])}" alt="" loading="lazy">
         <span class="foto-badge">Platzhalter</span>
         <figcaption class="foto-text">
           <strong>${escapeHtml(titel)}</strong>
@@ -807,6 +821,10 @@ export function buildLandingPage(lead, options = {}) {
   const kontaktEmail = options.kontaktEmail ?? "";
   const assets = options.assetsPath ?? "../assets";
   const fontCss = options.fontCss ?? "";
+  // Lokal zeigen die Seiten auf heruntergeladene Dateien, veröffentlicht
+  // direkt auf Unsplash – sonst läge das Bildmaterial im Repository.
+  const bildUrl = options.bildUrl ?? ((id, role) => `${assets}/${assetFileName(id, role)}`);
+  const veroeffentlicht = options.veroeffentlicht ?? false;
 
   const name = lead.name || "Ihr Restaurant";
   const ort = lead.ort || "";
@@ -868,7 +886,7 @@ export function buildLandingPage(lead, options = {}) {
 <title>${escapeHtml(name)}${ort ? ` – ${escapeHtml(menu.konzept ?? "Restaurant")} in ${escapeHtml(ort)}` : ""}</title>
 <meta name="description" content="${escapeHtml(`${name}${ort ? ` in ${ort}` : ""}: ${menu.konzept ?? menu.label}. ${schlagzeile} Jetzt Tisch reservieren oder zur Abholung vorbestellen.`)}">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
-<style>
+${veroeffentlicht ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<style>
 ${fontCss}
 :root {
   --bg: ${t.bg};
@@ -892,8 +910,13 @@ ${fontCss}
 ${PAGE_STYLES}
 </style>
 </head>
-<body>
+<body${veroeffentlicht ? ' class="veroeffentlicht"' : ""}>
 
+${
+  veroeffentlicht
+    ? `<div class="entwurf-hinweis">Unverbindlicher Gestaltungsentwurf – <strong>nicht</strong> die offizielle Website von ${escapeHtml(name)}.</div>`
+    : ""
+}
 <header class="topbar" id="topbar">
   <div class="wrap topbar-inner">
     <div class="brand">${escapeHtml(name)}</div>
@@ -909,7 +932,7 @@ ${PAGE_STYLES}
 
 <section class="hero">
   <div class="hero-media">
-    <img src="${assets}/${assetFileName(gestaltung.heroImage, "hero")}" alt="${escapeHtml(name)}">
+    <img src="${escapeHtml(bildUrl(gestaltung.heroImage, "hero"))}" alt="${escapeHtml(name)}">
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-inner">
@@ -936,7 +959,7 @@ ${PAGE_STYLES}
       <p>Alles frisch zubereitet. Zum Abholen einfach vorbestellen und zur Wunschzeit mitnehmen.</p>
     </div>
 
-    <div class="hl-grid ${spalten}">${renderHighlights(highlights, assets)}</div>
+    <div class="hl-grid ${spalten}">${renderHighlights(highlights, bildUrl)}</div>
 
     <div class="steps">
       <div class="step">
@@ -979,7 +1002,7 @@ ${PAGE_STYLES}
         teamBild: gestaltung.teamBild,
         bestsellerBild: highlights[0]?.bild,
       },
-      assets,
+      bildUrl,
     )}</div>
   </div>
 </section>

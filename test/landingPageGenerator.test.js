@@ -165,6 +165,33 @@ test("buildLandingPage bindet Bilder aus dem Asset-Ordner ein", () => {
   assert.match(html, /\.\.\/assets\/photo-[\w-]+-ambiente\.jpg/);
 });
 
+test("buildLandingPage nutzt eine übergebene Bildquelle statt lokaler Dateien", () => {
+  const html = buildLandingPage(lead, {
+    menu: testMenu,
+    bildUrl: (id, role) => `https://cdn.beispiel.de/${id}/${role}`,
+  });
+
+  assert.ok(html.includes("https://cdn.beispiel.de/photo-1599921841143-819065a55cc6/gericht"));
+  assert.ok(!html.includes("../assets/photo-"));
+});
+
+test("die veröffentlichte Fassung weist sich als Entwurf aus", () => {
+  const html = buildLandingPage(lead, { veroeffentlicht: true });
+
+  assert.ok(html.includes('<meta name="robots" content="noindex, nofollow">'));
+  assert.ok(html.includes('<body class="veroeffentlicht">'));
+  assert.ok(html.includes('class="entwurf-hinweis"'));
+  assert.ok(html.includes("nicht</strong> die offizielle Website von Gasthof Zur Post"));
+});
+
+test("die lokale Fassung trägt keinen Entwurfs-Hinweis und kein noindex", () => {
+  const html = buildLandingPage(lead);
+
+  assert.ok(!html.includes("noindex"));
+  assert.ok(!html.includes('class="entwurf-hinweis"'));
+  assert.ok(html.includes("<body>"));
+});
+
 test("buildLandingPage bindet übergebene Schriften ein", () => {
   const fontCss = "@font-face{font-family:'Inter';src:url('../assets/fonts/inter-400-latin.woff2') format('woff2');}";
   const html = buildLandingPage(lead, { fontCss });

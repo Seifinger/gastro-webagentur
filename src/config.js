@@ -17,3 +17,7 @@ export function loadRegions() {
 export const outputDir = path.join(__dirname, "..", "data", "output");
 
 export const landingPagesDir = path.join(__dirname, "..", "data", "landingpages");
+
+// Von GitHub Pages ausgeliefert. Der Ordner wird bei jedem Lauf komplett neu
+// erzeugt, damit abgewählte Entwürfe auch wirklich offline gehen.
+export const docsDir = path.join(__dirname, "..", "docs");

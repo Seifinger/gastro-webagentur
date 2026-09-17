@@ -1,0 +1,151 @@
+import { mkdirSync, writeFileSync, rmSync } from "node:fs";
+import path from "node:path";
+import { docsDir } from "./config.js";
+import { escapeHtml } from "./landingPageGenerator.js";
+import { remoteImageUrl } from "./imageLibrary.js";
+import { menuForCuisine } from "./menuCatalog.js";
+import {
+  parseArgs,
+  pruefeKueche,
+  waehleLeads,
+  baueEintraege,
+  ladeSchriften,
+  schreibeSeiten,
+} from "./buildSite.js";
+
+const HINWEIS =
+  "Unverbindliche Gestaltungsentwürfe. Die gezeigten Lokale sind keine Kunden und haben " +
+  "diese Seiten weder beauftragt noch freigegeben. Gerichte, Preise, Öffnungszeiten und " +
+  "Fotos sind Platzhalter.";
+
+function kontaktZeile(kontakt) {
+  if (!kontakt) return "";
+  return `<p class="kontakt">${escapeHtml(kontakt)}</p>`;
+}
+
+/**
+ * Öffentliche Übersicht. Bewusst ohne Lead-Score und Priorität – das sind
+ * interne Vertriebsdaten und gehören nicht ins Netz.
+ */
+function buildShowcasePage(entries, kontakt) {
+  const cards = entries
+    .map(
+      ({ lead, slug, gestaltung, menu }) => `
+      <a class="card" href="./${escapeHtml(slug)}/">
+        <div class="thumb" style="background:${gestaltung.theme.tint}">
+          <img src="${escapeHtml(remoteImageUrl(gestaltung.heroImage, "hero"))}" alt="" loading="lazy">
+        </div>
+        <div class="body">
+          <strong>${escapeHtml(lead.name)}</strong>
+          <span class="meta">${escapeHtml(menu.konzept)}${lead.ort ? ` · ${escapeHtml(lead.ort)}` : ""}</span>
+        </div>
+      </a>`,
+    )
+    .join("");
+
+  return `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Website-Entwürfe für Gastronomie</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 0 0 72px; background: #12110f; color: #f4f1ec;
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         line-height: 1.6; }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+  header { padding: 72px 0 40px; }
+  h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.15; margin: 0 0 16px;
+       font-family: Georgia, "Times New Roman", serif; font-weight: 600; }
+  .intro { color: #b9b1a6; font-size: 18px; max-width: 620px; margin: 0; }
+  .kontakt { margin: 22px 0 0; font-size: 15px; color: #e7e1d8; }
+  .disclaimer { margin: 28px 0 0; padding: 14px 18px; border-left: 3px solid #b4451f;
+                background: #1b1917; color: #b9b1a6; font-size: 14px; max-width: 720px; }
+  .grid { display: grid; gap: 22px; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
+  .card { background: #1b1917; border-radius: 14px; overflow: hidden; text-decoration: none;
+          color: inherit; display: block; transition: transform .16s ease; }
+  .card:hover { transform: translateY(-4px); }
+  .thumb { aspect-ratio: 16 / 10; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .body { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 4px; }
+  .body strong { font-size: 17px; }
+  .meta { font-size: 14px; color: #a9a196; }
+  footer { margin-top: 56px; padding-top: 24px; border-top: 1px solid #2a2724; color: #8d857b; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Website-Entwürfe für Gastronomie</h1>
+    <p class="intro">Beispielseiten mit Online-Reservierung, Abholbestellung und vollständiger Speisekarte –
+       jede in wenigen Minuten erzeugt und auf das jeweilige Lokal zugeschnitten.</p>
+    ${kontaktZeile(kontakt)}
+    <p class="disclaimer">${escapeHtml(HINWEIS)}</p>
+  </header>
+
+  <div class="grid">${cards}</div>
+
+  <footer>${escapeHtml(HINWEIS)}</footer>
+</div>
+</body>
+</html>
+`;
+}
+
+async function run() {
+  const args = parseArgs(process.argv.slice(2));
+
+  const fehler = pruefeKueche(args.cuisine);
+  if (fehler) {
+    console.log(`\n${fehler}\n`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const leads = waehleLeads(args);
+  if (leads.length === 0) {
+    console.log("\nKeine passenden Leads gefunden. Erst 'npm start' ausführen.\n");
+    return;
+  }
+
+  // Komplett neu aufbauen: Ein abgewählter Entwurf muss auch wirklich
+  // verschwinden und nicht als Altlast online bleiben.
+  rmSync(docsDir, { recursive: true, force: true });
+  mkdirSync(docsDir, { recursive: true });
+
+  const entries = baueEintraege(leads, args.cuisine);
+
+  console.log("\n🔤 Prüfe Schriften ...");
+  const fontCss = await ladeSchriften(path.join(docsDir, "assets", "fonts"));
+
+  schreibeSeiten(entries, docsDir, {
+    kontaktEmail: args.email,
+    fontCss,
+    veroeffentlicht: true,
+    // Bilder kommen im Netz direkt von Unsplash, damit das Repository nicht
+    // um mehrere Megabyte Stockfotos wächst.
+    bildUrl: remoteImageUrl,
+  });
+
+  for (const entry of entries) entry.menu = menuForCuisine(entry.cuisine);
+
+  writeFileSync(path.join(docsDir, "index.html"), buildShowcasePage(entries, args.kontakt), "utf-8");
+  writeFileSync(path.join(docsDir, ".nojekyll"), "", "utf-8");
+  writeFileSync(
+    path.join(docsDir, "robots.txt"),
+    "User-agent: *\nDisallow: /\n",
+    "utf-8",
+  );
+
+  console.log(`\n✅ ${entries.length} Entwürfe für die Veröffentlichung vorbereitet.`);
+  console.log(`   Ordner: ${docsDir}`);
+  console.log("\n   Nächster Schritt:");
+  console.log("     git add docs && git commit -m \"Entwürfe veröffentlichen\" && git push");
+  console.log("\n   Danach unter GitHub → Settings → Pages als Quelle");
+  console.log("   \"Deploy from a branch\", Branch: main, Ordner: /docs auswählen.\n");
+}
+
+run();

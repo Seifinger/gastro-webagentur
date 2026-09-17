@@ -110,7 +110,12 @@ export function assetFileName(id, role) {
   return `${id}-${role}.jpg`;
 }
 
-function assetUrl(id, role) {
+/**
+ * Adresse des Bildes bei Unsplash. Lokal laden wir es herunter; in der
+ * veröffentlichten Fassung verweisen wir direkt dorthin, damit das Repository
+ * nicht um mehrere Megabyte Stockfotos wächst.
+ */
+export function remoteImageUrl(id, role) {
   const { w, h } = IMAGE_ROLES[role];
   return `https://images.unsplash.com/${id}?w=${w}&h=${h}&fit=crop&crop=entropy&q=72&fm=jpg`;
 }
@@ -132,7 +137,7 @@ export async function ensureAssets(specs, targetDir) {
 
   for (const { id, role } of missing) {
     try {
-      const response = await fetch(assetUrl(id, role));
+      const response = await fetch(remoteImageUrl(id, role));
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const buffer = Buffer.from(await response.arrayBuffer());
       writeFileSync(path.join(targetDir, assetFileName(id, role)), buffer);

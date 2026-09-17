@@ -200,6 +200,42 @@ Die Karte wird **anhand des Restaurantnamens** gewählt (Pizzeria → italienisc
 
 Gerichte, Preise, Öffnungszeiten und Fotos sind Platzhalter und auf der Seite auch als solche gekennzeichnet – sie werden vor einer Veröffentlichung durch die echten Angaben und Aufnahmen des Wirts ersetzt.
 
+## Entwürfe öffentlich zeigen (GitHub Pages, kostenlos)
+
+Damit du einem Wirt vorab einen Link schicken kannst, einen QR-Code aufs Handy bringst oder er den Entwurf abends jemandem zeigen kann, lässt sich eine öffentliche Fassung erzeugen:
+
+```bash
+npm run publish-site -- --limit 12 --kontakt "Dein Name · deine@mail.de"
+git add docs && git commit -m "Entwürfe veröffentlichen" && git push
+```
+
+Einmalig einrichten: auf GitHub unter **Settings → Pages** als Quelle **„Deploy from a branch"** wählen, Branch `main`, Ordner `/docs`. Nach ein bis zwei Minuten liegt alles unter
+`https://seifinger.github.io/gastro-webagentur/`.
+
+Der Ordner `docs/` wird bei jedem Lauf **komplett neu gebaut** – nimmst du einen Lead aus der Auswahl, verschwindet sein Entwurf beim nächsten Push auch wirklich aus dem Netz. Es gelten dieselben Filter wie bei `npm run pages` (`--region`, `--limit`, `--min-score`, `--cuisine`).
+
+### Unterschiede zur lokalen Fassung
+
+| | `npm run pages` | `npm run publish-site` |
+|---|---|---|
+| Ordner | `data/landingpages/` (nicht in Git) | `docs/` (wird committet) |
+| Bilder | lokal heruntergeladen, **offline nutzbar** | direkt von Unsplash geladen, hält das Repository klein |
+| Schriften | lokal | lokal (rund 760 KB, wegen DSGVO nicht von Googles Servern) |
+| Hinweis | keiner | Leiste „Unverbindlicher Gestaltungsentwurf – **nicht** die offizielle Website von …" |
+| Suchmaschinen | – | `noindex, nofollow` auf jeder Seite |
+| Übersicht | mit Lead-Score und Priorität | neutrale Showcase-Seite **ohne** interne Vertriebsdaten |
+
+### Wichtig vor dem Veröffentlichen
+
+Die Seiten tragen Namen und Adresse echter Lokale, die davon nichts wissen. Deshalb:
+
+- Jede Seite trägt oben eine deutlich sichtbare Leiste, dass es **nicht** die offizielle Website des Lokals ist.
+- Jede Seite ist auf `noindex` gesetzt, damit sie nicht in Google auftaucht und dem Lokal die eigenen Suchergebnisse streitig macht.
+- Die URL (`seifinger.github.io/...`) ist erkennbar nicht die des Restaurants.
+- Die öffentliche Übersicht zeigt **keine** Lead-Scores und Prioritäten.
+
+Die `robots.txt` liegt zwar mit im Ordner, wird auf `github.io` aber nur im Wurzelverzeichnis der Domain ausgewertet – die Absicherung leistet hier das `noindex` im Seitenkopf. Wenn ein Wirt möchte, dass sein Entwurf verschwindet, nimm ihn aus der Auswahl und pushe neu.
+
 ## Tests ausführen
 
 Es gibt Unit-Tests für die Filterlogik, den Landing-Page-Generator und den Speisekarten-Katalog, die **ohne** echten API-Key laufen:
