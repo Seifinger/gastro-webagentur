@@ -6,6 +6,7 @@
   "description": "Lead-Generierung für die Restaurant-Web-Agentur: findet Gaststätten ohne Website über die Google Places API.",
   "scripts": {
     "start": "node src/index.js",
+    "dashboard": "node src/dashboardServer.js",
     "test": "node --test test/*.test.js"
   },
   "dependencies": {

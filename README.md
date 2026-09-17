@@ -122,6 +122,24 @@ War die Website beim Check nicht erreichbar (Timeout, Fehler, Seite offline), be
 
 Die Erkennung von Bestell-/Reservierungsfunktionen basiert auf gängigen Stichwörtern und bekannten Anbietern (GloriaFood, Lieferando, OpenTable, Quandoo, Resmio, ...) im HTML-Text der Seite – sie ersetzt keine manuelle Prüfung, gibt dir aber eine gute erste Sortierung. Die Gewichtungen stehen zentral in `src/scoring.js` und lassen sich dort leicht anpassen.
 
+## Dashboard (lokale Übersicht im Browser)
+
+Statt die CSV-Dateien einzeln in Excel zu öffnen, gibt es ein kleines lokales Dashboard, das alle bisher gesammelten Leads aus `data/output/` in einer sortier- und filterbaren Tabelle anzeigt.
+
+```bash
+npm run dashboard
+```
+
+Danach im Browser öffnen: **http://localhost:3000**
+
+Funktionen:
+- Kennzahlen oben (Anzahl Leads gesamt, "Sehr hoch"-Priorität, ohne Website)
+- Tabelle sortierbar per Klick auf eine Spaltenüberschrift (Standard: nach Score)
+- Filter nach Ort und Priorität, Suchfeld nach Name
+- Website-Spalte verlinkt direkt zur jeweiligen Seite
+
+Das Dashboard liest beim Aufruf einfach die vorhandenen CSV-Dateien neu ein – lass es also nach einem neuen `npm start`-Lauf laufen, um aktuelle Daten zu sehen (Browser-Seite neu laden reicht, der Server muss nicht neu gestartet werden). Es braucht keinen API-Key und läuft komplett offline auf deinem Rechner.
+
 ## Tests ausführen
 
 Es gibt Unit-Tests für die Filterlogik, die **ohne** echten API-Key laufen:
