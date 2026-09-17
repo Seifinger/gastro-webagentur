@@ -133,20 +133,116 @@ npm run dashboard
 Danach im Browser öffnen: **http://localhost:3000**
 
 Funktionen:
-- Kennzahlen oben (Anzahl Leads gesamt, "Sehr hoch"-Priorität, ohne Website)
+- Kennzahlen oben (Leads gesamt, "Sehr hoch"-Priorität, ohne Website, erstellte Entwürfe)
 - Tabelle sortierbar per Klick auf eine Spaltenüberschrift (Standard: nach Score)
 - Filter nach Ort und Priorität, Suchfeld nach Name
 - Website-Spalte verlinkt direkt zur jeweiligen Seite
+- **Entwurf-Spalte** öffnet die generierte Landingpage des Restaurants (siehe nächster Abschnitt) – praktisch beim Termin: Lead heraussuchen, „ansehen" klicken, dem Wirt zeigen
 
 Das Dashboard liest beim Aufruf einfach die vorhandenen CSV-Dateien neu ein – lass es also nach einem neuen `npm start`-Lauf laufen, um aktuelle Daten zu sehen (Browser-Seite neu laden reicht, der Server muss nicht neu gestartet werden). Es braucht keinen API-Key und läuft komplett offline auf deinem Rechner.
 
+## Landing-Page-Entwürfe erzeugen
+
+Für den Pitch lässt sich zu jedem Lead automatisch eine fertige Beispiel-Website erzeugen – mit Speisekarte, Online-Reservierung und Abholbestellung:
+
+```bash
+npm run pages
+```
+
+Die Seiten landen unter `data/landingpages/`. Es gibt zwei Wege, sie anzusehen:
+
+- **Über das Dashboard** (empfohlen): `npm run dashboard` starten und in der Spalte „Entwurf" auf „ansehen" klicken. Der Server liefert die Entwürfe unter `/entwuerfe/` gleich mit aus.
+- **Direkt im Dateisystem**: `data/landingpages/index.html` im Browser öffnen – eine Übersicht mit Vorschaubildern, von dort geht es zu jedem einzelnen Entwurf.
+
+Welcher Lead zu welchem Entwurf gehört, hält der Generator in `data/landingpages/entwuerfe.json` fest; das Dashboard liest diese Datei bei jedem Aufruf neu. Nach einem neuen `npm run pages` genügt es also, die Dashboard-Seite neu zu laden.
+
+Optionen:
+```bash
+npm run pages -- --region "Altötting"        # nur ein Ort
+npm run pages -- --min-score 80              # nur die dringendsten Fälle
+npm run pages -- --limit 10                  # die Top 10 nach Score
+npm run pages -- --email info@restaurant.de  # Bestellungen/Reservierungen per E-Mail versendbar machen
+npm run pages -- --cuisine asiatisch         # Küche vorgeben (siehe unten)
+```
+
+### Aufbau der Seite
+
+Die Reihenfolge folgt dem Bestellweg, nicht dem Erzählbedürfnis des Wirts:
+
+1. **Hero** – im ersten Bildschirm auf dem Handy stehen ohne Scrollen: Hintergrundbild, Konzept („Holzofenpizza & frische Pasta"), Ort, Name, die echte Google-Bewertung direkt unter der Überschrift und eine hyper-lokale Zeile („… – direkt am Stadtplatz in Tüßling.").
+2. **USP-Leiste** – drei kurze Badges statt Fließtext, je nach Küche z. B. „Heiß aus dem Steinofen" oder „Abholung in 20 Minuten".
+3. **Unsere Highlights** – bebilderter Auszug aus der Karte (3, 4 oder 6 Gerichte), jedes direkt vorbestellbar, dazu der Ablauf der Abholung in drei Schritten.
+4. **Ganze Speisekarte** als aufklappbares Akkordeon, direkt im HTML statt als PDF – auf dem Handy lesbar ohne Zoomen und für Google indexierbar. Jedes Gericht ist bestellbar.
+5. **Drei Bildplätze** für die eigenen Fotos des Wirts: Außenansicht, Team hinter der Theke, Bestseller-Gericht. Jeder Platz ist beschriftet und als Platzhalter markiert – der Entwurf ist damit gleichzeitig die Foto-Aufgabenliste.
+6. **Reservierung**, **Kontakt & Anfahrt** (Telefon als Direktwahl-Link, Adresse mit Route-planen-Link).
+
+Dazu auf dem Handy eine **feste Aktionsleiste am unteren Rand** mit „Bestellen" und „Reservieren", die immer sichtbar bleibt. „Bestellen" springt bei leerem Warenkorb zur Karte und zeigt sonst die aktuelle Summe.
+
+### Drei Themes statt Zufallsfarben
+
+Die Küche bestimmt die Gestaltungswelt, das Layout bleibt gleich:
+
+| Theme | Küchen | Anmutung |
+|---|---|---|
+| **Trattoria** | italienisch, griechisch, Café | Warme Erdtöne, Playfair Display als Serifenschrift, gemütlich-rustikal |
+| **Neo-Asian** | asiatisch, türkisch | Dunkler Hintergrund, kräftige Akzente (Neonrot, Gold, Orange), Montserrat in Versalien, urbaner Streetfood-Look |
+| **Wirtshaus** | bayerisch | Helles Holz mit Waldgrün, Dunkelrot oder Braun, Merriweather, bodenständig |
+
+Innerhalb eines Themes gibt es drei Akzentvarianten, dazu sechs Titelbilder je Küche – zwei benachbarte Wirtshäuser sehen also trotz gleichem Theme unterschiedlich aus. Die Zuordnung hängt fest am Lead: derselbe Lead ergibt immer denselben Entwurf.
+
+### Bilder und Schriften
+
+Stockfotos (Unsplash) und Schriften (Google Fonts, alle unter der SIL Open Font License) werden beim ersten Lauf **einmalig heruntergeladen** und unter `data/landingpages/assets/` abgelegt. Danach funktionieren die Entwürfe komplett offline – praktisch, wenn du sie beim Termin im Lokal auf dem Laptop zeigst und dort kein Empfang ist. Ein erneuter Lauf lädt nur noch Fehlendes nach. Schlägt der Schriften-Download fehl, greifen die Seiten auf Systemschriften zurück.
+
+### Speisekarte
+
+Die Karte wird **anhand des Restaurantnamens** gewählt (Pizzeria → italienisch, Döner → türkisch, Gasthof → bayerisch usw.); ohne passendes Stichwort ist bayerisch der Standard. Liegt der Generator daneben – etwa bei einem Thai-Lokal namens „Klabwong" – gib die Küche mit `--cuisine` vor. Möglich sind: `bayerisch`, `italienisch`, `asiatisch`, `griechisch`, `tuerkisch`, `cafe`.
+
+Gerichte, Preise, Öffnungszeiten und Fotos sind Platzhalter und auf der Seite auch als solche gekennzeichnet – sie werden vor einer Veröffentlichung durch die echten Angaben und Aufnahmen des Wirts ersetzt.
+
+## Entwürfe öffentlich zeigen (GitHub Pages, kostenlos)
+
+Damit du einem Wirt vorab einen Link schicken kannst, einen QR-Code aufs Handy bringst oder er den Entwurf abends jemandem zeigen kann, lässt sich eine öffentliche Fassung erzeugen:
+
+```bash
+npm run publish-site -- --limit 12 --kontakt "Dein Name · deine@mail.de"
+git add docs && git commit -m "Entwürfe veröffentlichen" && git push
+```
+
+Einmalig einrichten: auf GitHub unter **Settings → Pages** als Quelle **„Deploy from a branch"** wählen, Branch `main`, Ordner `/docs`. Nach ein bis zwei Minuten liegt alles unter
+`https://seifinger.github.io/gastro-webagentur/`.
+
+Der Ordner `docs/` wird bei jedem Lauf **komplett neu gebaut** – nimmst du einen Lead aus der Auswahl, verschwindet sein Entwurf beim nächsten Push auch wirklich aus dem Netz. Es gelten dieselben Filter wie bei `npm run pages` (`--region`, `--limit`, `--min-score`, `--cuisine`).
+
+### Unterschiede zur lokalen Fassung
+
+| | `npm run pages` | `npm run publish-site` |
+|---|---|---|
+| Ordner | `data/landingpages/` (nicht in Git) | `docs/` (wird committet) |
+| Bilder | lokal heruntergeladen, **offline nutzbar** | direkt von Unsplash geladen, hält das Repository klein |
+| Schriften | lokal | lokal (rund 760 KB, wegen DSGVO nicht von Googles Servern) |
+| Hinweis | keiner | Leiste „Unverbindlicher Gestaltungsentwurf – **nicht** die offizielle Website von …" |
+| Suchmaschinen | – | `noindex, nofollow` auf jeder Seite |
+| Übersicht | mit Lead-Score und Priorität | neutrale Showcase-Seite **ohne** interne Vertriebsdaten |
+
+### Wichtig vor dem Veröffentlichen
+
+Die Seiten tragen Namen und Adresse echter Lokale, die davon nichts wissen. Deshalb:
+
+- Jede Seite trägt oben eine deutlich sichtbare Leiste, dass es **nicht** die offizielle Website des Lokals ist.
+- Jede Seite ist auf `noindex` gesetzt, damit sie nicht in Google auftaucht und dem Lokal die eigenen Suchergebnisse streitig macht.
+- Die URL (`seifinger.github.io/...`) ist erkennbar nicht die des Restaurants.
+- Die öffentliche Übersicht zeigt **keine** Lead-Scores und Prioritäten.
+
+Die `robots.txt` liegt zwar mit im Ordner, wird auf `github.io` aber nur im Wurzelverzeichnis der Domain ausgewertet – die Absicherung leistet hier das `noindex` im Seitenkopf. Wenn ein Wirt möchte, dass sein Entwurf verschwindet, nimm ihn aus der Auswahl und pushe neu.
+
 ## Tests ausführen
 
-Es gibt Unit-Tests für die Filterlogik, die **ohne** echten API-Key laufen:
+Es gibt Unit-Tests für die Filterlogik, den Landing-Page-Generator und den Speisekarten-Katalog, die **ohne** echten API-Key laufen:
 ```bash
 npm test
 ```
 
 ## Geplante Erweiterungen (nicht Teil dieser ersten Version)
 
-- Demo-Ordner-Generierung (Phase 2 des Businessplans).
+- Outreach-Anschreiben pro Lead vorbereiten (Versand bleibt bewusst manuell freizugeben).

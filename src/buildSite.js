@@ -1,0 +1,128 @@
+import { mkdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
+import { readAllLeads } from "./csvImport.js";
+import {
+  buildLandingPage,
+  slugify,
+  themeForLead,
+  imageSpecsForLead,
+} from "./landingPageGenerator.js";
+import { detectCuisine, menuForCuisine, MENUS } from "./menuCatalog.js";
+import { ensureAssets } from "./imageLibrary.js";
+import { ensureFonts, fontFaceCss } from "./fontLibrary.js";
+
+// Gemeinsamer Unterbau für die lokale Fassung (npm run pages) und die
+// veröffentlichte Fassung (npm run publish-site). Beide sollen denselben
+// Entwurf ergeben – deshalb liegt die Auswahl- und Schreiblogik hier.
+
+export function parseArgs(argv) {
+  const args = { region: null, limit: null, minScore: 0, email: "", cuisine: null, kontakt: "" };
+  for (let i = 0; i < argv.length; i += 1) {
+    if (argv[i] === "--region") args.region = argv[++i];
+    if (argv[i] === "--limit") args.limit = Number(argv[++i]);
+    if (argv[i] === "--min-score") args.minScore = Number(argv[++i]);
+    if (argv[i] === "--email") args.email = argv[++i];
+    if (argv[i] === "--cuisine") args.cuisine = argv[++i];
+    if (argv[i] === "--kontakt") args.kontakt = argv[++i];
+  }
+  return args;
+}
+
+export function pruefeKueche(cuisine) {
+  if (cuisine && !MENUS[cuisine]) {
+    return `Unbekannte Küche "${cuisine}". Möglich sind: ${Object.keys(MENUS).join(", ")}`;
+  }
+  return null;
+}
+
+export function waehleLeads({ region, limit, minScore }) {
+  let selected = readAllLeads()
+    .filter((lead) => (region ? lead.ort === region : true))
+    .filter((lead) => (lead.score ?? 0) >= minScore)
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+
+  if (limit) selected = selected.slice(0, limit);
+  return selected;
+}
+
+/**
+ * Vergibt pro Lead einen eindeutigen Ordnernamen. Gleichnamige Restaurants in
+ * verschiedenen Orten bekommen eine laufende Nummer angehängt.
+ */
+function uniqueSlug(name, taken) {
+  const base = slugify(name);
+  let slug = base;
+  let counter = 2;
+  while (taken.has(slug)) {
+    slug = `${base}-${counter}`;
+    counter += 1;
+  }
+  taken.add(slug);
+  return slug;
+}
+
+export function baueEintraege(leads, cuisineOverride) {
+  const taken = new Set();
+  return leads.map((lead) => {
+    const cuisine = cuisineOverride ?? detectCuisine(lead.name);
+    return {
+      lead,
+      cuisine,
+      gestaltung: themeForLead(lead, cuisine),
+      slug: uniqueSlug(lead.name, taken),
+    };
+  });
+}
+
+export async function ladeBilder(entries, assetsDir) {
+  const specs = entries.flatMap(({ lead, cuisine }) => imageSpecsForLead(lead, cuisine));
+  const ergebnis = await ensureAssets(specs, assetsDir);
+
+  console.log(
+    ergebnis.geladen > 0
+      ? `   ${ergebnis.geladen} Bild(er) geladen.`
+      : "   Alle Bilder bereits vorhanden.",
+  );
+  if (ergebnis.fehlgeschlagen.length > 0) {
+    console.log(`   ⚠️  ${ergebnis.fehlgeschlagen.length} Bild(er) nicht geladen:`);
+    ergebnis.fehlgeschlagen.forEach((zeile) => console.log(`      ${zeile}`));
+  }
+  return ergebnis;
+}
+
+/**
+ * Lädt die Schriften und liefert das passende @font-face-CSS. Schlägt der
+ * Download fehl, kommt ein leerer String zurück und die Seiten greifen auf
+ * Systemschriften zurück.
+ */
+export async function ladeSchriften(fontsDir, cssPfad = "../assets/fonts") {
+  const ergebnis = await ensureFonts(fontsDir);
+
+  console.log(
+    ergebnis.geladen > 0
+      ? `   ${ergebnis.geladen} Schriftdatei(en) geladen.`
+      : "   Alle Schriften bereits vorhanden.",
+  );
+  if (ergebnis.fehlgeschlagen.length > 0) {
+    console.log(
+      `   ⚠️  ${ergebnis.fehlgeschlagen.length} Schrift(en) nicht geladen – die Entwürfe nutzen Systemschriften.`,
+    );
+    ergebnis.fehlgeschlagen.forEach((zeile) => console.log(`      ${zeile}`));
+  }
+
+  return fontFaceCss(fontsDir, cssPfad);
+}
+
+export function schreibeSeiten(entries, zielordner, optionen = {}) {
+  for (const entry of entries) {
+    const html = buildLandingPage(entry.lead, {
+      ...optionen,
+      menu: menuForCuisine(entry.cuisine),
+      gestaltung: entry.gestaltung,
+    });
+
+    const dir = path.join(zielordner, entry.slug);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(path.join(dir, "index.html"), html, "utf-8");
+  }
+}
