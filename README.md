@@ -280,6 +280,36 @@ Die Seiten tragen Namen und Adresse echter Lokale, die davon nichts wissen. Desh
 
 Die `robots.txt` liegt zwar mit im Ordner, wird auf `github.io` aber nur im Wurzelverzeichnis der Domain ausgewertet – die Absicherung leistet hier das `noindex` im Seitenkopf. Wenn ein Wirt möchte, dass sein Entwurf verschwindet, nimm ihn aus der Auswahl und pushe neu.
 
+## Wirt-Dashboard: Tische, Reservierungen, Abholbestellungen
+
+Die Landing-Page nimmt Reservierungen und Abholbestellungen entgegen – ankommen müssen sie beim Wirt. Dafür gibt es einen zweiten, kleinen Server, der pro Betrieb läuft:
+
+```bash
+npm run wirt -- --betrieb gasthaus-zur-post
+```
+
+Danach im Browser `http://localhost:3200` öffnen. Die Daten liegen in `data/betrieb/<betrieb>.json` (gitignoriert). Ohne `--betrieb` wird `standard` verwendet, mit `--port` lässt sich der Port ändern.
+
+Das Dashboard hat drei Reiter:
+
+**Tischplan.** Der Wirt trägt seine Tische mit Platzzahl ein (z. B. „Tisch 4 – 6 Plätze"). Die Summe ist die Kapazität des Hauses. Genau daran prüft der Server jede Online-Reservierung: Reicht zur gewünschten Zeit der Platz nicht mehr, bekommt der Gast sofort eine ehrliche Absage mit der freien Platzzahl statt einer Bestätigung, die später zurückgenommen werden muss. Als belegt gilt ein Tisch 120 Minuten ab der Reservierungszeit.
+
+**Reservierungen.** Online eingegangene Anfragen stehen auf „neu" und werden vom Wirt bestätigt oder abgesagt; eine Absage gibt die Plätze sofort wieder frei. Telefonisch angenommene Reservierungen trägt der Wirt über das Formular selbst ein – die gelten sofort als bestätigt und zählen genauso gegen die Kapazität, sonst wäre die Online-Verfügbarkeit falsch. Jeder Reservierung lässt sich ein Tisch zuweisen; die Auswahl zeigt nur Tische, die groß genug und zu der Zeit noch frei sind.
+
+**Bestellungen.** Eingehende Abholbestellungen zeigen Positionen, Summe und die **gewünschte** Abholzeit. Der Wirt bestätigt eine Abholzeit – entweder die gewünschte oder eine realistischere. Dazu gibt es einen fertig formulierten Text zum Vorlesen und die Telefonnummer als `tel:`-Link. Bis zur Bestätigung steht die Bestellung sichtbar auf „wartet auf Bestätigung"; auch der Gast liest auf der Landing-Page, dass die Abholzeit noch bestätigt wird.
+
+### Landing-Page an den Server anbinden
+
+Ohne Anbindung sind die Formulare eine Vorschau. Mit `--api` schicken sie echte Anfragen an den Wirt-Server:
+
+```bash
+npm run pages -- --api http://localhost:3200
+```
+
+Der Hinweis „Entwurfsansicht" verschwindet dann, weil die Anfrage wirklich beim Restaurant landet. Das gilt auch für `npm run publish-site -- --api https://...`.
+
+**Wichtig:** Das braucht einen laufenden Server. GitHub Pages liefert nur statische Dateien aus – die dort veröffentlichten Entwürfe bleiben also ohne `--api` und damit in der Vorschau-Fassung. Für einen echten Kunden läuft der Wirt-Server auf seinem eigenen Hosting (oder deinem), und die Seite zeigt auf diese Adresse.
+
 ## Tests ausführen
 
 Es gibt Unit-Tests für die Filterlogik, den Landing-Page-Generator und den Speisekarten-Katalog, die **ohne** echten API-Key laufen:

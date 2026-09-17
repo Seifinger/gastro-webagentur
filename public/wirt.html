@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tische & Bestellungen</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f4f2ee; --card: #fff; --line: #e2ddd4; --text: #221f1a; --muted: #6d655a;
+    --accent: #2f6b4f; --accent-dark: #24543e; --warn: #b4551f; --danger: #a33131;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.55;
+         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 18px; }
+
+  header { background: var(--card); border-bottom: 1px solid var(--line); padding: 18px 0; }
+  .kopf { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  h1 { font-size: 1.3rem; margin: 0; }
+  .betrieb { color: var(--muted); font-size: .85rem; }
+  .zaehler { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill { background: var(--bg); border: 1px solid var(--line); border-radius: 999px;
+          padding: 6px 14px; font-size: .85rem; font-weight: 600; }
+  .pill.aktiv { background: var(--warn); border-color: var(--warn); color: #fff; }
+
+  nav { display: flex; gap: 6px; padding: 14px 0 0; flex-wrap: wrap; }
+  nav button { padding: 11px 20px; border: 1px solid var(--line); border-bottom: none;
+               border-radius: 10px 10px 0 0; background: transparent; cursor: pointer;
+               font-family: inherit; font-size: .95rem; font-weight: 600; color: var(--muted); }
+  nav button.aktiv { background: var(--card); color: var(--text); }
+
+  main { padding: 0 0 70px; }
+  .tafel { background: var(--card); border: 1px solid var(--line); border-radius: 0 var(--radius) var(--radius) var(--radius);
+           padding: 22px; }
+  section[hidden] { display: none; }
+
+  .leiste { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
+  label { display: block; font-size: .78rem; font-weight: 700; text-transform: uppercase;
+          letter-spacing: .05em; color: var(--muted); margin-bottom: 5px; }
+  input, select, textarea { font-family: inherit; font-size: 1rem; color: var(--text);
+    padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fcfbf9; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .knopf { padding: 11px 18px; border-radius: 9px; border: 1px solid var(--accent);
+           background: var(--accent); color: #fff; font-family: inherit; font-size: .92rem;
+           font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .knopf:hover { background: var(--accent-dark); }
+  .knopf.stumm { background: transparent; color: var(--text); border-color: var(--line); }
+  .knopf.stumm:hover { background: var(--bg); border-color: var(--muted); }
+  .knopf.gefahr { background: transparent; color: var(--danger); border-color: var(--line); }
+  .knopf.gefahr:hover { border-color: var(--danger); }
+  .knopf.klein { padding: 7px 13px; font-size: .84rem; }
+
+  .balken { background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+            padding: 14px 18px; margin-bottom: 20px; }
+  .balken .zahl { font-size: 1.5rem; font-weight: 700; }
+  .balken .spur { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 10px; }
+  .balken .fuellung { height: 100%; background: var(--accent); transition: width .3s ease; }
+  .balken .fuellung.voll { background: var(--danger); }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  tr.abgesagt td { opacity: .45; text-decoration: line-through; }
+
+  .marke { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .73rem; font-weight: 700; }
+  .marke.online { background: #e4eef3; color: #2a5a74; }
+  .marke.manuell { background: #efeae1; color: #6d5a3a; }
+  .marke.neu { background: #fbe9dc; color: #8a4318; }
+  .marke.bestaetigt { background: #e2efe7; color: #23543d; }
+  .marke.abgeholt { background: #eceae6; color: #5d564c; }
+  .marke.abgelehnt, .marke.abgesagt { background: #f6e3e3; color: #8d2b2b; }
+
+  .aktionen { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .karten { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  @media (min-width: 780px) { .karten { grid-template-columns: repeat(2, 1fr); } }
+  .karte { border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; background: #fcfbf9; }
+  .karte.ist-neu { border-color: var(--warn); border-width: 2px; }
+  .karte h3 { margin: 0 0 4px; font-size: 1.05rem; }
+  .karte .meta { color: var(--muted); font-size: .85rem; margin-bottom: 12px; }
+  .karte ul { list-style: none; margin: 0 0 12px; padding: 0; font-size: .92rem; }
+  .karte li { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+  .karte .summe { display: flex; justify-content: space-between; font-weight: 700; padding-top: 10px;
+                  border-top: 1px solid var(--line); margin-bottom: 14px; }
+  .abholblock { background: var(--card); border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px; }
+  .abholblock .wunsch { font-size: .85rem; color: var(--muted); margin-bottom: 8px; }
+  .abholzeile { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .hinweis-gast { margin-top: 10px; font-size: .85rem; color: var(--warn); }
+
+  .formular { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 22px; }
+  .felder { display: grid; gap: 14px; grid-template-columns: 1fr; }
+  @media (min-width: 680px) { .felder { grid-template-columns: repeat(3, 1fr); } }
+  .felder .weit { grid-column: 1 / -1; }
+  .felder input, .felder select, .felder textarea { width: 100%; }
+
+  .leer { text-align: center; color: var(--muted); padding: 44px 16px; }
+  .fehler { background: #fdecec; border-left: 3px solid var(--danger); color: #7d2525;
+            padding: 11px 15px; border-radius: 8px; margin-bottom: 16px; font-size: .9rem; }
+
+  #toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); z-index: 60;
+           background: #221f1a; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: .9rem;
+           opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: 92vw; }
+  #toast.sichtbar { opacity: 1; transform: translate(-50%, 0); }
+  #toast.fehlerhaft { background: var(--danger); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap kopf">
+    <div>
+      <h1>Tische &amp; Bestellungen</h1>
+      <div class="betrieb" id="betrieb-name"></div>
+    </div>
+    <div class="zaehler" id="zaehler"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav>
+    <button data-tab="reservierungen" class="aktiv">Reservierungen</button>
+    <button data-tab="bestellungen">Bestellungen</button>
+    <button data-tab="tischplan">Tischplan</button>
+  </nav>
+
+  <main class="tafel">
+    <section id="tab-reservierungen">
+      <div class="leiste">
+        <div>
+          <label for="tag">Tag</label>
+          <input type="date" id="tag">
+        </div>
+        <button class="knopf stumm" id="heute-knopf" type="button">Heute</button>
+      </div>
+
+      <div class="balken" id="auslastung"></div>
+      <div id="res-liste"></div>
+
+      <form class="formular" id="manuell-form">
+        <h2 style="font-size:1.05rem;margin:0 0 4px">Reservierung von Hand eintragen</h2>
+        <p style="color:var(--muted);font-size:.88rem;margin:0 0 16px">
+          Für Anrufe und Gäste, die direkt an der Theke fragen – damit die Plätze im System belegt sind.
+        </p>
+        <div class="felder">
+          <div><label for="m-datum">Datum</label><input type="date" id="m-datum" required></div>
+          <div><label for="m-uhrzeit">Uhrzeit</label><input type="time" id="m-uhrzeit" step="900" required></div>
+          <div><label for="m-personen">Personen</label><input type="number" id="m-personen" min="1" max="40" value="2" required></div>
+          <div><label for="m-name">Name</label><input type="text" id="m-name" required></div>
+          <div><label for="m-telefon">Telefon</label><input type="tel" id="m-telefon"></div>
+          <div><label for="m-wunsch">Anmerkung</label><input type="text" id="m-wunsch" placeholder="Kinderstuhl, Fenster ..."></div>
+        </div>
+        <button class="knopf" type="submit" style="margin-top:16px">Eintragen</button>
+      </form>
+    </section>
+
+    <section id="tab-bestellungen" hidden>
+      <div id="best-liste"></div>
+    </section>
+
+    <section id="tab-tischplan" hidden>
+      <div class="balken" id="plan-summe"></div>
+      <div id="tisch-liste"></div>
+
+      <form class="formular" id="tisch-form">
+        <h2 style="font-size:1.05rem;margin:0 0 4px">Tisch anlegen</h2>
+        <p style="color:var(--muted);font-size:.88rem;margin:0 0 16px">
+          Bilden Sie Ihr Lokal ab, wie es wirklich steht. Aus der Summe der Plätze ergibt sich,
+          wie viele Online-Reservierungen angenommen werden.
+        </p>
+        <div class="felder">
+          <div><label for="t-name">Bezeichnung</label><input type="text" id="t-name" placeholder="Tisch 1, Stube, Terrasse 3" required></div>
+          <div><label for="t-plaetze">Plätze</label><input type="number" id="t-plaetze" min="1" max="40" value="4" required></div>
+        </div>
+        <button class="knopf" type="submit" style="margin-top:16px">Tisch hinzufügen</button>
+      </form>
+    </section>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+let stand = { tische: [], reservierungen: [], bestellungen: [], plaetzeGesamt: 0 };
+
+// Gästenamen kommen aus einem öffentlichen Formular - ohne Maskierung könnte
+// jemand über das Namensfeld Markup in dieses Dashboard schreiben.
+function esc(wert) {
+  return String(wert ?? "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+function melde(text, fehlerhaft = false) {
+  const t = document.getElementById("toast");
+  t.textContent = text;
+  t.className = "sichtbar" + (fehlerhaft ? " fehlerhaft" : "");
+  clearTimeout(t._z);
+  t._z = setTimeout(() => (t.className = ""), 4200);
+}
+
+async function ruf(pfad, daten) {
+  const antwort = await fetch(pfad, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(daten),
+  });
+  const ergebnis = await antwort.json();
+  if (!antwort.ok || ergebnis.ok === false) throw new Error(ergebnis.fehler ?? "Unbekannter Fehler");
+  return ergebnis;
+}
+
+function datumDeutsch(iso) {
+  if (!iso) return "";
+  const [j, m, t] = iso.split("-");
+  return `${t}.${m}.${j}`;
+}
+
+function euro(wert) {
+  return Number(wert).toFixed(2).replace(".", ",") + " €";
+}
+
+/* ---------- Reservierungen ---------- */
+
+function gewaehlterTag() {
+  return document.getElementById("tag").value || stand.heute;
+}
+
+function renderAuslastung() {
+  const tag = gewaehlterTag();
+  const amTag = stand.reservierungen.filter((r) => r.datum === tag && r.status !== "abgesagt");
+  const gaeste = amTag.reduce((s, r) => s + r.personen, 0);
+  const gesamt = stand.plaetzeGesamt;
+  const anteil = gesamt ? Math.min(100, (gaeste / gesamt) * 100) : 0;
+
+  document.getElementById("auslastung").innerHTML = gesamt === 0
+    ? `<strong>Noch kein Tischplan angelegt.</strong> Ohne Tische können keine Online-Reservierungen
+       angenommen werden – legen Sie im Reiter „Tischplan" Ihre Tische an.`
+    : `<span class="zahl">${gaeste}</span> von ${gesamt} Plätzen am ${esc(datumDeutsch(tag))} verplant
+       <span style="color:var(--muted)">· ${amTag.length} Reservierung(en)</span>
+       <div class="spur"><div class="fuellung${anteil >= 100 ? " voll" : ""}" style="width:${anteil}%"></div></div>`;
+}
+
+function tischOptionen(r) {
+  const passend = stand.tische.filter((t) => t.plaetze >= r.personen);
+  const optionen = passend
+    .map((t) => `<option value="${esc(t.id)}"${t.id === r.tischId ? " selected" : ""}>${esc(t.name)} (${t.plaetze})</option>`)
+    .join("");
+  return `<select class="tisch-wahl" data-id="${esc(r.id)}"><option value="">– offen –</option>${optionen}</select>`;
+}
+
+function renderReservierungen() {
+  renderAuslastung();
+  const tag = gewaehlterTag();
+  const liste = stand.reservierungen.filter((r) => r.datum === tag);
+  const ziel = document.getElementById("res-liste");
+
+  if (liste.length === 0) {
+    ziel.innerHTML = `<p class="leer">Für den ${esc(datumDeutsch(tag))} liegt noch keine Reservierung vor.</p>`;
+    return;
+  }
+
+  ziel.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Zeit</th><th>Name</th><th>Pers.</th><th>Tisch</th><th>Herkunft</th>
+        <th>Status</th><th>Kontakt</th><th></th>
+      </tr></thead>
+      <tbody>${liste.map((r) => `
+        <tr class="${r.status === "abgesagt" ? "abgesagt" : ""}">
+          <td><strong>${esc(r.uhrzeit)}</strong></td>
+          <td>${esc(r.name)}${r.wunsch ? `<div style="font-size:.82rem;color:var(--muted)">${esc(r.wunsch)}</div>` : ""}</td>
+          <td>${r.personen}</td>
+          <td>${tischOptionen(r)}</td>
+          <td><span class="marke ${esc(r.quelle)}">${r.quelle === "online" ? "Online" : "Von Hand"}</span></td>
+          <td><span class="marke ${esc(r.status)}">${({ neu: "Neu", bestaetigt: "Bestätigt", abgesagt: "Abgesagt" })[r.status]}</span></td>
+          <td>${r.telefon ? `<a href="tel:${esc(r.telefon.replace(/[^\\d+]/g, ""))}">${esc(r.telefon)}</a>` : "–"}</td>
+          <td><div class="aktionen">
+            ${r.status !== "bestaetigt" ? `<button class="knopf klein" data-res-status="bestaetigt" data-id="${esc(r.id)}">Bestätigen</button>` : ""}
+            ${r.status !== "abgesagt" ? `<button class="knopf klein gefahr" data-res-status="abgesagt" data-id="${esc(r.id)}">Absagen</button>` : ""}
+          </div></td>
+        </tr>`).join("")}
+      </tbody>
+    </table>`;
+}
+
+/* ---------- Bestellungen ---------- */
+
+function renderBestellungen() {
+  const ziel = document.getElementById("best-liste");
+  if (stand.bestellungen.length === 0) {
+    ziel.innerHTML = `<p class="leer">Noch keine Bestellung eingegangen.</p>`;
+    return;
+  }
+
+  const beschriftung = { neu: "Neu", bestaetigt: "Bestätigt", abgeholt: "Abgeholt", abgelehnt: "Abgelehnt" };
+
+  ziel.innerHTML = `<div class="karten">${stand.bestellungen.map((b) => {
+    const zeit = b.bestaetigteAbholzeit || b.abholzeit;
+    const nachricht = `Hallo ${b.name}, Ihre Bestellung ${b.nummer} ist bestätigt. Abholung: ${zeit}. Bis gleich!`;
+    return `
+    <div class="karte ${b.status === "neu" ? "ist-neu" : ""}">
+      <h3>${esc(b.nummer)} <span class="marke ${esc(b.status)}">${beschriftung[b.status]}</span></h3>
+      <div class="meta">${esc(b.name)}${b.telefon ? ` · <a href="tel:${esc(b.telefon.replace(/[^\\d+]/g, ""))}">${esc(b.telefon)}</a>` : ""}</div>
+      <ul>${b.positionen.map((p) => `<li><span>${p.menge} × ${esc(p.name)}</span><span>${euro(p.preis * p.menge)}</span></li>`).join("")}</ul>
+      <div class="summe"><span>Gesamt</span><span>${euro(b.gesamt)}</span></div>
+      ${b.hinweis ? `<p class="hinweis-gast">Hinweis: ${esc(b.hinweis)}</p>` : ""}
+
+      <div class="abholblock">
+        <div class="wunsch">Gewünschte Abholzeit: <strong>${esc(b.abholzeit)}</strong>${
+          b.bestaetigteAbholzeit ? ` · bestätigt für <strong>${esc(b.bestaetigteAbholzeit)}</strong>` : ""
+        }</div>
+        <div class="abholzeile">
+          <input type="text" class="abhol-zeit" data-id="${esc(b.id)}" value="${esc(b.bestaetigteAbholzeit || b.abholzeit)}" style="max-width:190px">
+          <button class="knopf klein" data-bestaetigen="${esc(b.id)}">Abholzeit bestätigen</button>
+          ${b.status === "bestaetigt" ? `<button class="knopf klein stumm" data-kopiere="${esc(nachricht)}">Nachricht kopieren</button>` : ""}
+          ${b.status !== "abgeholt" && b.status !== "abgelehnt" ? `<button class="knopf klein stumm" data-best-status="abgeholt" data-id="${esc(b.id)}">Abgeholt</button>` : ""}
+          ${b.status === "neu" ? `<button class="knopf klein gefahr" data-best-status="abgelehnt" data-id="${esc(b.id)}">Ablehnen</button>` : ""}
+        </div>
+      </div>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+/* ---------- Tischplan ---------- */
+
+function renderTischplan() {
+  document.getElementById("plan-summe").innerHTML =
+    `<span class="zahl">${stand.plaetzeGesamt}</span> Plätze an ${stand.tische.length} Tisch(en)
+     <div style="color:var(--muted);font-size:.88rem;margin-top:4px">
+       So viele Gäste kann Ihr Haus zur selben Zeit aufnehmen. Online-Reservierungen darüber hinaus
+       werden automatisch abgelehnt.
+     </div>`;
+
+  const ziel = document.getElementById("tisch-liste");
+  if (stand.tische.length === 0) {
+    ziel.innerHTML = `<p class="leer">Noch kein Tisch angelegt.</p>`;
+    return;
+  }
+
+  ziel.innerHTML = `
+    <table>
+      <thead><tr><th>Tisch</th><th>Plätze</th><th></th></tr></thead>
+      <tbody>${stand.tische.map((t) => `
+        <tr>
+          <td><strong>${esc(t.name)}</strong></td>
+          <td>${t.plaetze}</td>
+          <td><button class="knopf klein gefahr" data-tisch-weg="${esc(t.id)}">Entfernen</button></td>
+        </tr>`).join("")}
+      </tbody>
+    </table>`;
+}
+
+/* ---------- Laden und Ereignisse ---------- */
+
+async function lade() {
+  stand = await (await fetch("/api/betrieb")).json();
+  document.getElementById("betrieb-name").textContent = `Betrieb: ${stand.betrieb}`;
+  document.getElementById("zaehler").innerHTML = `
+    <span class="pill${stand.offeneReservierungen ? " aktiv" : ""}">${stand.offeneReservierungen} neue Reservierung(en)</span>
+    <span class="pill${stand.offeneBestellungen ? " aktiv" : ""}">${stand.offeneBestellungen} offene Bestellung(en)</span>`;
+
+  if (!document.getElementById("tag").value) document.getElementById("tag").value = stand.heute;
+  if (!document.getElementById("m-datum").value) document.getElementById("m-datum").value = stand.heute;
+
+  renderReservierungen();
+  renderBestellungen();
+  renderTischplan();
+}
+
+document.querySelectorAll("nav button").forEach((knopf) => {
+  knopf.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("aktiv", b === knopf));
+    ["reservierungen", "bestellungen", "tischplan"].forEach((name) => {
+      document.getElementById(`tab-${name}`).hidden = name !== knopf.dataset.tab;
+    });
+  });
+});
+
+document.getElementById("tag").addEventListener("change", renderReservierungen);
+document.getElementById("heute-knopf").addEventListener("click", () => {
+  document.getElementById("tag").value = stand.heute;
+  renderReservierungen();
+});
+
+document.addEventListener("click", async (e) => {
+  const ziel = e.target.closest("button");
+  if (!ziel) return;
+
+  try {
+    if (ziel.dataset.resStatus) {
+      await ruf("/api/reservierung/status", { id: ziel.dataset.id, status: ziel.dataset.resStatus });
+      await lade();
+      melde(ziel.dataset.resStatus === "abgesagt" ? "Reservierung abgesagt." : "Reservierung bestätigt.");
+    } else if (ziel.dataset.tischWeg) {
+      await ruf("/api/tisch/loeschen", { id: ziel.dataset.tischWeg });
+      await lade();
+      melde("Tisch entfernt.");
+    } else if (ziel.dataset.bestaetigen) {
+      const feld = document.querySelector(`.abhol-zeit[data-id="${ziel.dataset.bestaetigen}"]`);
+      await ruf("/api/bestellung/bestaetigen", { id: ziel.dataset.bestaetigen, abholzeit: feld.value });
+      await lade();
+      melde("Abholzeit bestätigt. Geben Sie dem Gast Bescheid.");
+    } else if (ziel.dataset.bestStatus) {
+      await ruf("/api/bestellung/status", { id: ziel.dataset.id, status: ziel.dataset.bestStatus });
+      await lade();
+      melde("Bestellung aktualisiert.");
+    } else if (ziel.dataset.kopiere) {
+      await navigator.clipboard.writeText(ziel.dataset.kopiere);
+      melde("Nachricht kopiert.");
+    }
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+document.addEventListener("change", async (e) => {
+  const wahl = e.target.closest(".tisch-wahl");
+  if (!wahl) return;
+  try {
+    await ruf("/api/reservierung/tisch", { id: wahl.dataset.id, tischId: wahl.value || null });
+    await lade();
+    melde(wahl.value ? "Tisch zugewiesen." : "Tischzuweisung gelöst.");
+  } catch (fehler) {
+    melde(fehler.message, true);
+    await lade();
+  }
+});
+
+document.getElementById("manuell-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    await ruf("/api/reservierung", {
+      datum: document.getElementById("m-datum").value,
+      uhrzeit: document.getElementById("m-uhrzeit").value,
+      personen: Number(document.getElementById("m-personen").value),
+      name: document.getElementById("m-name").value,
+      telefon: document.getElementById("m-telefon").value,
+      wunsch: document.getElementById("m-wunsch").value,
+    });
+    document.getElementById("m-name").value = "";
+    document.getElementById("m-telefon").value = "";
+    document.getElementById("m-wunsch").value = "";
+    document.getElementById("tag").value = document.getElementById("m-datum").value;
+    await lade();
+    melde("Reservierung eingetragen.");
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+document.getElementById("tisch-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    await ruf("/api/tisch", {
+      name: document.getElementById("t-name").value,
+      plaetze: Number(document.getElementById("t-plaetze").value),
+    });
+    document.getElementById("t-name").value = "";
+    await lade();
+    melde("Tisch angelegt.");
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+lade();
+// Im Betrieb liegt das Tablet offen herum - regelmäßig nachladen, damit neue
+// Bestellungen auftauchen, ohne dass jemand die Seite neu lädt.
+setInterval(lade, 20000);
+</script>
+
+</body>
+</html>

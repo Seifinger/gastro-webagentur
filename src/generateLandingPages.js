@@ -108,7 +108,7 @@ async function run() {
   console.log("🔤 Prüfe Schriften ...");
   const fontCss = await ladeSchriften(path.join(assetsDir, "fonts"));
 
-  schreibeSeiten(entries, landingPagesDir, { kontaktEmail: args.email, fontCss });
+  schreibeSeiten(entries, landingPagesDir, { kontaktEmail: args.email, fontCss, apiUrl: args.api });
 
   const overviewPath = path.join(landingPagesDir, "index.html");
   writeFileSync(overviewPath, buildOverviewPage(entries), "utf-8");

@@ -17,7 +17,7 @@ import { ensureFonts, fontFaceCss } from "./fontLibrary.js";
 // Entwurf ergeben – deshalb liegt die Auswahl- und Schreiblogik hier.
 
 export function parseArgs(argv) {
-  const args = { region: null, limit: null, minScore: 0, email: "", cuisine: null, kontakt: "" };
+  const args = { region: null, limit: null, minScore: 0, email: "", cuisine: null, kontakt: "", api: "" };
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === "--region") args.region = argv[++i];
     if (argv[i] === "--limit") args.limit = Number(argv[++i]);
@@ -25,6 +25,7 @@ export function parseArgs(argv) {
     if (argv[i] === "--email") args.email = argv[++i];
     if (argv[i] === "--cuisine") args.cuisine = argv[++i];
     if (argv[i] === "--kontakt") args.kontakt = argv[++i];
+    if (argv[i] === "--api") args.api = argv[++i];
   }
   return args;
 }

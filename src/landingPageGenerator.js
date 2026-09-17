@@ -438,6 +438,9 @@ textarea { resize: vertical; min-height: 90px; }
 .confirm-box.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
 .confirm-icon { width: 62px; height: 62px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
                 display: grid; place-items: center; font-size: 32px; margin: 0 auto 18px; }
+/* Abgelehnte Anfragen dürfen nicht wie Erfolg aussehen. */
+.confirm-box.hat-fehler .confirm-icon { background: #a33131; color: #fff; }
+.confirm-box.hat-fehler .confirm-summary { display: none; }
 .confirm-box h3 { font-size: 24px; margin-bottom: 12px; }
 .confirm-summary { text-align: left; background: var(--soft); border-radius: calc(var(--radius) / 1.5); padding: 17px 19px; margin: 22px 0; font-size: 15px; }
 .confirm-summary div { display: flex; justify-content: space-between; gap: 16px; padding: 3px 0; }
@@ -560,9 +563,11 @@ const PAGE_SCRIPT = `
     if (!byId("confirm").classList.contains("open")) byId("overlay").classList.remove("open");
   }
 
-  function showConfirm(title, text, rows, mailto) {
+  function showConfirm(title, text, rows, mailto, fehler) {
     byId("confirm-title").textContent = title;
     byId("confirm-text").textContent = text;
+    byId("confirm-icon").textContent = fehler ? "!" : "\\u2713";
+    byId("confirm").className = fehler ? "confirm-box hat-fehler" : "confirm-box";
 
     var box = byId("confirm-summary");
     box.innerHTML = "";
@@ -621,6 +626,51 @@ const PAGE_SCRIPT = `
     return prefix + "-" + String(Math.floor(1000 + Math.random() * 9000));
   }
 
+  /**
+   * Schickt die Anfrage an das Lokal. Ohne hinterlegte Adresse bleibt es beim
+   * Entwurf – dann wird nichts übertragen und die Bestätigung ist nur Ansicht.
+   */
+  function sende(pfad, nutzlast, knopf) {
+    if (!data.apiUrl) return Promise.resolve({ demo: true });
+
+    knopf.disabled = true;
+    var alterText = knopf.textContent;
+    knopf.textContent = "Wird gesendet \\u2026";
+
+    return fetch(data.apiUrl + pfad, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nutzlast)
+    })
+      .then(function (antwort) {
+        return antwort.json().then(function (ergebnis) {
+          if (!antwort.ok || ergebnis.ok === false) {
+            throw new Error(ergebnis.fehler || "Die Anfrage konnte nicht angenommen werden.");
+          }
+          return ergebnis;
+        });
+      })
+      .catch(function (fehler) {
+        // Auch ein Netzwerkabbruch darf nicht als Erfolg durchgehen.
+        throw new Error(fehler.message === "Failed to fetch"
+          ? "Wir konnten das Lokal gerade nicht erreichen. Bitte rufen Sie kurz an."
+          : fehler.message);
+      })
+      .then(function (ergebnis) {
+        knopf.disabled = false;
+        knopf.textContent = alterText;
+        return ergebnis;
+      }, function (fehler) {
+        knopf.disabled = false;
+        knopf.textContent = alterText;
+        throw fehler;
+      });
+  }
+
+  function zeigeFehler(text) {
+    showConfirm("Das hat nicht geklappt", text, [], "", true);
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function (button) {
       button.addEventListener("click", function () {
@@ -675,22 +725,45 @@ const PAGE_SCRIPT = `
         "\\nTelefon: " + form.elements.telefon.value +
         (form.elements.hinweis.value ? "\\nHinweis: " + form.elements.hinweis.value : "");
 
-      showConfirm(
-        "Bestellung aufgenommen",
-        "Wir bereiten Ihr Essen frisch zu. Bitte holen Sie es zur gew\\u00E4hlten Zeit bei uns ab.",
-        [
-          ["Bestellnummer", nummer],
-          ["Abholung", zeit],
-          ["Positionen", String(anzahl())],
-          ["Gesamt", euro(total())],
-        ],
-        mailtoLink("Abholbestellung " + nummer + " \\u2013 " + data.name, body)
-      );
+      var positionen = lines().map(function (line) {
+        return { name: line.name, menge: line.menge, preis: line.preis };
+      });
+      var summe = euro(total());
+      var stueck = String(anzahl());
 
-      cart = {};
-      renderCart();
-      form.reset();
-      closeDrawer();
+      sende("/oeffentlich/bestellung", {
+        positionen: positionen,
+        abholzeit: zeit,
+        name: form.elements.name.value,
+        telefon: form.elements.telefon.value,
+        hinweis: form.elements.hinweis.value
+      }, byId("order-submit")).then(function (ergebnis) {
+        // Die Abholzeit ist zun\\u00E4chst nur ein Wunsch: ob sie machbar ist,
+        // best\\u00E4tigt die K\\u00FCche.
+        var echteNummer = ergebnis.demo ? nummer : ergebnis.bestellung.nummer;
+        var text = ergebnis.demo
+          ? "Wir bereiten Ihr Essen frisch zu. Bitte holen Sie es zur gew\\u00E4hlten Zeit bei uns ab."
+          : "Ihre Bestellung liegt in der K\\u00FCche. Die Abholzeit best\\u00E4tigen wir Ihnen gleich \\u2013 falls es knapp wird, melden wir uns telefonisch.";
+
+        showConfirm(
+          ergebnis.demo ? "Bestellung aufgenommen" : "Bestellung eingegangen",
+          text,
+          [
+            ["Bestellnummer", echteNummer],
+            [ergebnis.demo ? "Abholung" : "Abholung (gew\\u00FCnscht)", zeit],
+            ["Positionen", stueck],
+            ["Gesamt", summe],
+          ],
+          mailtoLink("Abholbestellung " + echteNummer + " \\u2013 " + data.name, body)
+        );
+
+        cart = {};
+        renderCart();
+        form.reset();
+        closeDrawer();
+      }).catch(function (fehler) {
+        zeigeFehler(fehler.message);
+      });
     });
 
     byId("reservation-form").addEventListener("submit", function (event) {
@@ -709,20 +782,39 @@ const PAGE_SCRIPT = `
         (form.elements.email.value ? "\\nE-Mail: " + form.elements.email.value : "") +
         (form.elements.wunsch.value ? "\\nWunsch: " + form.elements.wunsch.value : "");
 
-      showConfirm(
-        "Tisch reserviert",
-        "Vielen Dank! Ihre Reservierung liegt uns vor \\u2013 wir freuen uns auf Ihren Besuch.",
-        [
-          ["Reservierungsnr.", nummer],
-          ["Datum", datum],
-          ["Uhrzeit", form.elements.uhrzeit.value],
-          ["Personen", form.elements.personen.value],
-        ],
-        mailtoLink("Tischreservierung " + nummer + " \\u2013 " + data.name, body)
-      );
+      var uhrzeit = form.elements.uhrzeit.value;
+      var personenText = form.elements.personen.value;
+      // "4 Personen" -> 4, damit das Lokal eine Zahl bekommt.
+      var personenZahl = parseInt(personenText, 10) || 1;
 
-      form.reset();
-      dateInput.value = iso;
+      sende("/oeffentlich/reservierung", {
+        datum: form.elements.datum.value,
+        uhrzeit: uhrzeit,
+        personen: personenZahl,
+        name: form.elements.name.value,
+        telefon: form.elements.telefon.value,
+        email: form.elements.email.value,
+        wunsch: form.elements.wunsch.value
+      }, form.querySelector("button[type=submit]")).then(function (ergebnis) {
+        showConfirm(
+          ergebnis.demo ? "Tisch reserviert" : "Anfrage eingegangen",
+          ergebnis.demo
+            ? "Vielen Dank! Ihre Reservierung liegt uns vor \\u2013 wir freuen uns auf Ihren Besuch."
+            : "Vielen Dank! Wir haben Ihren Tisch vorgemerkt und best\\u00E4tigen Ihnen die Reservierung in K\\u00FCrze.",
+          [
+            ["Reservierungsnr.", nummer],
+            ["Datum", datum],
+            ["Uhrzeit", uhrzeit],
+            ["Personen", personenText],
+          ],
+          mailtoLink("Tischreservierung " + nummer + " \\u2013 " + data.name, body)
+        );
+
+        form.reset();
+        dateInput.value = iso;
+      }).catch(function (fehler) {
+        zeigeFehler(fehler.message);
+      });
     });
 
     renderCart();
@@ -931,7 +1023,10 @@ export function buildLandingPage(lead, options = {}) {
   );
   const spalten = anzahlHighlights % 3 === 0 ? "spalten-3" : "";
 
-  const pageData = jsonForScript({ name, kontaktEmail });
+  // Ohne Betriebsserver bleibt es bei der Entwurfs-Bestätigung; mit Adresse
+  // gehen Reservierung und Bestellung wirklich an das Lokal.
+  const apiUrl = String(options.apiUrl ?? "").replace(/\/+$/, "");
+  const pageData = jsonForScript({ name, kontaktEmail, apiUrl });
 
   const kontaktZeilen = [
     adresse
@@ -1231,13 +1326,17 @@ ${renderStimmen(gestaltung.cuisine, lead, fiktiv)}
 </aside>
 
 <div class="confirm-box" id="confirm" role="dialog" aria-modal="true">
-  <div class="confirm-icon" aria-hidden="true">✓</div>
+  <div class="confirm-icon" id="confirm-icon" aria-hidden="true">✓</div>
   <h3 id="confirm-title"></h3>
   <p id="confirm-text"></p>
   <div class="confirm-summary" id="confirm-summary"></div>
   <a class="btn btn-ghost" id="confirm-mail" style="display:none" href="#">Bestätigung per E-Mail senden</a>
   <button class="btn btn-primary btn-block" id="confirm-close" type="button" style="margin-top:10px">Schließen</button>
-  <p class="demo-note">Entwurfsansicht: In der fertigen Version geht diese Anfrage direkt an das Restaurant.</p>
+  ${
+    apiUrl
+      ? ""
+      : '<p class="demo-note">Entwurfsansicht: In der fertigen Version geht diese Anfrage direkt an das Restaurant.</p>'
+  }
 </div>
 
 <footer>

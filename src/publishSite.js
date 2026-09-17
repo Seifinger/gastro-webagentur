@@ -126,6 +126,7 @@ async function run() {
     kontaktEmail: args.email,
     fontCss,
     veroeffentlicht: true,
+    apiUrl: args.api,
     // Bilder kommen im Netz direkt von Unsplash, damit das Repository nicht
     // um mehrere Megabyte Stockfotos wächst.
     bildUrl: remoteImageUrl,
