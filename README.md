@@ -194,6 +194,50 @@ Innerhalb eines Themes gibt es drei Akzentvarianten, dazu sechs Titelbilder je K
 
 Stockfotos (Unsplash) und Schriften (Google Fonts, alle unter der SIL Open Font License) werden beim ersten Lauf **einmalig heruntergeladen** und unter `data/landingpages/assets/` abgelegt. Danach funktionieren die Entwürfe komplett offline – praktisch, wenn du sie beim Termin im Lokal auf dem Laptop zeigst und dort kein Empfang ist. Ein erneuter Lauf lädt nur noch Fehlendes nach. Schlägt der Schriften-Download fehl, greifen die Seiten auf Systemschriften zurück.
 
+### Gästestimmen
+
+Vor der Reservierung steht eine Referenzen-Sektion. Auf den Entwürfen echter Häuser bleiben die drei Plätze **bewusst leer** und zeigen nur den Aufbau – die einzige echte Sozialbestätigung dort ist die Google-Gesamtnote.
+
+Das hat zwei Gründe, die sich nicht umgehen lassen:
+
+- Google untersagt das **Speichern von Rezensionstexten**. Dauerhaft gespeichert werden darf nur die `place_id`; Bewertungen müssen live abgerufen und mit Attribution angezeigt werden. Unsere Seiten sind statische Dateien im Git – genau das wäre nicht erlaubt.
+- Rezensionen enthalten **Namen echter Gäste**. Die auf einer Entwurfsseite zu veröffentlichen, die dem Lokal nicht gehört und die niemand beauftragt hat, wäre datenschutzrechtlich nicht sauber.
+
+Erfundene Zitate unter dem echten Namen eines Hauses kommen ebenfalls nicht in Frage – sie wären als echte Bewertungen lesbar. Ein Test stellt sicher, dass das nie passiert.
+
+Die **erfundenen Beispiel-Lokale** auf der Startseite haben dagegen ausformulierte Stimmen; dort ist klar gekennzeichnet, dass das Lokal nicht existiert.
+
+Sobald ein Wirt Kunde ist, lassen sich seine echten Bewertungen sauber einbinden: per Live-Abruf beim Seitenaufruf, mit Google-Attribution und ohne Speicherung.
+
+### Küche im Dashboard zuordnen
+
+Die Namenserkennung liegt bei Lokalen ohne Stichwort daneben. Im Dashboard gibt es deshalb pro Lead ein Auswahlfeld für die Küche; die Zuordnung landet in `data/kuechen.json` und hat Vorrang vor der automatischen Erkennung. Von Hand gesetzte Werte sind farbig hervorgehoben. Nach einer Änderung einmal `npm run pages` laufen lassen, damit der Entwurf die neue Stilrichtung bekommt.
+
+### QR-Code und Anschreiben
+
+In der Spalte **Pitch** öffnet „QR & Text" ein Fenster mit:
+
+- einem **QR-Code** auf die Demo-Adresse des Lokals – zum Zeigen auf dem Handy oder zum Ausdrucken
+- der Adresse zum Kopieren
+- einem **Anschreiben-Entwurf**, der den konkreten Befund aus der Analyse aufgreift („keine eigene Website hinterlegt", „auf dem Handy schwer zu bedienen" …)
+
+Der Text ist ein Entwurf zum Prüfen und Anpassen, kein Serienbrief. Unaufgeforderte Werbe-E-Mails an Gewerbetreibende sind in Deutschland nur eingeschränkt zulässig (§ 7 UWG) – der unproblematische Weg ist, den QR-Code beim Besuch vor Ort zu zeigen.
+
+### Bewegung je Küche
+
+Jede Stilrichtung hat ein eigenes bewegtes Element im Hero – nicht nur andere Farben, sondern ein anderer Mechanismus:
+
+| Küche | Element |
+|---|---|
+| Italienisch | Zwei Pizzahälften, die gegeneinander drehen (wie bei L'Osteria) |
+| Bayerisch | Die Tagesempfehlung wechselt durch |
+| Asiatisch | Gerichte laufen wie auf dem Sushi-Band durchs Bild |
+| Türkisch | Der Drehspieß dreht sich weiter |
+| Griechisch | Ruhiger Bildwechsel mit langsamer Annäherung |
+| Café | Aufsteigender Dampf über der Tasse |
+
+Alles reine CSS-Animationen, ohne Bibliothek und ohne zusätzliche Anfragen. Wer im Betriebssystem „Bewegung reduzieren" eingestellt hat, bekommt das Standbild.
+
 ### Speisekarte
 
 Die Karte wird **anhand des Restaurantnamens** gewählt (Pizzeria → italienisch, Döner → türkisch, Gasthof → bayerisch usw.); ohne passendes Stichwort ist bayerisch der Standard. Liegt der Generator daneben – etwa bei einem Thai-Lokal namens „Klabwong" – gib die Küche mit `--cuisine` vor. Möglich sind: `bayerisch`, `italienisch`, `asiatisch`, `griechisch`, `tuerkisch`, `cafe`.

@@ -1,6 +1,8 @@
 import { menuForLead, menuForCuisine, highlightCandidates, detectCuisine } from "./menuCatalog.js";
 import { HERO_IMAGES, INTERIOR_IMAGES, TEAM_IMAGES, assetFileName } from "./imageLibrary.js";
 import { resolveTheme, THEMES, themeNameForCuisine } from "./themes.js";
+import { heroSignatur, SIGNATUR_CSS } from "./heroSignature.js";
+import { stimmenFuer, PLATZHALTER_ERKLAERUNG } from "./testimonials.js";
 
 // Standard-Öffnungszeiten für den Entwurf. Google liefert diese Felder in
 // unserer Suchabfrage nicht mit, deshalb sind es bewusst Platzhalter, die auf
@@ -345,6 +347,26 @@ body.veroeffentlicht .topbar { top: 38px; }
 .foto-text span { font-size: 13px; color: rgba(255,255,255,.82); display: block; margin-top: 4px; }
 .foto-badge { position: absolute; right: 12px; top: 12px; font-size: 11px; font-weight: 700; color: #fff;
               background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.45); border-radius: 999px; padding: 3px 10px; }
+
+/* Gästestimmen */
+.stimmen-section { background: var(--soft); }
+.stimmen-note { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+                margin-bottom: 40px; font-size: 17px; }
+.stimmen-note .note { font-family: var(--display); font-size: 34px; font-weight: 700; color: var(--accent); }
+.stimmen-note .sterne { color: var(--gold); letter-spacing: 2px; font-size: 19px; }
+.stimmen-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 820px) { .stimmen-grid { grid-template-columns: repeat(3, 1fr); } }
+.stimme { position: relative; background: var(--surface); border: 1px solid var(--line);
+          border-radius: var(--radius); padding: 26px 24px 22px; display: flex; flex-direction: column; gap: 14px; }
+.stimme .sterne { color: var(--gold); letter-spacing: 2px; font-size: 15px; }
+.stimme p { font-size: 16px; line-height: 1.6; flex: 1; }
+.stimme footer { font-size: 14px; color: var(--ink-soft); display: flex; gap: 8px; flex-wrap: wrap; background: none; padding: 0; }
+.stimme footer strong { color: var(--ink); font-family: var(--body); font-size: 14px; }
+.stimme.ist-platzhalter { border-style: dashed; background: transparent; min-height: 172px; justify-content: center; }
+.stimme .sterne.leer { color: var(--line); }
+.stimme .slot-titel { flex: none; color: var(--ink-soft); font-family: var(--display); font-size: 18px; }
+.stimmen-erklaerung { margin-top: 26px; text-align: center; color: var(--ink-soft); font-size: 15px;
+                      max-width: 620px; margin-left: auto; margin-right: auto; }
 
 /* Formulare */
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
@@ -792,6 +814,62 @@ function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl) {
   ).join("");
 }
 
+/**
+ * Gästestimmen. Bei echten Häusern bewusst Platzhalter: Google-Rezensionen
+ * dürfen nicht gespeichert werden, und fremde Bewertungen auf einer
+ * unbeauftragten Seite wären ohnehin nicht in Ordnung.
+ */
+function renderStimmen(cuisine, lead, fiktiv) {
+  const { stimmen, slots, platzhalter } = stimmenFuer(cuisine, { fiktiv });
+
+  // Leere Plätze statt erfundener Zitate: ohne Sterne und ohne Namen ist
+  // nichts behauptet, der Aufbau ist trotzdem zu sehen.
+  const karten = platzhalter
+    ? slots
+        .map(
+          (titel) => `
+      <div class="stimme ist-platzhalter">
+        <span class="sterne leer" aria-hidden="true">★★★★★</span>
+        <p class="slot-titel">${escapeHtml(titel)}</p>
+        <footer><span>wird aus Ihren Google-Bewertungen übernommen</span></footer>
+      </div>`,
+        )
+        .join("")
+    : stimmen
+        .map(
+          ({ text, autor, wann }) => `
+      <blockquote class="stimme">
+        <span class="sterne" aria-hidden="true">★★★★★</span>
+        <p>${escapeHtml(text)}</p>
+        <footer><strong>${escapeHtml(autor)}</strong><span>${escapeHtml(wann)}</span></footer>
+      </blockquote>`,
+        )
+        .join("");
+
+  const note = lead.rating
+    ? `<div class="stimmen-note">
+         <span class="note">${String(lead.rating).replace(".", ",")}</span>
+         <span class="sterne" aria-hidden="true">${"★".repeat(Math.round(Number(lead.rating)))}</span>
+         <span>von 5 auf Google${
+           lead.anzahlBewertungen ? `, aus ${formatCount(lead.anzahlBewertungen)} Bewertungen` : ""
+         }</span>
+       </div>`
+    : "";
+
+  return `
+  <section class="section stimmen-section" id="stimmen">
+    <div class="wrap">
+      <div class="section-head mitte">
+        <div class="eyebrow">Gästestimmen</div>
+        <h2>Was unsere Gäste sagen</h2>
+      </div>
+      ${note}
+      <div class="stimmen-grid">${karten}</div>
+      ${platzhalter ? `<p class="stimmen-erklaerung">${escapeHtml(PLATZHALTER_ERKLAERUNG)}</p>` : ""}
+    </div>
+  </section>`;
+}
+
 function renderRating(lead) {
   if (!lead.rating) return "";
   const rounded = Math.round(Number(lead.rating));
@@ -912,6 +990,7 @@ ${fontCss}
   --radius: ${t.radius};
 }
 ${PAGE_STYLES}
+${SIGNATUR_CSS}
 </style>
 </head>
 <body${veroeffentlicht ? ' class="veroeffentlicht"' : ""}>
@@ -943,6 +1022,7 @@ ${
     <img src="${escapeHtml(bildUrl(gestaltung.heroImage, "hero"))}" alt="${escapeHtml(name)}">
   </div>
   <div class="hero-overlay"></div>
+  ${heroSignatur(gestaltung.cuisine, { highlights, bildUrl, escape: escapeHtml })}
   <div class="hero-inner">
     <div class="hero-kicker">${escapeHtml(menu.konzept ?? menu.label)}${ort ? ` · in ${escapeHtml(ort)}` : ""}</div>
     <h1>${escapeHtml(name)}</h1>
@@ -1014,6 +1094,8 @@ ${
     )}</div>
   </div>
 </section>
+
+${renderStimmen(gestaltung.cuisine, lead, fiktiv)}
 
 <section class="section reserve-section" id="reservierung">
   <div class="wrap">

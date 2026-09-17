@@ -219,6 +219,26 @@ body.veroeffentlicht .topbar { top: 38px; }
 .foto-badge { position: absolute; right: 12px; top: 12px; font-size: 11px; font-weight: 700; color: #fff;
               background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.45); border-radius: 999px; padding: 3px 10px; }
 
+/* Gästestimmen */
+.stimmen-section { background: var(--soft); }
+.stimmen-note { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+                margin-bottom: 40px; font-size: 17px; }
+.stimmen-note .note { font-family: var(--display); font-size: 34px; font-weight: 700; color: var(--accent); }
+.stimmen-note .sterne { color: var(--gold); letter-spacing: 2px; font-size: 19px; }
+.stimmen-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 820px) { .stimmen-grid { grid-template-columns: repeat(3, 1fr); } }
+.stimme { position: relative; background: var(--surface); border: 1px solid var(--line);
+          border-radius: var(--radius); padding: 26px 24px 22px; display: flex; flex-direction: column; gap: 14px; }
+.stimme .sterne { color: var(--gold); letter-spacing: 2px; font-size: 15px; }
+.stimme p { font-size: 16px; line-height: 1.6; flex: 1; }
+.stimme footer { font-size: 14px; color: var(--ink-soft); display: flex; gap: 8px; flex-wrap: wrap; background: none; padding: 0; }
+.stimme footer strong { color: var(--ink); font-family: var(--body); font-size: 14px; }
+.stimme.ist-platzhalter { border-style: dashed; background: transparent; min-height: 172px; justify-content: center; }
+.stimme .sterne.leer { color: var(--line); }
+.stimme .slot-titel { flex: none; color: var(--ink-soft); font-family: var(--display); font-size: 18px; }
+.stimmen-erklaerung { margin-top: 26px; text-align: center; color: var(--ink-soft); font-size: 15px;
+                      max-width: 620px; margin-left: auto; margin-right: auto; }
+
 /* Formulare */
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
 .field-grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
@@ -310,6 +330,113 @@ footer { background: var(--tint); color: rgba(255,255,255,.72); padding: 48px 0;
 footer strong { color: #fff; font-family: var(--display); text-transform: var(--display-transform); font-size: 17px; }
 .footer-note { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; line-height: 1.6; }
 
+
+.sig { position: absolute; z-index: 1; pointer-events: none; }
+
+/* Italienisch: zwei Pizzahälften, die gegeneinander drehen */
+.sig-pizza { right: -14%; top: 50%; transform: translateY(-50%);
+             width: clamp(240px, 42vw, 460px); aspect-ratio: 1; border-radius: 50%;
+             overflow: hidden; opacity: .92; box-shadow: 0 30px 70px -30px rgba(0,0,0,.8); }
+.sig-pizza .haelfte { position: absolute; inset: 0; }
+.sig-pizza .haelfte.links { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
+.sig-pizza .haelfte.rechts { clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%); }
+.sig-pizza img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+                 animation: sig-dreh 38s linear infinite; }
+.sig-pizza .haelfte.rechts img { animation-direction: reverse; }
+@keyframes sig-dreh { to { transform: rotate(360deg); } }
+@media (max-width: 899px) {
+  .sig-pizza { right: -26%; top: 16%; transform: none; width: 62vw; opacity: .5; }
+}
+
+/* Asiatisch: Gerichte laufen wie auf dem Sushi-Band durchs Bild */
+.sig-band { left: 0; right: 0; top: 70px; height: clamp(74px, 11vw, 108px); overflow: hidden;
+            opacity: .9; mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
+.sig-band .band { display: flex; gap: 12px; width: max-content; animation: sig-band 34s linear infinite; }
+.sig-band img { height: clamp(74px, 11vw, 108px); width: clamp(104px, 15vw, 150px);
+                object-fit: cover; border-radius: 4px; }
+@keyframes sig-band { to { transform: translateX(-50%); } }
+@media (max-width: 899px) { .sig-band { top: 62px; opacity: .55; } }
+
+/* Türkisch: der Drehspieß dreht sich weiter */
+.sig-spiess { right: 6%; top: 50%; transform: translateY(-50%);
+              width: clamp(120px, 17vw, 190px); height: clamp(260px, 38vw, 400px);
+              border-radius: 999px; overflow: hidden; opacity: .9;
+              box-shadow: inset 26px 0 44px -22px rgba(0,0,0,.95), inset -26px 0 44px -22px rgba(0,0,0,.95),
+                          0 30px 60px -28px rgba(0,0,0,.8); }
+.sig-spiess .fleisch { position: absolute; inset: 0; background-size: 220% 100%;
+                       background-repeat: repeat-x; animation: sig-spiess 16s linear infinite; }
+@keyframes sig-spiess { to { background-position-x: -220%; } }
+@media (max-width: 899px) {
+  .sig-spiess { right: -4%; top: 12%; transform: none; width: 34vw; height: 46vw; opacity: .5; }
+}
+
+/* Bayerisch: die Tagesempfehlung wechselt durch */
+.sig-tafel { right: 5%; top: 50%; transform: translateY(-50%);
+             width: clamp(210px, 27vw, 310px); aspect-ratio: 3 / 4; }
+.sig-tafel .karte { position: absolute; inset: 0; opacity: 0; border-radius: 10px; overflow: hidden;
+                    box-shadow: 0 26px 56px -26px rgba(0,0,0,.85); animation: sig-tafel 21s infinite; }
+.sig-tafel .karte:nth-child(2) { animation-delay: 7s; }
+.sig-tafel .karte:nth-child(3) { animation-delay: 14s; }
+.sig-tafel img { width: 100%; height: 100%; object-fit: cover; }
+.sig-tafel .schild { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 14px 12px;
+                     background: linear-gradient(180deg, transparent, rgba(0,0,0,.85));
+                     color: #fff; font-size: 14px; font-weight: 600; text-align: center; }
+.sig-tafel .schild small { display: block; font-size: 10px; font-weight: 700; letter-spacing: .14em;
+                           text-transform: uppercase; opacity: .75; margin-bottom: 3px; }
+@keyframes sig-tafel { 0%, 3% { opacity: 0; } 6%, 30% { opacity: 1; } 36%, 100% { opacity: 0; } }
+@media (max-width: 899px) {
+  .sig-tafel { right: 4%; top: 11%; transform: none; width: 34vw; opacity: .6; }
+  .sig-tafel .schild { display: none; }
+}
+
+/* Griechisch: ruhiger Bildwechsel mit langsamer Annäherung */
+.sig-diashow { right: 4%; top: 50%; transform: translateY(-50%);
+               width: clamp(230px, 34vw, 400px); aspect-ratio: 4 / 5; border-radius: 200px 200px 14px 14px;
+               overflow: hidden; opacity: .92; box-shadow: 0 30px 66px -28px rgba(0,0,0,.8); }
+.sig-diashow img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+                   opacity: 0; animation: sig-diashow 24s infinite; }
+.sig-diashow img:nth-child(2) { animation-delay: 8s; }
+.sig-diashow img:nth-child(3) { animation-delay: 16s; }
+@keyframes sig-diashow {
+  0% { opacity: 0; transform: scale(1); }
+  5%, 29% { opacity: 1; }
+  33%, 100% { opacity: 0; }
+  100% { transform: scale(1.12); }
+}
+@media (max-width: 899px) {
+  .sig-diashow { right: -8%; top: 12%; transform: none; width: 46vw; opacity: .5; }
+}
+
+/* Café: aufsteigender Dampf über der Tasse */
+.sig-tasse { right: 6%; top: 50%; transform: translateY(-50%);
+             width: clamp(210px, 30vw, 340px); aspect-ratio: 1; }
+.sig-tasse .becher { position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
+                     box-shadow: 0 28px 60px -26px rgba(0,0,0,.8); }
+.sig-tasse img { width: 100%; height: 100%; object-fit: cover; }
+.sig-tasse .dampf { position: absolute; left: 50%; top: -6%; width: 34%; height: 46%;
+                    transform: translateX(-50%); }
+.sig-tasse .dampf i { position: absolute; bottom: 0; width: 20px; height: 20px; border-radius: 50%;
+                      background: rgba(255,255,255,.7); filter: blur(9px); opacity: 0;
+                      animation: sig-dampf 5.5s ease-in infinite; }
+.sig-tasse .dampf i:nth-child(1) { left: 12%; }
+.sig-tasse .dampf i:nth-child(2) { left: 42%; animation-delay: 1.6s; }
+.sig-tasse .dampf i:nth-child(3) { left: 70%; animation-delay: 3.2s; }
+@keyframes sig-dampf {
+  0% { opacity: 0; transform: translateY(0) scale(.7); }
+  25% { opacity: .75; }
+  100% { opacity: 0; transform: translateY(-110px) scale(1.9); }
+}
+@media (max-width: 899px) {
+  .sig-tasse { right: -4%; top: 13%; transform: none; width: 44vw; opacity: .55; }
+}
+
+/* Wer Bewegung im System abgestellt hat, bekommt das Standbild. */
+@media (prefers-reduced-motion: reduce) {
+  .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
+  .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i { animation: none; }
+  .sig-tafel .karte:first-child, .sig-diashow img:first-child { opacity: 1; }
+}
+
 </style>
 </head>
 <body class="veroeffentlicht">
@@ -333,6 +460,19 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
     <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=1800&amp;h=1000&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Restaurant Fairway">
   </div>
   <div class="hero-overlay"></div>
+  <div class="sig sig-tafel" aria-hidden="true">
+        <div class="karte">
+          <img src="https://images.unsplash.com/photo-1558030006-450675393462?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="">
+          <div class="schild"><small>Heute empfohlen</small>Krustenbraten vom Schwein</div>
+        </div>
+        <div class="karte">
+          <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="">
+          <div class="schild"><small>Heute empfohlen</small>Grillrippchen</div>
+        </div>
+        <div class="karte">
+          <img src="https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="">
+          <div class="schild"><small>Heute empfohlen</small>Forelle Müllerin</div>
+        </div></div>
   <div class="hero-inner">
     <div class="hero-kicker">Wirtshausküche &amp; Biergarten · in Kraiburg am Inn</div>
     <h1>Restaurant Fairway</h1>
@@ -615,6 +755,38 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
       </figure></div>
   </div>
 </section>
+
+
+  <section class="section stimmen-section" id="stimmen">
+    <div class="wrap">
+      <div class="section-head mitte">
+        <div class="eyebrow">Gästestimmen</div>
+        <h2>Was unsere Gäste sagen</h2>
+      </div>
+      <div class="stimmen-note">
+         <span class="note">4,2</span>
+         <span class="sterne" aria-hidden="true">★★★★</span>
+         <span>von 5 auf Google, aus 19 Bewertungen</span>
+       </div>
+      <div class="stimmen-grid">
+      <div class="stimme ist-platzhalter">
+        <span class="sterne leer" aria-hidden="true">★★★★★</span>
+        <p class="slot-titel">Ihre erste Bewertung</p>
+        <footer><span>wird aus Ihren Google-Bewertungen übernommen</span></footer>
+      </div>
+      <div class="stimme ist-platzhalter">
+        <span class="sterne leer" aria-hidden="true">★★★★★</span>
+        <p class="slot-titel">Ihre zweite Bewertung</p>
+        <footer><span>wird aus Ihren Google-Bewertungen übernommen</span></footer>
+      </div>
+      <div class="stimme ist-platzhalter">
+        <span class="sterne leer" aria-hidden="true">★★★★★</span>
+        <p class="slot-titel">Ihre dritte Bewertung</p>
+        <footer><span>wird aus Ihren Google-Bewertungen übernommen</span></footer>
+      </div></div>
+      <p class="stimmen-erklaerung">Diese drei Plätze füllen wir mit echten Bewertungen Ihrer Gäste – auf Wunsch direkt aus Google, dann halten sie sich von selbst aktuell.</p>
+    </div>
+  </section>
 
 <section class="section reserve-section" id="reservierung">
   <div class="wrap">

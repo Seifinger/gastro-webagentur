@@ -10,6 +10,7 @@ import {
   escapeHtml,
 } from "../src/landingPageGenerator.js";
 import { menuForCuisine, highlightCandidates, MENUS } from "../src/menuCatalog.js";
+import { STIMMEN } from "../src/testimonials.js";
 
 const lead = {
   name: "Gasthof Zur Post",
@@ -173,6 +174,44 @@ test("buildLandingPage nutzt eine übergebene Bildquelle statt lokaler Dateien",
 
   assert.ok(html.includes("https://cdn.beispiel.de/photo-1599921841143-819065a55cc6/gericht"));
   assert.ok(!html.includes("../assets/photo-"));
+});
+
+test("Entwürfe echter Lokale bekommen niemals erfundene Bewertungen", () => {
+  // Google untersagt das Speichern von Rezensionstexten, und ein erfundenes
+  // Zitat unter dem echten Namen eines Hauses wäre als Bewertung lesbar.
+  const html = buildLandingPage(lead);
+
+  for (const kueche of Object.keys(STIMMEN)) {
+    for (const stimme of STIMMEN[kueche]) {
+      assert.ok(!html.includes(stimme.text), `Zitat aus "${kueche}" steht im Entwurf`);
+      assert.ok(!html.includes(stimme.autor), `Name "${stimme.autor}" steht im Entwurf`);
+    }
+  }
+
+  assert.ok(html.includes('class="stimme ist-platzhalter"'), "keine Platzhalter-Plätze");
+  assert.ok(html.includes("Ihre erste Bewertung"));
+});
+
+test("erfundene Beispiel-Lokale bekommen erfundene Stimmen", () => {
+  const html = buildLandingPage(lead, { fiktiv: true, veroeffentlicht: true });
+  const erwartet = STIMMEN.bayerisch;
+
+  assert.ok(html.includes(escapeHtml(erwartet[0].text)));
+  assert.ok(html.includes(erwartet[0].autor));
+  assert.ok(!html.includes('class="stimme ist-platzhalter"'));
+});
+
+test("die echte Google-Note steht auch in den Gästestimmen", () => {
+  const html = buildLandingPage(lead);
+
+  assert.ok(html.includes('id="stimmen"'));
+  assert.ok(html.includes("von 5 auf Google, aus 1.234 Bewertungen"));
+});
+
+test("die Gästestimmen stehen vor der Reservierung", () => {
+  const html = buildLandingPage(lead);
+
+  assert.ok(html.indexOf('id="stimmen"') < html.indexOf('id="reservierung"'));
 });
 
 test("die veröffentlichte Fassung weist sich als Entwurf aus", () => {
