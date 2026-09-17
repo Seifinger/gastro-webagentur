@@ -15,3 +15,5 @@ export function loadRegions() {
 }
 
 export const outputDir = path.join(__dirname, "..", "data", "output");
+
+export const landingPagesDir = path.join(__dirname, "..", "data", "landingpages");

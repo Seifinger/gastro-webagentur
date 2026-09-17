@@ -140,13 +140,40 @@ Funktionen:
 
 Das Dashboard liest beim Aufruf einfach die vorhandenen CSV-Dateien neu ein – lass es also nach einem neuen `npm start`-Lauf laufen, um aktuelle Daten zu sehen (Browser-Seite neu laden reicht, der Server muss nicht neu gestartet werden). Es braucht keinen API-Key und läuft komplett offline auf deinem Rechner.
 
+## Landing-Page-Entwürfe erzeugen
+
+Für den Pitch lässt sich zu jedem Lead automatisch eine fertige Beispiel-Website erzeugen – mit Speisekarte, Online-Reservierung und Abholbestellung:
+
+```bash
+npm run pages
+```
+
+Die Seiten landen unter `data/landingpages/`. Öffne `data/landingpages/index.html` im Browser für die Übersicht, von dort geht es zu jedem einzelnen Entwurf.
+
+Optionen:
+```bash
+npm run pages -- --region "Altötting"      # nur ein Ort
+npm run pages -- --min-score 80            # nur die dringendsten Fälle
+npm run pages -- --limit 10                # die Top 10 nach Score
+npm run pages -- --email info@restaurant.de  # Bestellungen/Reservierungen per E-Mail versendbar machen
+```
+
+Was jede erzeugte Seite kann:
+- **Tisch reservieren** – Datum, Uhrzeit, Personenzahl, Kontaktdaten, mit Pflichtfeldprüfung
+- **Abholung vorbestellen** – Gerichte in den Warenkorb legen, Menge ändern, Abholzeit wählen, Gesamtsumme live berechnet
+- **Kontakt & Anfahrt** – Telefonnummer als Direktwahl-Link, Adresse mit Route-planen-Link zu Google Maps
+- Echte Google-Bewertung des Restaurants im Kopfbereich
+- Mobilfreundlich, ohne externe Abhängigkeiten – eine einzige HTML-Datei pro Restaurant
+
+Die **Speisekarte wird anhand des Restaurantnamens passend gewählt** (Pizzeria → italienisch, Döner → türkisch, Gasthof → bayerisch usw.). Gerichte, Preise und Öffnungszeiten sind bewusst Platzhalter und auf der Seite auch als solche gekennzeichnet – sie werden vor einer Veröffentlichung durch die echten Angaben des Wirts ersetzt.
+
 ## Tests ausführen
 
-Es gibt Unit-Tests für die Filterlogik, die **ohne** echten API-Key laufen:
+Es gibt Unit-Tests für die Filterlogik, den Landing-Page-Generator und den Speisekarten-Katalog, die **ohne** echten API-Key laufen:
 ```bash
 npm test
 ```
 
 ## Geplante Erweiterungen (nicht Teil dieser ersten Version)
 
-- Demo-Ordner-Generierung (Phase 2 des Businessplans).
+- Outreach-Anschreiben pro Lead vorbereiten (Versand bleibt bewusst manuell freizugeben).
