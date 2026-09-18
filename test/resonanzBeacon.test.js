@@ -43,6 +43,21 @@ test("die Kennung lebt im sessionStorage, nicht in einem Cookie", () => {
   assert.doesNotMatch(skript, /localStorage\./);
 });
 
+// Dieser Fehler ist unsichtbar, bis er in Produktion auftritt: Lokal auf
+// derselben Herkunft funktioniert alles, erst der Sprung von GitHub Pages zum
+// Collector lässt ihn auffliegen. sendBeacon sendet immer im
+// Credentials-Modus "include", und dagegen lehnt der Browser ein
+// "Access-Control-Allow-Origin: *" ab – mit application/json käme das
+// Abschluss-Signal deshalb nie an.
+test("beide Signale nutzen einen Inhaltstyp ohne CORS-Vorabfrage", () => {
+  // Ohne die Kommentarzeilen: Die erklären gerade, warum application/json
+  // hier nicht in Frage kommt, und würden die Prüfung sonst selbst auslösen.
+  const code = skript.replace(/^\s*\/\/.*$/gm, "");
+
+  assert.match(code, /text\/plain/);
+  assert.doesNotMatch(code, /application\/json/);
+});
+
 test("das Beacon fasst den Betriebsserver des Wirts nicht an", () => {
   // apiUrl gehört dem Wirt (Reservierungen, Bestellungen) und ist bei einem
   // Entwurf leer – das Beacon hat dort nichts zu suchen.

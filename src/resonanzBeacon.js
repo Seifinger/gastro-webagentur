@@ -72,12 +72,20 @@ export function resonanzSkript(resonanzUrl, slug) {
     });
   }
 
+  // text/plain und nicht application/json, obwohl der Inhalt JSON ist: Nur
+  // die harmlosen Inhaltstypen lösen keine CORS-Vorabfrage aus. Das ist hier
+  // keine Feinoptimierung, sondern Bedingung – sendBeacon sendet immer im
+  // Credentials-Modus "include", und dagegen lehnt der Browser ein
+  // "Access-Control-Allow-Origin: *" ab. Mit application/json käme das
+  // Abschluss-Signal von einer veröffentlichten Seite nie an.
+  var TYP = "text/plain;charset=UTF-8";
+
   // Erstes Signal sofort: Auch ein Besuch von zwei Sekunden ist die
   // Information, dass der Link ankam.
   try {
     fetch(ZIEL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": TYP },
       body: nutzlast(),
       keepalive: true,
       mode: "cors"
@@ -91,7 +99,7 @@ export function resonanzSkript(resonanzUrl, slug) {
     if (gemeldet) return;
     gemeldet = true;
     try {
-      navigator.sendBeacon(ZIEL, new Blob([nutzlast()], { type: "application/json" }));
+      navigator.sendBeacon(ZIEL, new Blob([nutzlast()], { type: TYP }));
     } catch (e) {}
   }
 
