@@ -31,3 +31,9 @@ export const siteBaseUrl = (
 
 // Grußformel der Anschreiben-Entwürfe im Dashboard.
 export const absenderName = process.env.ABSENDER_NAME || "";
+
+// Host, auf dem dashboardServer.js und wirtServer.js lauschen. Default ist
+// 127.0.0.1, damit die Server ohne explizite Konfiguration nicht versehentlich
+// im lokalen Netzwerk erreichbar sind – über DASHBOARD_HOST in der .env
+// bewusst änderbar (z. B. auf 0.0.0.0).
+export const dashboardHost = process.env.DASHBOARD_HOST || "127.0.0.1";
