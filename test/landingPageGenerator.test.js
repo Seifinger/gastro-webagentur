@@ -11,6 +11,7 @@ import {
 } from "../src/landingPageGenerator.js";
 import { menuForCuisine, highlightCandidates, MENUS } from "../src/menuCatalog.js";
 import { STIMMEN } from "../src/testimonials.js";
+import { SIGNATUR_CSS } from "../src/heroSignature.js";
 
 const lead = {
   name: "Gasthof Zur Post",
@@ -461,6 +462,30 @@ test("Bayerisch bekommt den überlaufenden Bierkrug zusätzlich zur Tagestafel",
 
   assert.ok(html.includes('class="sig sig-tafel"'), "Tagestafel muss weiter existieren");
   assert.ok(html.includes('class="sig sig-beer"'), "Bierkrug-Detail fehlt");
+});
+
+test("?bewegung=aus schaltet dieselben Signatur-Animationen ab wie prefers-reduced-motion", () => {
+  // Kein echter Browser im Testlauf, deshalb Prüfung auf Quelltextebene:
+  // derselbe Regelblock muss unter der Media Query UND unter der Klasse
+  // .bewegung-aus stehen (per CSS-Nesting, nicht als zweite Abschrift).
+  // Manuell mit dem mitgelieferten Chromium verifiziert: mit ?bewegung=aus
+  // wechselt z.B. getComputedStyle(...).animationName für ".sig-tafel .karte"
+  // und ".sig-beer .schaum" von ihrem jeweiligen Animationsnamen auf "none".
+  const mediaIndex = SIGNATUR_CSS.indexOf("@media (prefers-reduced-motion: reduce)");
+  const klasseIndex = SIGNATUR_CSS.indexOf(".bewegung-aus {");
+  assert.ok(mediaIndex > -1 && klasseIndex > mediaIndex, ".bewegung-aus-Block fehlt oder steht vor der Media Query");
+
+  const geteilteRegeln = [
+    ".sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i,",
+    ".sig-lanterns .laterne { animation: none; }",
+    ".sig-beer .schaum, .sig-beer .tropfen { animation: none; }",
+  ];
+  const mediaBlock = SIGNATUR_CSS.slice(mediaIndex, klasseIndex);
+  const klasseBlock = SIGNATUR_CSS.slice(klasseIndex);
+  for (const regel of geteilteRegeln) {
+    assert.ok(mediaBlock.includes(regel), `Media-Block ohne: ${regel}`);
+    assert.ok(klasseBlock.includes(regel), `.bewegung-aus-Block ohne: ${regel}`);
+  }
 });
 
 test("hero.primaryAction 'reservation' betont Reservieren, ohne Texte oder Ziele zu ändern", () => {

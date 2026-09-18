@@ -7,6 +7,22 @@ import { assetFileName } from "./imageLibrary.js";
 // Vorbild ist die gegenläufig drehende Pizza bei L'Osteria. Zurückhaltung ist
 // dabei Absicht: das Element schmückt den Hero, es überlagert ihn nicht.
 
+// Die immer laufenden Endlos-Animationen der Signaturen: sie hängen an
+// keiner .bewegt-Klasse, sondern laufen unabhängig von motion.js. Diese
+// Regeln braucht es deshalb unter beiden Auslösern (siehe Ende von
+// SIGNATUR_CSS) – der echten Media Query für Besucher mit Systemeinstellung
+// und der Klasse .bewegung-aus, die motion.js bei ?bewegung=aus setzt.
+const SIGNATUR_REDUZIERT_REGELN = `
+  .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
+  .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i,
+  .sig-drehteller .teller, .sig-drehteller img,
+  .sig-schale img, .sig-schale .dampf i { animation: none; }
+  .sig-tafel .karte:first-child, .sig-diashow img:first-child { opacity: 1; }
+  .sig-lanterns .laterne { animation: none; }
+  .sig-lanterns .laterne .glow { animation: none; opacity: .6; }
+  .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
+`;
+
 const SIGNATUR_CSS = `
 .sig { position: absolute; z-index: 1; pointer-events: none; }
 
@@ -163,18 +179,22 @@ const SIGNATUR_CSS = `
 /* Thailändisch: eine Orchidee blüht auf, sobald der Hero ins Bild scrollt.
    Die Blütenblätter nutzen dieselbe Intersection-Observer-Kopplung wie der
    Rest der Seite (.bewegt/.da aus motion.js) statt einer eigenen Schleife –
-   das Aufblühen soll einmal passieren, nicht dauerhaft laufen. */
+   das Aufblühen soll einmal passieren, nicht dauerhaft laufen. Jedes
+   Blütenblatt steckt in einer eigenen, unbewegten <g> nur für die Drehung:
+   ein CSS-transform (die Skalierung beim Aufblühen) würde ein SVG-eigenes
+   transform="rotate(...)" auf demselben Element sonst vollständig
+   ersetzen statt sich mit ihm zu kombinieren. */
 .sig-orchid { right: 6%; top: 50%; transform: translateY(-50%);
               width: clamp(170px, 24vw, 260px); aspect-ratio: 1; opacity: .95;
               filter: drop-shadow(0 22px 40px rgba(0,0,0,.35)); }
 .sig-orchid svg { width: 100%; height: 100%; overflow: visible; }
-.sig-orchid .bluete { fill: #c99bdb; transform-box: fill-box; transform-origin: center;
-                      transition: opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1);
-                      transition-delay: calc(var(--i, 0) * .1s); }
-.sig-orchid .bluete-mitte { fill: #f4d35e; }
+.sig-orchid .bluete { transform-box: fill-box; transform-origin: center;
+                      transition: opacity 1.4s ease, transform 1.4s cubic-bezier(.22,.61,.36,1);
+                      transition-delay: calc(var(--i, 0) * .25s); }
 /* Vor dem Sichtbarwerden klein und unsichtbar, .da lässt sie zur vollen
-   Größe aufblühen – pro Blütenblatt um .1s versetzt (macht bei .7s
-   Übergang und 6 Blättern 1.2s Gesamtdauer, einmalig). */
+   Größe aufblühen – pro Element (5 Blütenblätter + Lippe) um .25s versetzt
+   (macht bei 1.4s Übergang und 6 Elementen 2.65s Gesamtdauer, einmalig –
+   bewusst langsam, damit das Aufblühen fürs Auge nachvollziehbar bleibt). */
 .bewegt .sig-orchid .bluete { opacity: 0; transform: scale(.3); }
 .bewegt .sig-orchid.da .bluete { opacity: 1; transform: scale(1); }
 @media (max-width: 899px) {
@@ -184,21 +204,25 @@ const SIGNATUR_CSS = `
 /* Indisch: ein Puder-Wölkchen platzt auf, sobald der Hero ins Bild scrollt –
    dieselbe .bewegt/.da-Kopplung wie bei der Orchidee, aber als einmalige
    @keyframes-Animation statt Übergang, weil Start- und Zielwert hier auf
-   zwei verschiedene Zwischenstufen fallen (nicht nur an/aus). */
+   zwei verschiedene Zwischenstufen fallen (nicht nur an/aus). Die Wolke
+   trägt jetzt eine gezeichnete Kontur (.puff) mit Gewürz-Flecken
+   (.fleck), die leicht gestaffelt zeitgleich mit ihr aufplatzen. */
 .sig-spice { right: 8%; top: 50%; transform: translateY(-50%);
              width: clamp(160px, 22vw, 240px); aspect-ratio: 1; }
-.sig-spice .puff { position: absolute; border-radius: 50%; filter: blur(7px); }
-.sig-spice .puff-1 { left: 20%; top: 30%; width: 46%; aspect-ratio: 1;
-                      background: radial-gradient(circle, #ffb238, #e2790a 72%); }
-.sig-spice .puff-2 { left: 42%; top: 46%; width: 38%; aspect-ratio: 1;
-                      background: radial-gradient(circle, #ffd27a, #d9660a 72%); }
-.sig-spice .puff-3 { left: 10%; top: 54%; width: 30%; aspect-ratio: 1;
-                      background: radial-gradient(circle, #ffc25c, #c65a06 72%); }
-.bewegt .sig-spice .puff { opacity: 0; transform: scale(.5); }
-.bewegt .sig-spice.da .puff { animation: sig-spice-puff .8s ease-out forwards; }
+.sig-spice svg { width: 100%; height: 100%; overflow: visible; }
+.sig-spice .puff, .sig-spice .fleck { transform-box: fill-box; transform-origin: center; }
+.bewegt .sig-spice .puff, .bewegt .sig-spice .fleck { opacity: 0; transform: scale(.5); }
+.bewegt .sig-spice.da .puff { animation: sig-spice-puff 2.2s ease-out forwards; }
+.bewegt .sig-spice.da .fleck { animation: sig-spice-puff 2.2s ease-out forwards;
+                                animation-delay: calc(var(--i, 0) * .12s); }
+/* Statt gleich von "da" zu "weg" zu blenden, hält die Wolke kurz bei voller
+   Größe, bevor sie verblasst – sonst ist sie beim ersten Sichtbarwerden des
+   Heros (Hero steht ja schon beim Laden im Bild) fürs Auge kaum zu fassen. */
 @keyframes sig-spice-puff {
-  from { opacity: .8; transform: scale(.5); }
-  to { opacity: 0; transform: scale(1.3); }
+  0% { opacity: .8; transform: scale(.5); }
+  35% { opacity: 1; transform: scale(1.05); }
+  65% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1.3); }
 }
 @media (max-width: 899px) {
   .sig-spice { right: -2%; top: 15%; transform: none; width: 40vw; }
@@ -206,22 +230,18 @@ const SIGNATUR_CSS = `
 
 /* Asiatisch (gemischt): ein bis zwei Laternen pulsieren dezent am Rand –
    nicht mittig über dem Essen wie das Sushi-Band, das Japanisch behält.
-   Statt box-shadow direkt zu animieren (teuer, löst Repaints aus), trägt
-   ein Pseudo-Element mit stärkerem Schein, dessen Opazität pulsiert – der
-   sichtbare Effekt ist derselbe, animiert wird trotzdem nur opacity. */
+   Statt box-shadow direkt zu animieren (teuer, löst Repaints aus), pulsiert
+   die Opazität des .glow-Elements im SVG – der sichtbare Effekt ist
+   derselbe, animiert wird trotzdem nur opacity. */
 .sig-lanterns { left: 3%; top: 14%; display: flex; flex-direction: column; gap: 26px; }
-.sig-lanterns .laterne { position: relative; width: clamp(30px, 4vw, 46px); aspect-ratio: 1;
-                          border-radius: 50%;
-                          background: radial-gradient(circle at 40% 35%, #ffb347, #c8380c 78%);
-                          box-shadow: 0 0 10px 2px rgba(255,130,40,.35);
-                          transform-origin: 50% -14%;
+.sig-lanterns .laterne { position: relative; height: clamp(70px, 9vw, 104px); aspect-ratio: 60 / 110;
+                          transform-origin: 50% 4%;
                           animation: sig-laterne-schaukel 7s ease-in-out infinite; }
-.sig-lanterns .laterne::after { content: ""; position: absolute; inset: -6px; border-radius: 50%;
-                                 box-shadow: 0 0 22px 10px rgba(255,140,40,.85); opacity: 0;
-                                 animation: sig-laterne-puls 4s ease-in-out infinite; }
-.sig-lanterns .laterne:nth-child(2) { width: clamp(22px, 3vw, 34px); animation-delay: 1.6s; }
-.sig-lanterns .laterne:nth-child(2)::after { animation-delay: .8s; }
-@keyframes sig-laterne-puls { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+.sig-lanterns .laterne .sig-lantern-form { width: 100%; height: 100%; display: block; overflow: visible; }
+.sig-lanterns .laterne .glow { animation: sig-laterne-puls 6s ease-in-out infinite; }
+.sig-lanterns .laterne:nth-child(2) { height: clamp(54px, 7vw, 80px); animation-delay: 1.6s; }
+.sig-lanterns .laterne:nth-child(2) .glow { animation-delay: 1.2s; }
+@keyframes sig-laterne-puls { 0%, 100% { opacity: .35; } 50% { opacity: .9; } }
 @keyframes sig-laterne-schaukel { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 @media (max-width: 899px) {
   .sig-lanterns { left: 2%; top: 8%; gap: 16px; }
@@ -229,25 +249,32 @@ const SIGNATUR_CSS = `
 
 /* Bayerisch: zusätzlich zur Tagestafel ein kleines Detail – der Bierkrug
    läuft alle 8s kurz über. Ergänzt die bestehende Signatur, ersetzt sie
-   nicht. */
-.sig-beer { right: 4%; bottom: 6%; width: clamp(40px, 5vw, 60px); aspect-ratio: 1 / 1.4; }
-.sig-beer .schaum { position: absolute; left: 8%; right: 8%; top: -8%; height: 30%;
+   nicht. Das Glas selbst (sig-beer-glas) ist ein statisches SVG-Icon,
+   Schaum und Tropfen sitzen als eigene Elemente darauf. */
+.sig-beer { position: relative; right: 4%; bottom: 6%; width: clamp(80px, 8vw, 110px);
+            aspect-ratio: 1 / 1.4; }
+.sig-beer-glas { position: absolute; inset: 0; width: 100%; height: 100%;
+                 color: rgba(255, 226, 150, .3);
+                 filter: drop-shadow(0 12px 18px rgba(0,0,0,.4)); }
+.sig-beer .schaum { position: absolute; left: 16%; right: 16%; top: 3%; height: 20%;
                      border-radius: 999px 999px 6px 6px; background: #fdf3d6;
                      box-shadow: 0 8px 14px -8px rgba(0,0,0,.4);
                      transform-origin: 50% 100%;
                      animation: sig-beer-schaum 8s ease-in-out infinite; }
-.sig-beer .tropfen { position: absolute; left: 50%; top: 16%; width: 5px; height: 5px;
+.sig-beer .tropfen { position: absolute; left: 50%; top: 18%; width: 5px; height: 5px;
                       border-radius: 50%; background: #fdf3d6; opacity: 0;
                       animation: sig-beer-tropfen 8s ease-in infinite; }
 .sig-beer .tropfen-2 { left: 64%; animation-delay: .25s; }
+/* Der eigentliche Überlauf-Moment (82–100 %) ist bewusst breiter als der
+   Rest des Zyklus, damit er als Ereignis lesbar ist statt nur als Zucken. */
 @keyframes sig-beer-schaum {
-  0%, 88% { transform: scaleY(1) translateY(0); }
-  93% { transform: scaleY(1.22) translateY(-12%); }
+  0%, 82% { transform: scaleY(1) translateY(0); }
+  91% { transform: scaleY(1.22) translateY(-12%); }
   100% { transform: scaleY(1) translateY(0); }
 }
 @keyframes sig-beer-tropfen {
-  0%, 88% { opacity: 0; transform: translateY(0); }
-  90% { opacity: .9; transform: translateY(0); }
+  0%, 82% { opacity: 0; transform: translateY(0); }
+  87% { opacity: .9; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(20px); }
 }
 @media (max-width: 899px) {
@@ -284,23 +311,25 @@ const SIGNATUR_CSS = `
 
 /* Wer Bewegung im System abgestellt hat, bekommt das Standbild. */
 @media (prefers-reduced-motion: reduce) {
-  .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
-  .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i,
-  .sig-drehteller .teller, .sig-drehteller img,
-  .sig-schale img, .sig-schale .dampf i { animation: none; }
-  .sig-tafel .karte:first-child, .sig-diashow img:first-child { opacity: 1; }
-  /* Auch bei einer Umstellung mitten im Besuch (.bewegt bleibt gesetzt) darf
-     die Blüte nicht wieder verschwinden – deshalb hier dieselbe Spezifität
-     wie die .da-Regel, aber als spätere Quelle. */
+  ${SIGNATUR_REDUZIERT_REGELN}
+  /* Nur hier nötig: reagiert auf eine Umstellung mitten im Besuch, bei der
+     .bewegt schon gesetzt ist (siehe motion.js). Der URL-Parameter
+     ?bewegung=aus unten setzt .bewegt gar nicht erst – dort liefen diese
+     Selektoren sonst ins Leere. */
   .bewegt .sig-orchid .bluete, .bewegt .sig-orchid.da .bluete {
     opacity: 1; transform: none; transition: none;
   }
-  .bewegt .sig-spice .puff, .bewegt .sig-spice.da .puff {
+  .bewegt .sig-spice .puff, .bewegt .sig-spice.da .puff,
+  .bewegt .sig-spice .fleck, .bewegt .sig-spice.da .fleck {
     opacity: 1; transform: none; animation: none;
   }
-  .sig-lanterns .laterne { animation: none; }
-  .sig-lanterns .laterne::after { animation: none; opacity: .55; }
-  .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
+}
+
+/* Für die Verkaufsdemo: derselbe Regelblock wie oben, unter der Klasse
+   verschachtelt (natives CSS-Nesting), die motion.js bei ?bewegung=aus
+   setzt – statt die Selektoren ein zweites Mal auszuschreiben. */
+.bewegung-aus {
+  ${SIGNATUR_REDUZIERT_REGELN}
 }
 `;
 
@@ -308,51 +337,90 @@ function bild(id, rolle, bildUrl) {
   return bildUrl ? bildUrl(id, rolle) : `../assets/${assetFileName(id, rolle)}`;
 }
 
-const ORCHID_BLUETENBLAETTER = 6;
+// Fünf Blütenblätter im Kreis, abwechselnd in zwei Fliedertönen.
+const ORCHID_BLUETENBLAETTER = [
+  { winkel: 0, farbe: "#c99bdb" },
+  { winkel: 72, farbe: "#c99bdb" },
+  { winkel: 144, farbe: "#d7aee3" },
+  { winkel: 216, farbe: "#c99bdb" },
+  { winkel: 288, farbe: "#d7aee3" },
+];
 
 /**
- * Sechs Blütenblätter (SVG-Pfade) im Kreis um eine Mitte – jedes mit eigenem
- * --i für den gestaffelten Übergang in der CSS-Regel .bewegt .sig-orchid.
+ * Fünf Blütenblätter (SVG-Pfade) im Kreis um eine Mitte, dazu Lippe
+ * (Labellum) und Mitte – jedes Blütenblatt samt Lippe mit eigenem --i für
+ * den gestaffelten Übergang in der CSS-Regel .bewegt .sig-orchid.
  */
 function heroOrchidBloom() {
-  const winkel = 360 / ORCHID_BLUETENBLAETTER;
-  const bluetenblaetter = Array.from({ length: ORCHID_BLUETENBLAETTER })
-    .map(
-      (_, i) => `
-        <g transform="rotate(${i * winkel} 50 50)" style="--i:${i}">
-          <path class="bluete" d="M50,50 C38,38 38,18 50,8 C62,18 62,38 50,50 Z"></path>
+  const bluetenblaetter = ORCHID_BLUETENBLAETTER.map(
+    ({ winkel, farbe }, i) => `
+        <g transform="rotate(${winkel})">
+          <path class="bluete" d="M0,0 C-16,-10 -20,-30 -8,-42 C0,-46 0,-46 8,-42 C20,-30 16,-10 0,0 Z" fill="${farbe}" style="--i:${i}"></path>
         </g>`,
-    )
-    .join("");
+  ).join("");
   return `
     <div class="sig sig-orchid" aria-hidden="true">
       <svg viewBox="0 0 100 100" focusable="false">
-        ${bluetenblaetter}
-        <circle class="bluete-mitte" cx="50" cy="50" r="6"></circle>
+        <g transform="translate(50 46)">
+          ${bluetenblaetter}
+          <path class="bluete labellum" d="M0,4 C-10,10 -12,26 0,34 C12,26 10,10 0,4 Z" fill="#8e3fae" style="--i:5"></path>
+          <circle class="bluete-mitte" r="4" fill="#f4d35e"></circle>
+        </g>
       </svg>
     </div>`;
 }
 
+const SPICE_FLECKEN = [
+  { cx: 30, cy: 40, r: 3, farbe: "#c1502a" },
+  { cx: 55, cy: 34, r: 2.4, farbe: "#7a3b12" },
+  { cx: 68, cy: 50, r: 3, farbe: "#c1502a" },
+  { cx: 42, cy: 58, r: 2, farbe: "#7a3b12" },
+  { cx: 58, cy: 62, r: 2.6, farbe: "#c1502a" },
+];
+
 function heroSpicePuff() {
+  const flecken = SPICE_FLECKEN.map(
+    ({ cx, cy, r, farbe }, i) =>
+      `<circle class="fleck" cx="${cx}" cy="${cy}" r="${r}" fill="${farbe}" style="--i:${i}"></circle>`,
+  ).join("");
   return `
     <div class="sig sig-spice" aria-hidden="true">
-      <div class="puff puff-1"></div>
-      <div class="puff puff-2"></div>
-      <div class="puff puff-3"></div>
+      <svg viewBox="0 0 100 100" focusable="false">
+        <path class="puff" d="M20,60 C10,50 14,30 32,28 C36,14 58,12 66,26 C82,24 92,40 82,52 C88,64 78,78 62,74 C54,86 30,84 24,72 C10,72 8,58 20,60 Z" fill="#e0a63a"></path>
+        ${flecken}
+      </svg>
     </div>`;
 }
+
+const LATERNE_SVG = `
+      <svg class="sig-lantern-form" viewBox="0 0 60 110" aria-hidden="true">
+        <rect x="20" y="4" width="20" height="6" rx="2" fill="#8a4a1c"></rect>
+        <ellipse cx="30" cy="14" rx="16" ry="5" fill="#8a4a1c"></ellipse>
+        <path d="M14,16 C4,30 4,60 14,80 C20,90 40,90 46,80 C56,60 56,30 46,16 Z" fill="#e2461f"></path>
+        <path d="M20,18 C12,32 12,62 20,78" stroke="#b23414" stroke-width="1.5" fill="none"></path>
+        <path d="M30,16 C24,32 24,64 30,84" stroke="#b23414" stroke-width="1.5" fill="none"></path>
+        <path d="M40,18 C48,32 48,62 40,78" stroke="#b23414" stroke-width="1.5" fill="none"></path>
+        <ellipse class="glow" cx="30" cy="48" rx="10" ry="18" fill="#ffd27a" opacity=".6"></ellipse>
+        <ellipse cx="30" cy="82" rx="16" ry="5" fill="#8a4a1c"></ellipse>
+        <rect x="20" y="88" width="20" height="6" rx="2" fill="#8a4a1c"></rect>
+        <line x1="30" x2="30" y1="94" y2="104" stroke="#8a4a1c" stroke-width="2"></line>
+        <circle cx="30" cy="106" r="4" fill="#8a4a1c"></circle>
+      </svg>`;
 
 function heroLanternGlow() {
   return `
     <div class="sig sig-lanterns" aria-hidden="true">
-      <div class="laterne"></div>
-      <div class="laterne"></div>
+      <div class="laterne">${LATERNE_SVG}</div>
+      <div class="laterne">${LATERNE_SVG}</div>
     </div>`;
 }
 
 function heroBeerFoamOverflow() {
   return `
     <div class="sig sig-beer" aria-hidden="true">
+      <svg class="sig-beer-glas" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17 2a2 2 0 0 1 1.995 1.85L19 4v4c0 1.335-.229 2.386-.774 3.692l-.157.363l-.31.701a8.9 8.9 0 0 0-.751 3.242l-.008.377V20a2 2 0 0 1-1.85 1.995L15 22H9a2 2 0 0 1-1.995-1.85L7 20v-3.625c0-1.132-.21-2.25-.617-3.28l-.142-.34l-.31-.699c-.604-1.358-.883-2.41-.925-3.698L5 8V4a2 2 0 0 1 1.85-1.995L7 2z"></path>
+      </svg>
       <div class="schaum"></div>
       <span class="tropfen tropfen-1"></span>
       <span class="tropfen tropfen-2"></span>
