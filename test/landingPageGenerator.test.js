@@ -453,6 +453,16 @@ test("Japanisch behält das Sushi-Band als Signatur", () => {
   assert.ok(html.includes('class="sig sig-band"'));
 });
 
+test("Bayerisch bekommt den überlaufenden Bierkrug zusätzlich zur Tagestafel", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.bayerisch,
+    gestaltung: themeForLead(lead, "bayerisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-tafel"'), "Tagestafel muss weiter existieren");
+  assert.ok(html.includes('class="sig sig-beer"'), "Bierkrug-Detail fehlt");
+});
+
 test("hero.primaryAction 'reservation' betont Reservieren, ohne Texte oder Ziele zu ändern", () => {
   const html = buildLandingPage(lead, {
     menu: MENUS.italienisch,

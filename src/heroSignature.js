@@ -227,6 +227,33 @@ const SIGNATUR_CSS = `
   .sig-lanterns { left: 2%; top: 8%; gap: 16px; }
 }
 
+/* Bayerisch: zusätzlich zur Tagestafel ein kleines Detail – der Bierkrug
+   läuft alle 8s kurz über. Ergänzt die bestehende Signatur, ersetzt sie
+   nicht. */
+.sig-beer { right: 4%; bottom: 6%; width: clamp(40px, 5vw, 60px); aspect-ratio: 1 / 1.4; }
+.sig-beer .schaum { position: absolute; left: 8%; right: 8%; top: -8%; height: 30%;
+                     border-radius: 999px 999px 6px 6px; background: #fdf3d6;
+                     box-shadow: 0 8px 14px -8px rgba(0,0,0,.4);
+                     transform-origin: 50% 100%;
+                     animation: sig-beer-schaum 8s ease-in-out infinite; }
+.sig-beer .tropfen { position: absolute; left: 50%; top: 16%; width: 5px; height: 5px;
+                      border-radius: 50%; background: #fdf3d6; opacity: 0;
+                      animation: sig-beer-tropfen 8s ease-in infinite; }
+.sig-beer .tropfen-2 { left: 64%; animation-delay: .25s; }
+@keyframes sig-beer-schaum {
+  0%, 88% { transform: scaleY(1) translateY(0); }
+  93% { transform: scaleY(1.22) translateY(-12%); }
+  100% { transform: scaleY(1) translateY(0); }
+}
+@keyframes sig-beer-tropfen {
+  0%, 88% { opacity: 0; transform: translateY(0); }
+  90% { opacity: .9; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(20px); }
+}
+@media (max-width: 899px) {
+  .sig-beer { right: 6%; bottom: 5%; width: 32px; }
+}
+
 /* Generische, küchenunabhängige Hero-Varianten – wählbar über das
    Design-Preset-Modell (designPresets.js) für A/B-Tests, ohne die
    küchenspezifischen Signaturen oben zu verändern. */
@@ -273,6 +300,7 @@ const SIGNATUR_CSS = `
   }
   .sig-lanterns .laterne { animation: none; }
   .sig-lanterns .laterne::after { animation: none; opacity: .55; }
+  .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
 }
 `;
 
@@ -319,6 +347,15 @@ function heroLanternGlow() {
     <div class="sig sig-lanterns" aria-hidden="true">
       <div class="laterne"></div>
       <div class="laterne"></div>
+    </div>`;
+}
+
+function heroBeerFoamOverflow() {
+  return `
+    <div class="sig sig-beer" aria-hidden="true">
+      <div class="schaum"></div>
+      <span class="tropfen tropfen-1"></span>
+      <span class="tropfen tropfen-2"></span>
     </div>`;
 }
 
@@ -407,7 +444,7 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
         </div>`,
       )
       .join("");
-    return `<div class="sig sig-tafel" aria-hidden="true">${karten}</div>`;
+    return `<div class="sig sig-tafel" aria-hidden="true">${karten}</div>${heroBeerFoamOverflow()}`;
   }
 
   // Ein Wölkchen aus Gewürzpuder platzt auf, sobald der Hero ins Bild
