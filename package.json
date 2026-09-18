@@ -11,7 +11,8 @@
     "publish-site": "node src/publishSite.js",
     "wirt": "node src/wirtServer.js",
     "resonanz": "node src/resonanzServer.js",
-    "test": "node --test --test-concurrency=1 test/*.test.js"
+    "test": "node --test --test-concurrency=1 test/*.test.js",
+    "preview": "node src/previewServer.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",
