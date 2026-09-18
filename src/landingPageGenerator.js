@@ -4,6 +4,7 @@ import { resolveTheme, THEMES, themeNameForCuisine } from "./themes.js";
 import { heroSignatur, SIGNATUR_CSS } from "./heroSignature.js";
 import { MOTION_CSS, MOTION_SCRIPT } from "./motion.js";
 import { stimmenFuer, PLATZHALTER_ERKLAERUNG } from "./testimonials.js";
+import { designPresets, DEFAULT_PRESET } from "./designPresets.js";
 
 // Standard-Öffnungszeiten für den Entwurf. Google liefert diese Felder in
 // unserer Suchabfrage nicht mit, deshalb sind es bewusst Platzhalter, die auf
@@ -337,6 +338,26 @@ body.veroeffentlicht .topbar { top: 38px; }
             color: var(--accent); font-size: 20px; line-height: 1; cursor: pointer; transition: background .16s ease, color .16s ease; }
 .mini-add:hover { background: var(--accent); color: var(--on-accent); }
 
+/* "Beliebt"-Badge auf Menü-Positionen */
+.beliebt { display: inline-block; font-size: 11px; font-weight: 700; color: var(--on-accent);
+           background: var(--accent); border-radius: 999px; padding: 1px 9px; margin-left: 8px; vertical-align: middle; }
+
+/* Speisekarte als Grid: kompakte Liste ohne Aufklappen, für Küchen mit
+   überschaubarer, auf einen Blick erfassbarer Karte. */
+.menu-grid-section { display: grid; gap: 28px; grid-template-columns: 1fr; margin-top: 8px; }
+@media (min-width: 760px) { .menu-grid-section { grid-template-columns: repeat(2, 1fr); } }
+.menu-grid-kat h3 { font-size: 20px; margin-bottom: 6px; }
+.menu-grid-kat .gericht { padding: 13px 0; }
+
+/* Speisekarte als Kartenoptik: nutzt dieselbe Bildkachel wie die Highlights,
+   allerdings ohne Bild – kompaktere Textkarte je Kategorie. */
+.menu-card-grid { display: grid; gap: 20px; grid-template-columns: 1fr; margin-top: 8px; }
+@media (min-width: 680px) { .menu-card-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1040px) { .menu-card-grid { grid-template-columns: repeat(3, 1fr); } }
+.menu-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
+.menu-card h3 { font-size: 18px; margin-bottom: 10px; }
+.menu-card .gericht { padding: 12px 0; }
+
 /* Bildplätze für die eigenen Fotos */
 .foto-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
 @media (min-width: 760px) { .foto-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -368,6 +389,29 @@ body.veroeffentlicht .topbar { top: 38px; }
 .stimme .slot-titel { flex: none; color: var(--ink-soft); font-family: var(--display); font-size: 18px; }
 .stimmen-erklaerung { margin-top: 26px; text-align: center; color: var(--ink-soft); font-size: 15px;
                       max-width: 620px; margin-left: auto; margin-right: auto; }
+
+/* Stimmen als horizontale Reihe zum Durchwischen statt festem Grid. */
+.stimmen-grid.carousel { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory;
+                          padding-bottom: 8px; margin: 0 -20px; padding-left: 20px; padding-right: 20px; }
+.stimmen-grid.carousel .stimme { flex: 0 0 min(340px, 84vw); scroll-snap-align: start; }
+
+/* Eine große hervorgehobene Stimme, kleinere darunter – für zurückhaltendere
+   Fine-Dining-Auftritte statt eines dichten Grids. */
+.stimmen-grid.featured { display: block; }
+.stimme.featured { padding: 40px 36px; margin-bottom: 20px; }
+.stimme.featured p { font-size: 21px; font-family: var(--display); line-height: 1.4; }
+.stimmen-grid.featured .stimmen-rest { display: grid; gap: 20px; grid-template-columns: 1fr; }
+@media (min-width: 820px) { .stimmen-grid.featured .stimmen-rest { grid-template-columns: repeat(2, 1fr); } }
+
+/* Reservierungswidget direkt im Hero: Datum und Personenzahl schon sichtbar,
+   der Rest folgt beim Klick weiter unten im vollständigen Formular. */
+.hero-res-widget { display: none; margin-top: 22px; background: rgba(255,255,255,.12);
+                    border: 1px solid rgba(255,255,255,.3); border-radius: var(--radius);
+                    padding: 16px; backdrop-filter: blur(6px); }
+@media (min-width: 900px) { .hero-res-widget { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; } }
+.hero-res-widget .field { gap: 5px; min-width: 140px; flex: 1; }
+.hero-res-widget label { color: rgba(255,255,255,.85); font-size: 12px; }
+.hero-res-widget input, .hero-res-widget select { background: rgba(255,255,255,.92); border: none; padding: 11px 12px; }
 
 /* Formulare */
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
@@ -537,7 +581,8 @@ const PAGE_SCRIPT = `
     byId("fab-count").textContent = String(anzahl());
     byId("order-submit").disabled = current.length === 0;
     byId("cart-fab").className = current.length === 0 ? "cart-fab" : "cart-fab visible";
-    byId("bar-order").textContent = current.length === 0 ? "Bestellen" : "Bestellen \\u00B7 " + euro(total());
+    var barOrderEl = byId("bar-order");
+    if (barOrderEl) barOrderEl.textContent = current.length === 0 ? "Bestellen" : "Bestellen \\u00B7 " + euro(total());
   }
 
   function changeQty(id, delta) {
@@ -688,10 +733,13 @@ const PAGE_SCRIPT = `
     onScroll();
 
     byId("cart-fab").addEventListener("click", openDrawer);
-    byId("bar-order").addEventListener("click", function () {
-      if (lines().length === 0) byId("karte").scrollIntoView({ behavior: "smooth" });
-      else openDrawer();
-    });
+    var barOrder = byId("bar-order");
+    if (barOrder) {
+      barOrder.addEventListener("click", function () {
+        if (lines().length === 0) byId("karte").scrollIntoView({ behavior: "smooth" });
+        else openDrawer();
+      });
+    }
     byId("drawer-close").addEventListener("click", closeDrawer);
     byId("overlay").addEventListener("click", function () { closeDrawer(); closeConfirm(); });
     byId("confirm-close").addEventListener("click", closeConfirm);
@@ -850,27 +898,47 @@ function renderHighlights(highlights, bildUrl) {
 }
 
 /**
+ * Ermittelt je Kategorie ein "beliebtestes" Gericht (höchster Preis als
+ * Heuristik, da keine echten Bestelldaten vorliegen) für das Beliebt-Badge.
+ */
+function meistgeliebterIndex(gerichte) {
+  return gerichte.reduce(
+    (bestIndex, gericht, index) =>
+      gericht.preis > gerichte[bestIndex].preis ? index : bestIndex,
+    0,
+  );
+}
+
+function gerichtZeile(gericht, katIndex, gerichtIndex, { showBadges, beliebt }) {
+  const veg = showBadges && gericht.vegetarisch ? ' <span class="veg">vegetarisch</span>' : "";
+  const beliebtBadge = beliebt ? ' <span class="beliebt">Beliebt</span>' : "";
+  return `
+    <div class="gericht">
+      <div class="gericht-body">
+        <div class="gericht-name">${escapeHtml(gericht.name)}${veg}${beliebtBadge}</div>
+        <div class="gericht-desc">${escapeHtml(gericht.beschreibung)}</div>
+      </div>
+      <div class="gericht-seite">
+        <span class="gericht-preis">${formatPrice(gericht.preis)}</span>
+        <button class="mini-add" type="button" data-add="${katIndex}-${gerichtIndex}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}" aria-label="${escapeHtml(gericht.name)} vorbestellen">+</button>
+      </div>
+    </div>`;
+}
+
+/**
  * Die vollständige Karte als aufklappbare Liste – direkt im HTML statt als
  * PDF, damit sie auf dem Handy lesbar ist und Google sie indexieren kann.
  */
-function renderMenuAccordion(menu) {
+function renderMenuAccordion(menu, options = {}) {
+  const { showBadges = true, highlightMostLoved = false } = options;
+
   return menu.kategorien
     .map((kategorie, katIndex) => {
+      const beliebtIndex = highlightMostLoved ? meistgeliebterIndex(kategorie.gerichte) : -1;
       const gerichte = kategorie.gerichte
-        .map((gericht, gerichtIndex) => {
-          const veg = gericht.vegetarisch ? ' <span class="veg">vegetarisch</span>' : "";
-          return `
-          <div class="gericht">
-            <div class="gericht-body">
-              <div class="gericht-name">${escapeHtml(gericht.name)}${veg}</div>
-              <div class="gericht-desc">${escapeHtml(gericht.beschreibung)}</div>
-            </div>
-            <div class="gericht-seite">
-              <span class="gericht-preis">${formatPrice(gericht.preis)}</span>
-              <button class="mini-add" type="button" data-add="${katIndex}-${gerichtIndex}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}" aria-label="${escapeHtml(gericht.name)} vorbestellen">+</button>
-            </div>
-          </div>`;
-        })
+        .map((gericht, gerichtIndex) =>
+          gerichtZeile(gericht, katIndex, gerichtIndex, { showBadges, beliebt: gerichtIndex === beliebtIndex }),
+        )
         .join("");
 
       return `
@@ -880,6 +948,65 @@ function renderMenuAccordion(menu) {
       </details>`;
     })
     .join("");
+}
+
+/**
+ * Kompakte, mehrspaltige Karte ohne Aufklappen – für Küchen, deren Karte
+ * überschaubar genug ist, um auf einen Blick gezeigt zu werden.
+ */
+function renderMenuGrid(menu, options = {}) {
+  const { showBadges = true, highlightMostLoved = false } = options;
+
+  const kategorien = menu.kategorien
+    .map((kategorie, katIndex) => {
+      const beliebtIndex = highlightMostLoved ? meistgeliebterIndex(kategorie.gerichte) : -1;
+      const gerichte = kategorie.gerichte
+        .map((gericht, gerichtIndex) =>
+          gerichtZeile(gericht, katIndex, gerichtIndex, { showBadges, beliebt: gerichtIndex === beliebtIndex }),
+        )
+        .join("");
+      return `
+      <div class="menu-grid-kat">
+        <h3>${escapeHtml(kategorie.name)}</h3>
+        ${gerichte}
+      </div>`;
+    })
+    .join("");
+
+  return `<div class="menu-grid-section">${kategorien}</div>`;
+}
+
+/**
+ * Die Karte als Kartenoptik je Kategorie – etwas mehr Weißraum und optische
+ * Nähe zu den Highlight-Karten oben auf der Seite.
+ */
+function renderMenuCards(menu, options = {}) {
+  const { showBadges = true, highlightMostLoved = false } = options;
+
+  const karten = menu.kategorien
+    .map((kategorie, katIndex) => {
+      const beliebtIndex = highlightMostLoved ? meistgeliebterIndex(kategorie.gerichte) : -1;
+      const gerichte = kategorie.gerichte
+        .map((gericht, gerichtIndex) =>
+          gerichtZeile(gericht, katIndex, gerichtIndex, { showBadges, beliebt: gerichtIndex === beliebtIndex }),
+        )
+        .join("");
+      return `
+      <article class="menu-card">
+        <h3>${escapeHtml(kategorie.name)}</h3>
+        ${gerichte}
+      </article>`;
+    })
+    .join("");
+
+  return `<div class="menu-card-grid">${karten}</div>`;
+}
+
+function renderMenu(menu, preset) {
+  const options = { showBadges: preset.menu.showBadges, highlightMostLoved: preset.menu.highlightMostLoved };
+  if (preset.menu.layout === "grid") return renderMenuGrid(menu, options);
+  if (preset.menu.layout === "card") return renderMenuCards(menu, options);
+  return renderMenuAccordion(menu, options);
 }
 
 /**
@@ -912,34 +1039,45 @@ function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl) {
  * dürfen nicht gespeichert werden, und fremde Bewertungen auf einer
  * unbeauftragten Seite wären ohnehin nicht in Ordnung.
  */
-function renderStimmen(cuisine, lead, fiktiv) {
-  const { stimmen, slots, platzhalter } = stimmenFuer(cuisine, { fiktiv });
-
-  // Leere Plätze statt erfundener Zitate: ohne Sterne und ohne Namen ist
-  // nichts behauptet, der Aufbau ist trotzdem zu sehen.
-  const karten = platzhalter
-    ? slots
-        .map(
-          (titel) => `
-      <div class="stimme ist-platzhalter">
+function stimmeKarte(eintrag, { platzhalter, featured }) {
+  if (platzhalter) {
+    return `
+      <div class="stimme ist-platzhalter${featured ? " featured" : ""}">
         <span class="sterne leer" aria-hidden="true">★★★★★</span>
-        <p class="slot-titel">${escapeHtml(titel)}</p>
+        <p class="slot-titel">${escapeHtml(eintrag)}</p>
         <footer><span>wird aus Ihren Google-Bewertungen übernommen</span></footer>
-      </div>`,
-        )
-        .join("")
-    : stimmen
-        .map(
-          ({ text, autor, wann }) => `
-      <blockquote class="stimme">
+      </div>`;
+  }
+  const { text, autor, wann } = eintrag;
+  return `
+      <blockquote class="stimme${featured ? " featured" : ""}">
         <span class="sterne" aria-hidden="true">★★★★★</span>
         <p>${escapeHtml(text)}</p>
         <footer><strong>${escapeHtml(autor)}</strong><span>${escapeHtml(wann)}</span></footer>
-      </blockquote>`,
-        )
-        .join("");
+      </blockquote>`;
+}
 
-  const note = lead.rating
+function renderStimmen(cuisine, lead, fiktiv, social = DEFAULT_PRESET.social) {
+  const { stimmen, slots, platzhalter } = stimmenFuer(cuisine, { fiktiv });
+  const eintraege = platzhalter ? slots : stimmen;
+  const layout = social.layout ?? "grid";
+
+  let karten;
+  let gridClass = "stimmen-grid";
+  if (layout === "carousel") {
+    gridClass = "stimmen-grid carousel";
+    karten = eintraege.map((eintrag) => stimmeKarte(eintrag, { platzhalter, featured: false })).join("");
+  } else if (layout === "featured_quote" && eintraege.length > 0) {
+    gridClass = "stimmen-grid featured";
+    const [erste, ...rest] = eintraege;
+    karten =
+      stimmeKarte(erste, { platzhalter, featured: true }) +
+      `<div class="stimmen-rest">${rest.map((eintrag) => stimmeKarte(eintrag, { platzhalter, featured: false })).join("")}</div>`;
+  } else {
+    karten = eintraege.map((eintrag) => stimmeKarte(eintrag, { platzhalter, featured: false })).join("");
+  }
+
+  const note = social.includeRatingStrip && lead.rating
     ? `<div class="stimmen-note">
          <span class="note">${String(lead.rating).replace(".", ",")}</span>
          <span class="sterne" aria-hidden="true">${"★".repeat(Math.round(Number(lead.rating)))}</span>
@@ -957,7 +1095,7 @@ function renderStimmen(cuisine, lead, fiktiv) {
         <h2>Was unsere Gäste sagen</h2>
       </div>
       ${note}
-      <div class="stimmen-grid">${karten}</div>
+      <div class="${gridClass}">${karten}</div>
       ${platzhalter ? `<p class="stimmen-erklaerung">${escapeHtml(PLATZHALTER_ERKLAERUNG)}</p>` : ""}
     </div>
   </section>`;
@@ -1000,6 +1138,7 @@ export function buildLandingPage(lead, options = {}) {
   const bildUrl = options.bildUrl ?? ((id, role) => `${assets}/${assetFileName(id, role)}`);
   const veroeffentlicht = options.veroeffentlicht ?? false;
   const fiktiv = options.fiktiv ?? false;
+  const preset = designPresets[gestaltung.cuisine] ?? DEFAULT_PRESET;
 
   const name = lead.name || "Ihr Restaurant";
   const ort = lead.ort || "";
@@ -1110,7 +1249,7 @@ ${
       <a href="#reservierung">Reservierung</a>
       <a href="#kontakt">Kontakt</a>
     </nav>
-    <a class="btn btn-primary" href="#reservierung">Tisch reservieren</a>
+    <a class="btn btn-primary" href="#reservierung">${escapeHtml(preset.header.ctaButton)}</a>
   </div>
 </header>
 
@@ -1126,9 +1265,26 @@ ${
     ${renderRating(lead)}
     <p class="hero-sub">${escapeHtml(schlagzeile)}</p>
     <div class="hero-actions">
-      <a class="btn btn-light" href="#karte">Zur Abholung bestellen</a>
-      <a class="btn btn-outline-light" href="#reservierung">Tisch reservieren</a>
+      <a class="btn btn-light" href="#karte">${escapeHtml(preset.hero.primaryAction)}</a>
+      <a class="btn btn-outline-light" href="#reservierung">${escapeHtml(preset.hero.secondaryAction)}</a>
     </div>
+    ${
+      preset.reservation.widgetVariant === "hero_widget"
+        ? `<form class="hero-res-widget" action="#reservierung" method="get">
+             <div class="field">
+               <label for="hero-res-datum">Datum</label>
+               <input type="date" id="hero-res-datum" name="datum" disabled>
+             </div>
+             <div class="field">
+               <label for="hero-res-personen">Personen</label>
+               <select id="hero-res-personen" disabled>
+                 <option>2 Personen</option>
+               </select>
+             </div>
+             <a class="btn btn-primary" href="#reservierung">Weiter</a>
+           </form>`
+        : ""
+    }
   </div>
 </section>
 
@@ -1170,7 +1326,7 @@ ${
       <h2>Unsere ganze Karte</h2>
       <p>Kategorie antippen zum Aufklappen. Jedes Gericht lässt sich direkt zur Abholung vorbestellen.</p>
     </div>
-    ${renderMenuAccordion(menu)}
+    ${renderMenu(menu, preset)}
   </div>
 </section>
 
@@ -1192,7 +1348,7 @@ ${
   </div>
 </section>
 
-${renderStimmen(gestaltung.cuisine, lead, fiktiv)}
+${renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social)}
 
 <section class="section reserve-section" id="reservierung">
   <div class="wrap">
@@ -1278,10 +1434,14 @@ ${renderStimmen(gestaltung.cuisine, lead, fiktiv)}
   <span id="fab-total">0,00 €</span>
 </button>
 
-<div class="mobilebar" id="mobilebar">
+${
+  preset.mobile.stickyActionBar
+    ? `<div class="mobilebar" id="mobilebar">
   <button class="btn btn-primary" id="bar-order" type="button">Bestellen</button>
   <a class="btn btn-ghost" href="#reservierung">Reservieren</a>
-</div>
+</div>`
+    : ""
+}
 
 <div class="overlay" id="overlay"></div>
 

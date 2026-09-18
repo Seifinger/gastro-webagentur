@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design-Konfigurator</title>
+<style>
+  :root { --bg:#f6f4f0; --surface:#fff; --ink:#1c1a17; --ink-soft:#6b655c; --line:#e2ddd3; --accent:#a3402b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
+  header { padding: 28px 24px 8px; }
+  header h1 { margin: 0 0 6px; font-size: 24px; }
+  header p { margin: 0; color: var(--ink-soft); font-size: 14px; max-width: 640px; }
+  main { display: grid; gap: 24px; grid-template-columns: 1fr; padding: 20px 24px 60px; max-width: 1100px; margin: 0 auto; }
+  @media (min-width: 900px) { main { grid-template-columns: 1fr 1fr; align-items: start; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
+  .panel h2 { font-size: 16px; margin: 0 0 16px; }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 14px 0 4px; }
+  label:first-of-type { margin-top: 0; }
+  select, input[type=text] {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
+    font-family: inherit; font-size: 14px; background: var(--bg); color: var(--ink);
+  }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .checkline { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+  .checkline input { width: auto; }
+  .checkline label { margin: 0; }
+  fieldset { border: 1px solid var(--line); border-radius: 10px; margin-top: 18px; padding: 12px 14px 16px; }
+  legend { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); padding: 0 6px; }
+  pre { background: #16151a; color: #d9e6c9; border-radius: 10px; padding: 18px; font-size: 12.5px; overflow-x: auto;
+        max-height: 70vh; line-height: 1.55; }
+  button { font-family: inherit; font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 999px;
+           border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  button.secondary { background: transparent; color: var(--accent); }
+  .actions { display: flex; gap: 10px; margin-top: 14px; }
+  .hint { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Design-Konfigurator</h1>
+  <p>
+    Reine Anzeige- und Bearbeitungsansicht der Design-Presets aus <code>src/designPresets.js</code>.
+    Änderungen wirken sich hier nicht automatisch auf den Generator aus – das JSON unten dient zum
+    Kopieren in die Datei. Diese Seite braucht keinen Build-Schritt.
+  </p>
+</header>
+<main>
+  <div class="panel">
+    <h2>Küche &amp; Preset</h2>
+    <label for="kueche">Küche</label>
+    <select id="kueche"></select>
+
+    <fieldset>
+      <legend>Hero</legend>
+      <label for="hero-primary">Primärer Button</label>
+      <input type="text" id="hero-primary">
+      <label for="hero-secondary">Sekundärer Button</label>
+      <input type="text" id="hero-secondary">
+    </fieldset>
+
+    <fieldset>
+      <legend>Header</legend>
+      <label for="header-cta">CTA-Text</label>
+      <input type="text" id="header-cta">
+      <div class="checkline"><input type="checkbox" id="header-sticky"><label for="header-sticky">Fixierter Header (sticky)</label></div>
+      <div class="checkline"><input type="checkbox" id="header-phone"><label for="header-phone">Telefonnummer sichtbar</label></div>
+      <div class="checkline"><input type="checkbox" id="header-trust"><label for="header-trust">USP-Leiste (trust strip)</label></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Speisekarte</legend>
+      <label for="menu-layout">Layout</label>
+      <select id="menu-layout">
+        <option value="list">Liste (Akkordeon)</option>
+        <option value="grid">Grid</option>
+        <option value="card">Karten</option>
+      </select>
+      <div class="checkline"><input type="checkbox" id="menu-badges"><label for="menu-badges">Vegetarisch-Badges anzeigen</label></div>
+      <div class="checkline"><input type="checkbox" id="menu-beliebt"><label for="menu-beliebt">"Beliebt"-Badge je Kategorie</label></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Reservierung</legend>
+      <label for="res-variant">Widget-Variante</label>
+      <select id="res-variant">
+        <option value="inline">Inline-Formular</option>
+        <option value="hero_widget">Kompakt im Hero</option>
+        <option value="external_link">Externes System</option>
+      </select>
+      <label for="res-external">Externes System (optional)</label>
+      <input type="text" id="res-external" placeholder="z. B. OpenTable-Link">
+    </fieldset>
+
+    <fieldset>
+      <legend>Bestellung</legend>
+      <div class="checkline"><input type="checkbox" id="ord-enabled"><label for="ord-enabled">Vorbestellung aktiv</label></div>
+      <label for="ord-mode">Modus</label>
+      <select id="ord-mode">
+        <option value="pickup">Abholung</option>
+        <option value="delivery">Lieferung</option>
+      </select>
+    </fieldset>
+
+    <fieldset>
+      <legend>Social Proof</legend>
+      <label for="social-layout">Layout</label>
+      <select id="social-layout">
+        <option value="grid">Grid</option>
+        <option value="carousel">Karussell</option>
+        <option value="featured_quote">Hervorgehobenes Zitat</option>
+      </select>
+      <div class="checkline"><input type="checkbox" id="social-rating"><label for="social-rating">Google-Bewertungszeile anzeigen</label></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Mobil</legend>
+      <div class="checkline"><input type="checkbox" id="mobile-bar"><label for="mobile-bar">Feste Aktionsleiste anzeigen</label></div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" id="reset-btn" class="secondary">Zurücksetzen</button>
+    </div>
+    <p class="hint">Der Build übernimmt das JSON rechts nicht automatisch – bitte manuell in <code>src/designPresets.js</code> einfügen.</p>
+  </div>
+
+  <div class="panel">
+    <h2>JSON-Vorschau</h2>
+    <pre id="preview"></pre>
+    <div class="actions">
+      <button type="button" id="copy-btn">In Zwischenablage kopieren</button>
+    </div>
+  </div>
+</main>
+
+<script>
+// Eigenständige Kopie der Preset-Daten: der schlichte HTTP-Server unter
+// dashboardServer.js liefert keinen statischen Zugriff auf src/, ein
+// ESM-Import von dort wäre hier also brüchig. Diese Seite bleibt bewusst
+// build-frei, daher die duplizierten Werte – bei Änderungen an
+// src/designPresets.js bitte hier synchron halten.
+const DEFAULT_PRESET = {
+  hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+  header: { sticky: true, ctaButton: "Tisch reservieren", phoneVisible: true, trustStrip: true },
+  layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
+  menu: { layout: "list", showBadges: true, highlightMostLoved: false },
+  reservation: { widgetVariant: "inline", externalSystem: null },
+  ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+  social: { layout: "grid", includeRatingStrip: true },
+  mobile: { stickyActionBar: true },
+};
+
+const designPresets = {
+  bayerisch: DEFAULT_PRESET,
+  italienisch: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Tavolo reservieren", phoneVisible: true, trustStrip: true },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
+    menu: { layout: "list", showBadges: true, highlightMostLoved: true },
+    reservation: { widgetVariant: "hero_widget", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "carousel", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+  asiatisch: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Tisch reservieren", phoneVisible: true, trustStrip: true },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
+    menu: { layout: "card", showBadges: true, highlightMostLoved: true },
+    reservation: { widgetVariant: "inline", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "carousel", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+  chinesisch: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Tisch reservieren", phoneVisible: true, trustStrip: true },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
+    menu: { layout: "card", showBadges: true, highlightMostLoved: true },
+    reservation: { widgetVariant: "hero_widget", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "grid", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+  thailaendisch: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Tisch reservieren", phoneVisible: true, trustStrip: true },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
+    menu: { layout: "grid", showBadges: true, highlightMostLoved: true },
+    reservation: { widgetVariant: "inline", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "carousel", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+  vietnamesisch: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Tisch reservieren", phoneVisible: true, trustStrip: true },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
+    menu: { layout: "grid", showBadges: true, highlightMostLoved: false },
+    reservation: { widgetVariant: "inline", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "grid", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+  tuerkisch: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Tisch reservieren", phoneVisible: true, trustStrip: true },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
+    menu: { layout: "grid", showBadges: true, highlightMostLoved: true },
+    reservation: { widgetVariant: "inline", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "grid", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+  griechisch: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Tisch reservieren", phoneVisible: true, trustStrip: true },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
+    menu: { layout: "card", showBadges: true, highlightMostLoved: true },
+    reservation: { widgetVariant: "hero_widget", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "carousel", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+  japanisch: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Omakase reservieren", phoneVisible: true, trustStrip: false },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "reduziert" },
+    menu: { layout: "list", showBadges: false, highlightMostLoved: true },
+    reservation: { widgetVariant: "hero_widget", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "featured_quote", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+  indisch: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Tisch reservieren", phoneVisible: true, trustStrip: false },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "reduziert" },
+    menu: { layout: "list", showBadges: true, highlightMostLoved: true },
+    reservation: { widgetVariant: "inline", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "featured_quote", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+  syrisch: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Tisch reservieren", phoneVisible: true, trustStrip: true },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
+    menu: { layout: "grid", showBadges: true, highlightMostLoved: false },
+    reservation: { widgetVariant: "inline", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "grid", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+  cafe: {
+    hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
+    header: { sticky: true, ctaButton: "Platz reservieren", phoneVisible: true, trustStrip: true },
+    layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
+    menu: { layout: "grid", showBadges: false, highlightMostLoved: false },
+    reservation: { widgetVariant: "inline", externalSystem: null },
+    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    social: { layout: "grid", includeRatingStrip: true },
+    mobile: { stickyActionBar: true },
+  },
+};
+
+const kuecheSelect = document.getElementById("kueche");
+Object.keys(designPresets).forEach((kueche) => {
+  const opt = document.createElement("option");
+  opt.value = kueche;
+  opt.textContent = kueche;
+  kuecheSelect.appendChild(opt);
+});
+
+const fields = {
+  heroPrimary: document.getElementById("hero-primary"),
+  heroSecondary: document.getElementById("hero-secondary"),
+  headerCta: document.getElementById("header-cta"),
+  headerSticky: document.getElementById("header-sticky"),
+  headerPhone: document.getElementById("header-phone"),
+  headerTrust: document.getElementById("header-trust"),
+  menuLayout: document.getElementById("menu-layout"),
+  menuBadges: document.getElementById("menu-badges"),
+  menuBeliebt: document.getElementById("menu-beliebt"),
+  resVariant: document.getElementById("res-variant"),
+  resExternal: document.getElementById("res-external"),
+  ordEnabled: document.getElementById("ord-enabled"),
+  ordMode: document.getElementById("ord-mode"),
+  socialLayout: document.getElementById("social-layout"),
+  socialRating: document.getElementById("social-rating"),
+  mobileBar: document.getElementById("mobile-bar"),
+};
+
+let current = null;
+
+function loadPreset(kueche) {
+  const preset = designPresets[kueche] ?? DEFAULT_PRESET;
+  current = JSON.parse(JSON.stringify(preset));
+  fillForm();
+  updatePreview();
+}
+
+function fillForm() {
+  fields.heroPrimary.value = current.hero.primaryAction;
+  fields.heroSecondary.value = current.hero.secondaryAction;
+  fields.headerCta.value = current.header.ctaButton;
+  fields.headerSticky.checked = current.header.sticky;
+  fields.headerPhone.checked = current.header.phoneVisible;
+  fields.headerTrust.checked = current.header.trustStrip;
+  fields.menuLayout.value = current.menu.layout;
+  fields.menuBadges.checked = current.menu.showBadges;
+  fields.menuBeliebt.checked = current.menu.highlightMostLoved;
+  fields.resVariant.value = current.reservation.widgetVariant;
+  fields.resExternal.value = current.reservation.externalSystem ?? "";
+  fields.ordEnabled.checked = current.ordering.enabled;
+  fields.ordMode.value = current.ordering.mode;
+  fields.socialLayout.value = current.social.layout;
+  fields.socialRating.checked = current.social.includeRatingStrip;
+  fields.mobileBar.checked = current.mobile.stickyActionBar;
+}
+
+function readForm() {
+  current.hero.primaryAction = fields.heroPrimary.value;
+  current.hero.secondaryAction = fields.heroSecondary.value;
+  current.header.ctaButton = fields.headerCta.value;
+  current.header.sticky = fields.headerSticky.checked;
+  current.header.phoneVisible = fields.headerPhone.checked;
+  current.header.trustStrip = fields.headerTrust.checked;
+  current.menu.layout = fields.menuLayout.value;
+  current.menu.showBadges = fields.menuBadges.checked;
+  current.menu.highlightMostLoved = fields.menuBeliebt.checked;
+  current.reservation.widgetVariant = fields.resVariant.value;
+  current.reservation.externalSystem = fields.resExternal.value || null;
+  current.ordering.enabled = fields.ordEnabled.checked;
+  current.ordering.mode = fields.ordMode.value;
+  current.social.layout = fields.socialLayout.value;
+  current.social.includeRatingStrip = fields.socialRating.checked;
+  current.mobile.stickyActionBar = fields.mobileBar.checked;
+}
+
+function updatePreview() {
+  const entry = { [kuecheSelect.value]: current };
+  document.getElementById("preview").textContent = JSON.stringify(entry, null, 2);
+}
+
+Object.values(fields).forEach((el) => {
+  el.addEventListener("input", () => { readForm(); updatePreview(); });
+});
+
+kuecheSelect.addEventListener("change", () => loadPreset(kuecheSelect.value));
+
+document.getElementById("reset-btn").addEventListener("click", () => loadPreset(kuecheSelect.value));
+
+document.getElementById("copy-btn").addEventListener("click", () => {
+  const text = document.getElementById("preview").textContent;
+  navigator.clipboard?.writeText(text).catch(() => {});
+});
+
+loadPreset(kuecheSelect.value);
+</script>
+</body>
+</html>
