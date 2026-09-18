@@ -10,13 +10,12 @@
 // 3. Wer Bewegung abgestellt hat, bekommt keine. "prefers-reduced-motion" ist
 //    kein Sonderfall, sondern eine Ansage.
 
-// Einmal definiert, zweimal verwendet (siehe unten): einerseits unter der
-// echten Media Query für Besucher mit Systemeinstellung, andererseits unter
-// der Klasse .bewegung-aus für die Verkaufsdemo (?bewegung=aus).
+// Die Hero-Fahrt und die Verbindungslinien hängen an keiner .bewegt-Klasse,
+// sondern laufen unabhängig davon. Diese Regeln braucht es deshalb unter
+// beiden Auslösern (siehe unten) – der echten Media Query für Besucher mit
+// Systemeinstellung und der Klasse .bewegung-aus für die Verkaufsdemo
+// (?bewegung=aus).
 const MOTION_REDUZIERT_REGELN = `
-  .bewegt .auftritt,
-  .bewegt .auftritt-karte,
-  .bewegt .usp-list span { opacity: 1; transform: none; transition: none; }
   .hero-media img { animation: none; }
   .step:not(:last-child)::after,
   .section-head .eyebrow::after { transform: scaleX(1); transition: none; }
@@ -110,16 +109,17 @@ export const MOTION_CSS = `
 
 /* --- Wer keine Bewegung will, bekommt keine ----------------------------- */
 @media (prefers-reduced-motion: reduce) {
+  .bewegt .auftritt,
+  .bewegt .auftritt-karte,
+  .bewegt .usp-list span { opacity: 1; transform: none; transition: none; }
   ${MOTION_REDUZIERT_REGELN}
 }
 
-/* Für die Verkaufsdemo: der URL-Parameter ?bewegung=aus (siehe MOTION_SCRIPT)
-   soll die Seite exakt so ruhigstellen wie prefers-reduced-motion – nicht
-   nur ähnlich. Statt die Regeln oben zu wiederholen, verschachtelt natives
-   CSS-Nesting denselben Block einfach unter der Klasse, die das Skript bei
-   erkanntem Parameter setzt. (Die .bewegt-Selektoren darin greifen hier nie
-   – .bewegt wird bei ?bewegung=aus gar nicht erst gesetzt –, sie stehen aber
-   für exakte Gleichheit mit dem reduced-motion-Block trotzdem mit drin.) */
+/* Für die Verkaufsdemo: derselbe Regelblock wie oben, unter der Klasse
+   verschachtelt (natives CSS-Nesting), die MOTION_SCRIPT bei ?bewegung=aus
+   setzt – statt die Selektoren ein zweites Mal auszuschreiben. Die drei
+   .bewegt-Selektoren oben fehlen hier bewusst: .bewegt wird bei
+   ?bewegung=aus gar nicht erst gesetzt, sie liefen also ohnehin ins Leere. */
 .bewegung-aus {
   ${MOTION_REDUZIERT_REGELN}
 }
