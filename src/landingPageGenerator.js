@@ -10,6 +10,7 @@ import { SIGNATUR_CSS } from "./heroSignature.js";
 import { MOTION_CSS, MOTION_SCRIPT, MOTION_EXTRA_CSS, MOTION_EXTRA_SKRIPT } from "./motion.js";
 import { EDITORIAL_CSS, TYPOGRAFIE_CSS } from "./styles/editorial.css.js";
 import { resonanzSkript } from "./resonanzBeacon.js";
+import { engineMarkerMeta } from "./engineVersion.js";
 import { getPresetVariant, withDesignDefaults, presetFuerArchetyp } from "./designPresets.js";
 import { escapeHtml, jsonForScript, optionList } from "./htmlHelpers.js";
 import { renderHeader } from "./sections/header.js";
@@ -969,7 +970,8 @@ export function buildLandingPage(lead, options = {}) {
 <title>${escapeHtml(name)}${ort ? ` – ${escapeHtml(menu.konzept ?? "Restaurant")} in ${escapeHtml(ort)}` : ""}</title>
 <meta name="description" content="${escapeHtml(`${name}${ort ? ` in ${ort}` : ""}: ${menu.konzept ?? menu.label}. ${schlagzeile} Jetzt Tisch reservieren oder zur Abholung vorbestellen.`)}">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
-${veroeffentlicht ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<style>
+${veroeffentlicht ? '<meta name="robots" content="noindex, nofollow">\n' : ""}${engineMarkerMeta({ archetyp: gestaltung.archetyp })}
+<style>
 ${fontCss}
 :root {
   --bg: ${t.bg};

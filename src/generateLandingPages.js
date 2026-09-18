@@ -1,9 +1,10 @@
-import { mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { mkdirSync, writeFileSync, readdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { landingPagesDir } from "./config.js";
 import { escapeHtml } from "./landingPageGenerator.js";
 import { assetFileName } from "./imageLibrary.js";
 import { loadLeadEdits } from "./leadEdits.js";
+import { merkeEntwuerfe, merkeEntwurf } from "./entwurfsManifest.js";
 import {
   parseArgs,
   pruefeKueche,
@@ -123,16 +124,7 @@ async function run() {
 
     // Nur den einen Eintrag im Manifest aktualisieren – die Zuordnung der
     // übrigen Leads bleibt unverändert erhalten.
-    const manifestPath = path.join(landingPagesDir, "entwuerfe.json");
-    let manifest = {};
-    try {
-      manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
-    } catch {
-      // Erster Lauf überhaupt, oder Manifest noch nicht vorhanden – ein
-      // leeres Manifest ist dann der richtige Ausgangspunkt.
-    }
-    if (lead.placeId) manifest[lead.placeId] = entry.slug;
-    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf-8");
+    merkeEntwurf(lead.placeId, entry.slug);
 
     console.log(`\n✅ Entwurf "${entry.slug}" neu gebaut.`);
     console.log(`   Ordner: ${path.join(landingPagesDir, entry.slug)}\n`);
@@ -179,15 +171,10 @@ async function run() {
   writeFileSync(overviewPath, buildOverviewPage(entries), "utf-8");
 
   // Zuordnung placeId -> Ordnername, damit das Dashboard den passenden
-  // Entwurf verlinken kann (Ordnernamen können durchnummeriert sein).
-  const manifest = Object.fromEntries(
-    entries.filter(({ lead }) => lead.placeId).map(({ lead, slug }) => [lead.placeId, slug]),
-  );
-  writeFileSync(
-    path.join(landingPagesDir, "entwuerfe.json"),
-    `${JSON.stringify(manifest, null, 2)}\n`,
-    "utf-8",
-  );
+  // Entwurf verlinken kann (Ordnernamen können durchnummeriert sein). Der
+  // festgehaltene Veröffentlichungsstand (Engine-Fassung, Datum) bleibt dabei
+  // erhalten – dieser Lauf baut nur die lokale Vorschau, nicht docs/.
+  merkeEntwuerfe(entries.map(({ lead, slug }) => ({ placeId: lead.placeId, slug })));
 
   console.log(`\n✅ ${entries.length} Landing-Page-Entwürfe erstellt.`);
   console.log(`   Übersicht: ${overviewPath}`);

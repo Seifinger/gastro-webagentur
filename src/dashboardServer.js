@@ -45,12 +45,12 @@ import { veroeffentlicheEntwurf } from "./veroeffentlichung.js";
 import { resonanzUebersicht } from "./resonanzStore.js";
 import { ladeStimmungsWahl, speichereStimmung, stimmungFuerLead } from "./stimmungsWahl.js";
 import { stimmungenFuer } from "./stimmungen.js";
+import { ladeManifest, slugFuerPlaceId, placeIdFuerSlug } from "./entwurfsManifest.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
 const dashboardHtmlPath = path.join(publicDir, "dashboard.html");
 const bearbeitenHtmlPath = path.join(publicDir, "bearbeiten.html");
-const manifestPath = path.join(landingPagesDir, "entwuerfe.json");
 
 const ENTWURF_PREFIX = "/entwuerfe/";
 const UPLOAD_PREFIX = "/uploads/";
@@ -95,11 +95,7 @@ const port = parsePort(process.argv.slice(2));
  * frisches "npm run pages" ohne Serverneustart sichtbar wird.
  */
 function readManifest() {
-  try {
-    return JSON.parse(readFileSync(manifestPath, "utf-8"));
-  } catch {
-    return {};
-  }
+  return ladeManifest();
 }
 
 function leadsMitZusatz() {
@@ -109,7 +105,7 @@ function leadsMitZusatz() {
 
   return readAllLeads()
     .map((lead) => {
-      const slug = manifest[lead.placeId];
+      const slug = slugFuerPlaceId(manifest, lead.placeId);
       const demoUrl = slug ? `${siteBaseUrl}/${slug}/` : "";
       // Ein Entwurf ist erst dann per QR-Code erreichbar, wenn er auch im
       // veröffentlichten Ordner liegt. Sonst schickt der QR den Wirt auf
@@ -205,7 +201,7 @@ function bildPlaetze() {
  */
 function findeLeadFuerSlug(slug) {
   const manifest = readManifest();
-  const placeId = Object.keys(manifest).find((id) => manifest[id] === slug);
+  const placeId = placeIdFuerSlug(manifest, slug);
   const lead = placeId ? readAllLeads().find((l) => l.placeId === placeId) : null;
   if (!lead) return null;
 

@@ -155,7 +155,29 @@ Die Seiten landen unter `data/landingpages/`. Es gibt zwei Wege, sie anzusehen:
 - **Über das Dashboard** (empfohlen): `npm run dashboard` starten und in der Spalte „Entwurf" auf „ansehen" klicken. Der Server liefert die Entwürfe unter `/entwuerfe/` gleich mit aus.
 - **Direkt im Dateisystem**: `data/landingpages/index.html` im Browser öffnen – eine Übersicht mit Vorschaubildern, von dort geht es zu jedem einzelnen Entwurf.
 
-Welcher Lead zu welchem Entwurf gehört, hält der Generator in `data/landingpages/entwuerfe.json` fest; das Dashboard liest diese Datei bei jedem Aufruf neu. Nach einem neuen `npm run pages` genügt es also, die Dashboard-Seite neu zu laden.
+Welcher Lead zu welchem Entwurf gehört, hält der Generator in `data/landingpages/entwuerfe.json` fest; das Dashboard liest diese Datei bei jedem Aufruf neu. Nach einem neuen `npm run pages` genügt es also, die Dashboard-Seite neu zu laden. Am selben Eintrag hängt außerdem, mit welcher Engine-Fassung der Entwurf zuletzt wirklich *veröffentlicht* wurde (siehe unten).
+
+### Welche Kundenseite steht noch auf dem alten Stand?
+
+```bash
+npm run engine-status
+```
+
+Jede erzeugte Seite trägt seit dem Umbau der Template-Engine einen Marker im
+`<head>` (`<meta name="engine-version" content="2">` plus den Archetyp). Seiten
+unter `docs/`, die vor dem Umbau veröffentlicht wurden, haben ihn nicht – sie
+zählen als Fassung 1. `npm run engine-status` listet alle veröffentlichten
+Ordner mit Fassung, Archetyp und Datum der letzten Veröffentlichung und nennt
+für die alten gleich den passenden Vorschau-Befehl.
+
+Wichtig: Das ist eine reine Buchführung, kein zweiter Renderpfad. Die drei
+Archetypen `traditionell`/`abend`/`hell` erzeugen nach dem Umbau bis aufs
+Zeichen dieselbe Seite wie vorher; alles Neue (Magazin-Raster, größere
+Typografie, zusätzliche Bewegung, der kräftigere `accentBold`) hängt an einem
+Preset, das es ausdrücklich anfordert, und die automatische Stimmungswahl
+zieht weiterhin nur aus den drei Grund-Archetypen. Ein Sammel-Lauf stellt also
+niemanden um – trotzdem gilt für den Übergang: lieber einzeln mit
+`--only <slug>` veröffentlichen, nach einem Blick in `npm run preview`.
 
 Optionen:
 ```bash
