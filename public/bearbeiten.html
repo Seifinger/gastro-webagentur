@@ -232,6 +232,36 @@ function zeigeHinweis(text) {
   box._timer = setTimeout(() => box.classList.remove("sichtbar"), 4000);
 }
 
+/* ---------- Zugriffsschutz: Dashboard-Token ---------- */
+
+// Fragt den Token einmalig ab (Wert "null" in localStorage bedeutet "noch nie
+// gefragt", ein leerer String bedeutet "bewusst leer gelassen, kein Schutz
+// konfiguriert"). Zusätzlich zum Header landet er als Cookie – das iframe mit
+// der Textvorschau lädt per GET-Navigation und kann keinen eigenen Header
+// setzen, das Cookie geht bei einer Navigation zur selben Origin aber mit.
+function dashboardToken() {
+  let token = localStorage.getItem("dashboardToken");
+  if (token === null) {
+    token = (window.prompt(
+      "Dashboard-Token (siehe DASHBOARD_TOKEN in der .env) – falls keiner gesetzt ist, einfach leer lassen:",
+    ) || "").trim();
+    localStorage.setItem("dashboardToken", token);
+  }
+  if (token) document.cookie = `dashboard_token=${encodeURIComponent(token)}; path=/; SameSite=Lax`;
+  return token;
+}
+
+async function geschuetzterFetch(url, optionen = {}) {
+  const antwort = await fetch(url, {
+    ...optionen,
+    headers: { ...(optionen.headers ?? {}), "X-Dashboard-Token": dashboardToken() },
+  });
+  if (antwort.status === 401) localStorage.removeItem("dashboardToken");
+  return antwort;
+}
+
+dashboardToken();
+
 function platzKarte(platz) {
   const vorschau = platz.aktuell
     ? `<img src="${esc(platz.aktuell)}" alt="Aktuelles Bild: ${esc(platz.titel)}">`
@@ -293,7 +323,7 @@ async function ladeHoch(karte, datei) {
     formular.set("rolle", rolle);
     formular.set("datei", blob, `${rolle}.jpg`);
 
-    const antwort = await fetch(`/intern/lead/${encodeURIComponent(slug)}/bild`, {
+    const antwort = await geschuetzterFetch(`/intern/lead/${encodeURIComponent(slug)}/bild`, {
       method: "POST",
       body: formular,
     });
@@ -390,7 +420,7 @@ document.getElementById("prompt-generieren").addEventListener("click", async () 
   schliesseVorschau();
 
   try {
-    const antwort = await fetch(`/intern/lead/${encodeURIComponent(slug)}/prompt`, {
+    const antwort = await geschuetzterFetch(`/intern/lead/${encodeURIComponent(slug)}/prompt`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ wunsch }),
@@ -418,7 +448,7 @@ document.getElementById("prompt-uebernehmen").addEventListener("click", async ()
 
   knopf.setAttribute("disabled", "disabled");
   try {
-    const antwort = await fetch(`/intern/lead/${encodeURIComponent(slug)}/prompt/uebernehmen`, { method: "POST" });
+    const antwort = await geschuetzterFetch(`/intern/lead/${encodeURIComponent(slug)}/prompt/uebernehmen`, { method: "POST" });
     const ergebnis = await antwort.json();
     if (!antwort.ok || !ergebnis.ok) throw new Error(ergebnis.fehler ?? "Übernehmen fehlgeschlagen.");
 
@@ -437,7 +467,7 @@ document.getElementById("prompt-uebernehmen").addEventListener("click", async ()
 
 document.getElementById("prompt-verwerfen").addEventListener("click", async () => {
   try {
-    await fetch(`/intern/lead/${encodeURIComponent(slug)}/prompt/verwerfen`, { method: "POST" });
+    await geschuetzterFetch(`/intern/lead/${encodeURIComponent(slug)}/prompt/verwerfen`, { method: "POST" });
   } catch {
     // Verwerfen ist reine Aufräumarbeit – schlägt der Aufruf fehl, bleibt der
     // Vorschlag serverseitig einfach ungenutzt liegen, bis der nächste ihn ersetzt.
@@ -461,7 +491,7 @@ document.getElementById("veroeffentlichen-knopf").addEventListener("click", asyn
   linkBox.innerHTML = "";
 
   try {
-    const antwort = await fetch(`/intern/lead/${encodeURIComponent(slug)}/veroeffentlichen`, { method: "POST" });
+    const antwort = await geschuetzterFetch(`/intern/lead/${encodeURIComponent(slug)}/veroeffentlichen`, { method: "POST" });
     const ergebnis = await antwort.json();
     if (!antwort.ok || !ergebnis.ok) throw new Error(ergebnis.fehler ?? "Veröffentlichen fehlgeschlagen.");
 
