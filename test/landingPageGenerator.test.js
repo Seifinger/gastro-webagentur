@@ -427,6 +427,26 @@ test("Thailändisch bekommt die aufblühende Orchidee als eigene Signatur", () =
   assert.ok(!html.includes('class="sig sig-diashow"'));
 });
 
+test("Syrisch bekommt den eingegossenen Minztee als eigene Signatur", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.syrisch,
+    gestaltung: themeForLead(lead, "syrisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-tea-form"'));
+  assert.ok(!html.includes('class="sig sig-spiess"'));
+});
+
+test("Türkisch behält den Drehspieß unverändert als Signatur", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.tuerkisch,
+    gestaltung: themeForLead(lead, "tuerkisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-spiess"'));
+  assert.ok(!html.includes('class="sig sig-tea-form"'));
+});
+
 test("Indisch bekommt das aufplatzende Gewürzwölkchen als eigene Signatur", () => {
   const html = buildLandingPage(lead, {
     menu: MENUS.indisch,
