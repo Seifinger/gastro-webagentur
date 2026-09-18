@@ -7,6 +7,28 @@ import { assetFileName } from "./imageLibrary.js";
 // Vorbild ist die gegenläufig drehende Pizza bei L'Osteria. Zurückhaltung ist
 // dabei Absicht: das Element schmückt den Hero, es überlagert ihn nicht.
 
+// Einmal definiert, zweimal verwendet (siehe Ende von SIGNATUR_CSS):
+// einerseits unter der echten Media Query für Besucher mit
+// Systemeinstellung, andererseits unter der Klasse .bewegung-aus, die
+// motion.js bei ?bewegung=aus setzt (Verkaufsdemo, siehe motion.js).
+const SIGNATUR_REDUZIERT_REGELN = `
+  .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
+  .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i,
+  .sig-drehteller .teller, .sig-drehteller img,
+  .sig-schale img, .sig-schale .dampf i { animation: none; }
+  .sig-tafel .karte:first-child, .sig-diashow img:first-child { opacity: 1; }
+  .bewegt .sig-orchid .bluete, .bewegt .sig-orchid.da .bluete {
+    opacity: 1; transform: none; transition: none;
+  }
+  .bewegt .sig-spice .puff, .bewegt .sig-spice.da .puff,
+  .bewegt .sig-spice .fleck, .bewegt .sig-spice.da .fleck {
+    opacity: 1; transform: none; animation: none;
+  }
+  .sig-lanterns .laterne { animation: none; }
+  .sig-lanterns .laterne .glow { animation: none; opacity: .6; }
+  .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
+`;
+
 const SIGNATUR_CSS = `
 .sig { position: absolute; z-index: 1; pointer-events: none; }
 
@@ -285,26 +307,22 @@ const SIGNATUR_CSS = `
 .sig-reservation-text { display: block; font-size: 15px; font-weight: 600; }
 @media (max-width: 899px) { .sig-reservation { display: none; } }
 
-/* Wer Bewegung im System abgestellt hat, bekommt das Standbild. */
+/* Wer Bewegung im System abgestellt hat, bekommt das Standbild. Bei einer
+   Umstellung mitten im Besuch (.bewegt bleibt gesetzt) darf z.B. die Blüte
+   nicht wieder verschwinden – deshalb hier dieselbe Spezifität wie die
+   .da-Regeln, aber als spätere Quelle. */
 @media (prefers-reduced-motion: reduce) {
-  .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
-  .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i,
-  .sig-drehteller .teller, .sig-drehteller img,
-  .sig-schale img, .sig-schale .dampf i { animation: none; }
-  .sig-tafel .karte:first-child, .sig-diashow img:first-child { opacity: 1; }
-  /* Auch bei einer Umstellung mitten im Besuch (.bewegt bleibt gesetzt) darf
-     die Blüte nicht wieder verschwinden – deshalb hier dieselbe Spezifität
-     wie die .da-Regel, aber als spätere Quelle. */
-  .bewegt .sig-orchid .bluete, .bewegt .sig-orchid.da .bluete {
-    opacity: 1; transform: none; transition: none;
-  }
-  .bewegt .sig-spice .puff, .bewegt .sig-spice.da .puff,
-  .bewegt .sig-spice .fleck, .bewegt .sig-spice.da .fleck {
-    opacity: 1; transform: none; animation: none;
-  }
-  .sig-lanterns .laterne { animation: none; }
-  .sig-lanterns .laterne .glow { animation: none; opacity: .6; }
-  .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
+  ${SIGNATUR_REDUZIERT_REGELN}
+}
+
+/* Für die Verkaufsdemo: derselbe Regelblock wie oben, nur unter der Klasse
+   verschachtelt (natives CSS-Nesting), die motion.js bei ?bewegung=aus
+   setzt, statt die Regeln zu wiederholen. Die .bewegt-Selektoren darin
+   greifen hier nie – .bewegt wird bei ?bewegung=aus gar nicht erst gesetzt
+   –, sie stehen für exakte Gleichheit mit dem reduced-motion-Block aber
+   trotzdem mit drin. */
+.bewegung-aus {
+  ${SIGNATUR_REDUZIERT_REGELN}
 }
 `;
 
