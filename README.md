@@ -138,6 +138,7 @@ Funktionen:
 - Filter nach Ort und Priorität, Suchfeld nach Name
 - Website-Spalte verlinkt direkt zur jeweiligen Seite
 - **Entwurf-Spalte** öffnet die generierte Landingpage des Restaurants (siehe nächster Abschnitt) – praktisch beim Termin: Lead heraussuchen, „ansehen" klicken, dem Wirt zeigen
+- **Resonanz-Spalte** zeigt, ob der Wirt den verschickten Entwurf geöffnet hat (nur mit eingerichtetem Collector, siehe „Resonanz" weiter unten)
 
 Das Dashboard liest beim Aufruf einfach die vorhandenen CSV-Dateien neu ein – lass es also nach einem neuen `npm start`-Lauf laufen, um aktuelle Daten zu sehen (Browser-Seite neu laden reicht, der Server muss nicht neu gestartet werden). Es braucht keinen API-Key und läuft komplett offline auf deinem Rechner.
 
@@ -315,6 +316,38 @@ Die Seiten tragen Namen und Adresse echter Lokale, die davon nichts wissen. Desh
 - Die öffentliche Übersicht zeigt **keine** Lead-Scores und Prioritäten.
 
 Die `robots.txt` liegt zwar mit im Ordner, wird auf `github.io` aber nur im Wurzelverzeichnis der Domain ausgewertet – die Absicherung leistet hier das `noindex` im Seitenkopf. Wenn ein Wirt möchte, dass sein Entwurf verschwindet, nimm ihn aus der Auswahl und pushe neu.
+
+## Resonanz: wurde der Entwurf überhaupt angesehen?
+
+Nach dem Verschicken weißt du sonst nicht, ob der Wirt den Link geöffnet hat – und das Anschreiben endet mit „komme ich diese Woche kurz bei Ihnen vorbei". Wer weiß, welche sechs von vierzig Wirten wirklich hineingeschaut haben, telefoniert nicht mehr kalt.
+
+Dafür gibt es einen kleinen Collector, den die veröffentlichten Entwürfe anfunken:
+
+```bash
+npm run resonanz
+```
+
+Damit die Entwürfe ihn kennen, muss seine öffentliche Adresse beim Bauen feststehen – entweder über `RESONANZ_URL` in der `.env` oder per Flag:
+
+```bash
+npm run publish-site -- --resonanz https://resonanz.deine-domain.de
+```
+
+Im Dashboard erscheint dann neben jedem Entwurf eine Spalte **Resonanz**: geöffnet, wann zuletzt, wie lange, und ob der Besucher bis zur Reservierungssektion gescrollt ist. Das letzte ist das stärkste Signal, das die Seite ohne Klick hergibt. Der Filter „nur geöffnete Entwürfe" macht daraus die Nachfassliste.
+
+### Was gemessen wird – und was bewusst nicht
+
+Gemessen wird die Reichweite eines Entwurfs, den du selbst gebaut und selbst verschickt hast, nicht eine Person. Gespeichert werden je Aufruf genau drei Dinge: Zeitpunkt, auf Zehnersekunden gerundete sichtbare Verweildauer, und ob die Reservierungssektion im Bild war.
+
+Nicht gespeichert werden IP-Adresse, User-Agent, Referer, Auflösung, Sprache oder Standort. Es gibt kein Cookie, keinen Dritt-Dienst und keine Wiedererkennung über mehrere Entwürfe oder Sitzungen hinweg. Die Besuchskennung lebt im `sessionStorage`, endet mit dem Tab und landet nie auf der Platte. Ein Test in `test/resonanzStore.test.js` sichert das ab.
+
+**„Nicht geöffnet" heißt nicht „nicht gelesen".** Adblocker und manche Mail-Programme verschlucken das Signal. Die Spalte taugt dazu, gute Gelegenheiten zu erkennen – nicht dazu, jemandem Desinteresse zu unterstellen.
+
+### Betrieb
+
+Der Collector muss vom Gerät des Wirts aus erreichbar sein, die Entwürfe liegen ja auf GitHub Pages. Er lauscht per Default nur auf `127.0.0.1`; für den echten Betrieb gehört ein Reverse Proxy mit TLS davor und `RESONANZ_HOST=0.0.0.0` gesetzt. Collector und Dashboard teilen sich nur das Verzeichnis `data/resonanz/` – das Dashboard liest bei jeder Anfrage frisch von der Platte.
+
+Ohne gesetzte `RESONANZ_URL` ist das Feature schlicht aus: Es wird kein Beacon eingebaut, und Spalte wie Filter bleiben im Dashboard weg. Die lokale Fassung (`npm run pages`) trägt grundsätzlich kein Beacon – sie ist deine eigene Vorschau. Aus demselben Grund hängt der Knopf „Entwurf öffnen" im Pitch-Fenster `?vorschau=1` an; der Link und die QR-Codes für den Wirt bleiben ohne den Parameter.
 
 ## Wirt-Dashboard: Tische, Reservierungen, Abholbestellungen
 
