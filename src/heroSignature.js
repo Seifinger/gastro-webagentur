@@ -160,6 +160,34 @@ const SIGNATUR_CSS = `
   .sig-schale { right: -6%; top: 12%; transform: none; width: 48vw; opacity: .55; }
 }
 
+/* Generische, küchenunabhängige Hero-Varianten – wählbar über das
+   Design-Preset-Modell (designPresets.js) für A/B-Tests, ohne die
+   küchenspezifischen Signaturen oben zu verändern. */
+.sig-dish { right: 5%; top: 50%; transform: translateY(-50%);
+            width: clamp(230px, 34vw, 400px); aspect-ratio: 4 / 5; border-radius: 22px;
+            overflow: hidden; opacity: .95; box-shadow: 0 30px 66px -28px rgba(0,0,0,.8); }
+.sig-dish img { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 899px) {
+  .sig-dish { right: -6%; top: 12%; transform: none; width: 46vw; opacity: .55; }
+}
+
+.sig-ambience { right: 4%; top: 50%; transform: translateY(-50%);
+                width: clamp(280px, 40vw, 460px); aspect-ratio: 16 / 11; border-radius: 18px;
+                overflow: hidden; opacity: .92; box-shadow: 0 30px 66px -28px rgba(0,0,0,.8); }
+.sig-ambience img { width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 899px) {
+  .sig-ambience { right: -10%; top: 12%; transform: none; width: 56vw; opacity: .5; }
+}
+
+.sig-reservation { right: 6%; top: 22%; }
+.sig-reservation-card { background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.35);
+                         backdrop-filter: blur(6px); border-radius: 14px; padding: 16px 20px;
+                         color: #fff; text-align: center; box-shadow: 0 20px 44px -20px rgba(0,0,0,.7); }
+.sig-reservation-kicker { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+                           letter-spacing: .14em; opacity: .75; margin-bottom: 4px; }
+.sig-reservation-text { display: block; font-size: 15px; font-weight: 600; }
+@media (max-width: 899px) { .sig-reservation { display: none; } }
+
 /* Wer Bewegung im System abgestellt hat, bekommt das Standbild. */
 @media (prefers-reduced-motion: reduce) {
   .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
@@ -277,6 +305,60 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
   }
 
   return "";
+}
+
+/**
+ * Generische, küchenunabhängige Hero-Varianten – nutzbar für A/B-Tests über
+ * das Design-Preset-Modell (siehe designPresets.js). Sie ergänzen die
+ * küchenspezifischen Signaturen oben, ersetzen sie aber nicht: Standard
+ * bleibt heroSignatur() (hero.type "signature").
+ */
+
+/**
+ * Ein einzelnes, großes Gerichtsfoto statt der bewegten Signatur – für Häuser,
+ * bei denen ein starkes Produktfoto mehr trägt als ein Bewegungseffekt.
+ */
+export function heroDishPhoto({ highlights = [], bildUrl, escape } = {}) {
+  const esc = escape ?? ((v) => String(v));
+  const gericht = highlights.find((g) => g.bild);
+  if (!gericht) return "";
+
+  const src = esc(bild(gericht.bild, "gericht", bildUrl));
+  return `
+    <div class="sig sig-dish" aria-hidden="true">
+      <img src="${src}" alt="">
+    </div>`;
+}
+
+/**
+ * Ein Ambiente-Foto (Außenansicht/Innenraum) statt Gericht oder Bewegung –
+ * für Häuser, die vor allem mit ihrem Raum oder ihrer Lage überzeugen.
+ */
+export function heroAmbiencePhoto({ hausBild, bildUrl, escape } = {}) {
+  const esc = escape ?? ((v) => String(v));
+  if (!hausBild) return "";
+
+  const src = esc(bild(hausBild, "ambiente", bildUrl));
+  return `
+    <div class="sig sig-ambience" aria-hidden="true">
+      <img src="${src}" alt="">
+    </div>`;
+}
+
+/**
+ * Ein schlichter Reservierungs-Teaser statt Bild – für Häuser, bei denen der
+ * reservierte Tisch (nicht die Abholung) im Vordergrund steht. Rein
+ * dekorativ, deshalb aria-hidden: der eigentliche, erreichbare Link zur
+ * Reservierung steht bereits in den Hero-Actions.
+ */
+export function heroReservationHero() {
+  return `
+    <div class="sig sig-reservation" aria-hidden="true">
+      <div class="sig-reservation-card">
+        <span class="sig-reservation-kicker">Tisch sichern</span>
+        <span class="sig-reservation-text">In 60 Sekunden reserviert</span>
+      </div>
+    </div>`;
 }
 
 export { SIGNATUR_CSS };
