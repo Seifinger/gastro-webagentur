@@ -7,7 +7,8 @@ import {
 import { HERO_IMAGES, INTERIOR_IMAGES, TEAM_IMAGES, assetFileName } from "./imageLibrary.js";
 import { resolveStimmung, stimmungenFuer, ARCHETYP_LABEL } from "./stimmungen.js";
 import { SIGNATUR_CSS } from "./heroSignature.js";
-import { MOTION_CSS, MOTION_SCRIPT } from "./motion.js";
+import { MOTION_CSS, MOTION_SCRIPT, MOTION_EXTRA_CSS, MOTION_EXTRA_SKRIPT } from "./motion.js";
+import { EDITORIAL_CSS, TYPOGRAFIE_CSS } from "./styles/editorial.css.js";
 import { resonanzSkript } from "./resonanzBeacon.js";
 import { getPresetVariant, withDesignDefaults, presetFuerArchetyp } from "./designPresets.js";
 import { escapeHtml, jsonForScript, optionList } from "./htmlHelpers.js";
@@ -943,6 +944,19 @@ export function buildLandingPage(lead, options = {}) {
   const kontaktZeilen = renderKontaktZeilen({ adresse, mapsUrl, telefon, telHref });
   const hoursRows = renderOeffnungszeiten(openingHours);
 
+  // Das Magazin-Raster und der Video-Hero sind opt-in. Nur wenn ein Preset sie
+  // anfordert, kommen der Editorial-Stil, die größere Schriftskala und der
+  // zusätzliche Bewegungsblock in die Seite. Für die drei bestehenden
+  // Archetypen bleibt die Ausgabe damit Zeichen für Zeichen dieselbe wie zuvor.
+  const asymmetrisch = preset.layout.gridStyle === "asymmetric";
+  const heroVideoSrc = eigeneBilder.heroVideo ?? lead.heroVideo ?? "";
+  const hatVideoHero = preset.hero.type === "video_loop" && Boolean(heroVideoSrc);
+  const brauchtExtraBewegung = asymmetrisch || preset.hero.type === "editorial" || hatVideoHero;
+  const typografieCss = TYPOGRAFIE_CSS[preset.typography?.scale ?? "standard"] ?? "";
+  const bodyKlassen = [veroeffentlicht ? "veroeffentlicht" : "", asymmetrisch ? "gitter-asymmetrisch" : ""]
+    .filter(Boolean)
+    .join(" ");
+
   const uspBadges = (menu.usps ?? [])
     .map((usp) => `<span><span aria-hidden="true">✓</span> ${escapeHtml(usp)}</span>`)
     .join("");
@@ -975,13 +989,17 @@ ${fontCss}
   --display-transform: ${t.displayTransform};
   --display-tracking: ${t.displayTracking};
   --radius: ${t.radius};
-}
+}${asymmetrisch ? `
+/* Der kräftigere Akzent aus colorMath.boldAccent – mindestens 4.5:1 gegen den
+   eigenen Grund. Er steht nur dort, wo er gebraucht wird: Die drei bestehenden
+   Archetypen arbeiten unverändert mit --accent. */
+:root { --accent-bold: ${t.accentBold ?? t.accent}; }` : ""}
 ${PAGE_STYLES}
 ${SIGNATUR_CSS}
-${MOTION_CSS}
+${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}
 </style>
 </head>
-<body${veroeffentlicht ? ' class="veroeffentlicht"' : ""}>
+<body${bodyKlassen ? ` class="${bodyKlassen}"` : ""}>
 
 ${
   veroeffentlicht
@@ -1000,6 +1018,7 @@ ${renderHero({
   name,
   ort,
   heroImageSrc: eigeneBilder.hero ?? bildUrl(gestaltung.heroImage, "hero"),
+  heroVideoSrc,
   konzeptLabel: menu.konzept ?? menu.label,
   heroHeadline,
   heroSchlagzeile,
@@ -1017,7 +1036,7 @@ ${(() => {
   // alles, was in der Vorgabe fehlt, wird in der bisherigen Reihenfolge
   // angehängt (das bisherige, feste Verhalten als Fallback).
   const sectionsById = {
-    highlights: renderHighlights({ highlights, bildUrl, showBadges: preset.menu.showBadges, beschreibungFuer, spalten }),
+    highlights: renderHighlights({ highlights, bildUrl, showBadges: preset.menu.showBadges, beschreibungFuer, spalten, gridStyle: preset.layout.gridStyle }),
 
     karte: renderMenu({ menu, menuLayout: preset.menu.layout, showBadges: preset.menu.showBadges, beschreibungFuer }),
 
@@ -1118,7 +1137,8 @@ ${renderFooter({ name, adresse, telefon })}
 
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${PAGE_SCRIPT}</script>
-<script>${MOTION_SCRIPT}</script>
+<script>${MOTION_SCRIPT}</script>${brauchtExtraBewegung ? `
+<script>${MOTION_EXTRA_SKRIPT}</script>` : ""}
 ${resonanzBeacon ? `<script>${resonanzBeacon}</script>` : ""}
 </body>
 </html>

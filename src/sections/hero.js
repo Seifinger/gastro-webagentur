@@ -49,6 +49,106 @@ export function renderRating(lead) {
 }
 
 /**
+ * Zerlegt eine Überschrift in Zeilen – serverseitig, nicht im Browser.
+ *
+ * Warum nicht zur Laufzeit: Wo eine Zeile umbricht, hängt an Schriftgröße und
+ * Fensterbreite. Ein Skript, das den Text im Browser zerlegt, muss dafür erst
+ * die Schrift abwarten, und bis dahin springt die Überschrift sichtbar. Hier
+ * steht der Umbruch stattdessen fest im Markup: Die Zeilen sind Blöcke, der
+ * Browser muss nichts messen, und ohne Skript steht die Überschrift ganz normal
+ * da – nur eben zeilenweise gesetzt.
+ *
+ * Die Wörter werden gleichmäßig auf höchstens `maxZeilen` Zeilen verteilt,
+ * damit aus einem langen Lokalnamen keine Treppe mit acht Stufen wird.
+ */
+export function zeilenAufteilen(text, maxZeilen = 3) {
+  const woerter = String(text ?? "").trim().split(/\s+/).filter(Boolean);
+  if (woerter.length === 0) return [];
+  const anzahl = Math.min(maxZeilen, woerter.length);
+  const proZeile = Math.ceil(woerter.length / anzahl);
+  const zeilen = [];
+  for (let i = 0; i < woerter.length; i += proZeile) {
+    zeilen.push(woerter.slice(i, i + proZeile).join(" "));
+  }
+  return zeilen;
+}
+
+/**
+ * Die Überschrift als gestaffelt auftretende Zeilen. Der Takt steht als
+ * CSS-Variable am Element – dieselbe Mechanik wie bei den bestehenden
+ * Auftritten, nur je Zeile statt je Karte (siehe MOTION_EXTRA_CSS).
+ */
+export function renderZeilenUeberschrift(text, { tag = "h1", maxZeilen = 3 } = {}) {
+  const zeilen = zeilenAufteilen(text, maxZeilen);
+  const inhalt = zeilen
+    .map((zeile, i) => `<span class="zeile" style="--takt:${i}">${escapeHtml(zeile)}</span>`)
+    .join("");
+  return `<${tag} class="zeilen auftritt-zeile">${inhalt}</${tag}>`;
+}
+
+/**
+ * Das Titelmedium des Heros. Mit hinterlegtem Video (hero.type "video_loop")
+ * läuft eine stumme Endlosschleife, sonst bleibt es beim Bild.
+ *
+ * Das Bild ist dabei nie weg: Es ist das `poster` des Videos – also das, was
+ * vor dem ersten Frame und bei abgestellter Bewegung zu sehen ist – und steht
+ * zusätzlich als `<img>` daneben, das die Regeln in MOTION_EXTRA_CSS bei
+ * prefers-reduced-motion einblenden. Ein Hero ohne Bild kann so nicht
+ * entstehen.
+ */
+export function renderHeroMedia({ heroImageSrc, heroVideoSrc, name }) {
+  if (!heroVideoSrc) {
+    return `<div class="hero-media">
+    <img src="${escapeHtml(heroImageSrc)}" alt="${escapeHtml(name)}">
+  </div>`;
+  }
+
+  return `<div class="hero-media">
+    <video class="hero-video" src="${escapeHtml(heroVideoSrc)}" poster="${escapeHtml(heroImageSrc)}"
+           autoplay muted loop playsinline preload="metadata" aria-label="${escapeHtml(name)}"></video>
+    <img class="hero-video-fallback" src="${escapeHtml(heroImageSrc)}" alt="${escapeHtml(name)}">
+  </div>`;
+}
+
+/**
+ * Der Editorial-Hero: Vollbild, die Überschrift zeilenweise groß gesetzt, die
+ * Kennziffern (Konzept, Bewertung) als Randspalte rechts. Layout dazu in
+ * styles/editorial.css.js.
+ */
+export function renderHeroEditorial(ctx) {
+  const { lead, preset, name, ort, heroImageSrc, heroVideoSrc, konzeptLabel, heroHeadline, heroSchlagzeile } = ctx;
+
+  // Dieselbe Darstellung wie renderRating: gefüllte und leere Sterne, damit
+  // aus 4,6 nicht optisch eine glatte Fünf wird.
+  const gerundet = Math.round(Number(lead.rating));
+  const sterne = "★".repeat(gerundet) + "☆".repeat(Math.max(0, 5 - gerundet));
+  const bewertung = lead.rating
+    ? `<div class="marginal-zeile"><span>Google</span><strong>${String(lead.rating).replace(".", ",")}/5</strong></div>
+      <div class="marginal-zeile"><span class="sterne" aria-hidden="true">${sterne}</span><span>${
+        lead.anzahlBewertungen ? `${formatCount(lead.anzahlBewertungen)} Bewertungen` : ""
+      }</span></div>`
+    : "";
+
+  return `<section class="hero hero-editorial">
+  ${renderHeroMedia({ heroImageSrc, heroVideoSrc, name })}
+  <div class="hero-overlay"></div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-kicker">${escapeHtml(konzeptLabel)}${ort ? ` · ${escapeHtml(ort)}` : ""}</div>
+      ${renderZeilenUeberschrift(heroHeadline)}
+      <p class="hero-sub">${escapeHtml(heroSchlagzeile)}</p>
+      <div class="hero-actions">${heroActionButtons(preset.hero.primaryAction)}</div>
+    </div>
+    <div class="hero-marginal">
+      <div class="marginal-zeile"><span>Haus</span><strong>${escapeHtml(konzeptLabel)}</strong></div>
+      ${ort ? `<div class="marginal-zeile"><span>Ort</span><strong>${escapeHtml(ort)}</strong></div>` : ""}
+      ${bewertung}
+    </div>
+  </div>
+</section>`;
+}
+
+/**
  * Der komplette Hero: Titelbild, Overlay, küchenspezifisches Feature
  * (renderHeroFeature) und der Textblock mit Konzept, Titel, Bewertung,
  * Schlagzeile und den beiden Haupt-CTAs.
@@ -68,12 +168,19 @@ export function renderRating(lead) {
  * @param {Function} ctx.bildUrl
  */
 export function renderHero(ctx) {
-  const { lead, preset, name, ort, heroImageSrc, konzeptLabel, heroHeadline, heroSchlagzeile, cuisine, highlights, hausBild, bildUrl } = ctx;
+  const { lead, preset, name, ort, heroImageSrc, heroVideoSrc, konzeptLabel, heroHeadline, heroSchlagzeile, cuisine, highlights, hausBild, bildUrl } = ctx;
+
+  // Der Editorial-Archetyp bringt einen eigenen Hero mit – große Typografie,
+  // asymmetrisches Raster. Alles andere läuft weiter durch den bisherigen.
+  if (preset.hero.type === "editorial") return renderHeroEditorial(ctx);
+
+  // Ein Video gibt es nur, wenn für diesen Lead wirklich eins hinterlegt ist
+  // (hero.type "video_loop" plus Datei). Fehlt eines von beidem, bleibt es beim
+  // bisherigen Bild-Hero – Zeichen für Zeichen derselbe wie zuvor.
+  const videoQuelle = preset.hero.type === "video_loop" ? heroVideoSrc : "";
 
   return `<section class="hero">
-  <div class="hero-media">
-    <img src="${escapeHtml(heroImageSrc)}" alt="${escapeHtml(name)}">
-  </div>
+  ${renderHeroMedia({ heroImageSrc, heroVideoSrc: videoQuelle, name })}
   <div class="hero-overlay"></div>
   ${renderHeroFeature(preset.hero.type, {
     cuisine,

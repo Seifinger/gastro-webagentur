@@ -29,6 +29,17 @@ const BASE_DEFAULT = {
   },
   layout: {
     sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"],
+    // "standard" ist das bisherige, gleichmäßige Raster. "asymmetric" ist das
+    // Magazin-Raster des Editorial-Archetyps (versetzte Spalten, Vollbild).
+    // Additiv: Wer das Feld nicht kennt, bekommt weiter das bisherige Raster.
+    gridStyle: "standard",
+  },
+  // Die Schriftgrößen-Stufe. Sie hängt am Archetyp, nicht an der Küche: Wie
+  // groß eine Überschrift auftritt, ist eine Frage der Haltung des Hauses,
+  // nicht seiner Speisekarte. "standard" ist exakt die bisherige Skala und
+  // gibt gar kein zusätzliches CSS aus.
+  typography: {
+    scale: "standard",
   },
   menu: {
     layout: "accordion",
@@ -60,6 +71,7 @@ export function withDesignDefaults(overrides = {}) {
     reservation: { ...BASE_DEFAULT.reservation, ...overrides.reservation },
     social: { ...BASE_DEFAULT.social, ...overrides.social },
     mobile: { ...BASE_DEFAULT.mobile, ...overrides.mobile },
+    typography: { ...BASE_DEFAULT.typography, ...overrides.typography },
   };
 }
 
@@ -164,6 +176,23 @@ export const ARCHETYP_PRESET = {
   hell: withDesignDefaults({
     header: { sticky: false },
     layout: { sectionOrder: ["karte", "highlights", "ambiente", "stimmen", "reservierung", "kontakt"] },
+  }),
+
+  // Das Magazin. Hier führt nicht die Bestellung, sondern das Bild: ein
+  // Vollbild-Hero mit zeilenweise auftretender Überschrift, danach die
+  // Highlights im versetzten Raster. Die Karte folgt direkt darauf – wer sich
+  // von einem Bild locken lässt, will als Nächstes wissen, was es gibt.
+  //
+  // Die Aktionsleiste unten und die feste Kopfzeile bleiben: Das Magazin ist
+  // eine Gestaltung, kein Verzicht auf den Bestellweg.
+  editorial: withDesignDefaults({
+    hero: { type: "editorial", primaryAction: "reservation" },
+    layout: {
+      gridStyle: "asymmetric",
+      sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"],
+    },
+    typography: { scale: "gross" },
+    social: { layout: "list" },
   }),
 };
 
