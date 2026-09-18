@@ -13,9 +13,16 @@ import {
 import { kuechenAuswahl } from "./menuCatalog.js";
 import { anschreiben } from "./outreach.js";
 import { ageInDays, isStale, isAgingSoon } from "./leadFreshness.js";
-import { FOTO_SLOTS, platzhalterBilder } from "./landingPageGenerator.js";
+import {
+  FOTO_SLOTS,
+  platzhalterBilder,
+  themeForLead,
+  ortsbezug,
+  buildLandingPage,
+} from "./landingPageGenerator.js";
 import { assetFileName } from "./imageLibrary.js";
-import { loadLeadEdits } from "./leadEdits.js";
+import { menuForCuisine, gerichtId } from "./menuCatalog.js";
+import { loadLeadEdits, saveLeadEdits } from "./leadEdits.js";
 import {
   BILD_ROLLEN,
   MAX_BYTES,
@@ -25,6 +32,7 @@ import {
   speichereLeadBild,
   uploadsDir,
 } from "./bildUpload.js";
+import { erzeugeTextVorschlag, letzterVorschlag, vergissVorschlag } from "./promptEdits.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -39,6 +47,10 @@ const UPLOAD_PREFIX = "/uploads/";
 // Entwürfe – nur für den Betreiber gedacht ist.
 const BILD_UPLOAD = /^\/intern\/lead\/([^/]+)\/bild$/;
 const LEAD_BILDER = /^\/api\/lead\/([^/]+)\/bilder$/;
+const PROMPT_VORSCHLAG = /^\/intern\/lead\/([^/]+)\/prompt$/;
+const PROMPT_VORSCHAU = /^\/intern\/lead\/([^/]+)\/prompt\/vorschau$/;
+const PROMPT_UEBERNEHMEN = /^\/intern\/lead\/([^/]+)\/prompt\/uebernehmen$/;
+const PROMPT_VERWERFEN = /^\/intern\/lead\/([^/]+)\/prompt\/verwerfen$/;
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -157,16 +169,28 @@ function bildPlaetze() {
 }
 
 /**
- * Was auf der Seite dieses Entwurfs gerade an den vier Bildplätzen steht:
- * entweder ein eigenes Foto aus den lead-edits oder der Stock-Platzhalter.
+ * Löst einen Entwurfs-Slug über die Manifest-Zuordnung auf den zugehörigen
+ * Lead und dessen Küche auf. Grundlage für die Bild- und die Text-Ansicht der
+ * Bearbeitungsseite.
  */
-function leadBilder(slug) {
+function findeLeadFuerSlug(slug) {
   const manifest = readManifest();
   const placeId = Object.keys(manifest).find((id) => manifest[id] === slug);
   const lead = placeId ? readAllLeads().find((l) => l.placeId === placeId) : null;
   if (!lead) return null;
 
-  const kueche = kuecheFuerLead(lead, ladeZuordnungen());
+  return { lead, kueche: kuecheFuerLead(lead, ladeZuordnungen()) };
+}
+
+/**
+ * Was auf der Seite dieses Entwurfs gerade an den vier Bildplätzen steht:
+ * entweder ein eigenes Foto aus den lead-edits oder der Stock-Platzhalter.
+ */
+function leadBilder(slug) {
+  const gefunden = findeLeadFuerSlug(slug);
+  if (!gefunden) return null;
+  const { lead, kueche } = gefunden;
+
   const platzhalter = platzhalterBilder(lead, kueche);
   const eigene = loadLeadEdits(slug).bilder ?? {};
 
@@ -187,6 +211,44 @@ function leadBilder(slug) {
   });
 
   return { slug, name: lead.name, entwurf: `${ENTWURF_PREFIX}${slug}/`, plaetze };
+}
+
+/**
+ * Alles, was ein Textvorschlag über den aktuellen Entwurf wissen muss: die
+ * schon aktiven Texte (Google-Standard oder frühere eigene Übersteuerung) und
+ * jedes Gericht der Karte mit seiner Gericht-ID – so kann das Sprachmodell
+ * highlightBeschreibungen nur mit IDs füllen, die es auf dieser Karte wirklich
+ * gibt (siehe erlaubteGerichtIds, geprüft in promptEdits.js).
+ */
+function leadTextKontext(slug) {
+  const gefunden = findeLeadFuerSlug(slug);
+  if (!gefunden) return null;
+  const { lead, kueche } = gefunden;
+
+  const menu = menuForCuisine(kueche);
+  const eigeneTexte = loadLeadEdits(slug).texte ?? {};
+  const eigeneBeschreibungen = eigeneTexte.highlightBeschreibungen ?? {};
+
+  const lage = ortsbezug(lead.adresse, lead.ort);
+  const schlagzeileStandard = lage ? `${menu.tagline} – ${lage}.` : `${menu.tagline}.`;
+
+  const gerichte = menu.kategorien.flatMap((kategorie, katIndex) =>
+    kategorie.gerichte.map((gericht, gerichtIndex) => {
+      const id = gerichtId(katIndex, gerichtIndex);
+      return { id, name: gericht.name, beschreibung: eigeneBeschreibungen[id] ?? gericht.beschreibung };
+    }),
+  );
+
+  return {
+    lead,
+    kueche,
+    menu,
+    name: lead.name || "Ihr Restaurant",
+    aktuelleHeadline: eigeneTexte.headline ?? (lead.name || "Ihr Restaurant"),
+    aktuelleSchlagzeile: eigeneTexte.schlagzeile ?? schlagzeileStandard,
+    gerichte,
+    erlaubteGerichtIds: new Set(gerichte.map((g) => g.id)),
+  };
 }
 
 function sendeJson(res, status, daten) {
@@ -269,6 +331,91 @@ export const handler = async (req, res) => {
     } catch (fehler) {
       sendeJson(res, 400, { ok: false, fehler: fehler.message });
     }
+    return;
+  }
+
+  const vorschlagTreffer = PROMPT_VORSCHLAG.exec(pathname);
+  if (vorschlagTreffer && req.method === "POST") {
+    const slug = decodeURIComponent(vorschlagTreffer[1]);
+    try {
+      const kontext = leadTextKontext(slug);
+      if (!kontext) throw new Error("Zu diesem Entwurf gibt es keinen Lead.");
+
+      const { wunsch } = JSON.parse(await leseKoerper(req));
+      const vorschlag = await erzeugeTextVorschlag(slug, wunsch, kontext);
+      sendeJson(res, 200, {
+        ok: true,
+        vorschlag,
+        vorschauUrl: `/intern/lead/${encodeURIComponent(slug)}/prompt/vorschau`,
+      });
+    } catch (fehler) {
+      sendeJson(res, 400, { ok: false, fehler: fehler.message });
+    }
+    return;
+  }
+
+  const vorschauTreffer = PROMPT_VORSCHAU.exec(pathname);
+  if (vorschauTreffer && req.method === "GET") {
+    const slug = decodeURIComponent(vorschauTreffer[1]);
+    const eintrag = letzterVorschlag(slug);
+    const kontext = eintrag ? leadTextKontext(slug) : null;
+
+    if (!eintrag || !kontext) {
+      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end("Kein Vorschlag vorhanden – erst \"Vorschlag generieren\" ausführen.");
+      return;
+    }
+
+    // Nicht gespeichert: gerendert wird direkt aus dem In-Memory-Vorschlag,
+    // über die schon aktiven lead-edits gelegt. Erst /prompt/uebernehmen
+    // schreibt etwas auf die Platte.
+    const vorhandeneEdits = loadLeadEdits(slug);
+    const html = buildLandingPage(kontext.lead, {
+      menu: kontext.menu,
+      gestaltung: themeForLead(kontext.lead, kontext.kueche),
+      bildUrl: (id, role) => `${ENTWURF_PREFIX}assets/${assetFileName(id, role)}`,
+      editUebersteuerung: {
+        bilder: vorhandeneEdits.bilder,
+        texte: { ...vorhandeneEdits.texte, ...eintrag.vorschlag },
+      },
+    });
+
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(html);
+    return;
+  }
+
+  const uebernehmenTreffer = PROMPT_UEBERNEHMEN.exec(pathname);
+  if (uebernehmenTreffer && req.method === "POST") {
+    const slug = decodeURIComponent(uebernehmenTreffer[1]);
+    try {
+      const eintrag = letzterVorschlag(slug);
+      if (!eintrag) throw new Error("Kein Vorschlag zum Übernehmen vorhanden.");
+
+      const vorhanden = loadLeadEdits(slug);
+      const neueTexte = {
+        ...vorhanden.texte,
+        ...("headline" in eintrag.vorschlag ? { headline: eintrag.vorschlag.headline } : {}),
+        ...("schlagzeile" in eintrag.vorschlag ? { schlagzeile: eintrag.vorschlag.schlagzeile } : {}),
+        highlightBeschreibungen: {
+          ...(vorhanden.texte?.highlightBeschreibungen ?? {}),
+          ...(eintrag.vorschlag.highlightBeschreibungen ?? {}),
+        },
+      };
+
+      saveLeadEdits(slug, { ...vorhanden, texte: neueTexte });
+      vergissVorschlag(slug);
+      sendeJson(res, 200, { ok: true });
+    } catch (fehler) {
+      sendeJson(res, 400, { ok: false, fehler: fehler.message });
+    }
+    return;
+  }
+
+  const verwerfenTreffer = PROMPT_VERWERFEN.exec(pathname);
+  if (verwerfenTreffer && req.method === "POST") {
+    vergissVorschlag(decodeURIComponent(verwerfenTreffer[1]));
+    sendeJson(res, 200, { ok: true });
     return;
   }
 
