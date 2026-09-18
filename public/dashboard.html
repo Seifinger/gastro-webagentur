@@ -107,8 +107,12 @@
   .pitch-raster { display: grid; gap: 22px; grid-template-columns: 1fr; }
   @media (min-width: 640px) { .pitch-raster { grid-template-columns: 280px 1fr; } }
   .qr-feld { text-align: center; }
-  .qr-feld img { width: 100%; max-width: 240px; background: #fff; border: 1px solid var(--border);
+  .qr-paar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .qr-stueck { flex: 1 1 110px; max-width: 130px; }
+  .qr-feld img { width: 100%; max-width: 130px; background: #fff; border: 1px solid var(--border);
                  border-radius: 10px; padding: 8px; }
+  .qr-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+              color: var(--muted); margin: 8px 0 0; }
   .qr-feld p { font-size: .8rem; color: var(--muted); margin: 10px 0 0; }
   .pitch-block { margin-bottom: 16px; }
   .qr-warnung { display: none; margin: 0 0 14px; padding: 11px 13px; border-radius: 8px;
@@ -271,11 +275,21 @@
 
     <div class="pitch-raster">
       <div class="qr-feld">
-        <p class="qr-warnung">Dieser Entwurf ist <strong>noch nicht veröffentlicht</strong> – der QR-Code
-           führt gerade auf eine 404-Seite. Erst <code>npm run publish-site</code> ausführen,
+        <p class="qr-warnung">Dieser Entwurf ist <strong>noch nicht veröffentlicht</strong> – die QR-Codes
+           führen gerade auf eine 404-Seite. Erst <code>npm run publish-site</code> ausführen,
            dann <code>docs/</code> committen und nach <code>main</code> pushen.</p>
-        <img id="pitch-qr" alt="QR-Code zum Entwurf">
-        <p>Abscannen führt direkt zum Entwurf – ideal, um ihn dem Wirt aufs eigene Handy zu geben.</p>
+        <div class="qr-paar">
+          <div class="qr-stueck">
+            <img id="pitch-qr" alt="QR-Code zum Entwurf, mit Bewegungseffekten">
+            <p class="qr-label">Mit Bewegung</p>
+          </div>
+          <div class="qr-stueck">
+            <img id="pitch-qr-ruhig" alt="QR-Code zum Entwurf, ohne Bewegungseffekte">
+            <p class="qr-label">Ohne Bewegung</p>
+          </div>
+        </div>
+        <p>Zwei Varianten desselben Entwurfs – praktisch, um vor Ort situativ zu zeigen,
+           was beim Wirt besser ankommt.</p>
       </div>
 
       <div>
@@ -532,6 +546,10 @@ function oeffnePitch(placeId) {
   document.getElementById("pitch-titel").textContent = lead.name || "Entwurf";
   document.getElementById("pitch-url").value = lead.demoUrl;
   document.getElementById("pitch-qr").src = `/api/qr?url=${encodeURIComponent(lead.demoUrl)}`;
+  // Zweiter QR-Code auf dieselbe Seite, nur mit ?bewegung=aus (siehe
+  // motion.js) – zum situativen Zeigen mit oder ohne Bewegungseffekte.
+  document.getElementById("pitch-qr-ruhig").src =
+    `/api/qr?url=${encodeURIComponent(lead.demoUrl + "?bewegung=aus")}`;
   document.getElementById("pitch-betreff").value = lead.anschreiben.betreff;
   document.getElementById("pitch-text").value = lead.anschreiben.text;
   document.getElementById("pitch-oeffnen").href = lead.demoUrl;
