@@ -5,7 +5,14 @@ import { timingSafeEqual } from "node:crypto";
 import path from "node:path";
 import QRCode from "qrcode";
 import { readAllLeads } from "./csvImport.js";
-import { landingPagesDir, docsDir, siteBaseUrl, absenderName, dashboardHost } from "./config.js";
+import {
+  landingPagesDir,
+  docsDir,
+  siteBaseUrl,
+  absenderName,
+  dashboardHost,
+  resonanzUrl,
+} from "./config.js";
 import {
   ladeZuordnungen,
   speichereZuordnung,
@@ -35,6 +42,7 @@ import {
 } from "./bildUpload.js";
 import { erzeugeTextVorschlag, letzterVorschlag, vergissVorschlag } from "./promptEdits.js";
 import { veroeffentlicheEntwurf } from "./veroeffentlichung.js";
+import { resonanzUebersicht } from "./resonanzStore.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -122,6 +130,10 @@ function leadsMitZusatz() {
         alterTage: Number.isFinite(alter) ? Math.floor(alter) : null,
         staleWarnung: isAgingSoon(lead),
         abgelaufen: isStale(lead),
+        // Hat der Wirt den Entwurf angesehen? Der Collector schreibt nach
+        // data/resonanz/, hier wird bei jeder Anfrage frisch gelesen – beide
+        // Prozesse teilen sich nur die Platte (siehe resonanzServer.js).
+        resonanz: slug ? resonanzUebersicht(slug) : null,
       };
     })
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
@@ -487,7 +499,11 @@ export const handler = async (req, res) => {
   }
 
   if (pathname === "/api/leads") {
-    sendeJson(res, 200, { kuechen: kuechenAuswahl(), leads: leadsMitZusatz() });
+    sendeJson(res, 200, {
+      kuechen: kuechenAuswahl(),
+      leads: leadsMitZusatz(),
+      resonanzAktiv: Boolean(resonanzUrl),
+    });
     return;
   }
 

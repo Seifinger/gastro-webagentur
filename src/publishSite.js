@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync, rmSync, existsSync, copyFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { docsDir } from "./config.js";
+import { docsDir, resonanzUrl } from "./config.js";
 import { escapeHtml } from "./landingPageGenerator.js";
 import { remoteImageUrl } from "./imageLibrary.js";
 import { menuForCuisine } from "./menuCatalog.js";
@@ -152,7 +152,12 @@ function lokalisiereEigeneBilder(editUebersteuerung, slug, zielordner) {
  * überschreibbar, damit Tests gegen ein leeres Verzeichnis prüfen können,
  * ohne das echte docs/ anzufassen – im Betrieb ist es immer docsDir.
  */
-export async function baueUndSchreibeEinzelnenEntwurf(slug, { cuisine, email = "", api = "", zielordner = docsDir } = {}) {
+// resonanz kommt per Default aus der .env, damit der Einzel-Publish aus dem
+// Dashboard (veroeffentlichung.js) das Beacon nicht stillschweigend abschaltet.
+export async function baueUndSchreibeEinzelnenEntwurf(
+  slug,
+  { cuisine, email = "", api = "", resonanz = resonanzUrl, zielordner = docsDir } = {},
+) {
   const lead = leadFuerSlug(slug);
   if (!lead) throw new Error(`Kein Lead für Slug "${slug}" gefunden.`);
 
@@ -176,6 +181,7 @@ export async function baueUndSchreibeEinzelnenEntwurf(slug, { cuisine, email = "
       fontCss,
       veroeffentlicht: true,
       apiUrl: api,
+      resonanzUrl: resonanz,
       // Wie beim vollständigen Lauf: Bilder kommen im Netz direkt von Unsplash.
       bildUrl: remoteImageUrl,
     },
@@ -204,6 +210,7 @@ async function run() {
         cuisine: args.cuisine,
         email: args.email,
         api: args.api,
+        resonanz: args.resonanz,
       });
       console.log(`\n✅ Entwurf "${slug}" veröffentlicht (nur dieser Ordner wurde geschrieben).`);
       console.log(`   Ordner: ${ordner}\n`);
@@ -238,6 +245,7 @@ async function run() {
     fontCss,
     veroeffentlicht: true,
     apiUrl: args.api,
+    resonanzUrl: args.resonanz,
     // Bilder kommen im Netz direkt von Unsplash, damit das Repository nicht
     // um mehrere Megabyte Stockfotos wächst.
     bildUrl: remoteImageUrl,

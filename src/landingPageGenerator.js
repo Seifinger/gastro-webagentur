@@ -15,6 +15,7 @@ import {
   SIGNATUR_CSS,
 } from "./heroSignature.js";
 import { MOTION_CSS, MOTION_SCRIPT } from "./motion.js";
+import { resonanzSkript } from "./resonanzBeacon.js";
 import { stimmenFuer, PLATZHALTER_ERKLAERUNG } from "./testimonials.js";
 import { getPresetVariant, withDesignDefaults } from "./designPresets.js";
 
@@ -1155,6 +1156,11 @@ export function buildLandingPage(lead, options = {}) {
   const apiUrl = String(options.apiUrl ?? "").replace(/\/+$/, "");
   const pageData = jsonForScript({ name, kontaktEmail, apiUrl });
 
+  // Getrennt von apiUrl: Das ist der Betriebsserver des Wirts, dies hier die
+  // Agentur, die wissen will, ob ihr Entwurf angesehen wurde. Ohne Adresse
+  // entsteht kein Skript und die Seite bleibt exakt wie vorher.
+  const resonanzBeacon = resonanzSkript(options.resonanzUrl, options.slug);
+
   const kontaktZeilen = [
     adresse
       ? `<li><span class="k">📍</span><span>${escapeHtml(adresse)}${
@@ -1503,6 +1509,7 @@ ${
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${PAGE_SCRIPT}</script>
 <script>${MOTION_SCRIPT}</script>
+${resonanzBeacon ? `<script>${resonanzBeacon}</script>` : ""}
 </body>
 </html>
 `;

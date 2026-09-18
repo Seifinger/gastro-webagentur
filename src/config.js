@@ -37,3 +37,17 @@ export const absenderName = process.env.ABSENDER_NAME || "";
 // im lokalen Netzwerk erreichbar sind – über DASHBOARD_HOST in der .env
 // bewusst änderbar (z. B. auf 0.0.0.0).
 export const dashboardHost = process.env.DASHBOARD_HOST || "127.0.0.1";
+
+// Öffentliche Adresse des Resonanz-Collectors (resonanzServer.js), die in die
+// Entwürfe eingebaut wird. Sie muss vom Gerät des Wirts aus erreichbar sein –
+// die Entwürfe liegen auf GitHub Pages, nicht neben dem Server.
+//
+// Leer lassen schaltet die Resonanzmessung ab: Dann wird gar kein Beacon in
+// die Seite eingebaut und die Entwürfe verhalten sich exakt wie vorher.
+export const resonanzUrl = (process.env.RESONANZ_URL || "").replace(/\/+$/, "");
+
+export const resonanzPort = Number(process.env.RESONANZ_PORT || 3300);
+
+// Wie dashboardHost per Default 127.0.0.1. Für den echten Betrieb gehört der
+// Collector hinter einen Reverse Proxy mit TLS, der auf diesen Port zeigt.
+export const resonanzHost = process.env.RESONANZ_HOST || dashboardHost;

@@ -10,6 +10,7 @@
     "pages": "node src/generateLandingPages.js",
     "publish-site": "node src/publishSite.js",
     "wirt": "node src/wirtServer.js",
+    "resonanz": "node src/resonanzServer.js",
     "test": "node --test test/*.test.js"
   },
   "dependencies": {
