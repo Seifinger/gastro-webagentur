@@ -163,18 +163,21 @@ const SIGNATUR_CSS = `
 /* Thailändisch: eine Orchidee blüht auf, sobald der Hero ins Bild scrollt.
    Die Blütenblätter nutzen dieselbe Intersection-Observer-Kopplung wie der
    Rest der Seite (.bewegt/.da aus motion.js) statt einer eigenen Schleife –
-   das Aufblühen soll einmal passieren, nicht dauerhaft laufen. */
+   das Aufblühen soll einmal passieren, nicht dauerhaft laufen. Jedes
+   Blütenblatt steckt in einer eigenen, unbewegten <g> nur für die Drehung:
+   ein CSS-transform (die Skalierung beim Aufblühen) würde ein SVG-eigenes
+   transform="rotate(...)" auf demselben Element sonst vollständig
+   ersetzen statt sich mit ihm zu kombinieren. */
 .sig-orchid { right: 6%; top: 50%; transform: translateY(-50%);
               width: clamp(170px, 24vw, 260px); aspect-ratio: 1; opacity: .95;
               filter: drop-shadow(0 22px 40px rgba(0,0,0,.35)); }
 .sig-orchid svg { width: 100%; height: 100%; overflow: visible; }
-.sig-orchid .bluete { fill: #c99bdb; transform-box: fill-box; transform-origin: center;
+.sig-orchid .bluete { transform-box: fill-box; transform-origin: center;
                       transition: opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1);
                       transition-delay: calc(var(--i, 0) * .1s); }
-.sig-orchid .bluete-mitte { fill: #f4d35e; }
 /* Vor dem Sichtbarwerden klein und unsichtbar, .da lässt sie zur vollen
-   Größe aufblühen – pro Blütenblatt um .1s versetzt (macht bei .7s
-   Übergang und 6 Blättern 1.2s Gesamtdauer, einmalig). */
+   Größe aufblühen – pro Element (5 Blütenblätter + Lippe) um .1s versetzt
+   (macht bei .7s Übergang und 6 Elementen 1.2s Gesamtdauer, einmalig). */
 .bewegt .sig-orchid .bluete { opacity: 0; transform: scale(.3); }
 .bewegt .sig-orchid.da .bluete { opacity: 1; transform: scale(1); }
 @media (max-width: 899px) {
@@ -309,27 +312,35 @@ function bild(id, rolle, bildUrl) {
   return bildUrl ? bildUrl(id, rolle) : `../assets/${assetFileName(id, rolle)}`;
 }
 
-const ORCHID_BLUETENBLAETTER = 6;
+// Fünf Blütenblätter im Kreis, abwechselnd in zwei Fliedertönen.
+const ORCHID_BLUETENBLAETTER = [
+  { winkel: 0, farbe: "#c99bdb" },
+  { winkel: 72, farbe: "#c99bdb" },
+  { winkel: 144, farbe: "#d7aee3" },
+  { winkel: 216, farbe: "#c99bdb" },
+  { winkel: 288, farbe: "#d7aee3" },
+];
 
 /**
- * Sechs Blütenblätter (SVG-Pfade) im Kreis um eine Mitte – jedes mit eigenem
- * --i für den gestaffelten Übergang in der CSS-Regel .bewegt .sig-orchid.
+ * Fünf Blütenblätter (SVG-Pfade) im Kreis um eine Mitte, dazu Lippe
+ * (Labellum) und Mitte – jedes Blütenblatt samt Lippe mit eigenem --i für
+ * den gestaffelten Übergang in der CSS-Regel .bewegt .sig-orchid.
  */
 function heroOrchidBloom() {
-  const winkel = 360 / ORCHID_BLUETENBLAETTER;
-  const bluetenblaetter = Array.from({ length: ORCHID_BLUETENBLAETTER })
-    .map(
-      (_, i) => `
-        <g transform="rotate(${i * winkel} 50 50)" style="--i:${i}">
-          <path class="bluete" d="M50,50 C38,38 38,18 50,8 C62,18 62,38 50,50 Z"></path>
+  const bluetenblaetter = ORCHID_BLUETENBLAETTER.map(
+    ({ winkel, farbe }, i) => `
+        <g transform="rotate(${winkel})">
+          <path class="bluete" d="M0,0 C-16,-10 -20,-30 -8,-42 C0,-46 0,-46 8,-42 C20,-30 16,-10 0,0 Z" fill="${farbe}" style="--i:${i}"></path>
         </g>`,
-    )
-    .join("");
+  ).join("");
   return `
     <div class="sig sig-orchid" aria-hidden="true">
       <svg viewBox="0 0 100 100" focusable="false">
-        ${bluetenblaetter}
-        <circle class="bluete-mitte" cx="50" cy="50" r="6"></circle>
+        <g transform="translate(50 46)">
+          ${bluetenblaetter}
+          <path class="bluete labellum" d="M0,4 C-10,10 -12,26 0,34 C12,26 10,10 0,4 Z" fill="#8e3fae" style="--i:5"></path>
+          <circle class="bluete-mitte" r="4" fill="#f4d35e"></circle>
+        </g>
       </svg>
     </div>`;
 }
