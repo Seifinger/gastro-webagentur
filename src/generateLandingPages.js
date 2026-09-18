@@ -116,6 +116,9 @@ async function run() {
     console.log("🔤 Prüfe Schriften ...");
     const fontCss = await ladeSchriften(path.join(assetsDir, "fonts"));
 
+    // Ohne resonanzUrl: Die lokale Fassung ist die Vorschau des Betreibers,
+    // und die darf die Nachfassliste nicht mit eigenen Aufrufen füllen.
+    // Gemessen wird nur, was unter docs/ veröffentlicht beim Wirt landet.
     schreibeSeiten([entry], landingPagesDir, { kontaktEmail: args.email, fontCss, apiUrl: args.api });
 
     // Nur den einen Eintrag im Manifest aktualisieren – die Zuordnung der

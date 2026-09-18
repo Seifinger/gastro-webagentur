@@ -11,7 +11,7 @@ import { menuForCuisine, MENUS } from "./menuCatalog.js";
 import { ladeZuordnungen, kuecheFuerLead } from "./cuisineOverrides.js";
 import { ensureAssets } from "./imageLibrary.js";
 import { ensureFonts, fontFaceCss } from "./fontLibrary.js";
-import { landingPagesDir } from "./config.js";
+import { landingPagesDir, resonanzUrl } from "./config.js";
 
 // Gemeinsamer Unterbau für die lokale Fassung (npm run pages) und die
 // veröffentlichte Fassung (npm run publish-site). Beide sollen denselben
@@ -26,6 +26,9 @@ export function parseArgs(argv) {
     cuisine: null,
     kontakt: "",
     api: "",
+    // Adresse des Resonanz-Collectors. Leer gelassen wird kein Beacon in die
+    // Entwürfe gebaut; Default kommt aus RESONANZ_URL in der .env.
+    resonanz: resonanzUrl,
     // Nur diesen einen Entwurf neu bauen (siehe leadFuerSlug unten) – für
     // Änderungen an einem einzelnen Lead, ohne die übrigen ~55 anzufassen.
     only: null,
@@ -38,6 +41,7 @@ export function parseArgs(argv) {
     if (argv[i] === "--cuisine") args.cuisine = argv[++i];
     if (argv[i] === "--kontakt") args.kontakt = argv[++i];
     if (argv[i] === "--api") args.api = argv[++i];
+    if (argv[i] === "--resonanz") args.resonanz = argv[++i];
     if (argv[i] === "--only") args.only = argv[++i];
   }
   return args;
@@ -175,6 +179,9 @@ export function schreibeSeiten(entries, zielordner, optionen = {}) {
       menu: menuForCuisine(entry.cuisine),
       gestaltung: entry.gestaltung,
       editUebersteuerung: entry.editUebersteuerung,
+      // Das Resonanz-Beacon meldet den Entwurf unter genau dieser Kennung –
+      // vergeben wird sie erst hier von uniqueSlug().
+      slug: entry.slug,
     });
 
     const dir = path.join(zielordner, entry.slug);

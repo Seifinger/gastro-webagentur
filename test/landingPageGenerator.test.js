@@ -751,3 +751,27 @@ test("eine unbekannte Gericht-ID ändert keine Beschreibung", () => {
 
   assert.equal(html, buildLandingPage(lead, { menu: editMenu }));
 });
+
+test("ohne Collector-Adresse trägt der Entwurf kein Resonanz-Beacon", () => {
+  const html = buildLandingPage(lead, { menu: testMenu, slug: "gasthof-zur-post-abc" });
+
+  assert.ok(!html.includes("sendBeacon"));
+});
+
+test("erst mit Collector-Adresse und Slug meldet der Entwurf seine Aufrufe", () => {
+  const html = buildLandingPage(lead, {
+    menu: testMenu,
+    slug: "gasthof-zur-post-abc",
+    resonanzUrl: "https://resonanz.example",
+  });
+
+  assert.ok(html.includes("sendBeacon"));
+  assert.ok(html.includes('"https://resonanz.example/resonanz"'));
+  assert.ok(html.includes('"gasthof-zur-post-abc"'));
+});
+
+test("ohne Slug bleibt das Beacon weg, statt namenlos zu melden", () => {
+  const html = buildLandingPage(lead, { menu: testMenu, resonanzUrl: "https://resonanz.example" });
+
+  assert.ok(!html.includes("sendBeacon"));
+});
