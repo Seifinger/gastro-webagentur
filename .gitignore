@@ -1,5 +1,6 @@
 node_modules/
 .env
+.claude/worktrees/
 data/output/
 data/landingpages/
 data/betrieb/
