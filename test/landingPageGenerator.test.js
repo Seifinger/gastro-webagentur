@@ -447,6 +447,16 @@ test("Türkisch behält den Drehspieß unverändert als Signatur", () => {
   assert.ok(!html.includes('class="sig sig-tea-form"'));
 });
 
+test("Griechisch bekommt den schaukelnden Olivenzweig als eigene Signatur", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.griechisch,
+    gestaltung: themeForLead(lead, "griechisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-olive-form"'));
+  assert.ok(!html.includes('class="sig sig-diashow"'));
+});
+
 test("Indisch bekommt das aufplatzende Gewürzwölkchen als eigene Signatur", () => {
   const html = buildLandingPage(lead, {
     menu: MENUS.indisch,

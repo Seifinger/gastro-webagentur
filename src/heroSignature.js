@@ -22,6 +22,7 @@ const SIGNATUR_REDUZIERT_REGELN = `
   .sig-lanterns .laterne .glow { animation: none; opacity: .6; }
   .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
   .sig-tea-form .tee-fluessigkeit, .sig-tea-form .strahl, .sig-tea-form .dampf-tee i { animation: none; }
+  .sig-olive-form { animation: none; }
 `;
 
 const SIGNATUR_CSS = `
@@ -130,6 +131,20 @@ const SIGNATUR_CSS = `
 }
 @media (max-width: 899px) {
   .sig-diashow { right: -8%; top: 12%; transform: none; width: 46vw; opacity: .5; }
+}
+
+/* Griechisch: ein Olivenzweig schaukelt sanft – ein eigenes, kulturell
+   eindeutiges Motiv statt der bisherigen, kulturell neutralen Fotodiashow.
+   Dieselbe Schaukel-Mechanik wie bei den Laternen (sig-laterne-schaukel),
+   angewandt auf den gesamten Zweig statt auf einzelne Elemente. */
+.sig-olive-form { right: 6%; top: 45%; width: clamp(150px, 22vw, 220px);
+                  transform-origin: 10% 90%; opacity: .95;
+                  filter: drop-shadow(0 18px 32px rgba(0,0,0,.3));
+                  animation: sig-oliven-schaukel 7s ease-in-out infinite; }
+.sig-olive-form svg { width: 100%; height: auto; overflow: visible; }
+@keyframes sig-oliven-schaukel { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@media (max-width: 899px) {
+  .sig-olive-form { right: -4%; top: 12%; width: 40vw; opacity: .55; }
 }
 
 /* Café: aufsteigender Dampf über der Tasse */
@@ -468,6 +483,27 @@ function heroMintTeaPour() {
     </div>`;
 }
 
+/**
+ * Griechisch: ein Olivenzweig schaukelt sanft – ersetzt die bisherige
+ * fotobasierte Diashow durch ein rein gezeichnetes, kulturell eindeutigeres
+ * Motiv. Läuft dauerhaft wie die Laternen bei Asiatisch (sig-laterne-schaukel
+ * als Vorbild), nicht als einmaliges Aufblüh-Ereignis wie bei der Orchidee.
+ */
+function heroOliveBranch() {
+  return `
+    <div class="sig sig-olive-form" aria-hidden="true">
+      <svg viewBox="0 0 100 100" focusable="false">
+        <path class="zweig" d="M10,80 C30,70 50,50 70,20" stroke="#6b7d3d" stroke-width="3" fill="none"></path>
+        <path class="blatt" d="M28,68 C20,64 20,56 28,54 C32,60 32,64 28,68 Z" fill="#7f9a4a" style="--i:0"></path>
+        <path class="blatt" d="M42,56 C34,52 34,44 42,42 C46,48 46,52 42,56 Z" fill="#8ea85a" style="--i:1"></path>
+        <path class="blatt" d="M56,42 C48,38 48,30 56,28 C60,34 60,38 56,42 Z" fill="#7f9a4a" style="--i:2"></path>
+        <ellipse class="olive" cx="34" cy="66" rx="5" ry="7" fill="#3c4a24" style="--i:0"></ellipse>
+        <ellipse class="olive" cx="50" cy="50" rx="5" ry="7" fill="#4b5c2c" style="--i:1"></ellipse>
+        <ellipse class="olive" cx="63" cy="34" rx="5" ry="7" fill="#3c4a24" style="--i:2"></ellipse>
+      </svg>
+    </div>`;
+}
+
 function heroBeerFoamOverflow() {
   return `
     <div class="sig sig-beer" aria-hidden="true">
@@ -580,13 +616,10 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
     return heroSpicePuff();
   }
 
+  // Ein schaukelnder Olivenzweig statt der kulturell neutralen Fotodiashow –
+  // rein dekorativ, deshalb ohne Abhängigkeit von Gerichtsfotos.
   if (cuisine === "griechisch") {
-    if (gerichte.length < 3) return "";
-    const bilder = gerichte
-      .slice(0, 3)
-      .map((g) => `<img src="${esc(bild(g.bild, "gericht", bildUrl))}" alt="">`)
-      .join("");
-    return `<div class="sig sig-diashow" aria-hidden="true">${bilder}</div>`;
+    return heroOliveBranch();
   }
 
   // Eine Orchidee, die beim Sichtbarwerden des Heros aufblüht – rein
