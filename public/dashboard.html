@@ -76,6 +76,12 @@
   }
   a.entwurf:hover { background: #1d4ed8; }
 
+  .filter-resonanz { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #475569; }
+  .resonanz-spalte { white-space: nowrap; }
+  .resonanz-still { color: #94a3b8; }
+  .resonanz-offen { color: #0f172a; }
+  .resonanz-stark { color: #15803d; }
+
   a.bearbeiten {
     display: inline-block;
     padding: 3px 10px;
@@ -243,6 +249,9 @@
   <input id="search" type="text" placeholder="Suche nach Name...">
   <select id="filterOrt"><option value="">Alle Orte</option></select>
   <select id="filterPrioritaet"><option value="">Alle Prioritäten</option></select>
+  <label class="filter-resonanz" id="filterResonanzFeld" style="display:none">
+    <input id="filterResonanz" type="checkbox"> nur geöffnete Entwürfe
+  </label>
 </div>
 
 <div class="table-wrap">
@@ -254,6 +263,8 @@
         <th data-key="name">Name</th>
         <th data-key="kueche">Küche</th>
         <th data-key="entwurf">Entwurf</th>
+        <th class="nosort resonanz-spalte" id="resonanzKopf" style="display:none"
+            title="Nicht geöffnet heißt nicht ungelesen: Adblocker und manche Mail-Programme verschlucken das Signal.">Resonanz</th>
         <th class="nosort">Bearbeiten</th>
         <th class="nosort">Pitch</th>
         <th data-key="ort">Ort</th>
@@ -346,6 +357,7 @@
 
 <script>
 let allLeads = [];
+let resonanzAktiv = false;
 let kuechen = [];
 let sortKey = "score";
 let sortDir = -1;
@@ -429,6 +441,39 @@ function alterZelle(l) {
   return `${l.alterTage} Tage`;
 }
 
+function seither(zeitpunkt) {
+  const minuten = Math.round((Date.now() - new Date(zeitpunkt).getTime()) / 60000);
+  if (!Number.isFinite(minuten) || minuten < 0) return "";
+  if (minuten < 60) return "gerade eben";
+  const stunden = Math.round(minuten / 60);
+  if (stunden < 24) return `vor ${stunden} Std`;
+  const tage = Math.round(stunden / 24);
+  return tage === 1 ? "gestern" : `vor ${tage} Tagen`;
+}
+
+function dauer(sekunden) {
+  if (!sekunden) return "";
+  if (sekunden < 60) return `${sekunden} Sek`;
+  return `${Math.floor(sekunden / 60)}:${String(sekunden % 60).padStart(2, "0")} Min`;
+}
+
+function resonanzZelle(l) {
+  if (!l.slug) return "-";
+  const r = l.resonanz;
+  // Grau und beiläufig, nicht alarmrot: Bei einem Entwurf von vorgestern ist
+  // "noch nicht geöffnet" der Normalfall und keine schlechte Nachricht.
+  if (!r || !r.geoeffnet) return '<span class="resonanz-still">noch nicht geöffnet</span>';
+
+  const teile = [r.anzahl > 1 ? `${r.anzahl}×` : "geöffnet", seither(r.letzterAufruf), dauer(r.maxSekunden)];
+  // Wer bis zur Reservierung gescrollt ist, hat über die Seite nachgedacht –
+  // das ist die Zeile, bei der sich der Anruf am ehesten lohnt.
+  const bisReservierung = r.reservierungGesehen
+    ? ' <strong class="resonanz-stark">bis Reservierung</strong>'
+    : "";
+
+  return `<span class="resonanz-offen">${teile.filter(Boolean).join(" · ")}</span>${bisReservierung}`;
+}
+
 function renderStats(leads) {
   const total = leads.length;
   const sehrHoch = leads.filter((l) => l.score >= 80).length;
@@ -492,11 +537,13 @@ function applyFiltersAndRender() {
   const search = document.getElementById("search").value.toLowerCase();
   const ort = document.getElementById("filterOrt").value;
   const prioritaet = document.getElementById("filterPrioritaet").value;
+  const nurGeoeffnet = document.getElementById("filterResonanz").checked;
 
   let filtered = allLeads.filter((l) =>
     (!search || (l.name || "").toLowerCase().includes(search)) &&
     (!ort || l.ort === ort) &&
-    (!prioritaet || l.priorität === prioritaet)
+    (!prioritaet || l.priorität === prioritaet) &&
+    (!nurGeoeffnet || (l.resonanz && l.resonanz.geoeffnet))
   );
 
   filtered.sort((a, b) => {
@@ -516,6 +563,7 @@ function applyFiltersAndRender() {
       <td>${esc(l.name)}</td>
       <td>${kuecheSelect(l)}</td>
       <td>${l.entwurf ? `<a class="entwurf" href="${esc(l.entwurf)}" target="_blank" rel="noopener">ansehen</a>` : "-"}</td>
+      ${resonanzAktiv ? `<td class="resonanz-spalte">${resonanzZelle(l)}</td>` : ""}
       <td>${l.slug ? `<a class="bearbeiten" href="/bearbeiten.html?lead=${encodeURIComponent(l.slug)}">Bilder</a>` : "-"}</td>
       <td>${l.demoUrl ? `<button class="pitch" data-pitch="${esc(l.placeId)}">QR &amp; Text</button>` : "-"}</td>
       <td>${esc(l.ort)}</td>
@@ -541,7 +589,7 @@ document.querySelectorAll("th[data-key]").forEach((th) => {
   });
 });
 
-["search", "filterOrt", "filterPrioritaet"].forEach((id) => {
+["search", "filterOrt", "filterPrioritaet", "filterResonanz"].forEach((id) => {
   document.getElementById(id).addEventListener("input", applyFiltersAndRender);
 });
 
@@ -593,7 +641,11 @@ function oeffnePitch(placeId) {
     `/api/qr?url=${encodeURIComponent(lead.demoUrl + "?bewegung=aus")}`;
   document.getElementById("pitch-betreff").value = lead.anschreiben.betreff;
   document.getElementById("pitch-text").value = lead.anschreiben.text;
-  document.getElementById("pitch-oeffnen").href = lead.demoUrl;
+  // Der eigene Kontrollblick auf den Entwurf darf nicht als Öffnung durch den
+  // Wirt zählen, sonst ist der Resonanz-Filter wertlos. Das Beacon steigt bei
+  // ?vorschau=1 aus (siehe resonanzBeacon.js); der Link im Anschreiben und die
+  // QR-Codes bleiben bewusst ohne den Parameter.
+  document.getElementById("pitch-oeffnen").href = `${lead.demoUrl}?vorschau=1`;
 
   const mailto = `mailto:?subject=${encodeURIComponent(lead.anschreiben.betreff)}&body=${encodeURIComponent(lead.anschreiben.text)}`;
   document.getElementById("pitch-mail").href = mailto;
@@ -636,6 +688,11 @@ function ladeLeads() {
     .then((daten) => {
       kuechen = daten.kuechen;
       allLeads = daten.leads;
+      // Ohne konfigurierten Collector gibt es nichts zu zeigen – dann bleiben
+      // Spalte und Filter ganz weg, statt überall Striche zu setzen.
+      resonanzAktiv = Boolean(daten.resonanzAktiv);
+      document.getElementById("resonanzKopf").style.display = resonanzAktiv ? "" : "none";
+      document.getElementById("filterResonanzFeld").style.display = resonanzAktiv ? "" : "none";
       renderStats(allLeads);
       if (!filterGefuellt) {
         populateFilters(allLeads);
