@@ -9,6 +9,7 @@ import {
 } from "./landingPageGenerator.js";
 import { menuForCuisine, MENUS } from "./menuCatalog.js";
 import { ladeZuordnungen, kuecheFuerLead } from "./cuisineOverrides.js";
+import { ladeStimmungsWahl, stimmungFuerLead } from "./stimmungsWahl.js";
 import { ensureAssets } from "./imageLibrary.js";
 import { ensureFonts, fontFaceCss } from "./fontLibrary.js";
 import { landingPagesDir, resonanzUrl } from "./config.js";
@@ -99,13 +100,14 @@ function uniqueSlug(lead, taken) {
 export function baueEintraege(leads, cuisineOverride) {
   const taken = new Set();
   const zuordnungen = ladeZuordnungen();
+  const stimmungsWahl = ladeStimmungsWahl();
 
   return leads.map((lead) => {
     const cuisine = cuisineOverride ?? kuecheFuerLead(lead, zuordnungen);
     return {
       lead,
       cuisine,
-      gestaltung: themeForLead(lead, cuisine),
+      gestaltung: themeForLead(lead, cuisine, stimmungFuerLead(lead, cuisine, stimmungsWahl)),
       slug: uniqueSlug(lead, taken),
     };
   });

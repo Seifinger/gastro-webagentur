@@ -135,6 +135,48 @@ export const DESIGN_PRESETS = {
   },
 };
 
+/**
+ * Das Layout je Archetyp – einmal definiert und von allen zwölf Küchen
+ * genutzt. Eine Stimmung nennt nur ihren Archetyp (siehe stimmungen.js), die
+ * Küche steuert Farbe, Schrift und Bilder bei. Ohne diese Trennung wären es
+ * 36 Layout-Definitionen statt drei.
+ *
+ * Die Hero-Signatur bleibt in allen dreien erhalten: Sie gehört der Küche,
+ * nicht der Stimmung, und ist das einzige bewegte Element der Seite.
+ */
+export const ARCHETYP_PRESET = {
+  // Unverändert das bisherige Verhalten – der Entwurf, den es immer gab.
+  traditionell: withDesignDefaults(),
+
+  // Das Abendhaus lebt vom reservierten Tisch, nicht von der Abholung. Das
+  // Ambiente rückt nach vorn: Wer abends auswählt, entscheidet über den Raum,
+  // bevor er die Karte liest. Die Stimmen stehen untereinander statt im
+  // Raster – ruhiger, passend zur dunklen Welt.
+  abend: withDesignDefaults({
+    hero: { primaryAction: "reservation" },
+    layout: { sectionOrder: ["ambiente", "karte", "highlights", "stimmen", "reservierung", "kontakt"] },
+    social: { layout: "list" },
+  }),
+
+  // Das helle Haus wird unterwegs auf dem Handy überflogen: Karte zuerst,
+  // keine mitscrollende Kopfzeile. Die feste Aktionsleiste unten bleibt – sie
+  // ist auf dem Handy der Weg zur Bestellung.
+  hell: withDesignDefaults({
+    header: { sticky: false },
+    layout: { sectionOrder: ["karte", "highlights", "ambiente", "stimmen", "reservierung", "kontakt"] },
+  }),
+};
+
+const FALLBACK_ARCHETYP = "traditionell";
+
+/**
+ * Layout einer Stimmung. Ein unbekannter Archetyp fällt auf das bisherige
+ * Verhalten zurück, statt die Seite ohne Layout zu lassen.
+ */
+export function presetFuerArchetyp(archetyp) {
+  return ARCHETYP_PRESET[archetyp] ?? ARCHETYP_PRESET[FALLBACK_ARCHETYP];
+}
+
 const FALLBACK_CUISINE = "bayerisch";
 
 /**

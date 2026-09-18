@@ -14,6 +14,7 @@ import { loadLeadEdits } from "../src/leadEdits.js";
 import { assetFileName } from "../src/imageLibrary.js";
 import { STIMMEN } from "../src/testimonials.js";
 import { SIGNATUR_CSS } from "../src/heroSignature.js";
+import { stimmungenFuer } from "../src/stimmungen.js";
 
 const lead = {
   name: "Gasthof Zur Post",
@@ -282,17 +283,38 @@ test("buildLandingPage blendet den E-Mail-Versand nur mit Kontaktadresse ein", (
   assert.ok(mit.includes("info@beispiel.de"));
 });
 
-test("themeForLead wählt das Theme passend zur Küche", () => {
-  assert.equal(themeForLead({ name: "Pizzeria Tropea" }).themeName, "trattoria");
-  assert.equal(themeForLead({ name: "Gasthof Huber" }).themeName, "wirtshaus");
-  assert.equal(themeForLead({ name: "Sushi Bar" }).themeName, "neoasian");
-  assert.equal(themeForLead({ name: "Döner Palast" }).themeName, "neoasian");
+test("themeForLead wählt eine Stimmung der erkannten Küche", () => {
+  // Jede Küche hat ihre eigenen drei Welten – vorher teilten sich zwölf
+  // Küchen drei Themes, und Griechisch sah aus wie Italienisch.
+  for (const [name, kueche] of [
+    ["Pizzeria Tropea", "italienisch"],
+    ["Gasthof Huber", "bayerisch"],
+    ["Sushi Bar", "japanisch"],
+    ["Döner Palast", "tuerkisch"],
+  ]) {
+    const g = themeForLead({ name });
+    assert.equal(g.cuisine, kueche);
+    assert.ok(
+      stimmungenFuer(kueche).some((s) => s.id === g.stimmung),
+      `${name}: "${g.stimmung}" gehört nicht zu ${kueche}`,
+    );
+  }
 });
 
-test("das Neo-Asian-Theme ist dunkel, die anderen hell", () => {
-  assert.equal(themeForLead({ name: "Sushi Bar" }).theme.dark, true);
-  assert.equal(themeForLead({ name: "Pizzeria Roma" }).theme.dark, false);
-  assert.equal(themeForLead({ name: "Gasthof Huber" }).theme.dark, false);
+test("eine gewählte Stimmung schlägt die Seed-Auswahl", () => {
+  const g = themeForLead({ name: "Taverna Mykonos", placeId: "abc" }, "griechisch", "olivenhain");
+
+  assert.equal(g.stimmung, "olivenhain");
+  assert.equal(g.archetyp, "hell");
+  assert.equal(g.theme.dark, false);
+});
+
+test("der Archetyp der Stimmung bestimmt, ob die Welt hell oder dunkel ist", () => {
+  const abend = themeForLead({ name: "Taverna", placeId: "x" }, "griechisch", "athener-moderne");
+  const traditionell = themeForLead({ name: "Taverna", placeId: "x" }, "griechisch", "taverne-am-hafen");
+
+  assert.equal(abend.theme.dark, true);
+  assert.equal(traditionell.theme.dark, false);
 });
 
 test("themeForLead liefert für denselben Lead immer dasselbe Design", () => {
@@ -316,19 +338,24 @@ test("themeForLead wählt nie ein leeres Bild oder Farbwert", () => {
 
 test("themeForLead erzeugt innerhalb einer Küche verschiedene Varianten", () => {
   const varianten = new Set();
+  const stimmungen = new Set();
   for (let i = 0; i < 120; i += 1) {
     const g = themeForLead({ name: `Pizzeria ${i}`, placeId: `id-${i * 104729}` });
-    varianten.add(`${g.theme.varianteName}|${g.heroImage}`);
+    varianten.add(`${g.stimmung}|${g.heroImage}`);
+    stimmungen.add(g.stimmung);
   }
 
-  assert.ok(varianten.size >= 8, `nur ${varianten.size} Varianten`);
+  // Drei Stimmungen mal zwei Hero-Bildern: Zwei Nachbarlokale derselben Küche
+  // sollen sich ohne Zutun unterscheiden.
+  assert.equal(stimmungen.size, 3);
+  assert.ok(varianten.size >= 5, `nur ${varianten.size} Varianten`);
 });
 
 test("themeForLead akzeptiert eine vorgegebene Küche", () => {
   const g = themeForLead({ name: "Klabwong", placeId: "abc" }, "asiatisch");
 
   assert.equal(g.cuisine, "asiatisch");
-  assert.equal(g.themeName, "neoasian");
+  assert.ok(stimmungenFuer("asiatisch").some((s) => s.id === g.stimmung));
 });
 
 test("imageSpecsForLead listet jedes Bild genau einmal", () => {

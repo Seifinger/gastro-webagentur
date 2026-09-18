@@ -43,6 +43,8 @@ import {
 import { erzeugeTextVorschlag, letzterVorschlag, vergissVorschlag } from "./promptEdits.js";
 import { veroeffentlicheEntwurf } from "./veroeffentlichung.js";
 import { resonanzUebersicht } from "./resonanzStore.js";
+import { ladeStimmungsWahl, speichereStimmung, stimmungFuerLead } from "./stimmungsWahl.js";
+import { stimmungsAuswahl, stimmungenFuer } from "./stimmungen.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -437,7 +439,13 @@ export const handler = async (req, res) => {
     const vorhandeneEdits = loadLeadEdits(slug);
     const html = buildLandingPage(kontext.lead, {
       menu: kontext.menu,
-      gestaltung: themeForLead(kontext.lead, kontext.kueche),
+      // Mit derselben Stimmung wie der spätere Entwurf – sonst zeigt die
+      // Vorschau eine andere Welt als die Seite, die der Wirt bekommt.
+      gestaltung: themeForLead(
+        kontext.lead,
+        kontext.kueche,
+        stimmungFuerLead(kontext.lead, kontext.kueche),
+      ),
       bildUrl: (id, role) => `${ENTWURF_PREFIX}assets/${assetFileName(id, role)}`,
       editUebersteuerung: {
         bilder: vorhandeneEdits.bilder,
