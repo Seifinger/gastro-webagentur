@@ -1,10 +1,11 @@
 import { createServer } from "node:http";
 import { readFileSync, existsSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { timingSafeEqual } from "node:crypto";
 import path from "node:path";
 import QRCode from "qrcode";
 import { readAllLeads } from "./csvImport.js";
-import { landingPagesDir, docsDir, siteBaseUrl, absenderName } from "./config.js";
+import { landingPagesDir, docsDir, siteBaseUrl, absenderName, dashboardHost } from "./config.js";
 import {
   ladeZuordnungen,
   speichereZuordnung,
@@ -258,6 +259,48 @@ function sendeJson(res, status, daten) {
   res.end(JSON.stringify(daten));
 }
 
+/* ---------- Zugriffsschutz für die schreibenden/kostenpflichtigen Routen ---------- */
+
+// Alles unter /intern/ (Bild-Upload, Prompt-Vorschläge samt Vorschau,
+// Veröffentlichen) sowie die Kuechen-Override-Route – das sind die einzigen
+// Aktionen, die etwas schreiben, Geld kosten (Anthropic-API) oder committen
+// und pushen. Reine Anzeige-Routen wie /api/leads bleiben ungeschützt.
+function brauchtToken(pathname, method) {
+  if (pathname.startsWith("/intern/")) return true;
+  if (pathname === "/api/kueche" && method === "POST") return true;
+  return false;
+}
+
+function tokenAusAnfrage(req) {
+  const headerToken = req.headers["x-dashboard-token"];
+  if (headerToken) return Array.isArray(headerToken) ? headerToken[0] : headerToken;
+
+  // Fürs iframe mit der Textvorschau (PROMPT_VORSCHAU): das lädt per
+  // GET-Navigation, ohne eigenen Header setzen zu können – das Cookie geht
+  // bei einer Navigation zur selben Origin trotzdem mit.
+  const treffer = /(?:^|;\s*)dashboard_token=([^;]+)/.exec(req.headers.cookie ?? "");
+  return treffer ? decodeURIComponent(treffer[1]) : null;
+}
+
+/**
+ * Liest DASHBOARD_TOKEN bei jeder Anfrage frisch aus process.env statt es
+ * einmalig beim Start zu cachen – genau wie ANTHROPIC_API_KEY in
+ * promptEdits.js. Nur so können Tests den Token je Testfall setzen, ohne das
+ * Modul neu zu laden.
+ */
+function tokenGueltig(eingegeben) {
+  const erwartet = process.env.DASHBOARD_TOKEN || "";
+  if (!erwartet) return true; // kein Schutz konfiguriert – siehe Warnung beim Start
+
+  if (!eingegeben) return false;
+
+  const a = Buffer.from(String(eingegeben));
+  const b = Buffer.from(erwartet);
+  // timingSafeEqual wirft bei unterschiedlicher Länge, statt "ungleich" zu
+  // liefern – deshalb die Länge vorher separat prüfen.
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 function leseKoerper(req) {
   return new Promise((resolve, reject) => {
     let roh = "";
@@ -277,6 +320,14 @@ export const handler = async (req, res) => {
     req.url,
     `http://${req.headers.host ?? "localhost"}`,
   );
+
+  if (brauchtToken(pathname, req.method) && !tokenGueltig(tokenAusAnfrage(req))) {
+    sendeJson(res, 401, {
+      ok: false,
+      fehler: "Ungültiger oder fehlender Dashboard-Token. Bitte im Dashboard neu anmelden.",
+    });
+    return;
+  }
 
   if (pathname === "/" || pathname === "/index.html") {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
@@ -490,6 +541,13 @@ export const handler = async (req, res) => {
 // importiert denselben Handler und hängt ihn an einen eigenen Port, statt
 // dem laufenden Dashboard den Platz wegzunehmen.
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  if (!process.env.DASHBOARD_TOKEN) {
+    console.log(
+      "\n⚠️  Dashboard läuft ohne Zugriffsschutz - nicht für den Einsatz außerhalb von localhost geeignet.\n" +
+        "   DASHBOARD_TOKEN in der .env setzen, um die /intern/-Routen abzusichern (siehe .env.example).\n",
+    );
+  }
+
   const server = createServer(handler);
 
   // Ein belegter Port ist der häufigste Stolperstein beim Start. Die Meldung
@@ -504,7 +562,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     throw fehler;
   });
 
-  server.listen(port, () => {
-    console.log(`\n📊 Dashboard läuft: http://localhost:${port}\n`);
+  server.listen(port, dashboardHost, () => {
+    console.log(`\n📊 Dashboard läuft: http://${dashboardHost}:${port}\n`);
   });
 }
