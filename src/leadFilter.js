@@ -13,6 +13,9 @@ export function toLead(place, region) {
     anzahlBewertungen: place.userRatingCount ?? "",
     placeId: place.id ?? "",
     ort: region,
+    // Zeitpunkt des Abrufs – Google erlaubt laut Nutzungsbedingungen nur ein
+    // zeitlich begrenztes Zwischenspeichern von Place-Daten (siehe leadFreshness.js).
+    fetchedAt: new Date().toISOString(),
   };
 }
 

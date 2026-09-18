@@ -60,6 +60,9 @@
     color: var(--muted);
   }
   .hinweis a { color: var(--accent); font-weight: 600; }
+  .hinweis.warnung { border-left-color: #ca8a04; color: #92650a; }
+
+  .alter-warnung { color: #ca8a04; font-weight: 600; white-space: nowrap; }
 
   a.entwurf {
     display: inline-block;
@@ -218,6 +221,7 @@
 
 <div class="stats" id="stats"></div>
 <div class="hinweis" id="entwurfHinweis"></div>
+<div class="hinweis warnung" id="frischeHinweis"></div>
 
 <div class="controls">
   <input id="search" type="text" placeholder="Suche nach Name...">
@@ -244,6 +248,7 @@
         <th data-key="mobilFreundlich">Mobil</th>
         <th data-key="wirktVeraltet">Veraltet?</th>
         <th data-key="rating">Bewertung</th>
+        <th data-key="alterTage">Alter</th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
@@ -356,6 +361,20 @@ function yn(value) {
   return '<span class="yn unknown">–</span>';
 }
 
+// Google erlaubt laut Nutzungsbedingungen nur ein zeitlich begrenztes
+// Zwischenspeichern von Place-Daten – ab 25 Tagen wird gewarnt, bevor der
+// Lead mit 30 Tagen "stale" wird und neu abgerufen werden müsste.
+function alterZelle(l) {
+  if (l.alterTage == null) return "unbekannt";
+  if (l.staleWarnung) {
+    const titel = l.abgelaufen
+      ? "Älter als 30 Tage – laut Google-Nutzungsbedingungen neu abrufen"
+      : "Bald 30 Tage alt – Google erlaubt kein längeres Zwischenspeichern";
+    return `<span class="alter-warnung" title="${esc(titel)}">⚠️ ${l.alterTage} Tage</span>`;
+  }
+  return `${l.alterTage} Tage`;
+}
+
 function renderStats(leads) {
   const total = leads.length;
   const sehrHoch = leads.filter((l) => l.score >= 80).length;
@@ -378,6 +397,18 @@ function renderStats(leads) {
   } else {
     hinweis.innerHTML = `<a href="/entwuerfe/" target="_blank" rel="noopener">Übersicht aller Entwürfe öffnen</a>`;
     hinweis.style.display = "block";
+  }
+
+  const baldVeraltet = leads.filter((l) => l.staleWarnung).length;
+  const frischeHinweis = document.getElementById("frischeHinweis");
+  if (baldVeraltet > 0) {
+    frischeHinweis.textContent =
+      `⚠️ ${baldVeraltet} Lead(s) sind seit mindestens 25 Tagen gespeichert – ` +
+      `Google erlaubt maximal 30 Tage Zwischenspeicherung von Place-Daten. ` +
+      `Diese Leads bald mit "node src/index.js --region ..." neu abrufen.`;
+    frischeHinweis.style.display = "block";
+  } else {
+    frischeHinweis.style.display = "none";
   }
 }
 
@@ -441,6 +472,7 @@ function applyFiltersAndRender() {
       <td>${yn(l.mobilFreundlich)}</td>
       <td>${yn(l.wirktVeraltet)}</td>
       <td>${l.rating ? `${l.rating} (${l.anzahlBewertungen || 0})` : "-"}</td>
+      <td>${alterZelle(l)}</td>
     </tr>
   `).join("");
 }
