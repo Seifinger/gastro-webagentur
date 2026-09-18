@@ -610,7 +610,7 @@ document.querySelectorAll("th[data-key]").forEach((th) => {
   document.getElementById(id).addEventListener("input", applyFiltersAndRender);
 });
 
-// Küche ändern: speichern und neu laden, damit Theme-Hinweis und
+// Küche ändern: speichern und neu laden, damit die Stimmungsauswahl und
 // Anschreiben sofort zum neuen Wert passen.
 document.getElementById("tbody").addEventListener("change", async (event) => {
   const select = event.target.closest("select.kueche");

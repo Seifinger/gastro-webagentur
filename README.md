@@ -179,17 +179,53 @@ Die Reihenfolge folgt dem Bestellweg, nicht dem Erzählbedürfnis des Wirts:
 
 Dazu auf dem Handy eine **feste Aktionsleiste am unteren Rand** mit „Bestellen" und „Reservieren", die immer sichtbar bleibt. „Bestellen" springt bei leerem Warenkorb zur Karte und zeigt sonst die aktuelle Summe.
 
-### Drei Themes statt Zufallsfarben
+### Drei Stimmungen je Küche
 
-Die Küche bestimmt die Gestaltungswelt, das Layout bleibt gleich:
+Jede der zwölf Küchen hat drei ausgearbeitete Gestaltungswelten. Vorher teilten sich alle zwölf nur drei Themes – Griechisch lief auf demselben Trattoria-Theme wie Italienisch, Türkisch auf dem dunklen Neo-Asian. Speisekarte und Hero-Signatur waren küchenspezifisch, die Farbwelt nicht, und genau das fällt beim Wirt auf: Sein Lokal sieht aus wie das italienische zwei Straßen weiter.
 
-| Theme | Küchen | Anmutung |
+Die drei Stimmungen folgen überall denselben Archetypen. Das ist auch die Frage, die man dem Wirt stellen kann: **traditionell, abendlich oder hell – was ist Ihr Haus?**
+
+| Küche | Traditionell | Abend | Hell & modern |
+|---|---|---|---|
+| Bayerisch | Wirtshaus | Kellerstube | Biergarten |
+| Italienisch | Trattoria | Osteria Notte | Costiera |
+| Griechisch | Taverne am Hafen | Athener Moderne | Olivenhain |
+| Türkisch | Basar | Bosporus bei Nacht | Anatolische Erde |
+| Syrisch | Damaszener Hof | Gewürzbasar | Levante Modern |
+| Chinesisch | Rote Laterne | Shanghai Nacht | Teehaus |
+| Thailändisch | Orchidee | Streetfood Nacht | Andamanen |
+| Vietnamesisch | Indochine | Hanoi Nacht | Straßenküche |
+| Japanisch | Izakaya | Omakase | Washitsu |
+| Indisch | Gewürzmarkt | Maharadscha | Südindisch hell |
+| Asiatisch | Marktstand | Neon | Fusion Minimal |
+| Café | Wiener Kaffeehaus | Konditorei | Third Wave |
+
+Der Archetyp trägt das **Layout** (Reihenfolge der Abschnitte, ob Reservierung oder Abholung vorn steht, ob die Kopfzeile mitscrollt) – einmal definiert in `designPresets.js` und von allen Küchen genutzt. Die Küche trägt **Farbe, Schrift und Bildauswahl**: Die sechs Hero-Aufnahmen einer Küche teilen sich überschneidungsfrei auf die drei Stimmungen auf, dazu je ein eigenes Interieurbild.
+
+Der Archetyp legt dabei *nicht* fest, ob eine Welt hell oder dunkel ist. Ein Izakaya ist traditionell und trotzdem dunkel, eine Konditorei abendlich und trotzdem hell – die Küche entscheidet.
+
+Die **Hero-Signatur bleibt über alle drei Stimmungen gleich**: Sie ist die Identität der Küche, nicht die der Stimmung.
+
+Ohne eigene Wahl entscheidet der Seed des Leads, welche der drei Welten ein Lokal bekommt – zwei Nachbarlokale derselben Küche wirken damit von selbst verschieden. Im Dashboard lässt sich die Stimmung je Lead von Hand setzen (Spalte **Stimmung**, gespeichert in `data/stimmungen.json`); der Entwurf übernimmt sie beim nächsten Bauen. Wird später die Küche umgestellt, verfällt die dann unpassende Stimmung automatisch.
+
+Ein Test prüft die Lesbarkeit aller 36 Welten rechnerisch – 288 Farbpaarungen, die auf der Seite wirklich vorkommen. Beim ersten Lauf fielen 16 durch, meist weiße Schrift auf zu hellen Akzentflächen.
+
+### Schriften der Stimmungen
+
+Sechs Anzeigeschriften geben den 36 Welten Bandbreite, dazu Inter für den Fließtext überall:
+
+| Schrift | Anmutung | Zum Beispiel |
 |---|---|---|
-| **Trattoria** | italienisch, griechisch, Café | Warme Erdtöne, Playfair Display als Serifenschrift, gemütlich-rustikal |
-| **Neo-Asian** | asiatisch, türkisch | Dunkler Hintergrund, kräftige Akzente (Neonrot, Gold, Orange), Montserrat in Versalien, urbaner Streetfood-Look |
-| **Wirtshaus** | bayerisch | Helles Holz mit Waldgrün, Dunkelrot oder Braun, Merriweather, bodenständig |
+| **Playfair Display** | eleganter Serifenkontrast | Trattoria, Taverne am Hafen |
+| **Merriweather** | bodenständige Serife | Wirtshaus, Anatolische Erde |
+| **Cormorant Garamond** | fein und luftig | Olivenhain, Washitsu, Teehaus |
+| **DM Serif Display** | hoher Kontrast, abendlich | Omakase, Maharadscha, Osteria Notte |
+| **Montserrat** | geometrische Groteske | Athener Moderne, Neon |
+| **Oswald** | schmal, Markt und Straße | Basar, Gewürzmarkt, Streetfood Nacht |
 
-Innerhalb eines Themes gibt es drei Akzentvarianten, dazu sechs Titelbilder je Küche – zwei benachbarte Wirtshäuser sehen also trotz gleichem Theme unterschiedlich aus. Die Zuordnung hängt fest am Lead: derselbe Lead ergibt immer denselben Entwurf.
+Alle liegen lokal (`fontLibrary.js` lädt sie einmalig herunter) – eingebundene Web-Schriften würden die Entwürfe offline unbrauchbar machen und bei jedem Aufruf Googles Server kontaktieren. Je Anzeigefamilie gibt es nur einen Schnitt: Jeder weitere wöge in jedem Entwurf mit, auch wo er nie zum Einsatz kommt. Pro Seite überträgt der Browser Inter plus die eine tatsächlich benutzte Anzeigeschrift.
+
+Die Zuordnung hängt fest am Lead: derselbe Lead ergibt immer denselben Entwurf.
 
 ### Bilder und Schriften
 
@@ -301,7 +337,7 @@ Der Ordner `docs/` wird bei jedem Lauf **komplett neu gebaut** – nimmst du ein
 |---|---|---|
 | Ordner | `data/landingpages/` (nicht in Git) | `docs/` (wird committet) |
 | Bilder | lokal heruntergeladen, **offline nutzbar** | direkt von Unsplash geladen, hält das Repository klein |
-| Schriften | lokal | lokal (rund 760 KB, wegen DSGVO nicht von Googles Servern) |
+| Schriften | lokal | lokal (rund 880 KB für alle sieben Familien, wegen DSGVO nicht von Googles Servern) |
 | Hinweis | keiner | Leiste „Unverbindlicher Gestaltungsentwurf – **nicht** die offizielle Website von …" |
 | Suchmaschinen | – | `noindex, nofollow` auf jeder Seite |
 | Übersicht | mit Lead-Score und Priorität | neutrale Showcase-Seite **ohne** interne Vertriebsdaten |

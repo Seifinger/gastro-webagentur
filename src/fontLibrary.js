@@ -120,7 +120,7 @@ export async function ensureFonts(targetDir) {
 /**
  * Baut das @font-face-CSS für die lokal abgelegten Schriften. Ohne Manifest
  * kommt ein leerer String zurück – die Seiten greifen dann auf die
- * Systemschriften der Theme-Definition zurück.
+ * Systemschriften der Stimmung zurück.
  */
 export function fontFaceCss(fontsDir, assetsPath = "../assets/fonts") {
   let manifest;

@@ -44,7 +44,7 @@ function hashText(text) {
 }
 
 /**
- * Leitet aus dem Lead das Erscheinungsbild ab: Die Küche bestimmt das Theme,
+ * Leitet aus dem Lead das Erscheinungsbild ab: Die Küche bestimmt die Stimmung,
  * der Lead die Akzentvariante und die Bildauswahl. Gleicher Lead ergibt
  * immer denselben Entwurf.
  */
