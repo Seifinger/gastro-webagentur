@@ -1,16 +1,25 @@
 import { mkdirSync, existsSync, writeFileSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-// Die Themes brauchen echte Schriften. Wir laden sie einmalig von Google Fonts
-// und legen sie lokal ab – eingebundene Web-Schriften würden die Entwürfe
-// offline unbrauchbar machen. Alle vier Familien stehen unter der SIL Open
-// Font License und dürfen selbst gehostet werden.
+// Die Stimmungen brauchen echte Schriften. Wir laden sie einmalig von Google
+// Fonts und legen sie lokal ab – eingebundene Web-Schriften würden die
+// Entwürfe offline unbrauchbar machen und bei jedem Aufruf Googles Server
+// kontaktieren. Alle Familien stehen unter der SIL Open Font License und
+// dürfen selbst gehostet werden.
+//
+// Inter trägt den Fließtext aller Stimmungen, die übrigen fünf sind
+// Anzeigeschriften: Je Stimmung wird genau eine davon gebraucht (siehe
+// stimmungen.js). Deshalb nur ein Schnitt je Anzeigefamilie – jeder weitere
+// wöge in jedem Entwurf mit, auch wo er nie zum Einsatz kommt.
 
 const FAMILIES = [
   { family: "Inter", weights: [400, 600, 700] },
   { family: "Playfair Display", weights: [700] },
   { family: "Merriweather", weights: [700] },
   { family: "Montserrat", weights: [600, 700] },
+  { family: "Cormorant Garamond", weights: [600] },
+  { family: "DM Serif Display", weights: [400] },
+  { family: "Oswald", weights: [500] },
 ];
 
 // Für deutsche Texte reichen diese beiden Zeichensatz-Ausschnitte; die

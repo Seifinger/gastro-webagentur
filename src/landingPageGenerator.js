@@ -6,7 +6,7 @@ import {
   gerichtId,
 } from "./menuCatalog.js";
 import { HERO_IMAGES, INTERIOR_IMAGES, TEAM_IMAGES, assetFileName } from "./imageLibrary.js";
-import { resolveTheme, THEMES, themeNameForCuisine } from "./themes.js";
+import { resolveStimmung, stimmungenFuer, ARCHETYP_LABEL } from "./stimmungen.js";
 import {
   heroSignatur,
   heroDishPhoto,
@@ -17,7 +17,7 @@ import {
 import { MOTION_CSS, MOTION_SCRIPT } from "./motion.js";
 import { resonanzSkript } from "./resonanzBeacon.js";
 import { stimmenFuer, PLATZHALTER_ERKLAERUNG } from "./testimonials.js";
-import { getPresetVariant, withDesignDefaults } from "./designPresets.js";
+import { getPresetVariant, withDesignDefaults, presetFuerArchetyp } from "./designPresets.js";
 
 // Standard-Öffnungszeiten für den Entwurf. Google liefert diese Felder in
 // unserer Suchabfrage nicht mit, deshalb sind es bewusst Platzhalter, die auf
@@ -48,37 +48,53 @@ function hashText(text) {
  * der Lead die Akzentvariante und die Bildauswahl. Gleicher Lead ergibt
  * immer denselben Entwurf.
  */
-export function themeForLead(lead, cuisineOverride) {
+export function themeForLead(lead, cuisineOverride, stimmungsId) {
   const cuisine = cuisineOverride ?? detectCuisine(lead?.name);
   const seed = hashText(String(lead?.placeId || lead?.name || "restaurant"));
 
+  // Ohne ausdrückliche Wahl entscheidet der Seed, welche der drei Stimmungen
+  // dieser Küche das Lokal bekommt – zwei Nachbarlokale wirken damit von
+  // selbst verschieden, ohne dass jemand eingreifen muss.
+  const stimmung = resolveStimmung(cuisine, { id: stimmungsId, seed });
+  const rang = stimmungenFuer(cuisine).indexOf(stimmung);
+
   const heroPool = HERO_IMAGES[cuisine] ?? HERO_IMAGES.bayerisch;
   const interiorPool = INTERIOR_IMAGES[cuisine] ?? INTERIOR_IMAGES.bayerisch;
+  // Jede Stimmung beansprucht zwei der sechs Hero-Aufnahmen; welche der beiden
+  // es wird, entscheidet weiterhin der Seed.
+  const heroAuswahl = stimmung.bilder.map((i) => heroPool[i]).filter(Boolean);
+  const { id, archetyp, bilder, ...themeWerte } = stimmung;
 
   return {
     cuisine,
     seed,
-    themeName: themeNameForCuisine(cuisine),
-    theme: resolveTheme(cuisine, seed % THEMES[themeNameForCuisine(cuisine)].varianten.length),
+    stimmung: id,
+    archetyp,
+    themeName: id,
+    theme: { ...themeWerte, varianteName: ARCHETYP_LABEL[archetyp] },
     // Unbedingt >>> statt >>: der Hash nutzt den vollen 32-Bit-Bereich, ein
     // vorzeichenbehafteter Shift ergäbe negative Indizes.
-    heroImage: heroPool[(seed >>> 12) % heroPool.length],
-    hausBild: interiorPool[(seed >>> 9) % interiorPool.length],
+    heroImage: heroAuswahl[(seed >>> 12) % heroAuswahl.length],
+    // Ein Interieurbild je Stimmung, damit auch der Raum mitwechselt.
+    hausBild: interiorPool[rang % interiorPool.length],
     teamBild: TEAM_IMAGES[(seed >>> 15) % TEAM_IMAGES.length],
   };
 }
 
 /**
- * Löst das Design-Preset für eine Seite auf: eine eigene Vorgabe
- * (options.preset) gewinnt und wird mit den Standardwerten aufgefüllt, sonst
- * die benannte Variante der Küche (options.designVariant, Standard
- * "default"). Fehlt ein Feld, greift in jedem Fall der bisherige
- * Standardwert aus designPresets.js – das bisherige Verhalten bleibt also
- * ohne Angaben unverändert.
+ * Löst das Layout einer Seite auf, in dieser Rangfolge:
+ *
+ * 1. eine eigene Vorgabe (options.preset), mit Standardwerten aufgefüllt
+ * 2. eine ausdrücklich benannte Küchenvariante (options.designVariant)
+ * 3. der Archetyp der Stimmung – der normale Weg, siehe stimmungen.js
+ *
+ * Fehlt ein Feld, greift überall der Standardwert aus designPresets.js. Eine
+ * Seite ohne Layout kann es damit nicht geben.
  */
-function resolveDesignPreset(cuisine, options) {
+function resolveDesignPreset(gestaltung, options) {
   if (options.preset) return withDesignDefaults(options.preset);
-  return getPresetVariant(cuisine, options.designVariant);
+  if (options.designVariant) return getPresetVariant(gestaltung.cuisine, options.designVariant);
+  return presetFuerArchetyp(gestaltung.archetyp);
 }
 
 // Ohne Übersteuerung bleibt jede Gerichtsbeschreibung die aus menuCatalog.js.
@@ -1104,7 +1120,7 @@ export function buildLandingPage(lead, options = {}) {
   const menu = options.menu ?? menuForLead(lead);
   const gestaltung = options.gestaltung ?? themeForLead(lead);
   const t = gestaltung.theme;
-  const preset = resolveDesignPreset(gestaltung.cuisine, options);
+  const preset = resolveDesignPreset(gestaltung, options);
   const openingHours = options.öffnungszeiten ?? DEFAULT_OPENING_HOURS;
   const kontaktEmail = options.kontaktEmail ?? "";
   const assets = options.assetsPath ?? "../assets";
