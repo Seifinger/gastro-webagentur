@@ -412,6 +412,18 @@ test("ein unbekannter hero.type fällt auf die Küchen-Signatur zurück", () => 
   assert.ok(html.includes('class="sig sig-pizza"'));
 });
 
+// --- Küchenspezifische Hero-Signaturen (heroSignature.js) -------------------
+
+test("Thailändisch bekommt die aufblühende Orchidee als eigene Signatur", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.thailaendisch,
+    gestaltung: themeForLead(lead, "thailaendisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-orchid"'));
+  assert.ok(!html.includes('class="sig sig-diashow"'));
+});
+
 test("hero.primaryAction 'reservation' betont Reservieren, ohne Texte oder Ziele zu ändern", () => {
   const html = buildLandingPage(lead, {
     menu: MENUS.italienisch,
