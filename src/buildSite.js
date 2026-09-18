@@ -139,6 +139,7 @@ export function schreibeSeiten(entries, zielordner, optionen = {}) {
       ...optionen,
       menu: menuForCuisine(entry.cuisine),
       gestaltung: entry.gestaltung,
+      editUebersteuerung: entry.editUebersteuerung,
     });
 
     const dir = path.join(zielordner, entry.slug);

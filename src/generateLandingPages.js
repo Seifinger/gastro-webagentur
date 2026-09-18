@@ -3,6 +3,7 @@ import path from "node:path";
 import { landingPagesDir } from "./config.js";
 import { escapeHtml } from "./landingPageGenerator.js";
 import { assetFileName } from "./imageLibrary.js";
+import { loadLeadEdits } from "./leadEdits.js";
 import {
   parseArgs,
   pruefeKueche,
@@ -87,7 +88,13 @@ async function run() {
   }
 
   mkdirSync(landingPagesDir, { recursive: true });
-  const entries = baueEintraege(leads, args.cuisine);
+
+  // Was ein Kunde für seinen Entwurf selbst eingepflegt hat. Ohne Datei bleibt
+  // es beim generischen Entwurf – der Normalfall für die übrigen Leads.
+  const entries = baueEintraege(leads, args.cuisine).map((entry) => ({
+    ...entry,
+    editUebersteuerung: loadLeadEdits(entry.slug),
+  }));
 
   // Entwurfsordner aus früheren Läufen entfernen – sonst bleiben Seiten mit
   // veralteter Küche oder altem Namen liegen und das Dashboard verlinkt sie
