@@ -44,7 +44,7 @@ import { erzeugeTextVorschlag, letzterVorschlag, vergissVorschlag } from "./prom
 import { veroeffentlicheEntwurf } from "./veroeffentlichung.js";
 import { resonanzUebersicht } from "./resonanzStore.js";
 import { ladeStimmungsWahl, speichereStimmung, stimmungFuerLead } from "./stimmungsWahl.js";
-import { stimmungsAuswahl, stimmungenFuer } from "./stimmungen.js";
+import { stimmungenFuer } from "./stimmungen.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -105,6 +105,7 @@ function readManifest() {
 function leadsMitZusatz() {
   const manifest = readManifest();
   const zuordnungen = ladeZuordnungen();
+  const stimmungsWahl = ladeStimmungsWahl();
 
   return readAllLeads()
     .map((lead) => {
@@ -117,10 +118,22 @@ function leadsMitZusatz() {
         Boolean(slug) && existsSync(path.join(docsDir, slug, "index.html"));
       const alter = ageInDays(lead);
 
+      const kueche = kuecheFuerLead(lead, zuordnungen);
+      const gewaehlteStimmung = stimmungFuerLead(lead, kueche, stimmungsWahl);
+
       return {
         ...lead,
-        kueche: kuecheFuerLead(lead, zuordnungen),
+        kueche,
         kuecheManuell: Boolean(zuordnungen[lead.placeId]),
+        // Ohne eigene Wahl entscheidet der Seed – das Dashboard zeigt dann,
+        // welche Stimmung dabei herauskommt, statt eines leeren Feldes.
+        stimmung: gewaehlteStimmung ?? themeForLead(lead, kueche).stimmung,
+        stimmungManuell: Boolean(gewaehlteStimmung),
+        stimmungen: stimmungenFuer(kueche).map(({ id, label, archetyp }) => ({
+          id,
+          label,
+          archetyp,
+        })),
         slug: slug ?? "",
         entwurf: slug ? `${ENTWURF_PREFIX}${slug}/` : "",
         demoUrl,
@@ -276,12 +289,13 @@ function sendeJson(res, status, daten) {
 /* ---------- Zugriffsschutz für die schreibenden/kostenpflichtigen Routen ---------- */
 
 // Alles unter /intern/ (Bild-Upload, Prompt-Vorschläge samt Vorschau,
-// Veröffentlichen) sowie die Kuechen-Override-Route – das sind die einzigen
-// Aktionen, die etwas schreiben, Geld kosten (Anthropic-API) oder committen
-// und pushen. Reine Anzeige-Routen wie /api/leads bleiben ungeschützt.
+// Veröffentlichen) sowie die Routen, die eine Zuordnung schreiben – das sind
+// die einzigen Aktionen, die etwas schreiben, Geld kosten (Anthropic-API) oder
+// committen und pushen. Reine Anzeige-Routen wie /api/leads bleiben ungeschützt.
 function brauchtToken(pathname, method) {
   if (pathname.startsWith("/intern/")) return true;
   if (pathname === "/api/kueche" && method === "POST") return true;
+  if (pathname === "/api/stimmung" && method === "POST") return true;
   return false;
 }
 
@@ -519,6 +533,17 @@ export const handler = async (req, res) => {
     try {
       const { placeId, kueche } = JSON.parse(await leseKoerper(req));
       speichereZuordnung(placeId, kueche ?? "");
+      sendeJson(res, 200, { ok: true });
+    } catch (error) {
+      sendeJson(res, 400, { ok: false, fehler: error.message });
+    }
+    return;
+  }
+
+  if (pathname === "/api/stimmung" && req.method === "POST") {
+    try {
+      const { placeId, kueche, stimmung } = JSON.parse(await leseKoerper(req));
+      speichereStimmung(placeId, kueche, stimmung ?? "");
       sendeJson(res, 200, { ok: true });
     } catch (error) {
       sendeJson(res, 400, { ok: false, fehler: error.message });

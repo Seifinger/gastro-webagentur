@@ -391,6 +391,8 @@ Es gibt Unit-Tests für die Filterlogik, den Landing-Page-Generator und den Spei
 npm test
 ```
 
+Das Skript setzt bewusst `--test-concurrency=1`. Mehrere Testdateien legen echte Dateien unter `data/` an – Lead-CSVs und das Entwurfs-Manifest `data/landingpages/entwuerfe.json`. Parallel laufende Testdateien haben sich dabei gegenseitig die Fixtures unter den Füßen weggeschrieben: Ein Test richtete seinen Lead ein, eine andere Datei überschrieb das Manifest, und der erste bekam „Zu diesem Entwurf gibt es keinen Lead" – etwa jeder fünfte Lauf, an wechselnden Stellen. Seriell kostet die Suite gut eine Sekunde mehr und ist dafür verlässlich.
+
 ## Geplante Erweiterungen (nicht Teil dieser ersten Version)
 
 - Outreach-Anschreiben pro Lead vorbereiten (Versand bleibt bewusst manuell freizugeben).

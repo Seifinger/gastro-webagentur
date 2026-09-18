@@ -152,6 +152,19 @@ test("mit gesetztem DASHBOARD_TOKEN: die Kuechen-Override-Route ist ebenfalls ge
     }),
   ));
 
+test("mit gesetztem DASHBOARD_TOKEN: die Stimmungs-Route ist ebenfalls geschützt", () =>
+  mitToken("geheim-123", () =>
+    mitServer(async (basis) => {
+      const antwort = await fetch(`${basis}/api/stimmung`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ placeId: "irgendeine-id", kueche: "griechisch", stimmung: "olivenhain" }),
+      });
+
+      assert.equal(antwort.status, 401);
+    }),
+  ));
+
 test("mit gesetztem DASHBOARD_TOKEN: rein lesende Routen bleiben ungeschützt", () =>
   mitToken("geheim-123", () =>
     mitServer(async (basis) => {
