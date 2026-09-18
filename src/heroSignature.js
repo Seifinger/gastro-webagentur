@@ -204,6 +204,29 @@ const SIGNATUR_CSS = `
   .sig-spice { right: -2%; top: 15%; transform: none; width: 40vw; }
 }
 
+/* Asiatisch (gemischt): ein bis zwei Laternen pulsieren dezent am Rand –
+   nicht mittig über dem Essen wie das Sushi-Band, das Japanisch behält.
+   Statt box-shadow direkt zu animieren (teuer, löst Repaints aus), trägt
+   ein Pseudo-Element mit stärkerem Schein, dessen Opazität pulsiert – der
+   sichtbare Effekt ist derselbe, animiert wird trotzdem nur opacity. */
+.sig-lanterns { left: 3%; top: 14%; display: flex; flex-direction: column; gap: 26px; }
+.sig-lanterns .laterne { position: relative; width: clamp(30px, 4vw, 46px); aspect-ratio: 1;
+                          border-radius: 50%;
+                          background: radial-gradient(circle at 40% 35%, #ffb347, #c8380c 78%);
+                          box-shadow: 0 0 10px 2px rgba(255,130,40,.35);
+                          transform-origin: 50% -14%;
+                          animation: sig-laterne-schaukel 7s ease-in-out infinite; }
+.sig-lanterns .laterne::after { content: ""; position: absolute; inset: -6px; border-radius: 50%;
+                                 box-shadow: 0 0 22px 10px rgba(255,140,40,.85); opacity: 0;
+                                 animation: sig-laterne-puls 4s ease-in-out infinite; }
+.sig-lanterns .laterne:nth-child(2) { width: clamp(22px, 3vw, 34px); animation-delay: 1.6s; }
+.sig-lanterns .laterne:nth-child(2)::after { animation-delay: .8s; }
+@keyframes sig-laterne-puls { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+@keyframes sig-laterne-schaukel { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@media (max-width: 899px) {
+  .sig-lanterns { left: 2%; top: 8%; gap: 16px; }
+}
+
 /* Generische, küchenunabhängige Hero-Varianten – wählbar über das
    Design-Preset-Modell (designPresets.js) für A/B-Tests, ohne die
    küchenspezifischen Signaturen oben zu verändern. */
@@ -248,6 +271,8 @@ const SIGNATUR_CSS = `
   .bewegt .sig-spice .puff, .bewegt .sig-spice.da .puff {
     opacity: 1; transform: none; animation: none;
   }
+  .sig-lanterns .laterne { animation: none; }
+  .sig-lanterns .laterne::after { animation: none; opacity: .55; }
 }
 `;
 
@@ -289,6 +314,14 @@ function heroSpicePuff() {
     </div>`;
 }
 
+function heroLanternGlow() {
+  return `
+    <div class="sig sig-lanterns" aria-hidden="true">
+      <div class="laterne"></div>
+      <div class="laterne"></div>
+    </div>`;
+}
+
 /**
  * Liefert das bewegte Hero-Element zur Küche. Ohne passende Bilder bleibt es
  * weg – lieber kein Effekt als ein leerer Rahmen.
@@ -314,9 +347,8 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
       </div>`;
   }
 
-  // Das Sushi-Band gehört zu Japan, wird aber auch von der panasiatischen
-  // Sammelkategorie genutzt – dort passt nichts Genaueres.
-  if (cuisine === "asiatisch" || cuisine === "japanisch") {
+  // Das Sushi-Band gehört zu Japan.
+  if (cuisine === "japanisch") {
     if (gerichte.length < 3) return "";
     const bilder = gerichte.slice(0, 5);
     // Doppelt ausgeben, damit der Umlauf ohne Sprung schließt.
@@ -324,6 +356,12 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
       .map((g) => `<img src="${esc(bild(g.bild, "gericht", bildUrl))}" alt="">`)
       .join("");
     return `<div class="sig sig-band" aria-hidden="true"><div class="band">${kette}</div></div>`;
+  }
+
+  // Die panasiatische Sammelkategorie bekommt Laternen am Rand statt des
+  // Sushi-Bands – rein dekorativ, deshalb ohne Abhängigkeit von Gerichtsfotos.
+  if (cuisine === "asiatisch") {
+    return heroLanternGlow();
   }
 
   // Der Drehteller in der Tischmitte: drei Schalen, die langsam vorbeiziehen.

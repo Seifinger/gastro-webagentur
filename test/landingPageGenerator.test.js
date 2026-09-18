@@ -434,6 +434,25 @@ test("Indisch bekommt das aufplatzende Gewürzwölkchen als eigene Signatur", ()
   assert.ok(!html.includes('class="sig sig-tafel"'));
 });
 
+test("Asiatisch (gemischt) bekommt pulsierende Laternen statt des Sushi-Bands", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.asiatisch,
+    gestaltung: themeForLead(lead, "asiatisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-lanterns"'));
+  assert.ok(!html.includes('class="sig sig-band"'));
+});
+
+test("Japanisch behält das Sushi-Band als Signatur", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.japanisch,
+    gestaltung: themeForLead(lead, "japanisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-band"'));
+});
+
 test("hero.primaryAction 'reservation' betont Reservieren, ohne Texte oder Ziele zu ändern", () => {
   const html = buildLandingPage(lead, {
     menu: MENUS.italienisch,
