@@ -107,17 +107,13 @@ async function run() {
   }
 
   const leads = waehleLeads(args);
-  if (leads.length === 0) {
-    console.log("\nKeine passenden Leads gefunden. Erst 'npm start' ausführen.\n");
-    return;
-  }
 
   // Komplett neu aufbauen: Ein abgewählter Entwurf muss auch wirklich
   // verschwinden und nicht als Altlast online bleiben.
   rmSync(docsDir, { recursive: true, force: true });
   mkdirSync(docsDir, { recursive: true });
 
-  const entries = baueEintraege(leads, args.cuisine);
+  const entries = leads.length > 0 ? baueEintraege(leads, args.cuisine) : [];
 
   console.log("\n🔤 Prüfe Schriften ...");
   const fontCss = await ladeSchriften(path.join(docsDir, "assets", "fonts"));
@@ -137,13 +133,21 @@ async function run() {
   schreibeSeiten(entries, docsDir, gemeinsam);
 
   // Erfundene Lokale: das, was auf der Startseite steht.
-  const demoEntries = DEMO_LEADS.map((lead) => ({
-    lead,
-    cuisine: lead.kueche,
-    gestaltung: themeForLead(lead, lead.kueche),
-    slug: `beispiel-${lead.kueche}`,
-    menu: menuForCuisine(lead.kueche),
-  }));
+  const demoEntries = DEMO_LEADS.map((lead) => {
+    let slug = `beispiel-${lead.kueche}`;
+    // Wenn der Lead einen sprechenden placeId hat (z. B. "demo-losteria"),
+    // nutze den Namen in der Slug, um Kollisionen bei mehreren Pro Küche zu vermeiden
+    if (lead.placeId.startsWith("demo-") && lead.placeId !== `demo-${lead.kueche}`) {
+      slug = lead.placeId;
+    }
+    return {
+      lead,
+      cuisine: lead.kueche,
+      gestaltung: themeForLead(lead, lead.kueche),
+      slug,
+      menu: menuForCuisine(lead.kueche),
+    };
+  });
   schreibeSeiten(demoEntries, docsDir, { ...gemeinsam, fiktiv: true });
 
   writeFileSync(path.join(docsDir, "index.html"), buildShowcasePage(demoEntries, args.kontakt), "utf-8");

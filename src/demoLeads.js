@@ -105,4 +105,22 @@ export const DEMO_LEADS = [
     rating: 4.9,
     anzahlBewertungen: 341,
   },
+  {
+    placeId: "demo-losteria",
+    kueche: "italienisch",
+    name: "Losteria",
+    ort: "München",
+    adresse: "Musterstraße 45, 80331 München",
+    rating: 4.7,
+    anzahlBewertungen: 892,
+  },
+  {
+    placeId: "demo-hans-im-glück",
+    kueche: "bayerisch",
+    name: "Hans im Glück",
+    ort: "München",
+    adresse: "Musterallee 22, 80331 München",
+    rating: 4.6,
+    anzahlBewertungen: 1247,
+  },
 ];
