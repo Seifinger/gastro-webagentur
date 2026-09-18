@@ -181,6 +181,29 @@ const SIGNATUR_CSS = `
   .sig-orchid { right: -6%; top: 12%; transform: none; width: 40vw; opacity: .6; }
 }
 
+/* Indisch: ein Puder-Wölkchen platzt auf, sobald der Hero ins Bild scrollt –
+   dieselbe .bewegt/.da-Kopplung wie bei der Orchidee, aber als einmalige
+   @keyframes-Animation statt Übergang, weil Start- und Zielwert hier auf
+   zwei verschiedene Zwischenstufen fallen (nicht nur an/aus). */
+.sig-spice { right: 8%; top: 50%; transform: translateY(-50%);
+             width: clamp(160px, 22vw, 240px); aspect-ratio: 1; }
+.sig-spice .puff { position: absolute; border-radius: 50%; filter: blur(7px); }
+.sig-spice .puff-1 { left: 20%; top: 30%; width: 46%; aspect-ratio: 1;
+                      background: radial-gradient(circle, #ffb238, #e2790a 72%); }
+.sig-spice .puff-2 { left: 42%; top: 46%; width: 38%; aspect-ratio: 1;
+                      background: radial-gradient(circle, #ffd27a, #d9660a 72%); }
+.sig-spice .puff-3 { left: 10%; top: 54%; width: 30%; aspect-ratio: 1;
+                      background: radial-gradient(circle, #ffc25c, #c65a06 72%); }
+.bewegt .sig-spice .puff { opacity: 0; transform: scale(.5); }
+.bewegt .sig-spice.da .puff { animation: sig-spice-puff .8s ease-out forwards; }
+@keyframes sig-spice-puff {
+  from { opacity: .8; transform: scale(.5); }
+  to { opacity: 0; transform: scale(1.3); }
+}
+@media (max-width: 899px) {
+  .sig-spice { right: -2%; top: 15%; transform: none; width: 40vw; }
+}
+
 /* Generische, küchenunabhängige Hero-Varianten – wählbar über das
    Design-Preset-Modell (designPresets.js) für A/B-Tests, ohne die
    küchenspezifischen Signaturen oben zu verändern. */
@@ -222,6 +245,9 @@ const SIGNATUR_CSS = `
   .bewegt .sig-orchid .bluete, .bewegt .sig-orchid.da .bluete {
     opacity: 1; transform: none; transition: none;
   }
+  .bewegt .sig-spice .puff, .bewegt .sig-spice.da .puff {
+    opacity: 1; transform: none; animation: none;
+  }
 }
 `;
 
@@ -251,6 +277,15 @@ function heroOrchidBloom() {
         ${bluetenblaetter}
         <circle class="bluete-mitte" cx="50" cy="50" r="6"></circle>
       </svg>
+    </div>`;
+}
+
+function heroSpicePuff() {
+  return `
+    <div class="sig sig-spice" aria-hidden="true">
+      <div class="puff puff-1"></div>
+      <div class="puff puff-2"></div>
+      <div class="puff puff-3"></div>
     </div>`;
 }
 
@@ -321,9 +356,8 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
       </div>`;
   }
 
-  // Die wechselnde Tagesempfehlung – bei der indischen Karte trägt sie die
-  // Currys, beim Wirtshaus den Braten.
-  if (cuisine === "bayerisch" || cuisine === "indisch") {
+  // Die wechselnde Tagesempfehlung trägt beim Wirtshaus den Braten.
+  if (cuisine === "bayerisch") {
     if (gerichte.length < 3) return "";
     const karten = gerichte
       .slice(0, 3)
@@ -336,6 +370,12 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
       )
       .join("");
     return `<div class="sig sig-tafel" aria-hidden="true">${karten}</div>`;
+  }
+
+  // Ein Wölkchen aus Gewürzpuder platzt auf, sobald der Hero ins Bild
+  // scrollt – rein dekorativ, deshalb ohne Abhängigkeit von Gerichtsfotos.
+  if (cuisine === "indisch") {
+    return heroSpicePuff();
   }
 
   if (cuisine === "griechisch") {

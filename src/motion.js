@@ -126,7 +126,8 @@ export const MOTION_SCRIPT = `
     [".reserve-grid > *", "auftritt"],
     [".contact-grid > *", "auftritt"],
     [".kat", "auftritt"],
-    [".sig-orchid", "auftritt-orchid"]
+    [".sig-orchid", "auftritt-orchid"],
+    [".sig-spice", "auftritt-spice"]
   ];
 
   var beobachtet = [];

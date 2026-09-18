@@ -424,6 +424,16 @@ test("Thailändisch bekommt die aufblühende Orchidee als eigene Signatur", () =
   assert.ok(!html.includes('class="sig sig-diashow"'));
 });
 
+test("Indisch bekommt das aufplatzende Gewürzwölkchen als eigene Signatur", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.indisch,
+    gestaltung: themeForLead(lead, "indisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-spice"'));
+  assert.ok(!html.includes('class="sig sig-tafel"'));
+});
+
 test("hero.primaryAction 'reservation' betont Reservieren, ohne Texte oder Ziele zu ändern", () => {
   const html = buildLandingPage(lead, {
     menu: MENUS.italienisch,
