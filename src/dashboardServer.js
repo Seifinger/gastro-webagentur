@@ -12,6 +12,7 @@ import {
 } from "./cuisineOverrides.js";
 import { kuechenAuswahl } from "./menuCatalog.js";
 import { anschreiben } from "./outreach.js";
+import { ageInDays, isStale, isAgingSoon } from "./leadFreshness.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dashboardHtmlPath = path.join(__dirname, "..", "public", "dashboard.html");
@@ -69,6 +70,7 @@ function leadsMitZusatz() {
       // eine 404-Seite – vor seinen Augen, mitten im Gespräch.
       const veroeffentlicht =
         Boolean(slug) && existsSync(path.join(docsDir, slug, "index.html"));
+      const alter = ageInDays(lead);
 
       return {
         ...lead,
@@ -78,6 +80,12 @@ function leadsMitZusatz() {
         demoUrl,
         veroeffentlicht,
         anschreiben: anschreiben(lead, demoUrl, absenderName),
+        // Google erlaubt laut Nutzungsbedingungen nur ein zeitlich begrenztes
+        // Zwischenspeichern von Place-Daten – der Wirt bekommt einen
+        // Frühwarn-Hinweis, bevor die Frist abläuft (siehe leadFreshness.js).
+        alterTage: Number.isFinite(alter) ? Math.floor(alter) : null,
+        staleWarnung: isAgingSoon(lead),
+        abgelaufen: isStale(lead),
       };
     })
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));

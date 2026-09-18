@@ -19,6 +19,7 @@ const COLUMNS = [
   "anzahlBewertungen",
   "placeId",
   "ort",
+  "fetchedAt",
 ];
 
 function escapeCsvValue(value) {
