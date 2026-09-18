@@ -27,7 +27,7 @@ function buildOverviewPage(entries) {
         <div class="body">
           <strong>${escapeHtml(lead.name)}</strong>
           <span class="meta">${escapeHtml(lead.ort ?? "")} · ${escapeHtml(cuisine)}</span>
-          <span class="meta">Theme: ${escapeHtml(gestaltung.theme.label)} / ${escapeHtml(gestaltung.theme.varianteName)}</span>
+          <span class="meta">Stimmung: ${escapeHtml(gestaltung.theme.label)} (${escapeHtml(gestaltung.theme.varianteName)})</span>
         </div>
       </a>`,
     )
@@ -62,7 +62,7 @@ function buildOverviewPage(entries) {
 <body>
 <div class="wrap">
   <h1>Landing-Page-Entwürfe</h1>
-  <p class="lead">${entries.length} Entwürfe, sortiert nach Lead-Score. Jede Seite hat ein Theme passend zur Küche, Highlights aus der Karte, Abholbestellung und Tischreservierung.</p>
+  <p class="lead">${entries.length} Entwürfe, sortiert nach Lead-Score. Jede Seite hat eine Stimmung passend zur Küche, Highlights aus der Karte, Abholbestellung und Tischreservierung.</p>
   <div class="grid">${cards}</div>
 </div>
 </body>
