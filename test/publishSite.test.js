@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs, leadFuerSlug, baueEintraege, schreibeSeiten } from "../src/buildSite.js";
 import { baueUndSchreibeEinzelnenEntwurf } from "../src/publishSite.js";
+import { uploadsDir } from "../src/bildUpload.js";
 import { saveLeadEdits, loadLeadEdits } from "../src/leadEdits.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -205,6 +206,75 @@ test("baueUndSchreibeEinzelnenEntwurf baut nur den Ziel-Slug in zielordner und r
     readFileSync(path.join(scratchDocsDir, "ein-anderer-entwurf", "index.html"), "utf-8"),
     "unveraendert",
   );
+});
+
+test("baueUndSchreibeEinzelnenEntwurf kopiert ein eigenes Foto mit und schreibt den Pfad relativ um", async (t) => {
+  const placeId = "ChIJgranularbild1";
+  richteLeadEin("test-granular-bild", placeId, "Gasthaus Zum Löwen");
+  t.after(() => raeumeAuf("test-granular-bild", placeId));
+
+  const [{ slug }] = baueEintraege(
+    [{ name: "Gasthaus Zum Löwen", placeId, ort: "Mühldorf am Inn" }],
+    "bayerisch",
+  );
+  schreibeManifest({ [placeId]: slug });
+
+  // Ein eigenes Foto simulieren, wie es bildUpload.js unter public/uploads/
+  // ablegen würde – die Bilddaten selbst sind für den Test irrelevant, nur
+  // dass die Datei existiert und danach byteidentisch woanders liegt.
+  mkdirSync(path.join(uploadsDir, slug), { recursive: true });
+  const bildInhalt = Buffer.from("fake-jpeg-bytes");
+  writeFileSync(path.join(uploadsDir, slug, "hero.jpg"), bildInhalt);
+  saveLeadEdits(slug, { bilder: { hero: `/uploads/${slug}/hero.jpg` } });
+  t.after(() => {
+    rmSync(path.join(leadEditsDir, `${slug}.json`), { force: true });
+    rmSync(path.join(uploadsDir, slug), { recursive: true, force: true });
+  });
+
+  rmSync(scratchDocsDir, { recursive: true, force: true });
+  mkdirSync(path.join(scratchDocsDir, "assets", "fonts"), { recursive: true });
+  writeFileSync(path.join(scratchDocsDir, "assets", "fonts", "fonts.json"), "[]", "utf-8");
+
+  await baueUndSchreibeEinzelnenEntwurf(slug, { zielordner: scratchDocsDir });
+
+  // Die Referenz im HTML zeigt relativ in den Entwurfsordner selbst – nicht
+  // mehr auf den lokalen, gitignorten /uploads/-Pfad, den es auf GitHub
+  // Pages gar nicht gibt.
+  const html = readFileSync(path.join(scratchDocsDir, slug, "index.html"), "utf-8");
+  assert.match(html, /<img src="\.\/bilder\/hero\.jpg" alt="Gasthaus Zum Löwen">/);
+  assert.ok(!html.includes("/uploads/"));
+
+  const kopie = path.join(scratchDocsDir, slug, "bilder", "hero.jpg");
+  assert.ok(existsSync(kopie));
+  assert.deepEqual(readFileSync(kopie), bildInhalt);
+
+  // Die Quelle unter public/uploads/ bleibt unverändert (nicht verschoben).
+  assert.deepEqual(readFileSync(path.join(uploadsDir, slug, "hero.jpg")), bildInhalt);
+});
+
+test("fehlt die hochgeladene Datei lokal, bricht der Build nicht ab und behält den alten Pfad", async (t) => {
+  const placeId = "ChIJgranularbildfehlt1";
+  richteLeadEin("test-granular-bild-fehlt", placeId, "Gasthaus Ohne Foto");
+  t.after(() => raeumeAuf("test-granular-bild-fehlt", placeId));
+
+  const [{ slug }] = baueEintraege(
+    [{ name: "Gasthaus Ohne Foto", placeId, ort: "Mühldorf am Inn" }],
+    "bayerisch",
+  );
+  schreibeManifest({ [placeId]: slug });
+  // Eintrag verweist auf eine Datei, die es unter public/uploads/ gar nicht
+  // (mehr) gibt – z. B. manuell gelöscht.
+  saveLeadEdits(slug, { bilder: { hero: `/uploads/${slug}/hero.jpg` } });
+  t.after(() => rmSync(path.join(leadEditsDir, `${slug}.json`), { force: true }));
+
+  rmSync(scratchDocsDir, { recursive: true, force: true });
+  mkdirSync(path.join(scratchDocsDir, "assets", "fonts"), { recursive: true });
+  writeFileSync(path.join(scratchDocsDir, "assets", "fonts", "fonts.json"), "[]", "utf-8");
+
+  await assert.doesNotReject(baueUndSchreibeEinzelnenEntwurf(slug, { zielordner: scratchDocsDir }));
+
+  const html = readFileSync(path.join(scratchDocsDir, slug, "index.html"), "utf-8");
+  assert.match(html, new RegExp(`/uploads/${slug}/hero\\.jpg`));
 });
 
 test("baueUndSchreibeEinzelnenEntwurf wirft eine verständliche Meldung für einen unbekannten Slug", async () => {

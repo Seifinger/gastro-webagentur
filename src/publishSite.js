@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdirSync, writeFileSync, rmSync, existsSync, copyFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { docsDir } from "./config.js";
@@ -8,6 +8,7 @@ import { menuForCuisine } from "./menuCatalog.js";
 import { themeForLead } from "./landingPageGenerator.js";
 import { DEMO_LEADS } from "./demoLeads.js";
 import { loadLeadEdits } from "./leadEdits.js";
+import { uploadsDir } from "./bildUpload.js";
 import {
   parseArgs,
   pruefeKueche,
@@ -100,6 +101,50 @@ function buildShowcasePage(entries, kontakt) {
 }
 
 /**
+ * Eigene Fotos liegen lokal unter public/uploads/<slug>/<rolle>.jpg und
+ * werden dort nur vom Dashboard-Server ausgeliefert (siehe bildUpload.js) –
+ * auf GitHub Pages gibt es diesen Server nicht, ein referenzierter
+ * "/uploads/..."-Pfad wäre dort ein totes Bild. Für die Veröffentlichung wird
+ * die Datei deshalb mit in den Entwurfsordner kopiert und die Referenz auf
+ * einen relativen Pfad umgeschrieben – die veröffentlichte Seite bleibt
+ * damit in sich geschlossen, wie schon die Stock-Bilder unter docs/assets/.
+ */
+function lokalisiereEigeneBilder(editUebersteuerung, slug, zielordner) {
+  const bilder = editUebersteuerung?.bilder;
+  if (!bilder) return editUebersteuerung;
+
+  const erwarteterPrefix = `/uploads/${slug}/`;
+  const uebersetzt = {};
+  let veraendert = false;
+
+  for (const [rolle, pfad] of Object.entries(bilder)) {
+    if (typeof pfad !== "string" || !pfad.startsWith(erwarteterPrefix)) {
+      uebersetzt[rolle] = pfad;
+      continue;
+    }
+
+    const dateiname = path.basename(pfad);
+    const quelle = path.join(uploadsDir, slug, dateiname);
+    if (!existsSync(quelle)) {
+      // Datei lokal nicht (mehr) vorhanden – lieber der alte Pfad als ein
+      // abgebrochener Build; das eine Bild bliebe dann zwar tot, der Rest
+      // der Seite aber nicht.
+      uebersetzt[rolle] = pfad;
+      continue;
+    }
+
+    const zielDatei = path.join(zielordner, slug, "bilder", dateiname);
+    mkdirSync(path.dirname(zielDatei), { recursive: true });
+    copyFileSync(quelle, zielDatei);
+
+    uebersetzt[rolle] = `./bilder/${dateiname}`;
+    veraendert = true;
+  }
+
+  return veraendert ? { ...editUebersteuerung, bilder: uebersetzt } : editUebersteuerung;
+}
+
+/**
  * Baut genau einen Entwurf und schreibt ihn nach zielordner/<slug>/ – ohne
  * den Rest von zielordner anzufassen. Grundlage für "npm run publish-site --
  * --only <slug>" (unten) und für den Veröffentlichen-Knopf im
@@ -123,14 +168,18 @@ export async function baueUndSchreibeEinzelnenEntwurf(slug, { cuisine, email = "
   mkdirSync(zielordner, { recursive: true });
   const fontCss = await ladeSchriften(path.join(zielordner, "assets", "fonts"));
 
-  schreibeSeiten([entry], zielordner, {
-    kontaktEmail: email,
-    fontCss,
-    veroeffentlicht: true,
-    apiUrl: api,
-    // Wie beim vollständigen Lauf: Bilder kommen im Netz direkt von Unsplash.
-    bildUrl: remoteImageUrl,
-  });
+  schreibeSeiten(
+    [{ ...entry, editUebersteuerung: lokalisiereEigeneBilder(entry.editUebersteuerung, entry.slug, zielordner) }],
+    zielordner,
+    {
+      kontaktEmail: email,
+      fontCss,
+      veroeffentlicht: true,
+      apiUrl: api,
+      // Wie beim vollständigen Lauf: Bilder kommen im Netz direkt von Unsplash.
+      bildUrl: remoteImageUrl,
+    },
+  );
 
   return { slug: entry.slug, ordner: path.join(zielordner, entry.slug) };
 }
@@ -176,10 +225,10 @@ async function run() {
   rmSync(docsDir, { recursive: true, force: true });
   mkdirSync(docsDir, { recursive: true });
 
-  const entries = baueEintraege(leads, args.cuisine).map((entry) => ({
-    ...entry,
-    editUebersteuerung: loadLeadEdits(entry.slug),
-  }));
+  const entries = baueEintraege(leads, args.cuisine).map((entry) => {
+    const editUebersteuerung = loadLeadEdits(entry.slug);
+    return { ...entry, editUebersteuerung: lokalisiereEigeneBilder(editUebersteuerung, entry.slug, docsDir) };
+  });
 
   console.log("\n🔤 Prüfe Schriften ...");
   const fontCss = await ladeSchriften(path.join(docsDir, "assets", "fonts"));

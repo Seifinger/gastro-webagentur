@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { dashboardHost } from "./config.js";
 import {
   ladeBetrieb,
   legeTischAn,
@@ -239,7 +240,7 @@ server.on("error", (fehler) => {
   throw fehler;
 });
 
-server.listen(port, () => {
-  console.log(`\n🍽️  Wirt-Dashboard für "${slug}": http://localhost:${port}`);
-  console.log(`    Reservierungen der Seite gehen an: http://localhost:${port}/oeffentlich/\n`);
+server.listen(port, dashboardHost, () => {
+  console.log(`\n🍽️  Wirt-Dashboard für "${slug}": http://${dashboardHost}:${port}`);
+  console.log(`    Reservierungen der Seite gehen an: http://${dashboardHost}:${port}/oeffentlich/\n`);
 });

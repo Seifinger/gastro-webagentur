@@ -350,6 +350,33 @@ let kuechen = [];
 let sortKey = "score";
 let sortDir = -1;
 
+/* ---------- Zugriffsschutz: Dashboard-Token ---------- */
+
+// Fragt den Token einmalig ab (Wert "null" in localStorage bedeutet "noch nie
+// gefragt", ein leerer String bedeutet "bewusst leer gelassen, kein Schutz
+// konfiguriert") und schickt ihn danach bei jeder schreibenden Anfrage mit.
+function dashboardToken() {
+  let token = localStorage.getItem("dashboardToken");
+  if (token === null) {
+    token = (window.prompt(
+      "Dashboard-Token (siehe DASHBOARD_TOKEN in der .env) – falls keiner gesetzt ist, einfach leer lassen:",
+    ) || "").trim();
+    localStorage.setItem("dashboardToken", token);
+  }
+  return token;
+}
+
+async function geschuetzterFetch(url, optionen = {}) {
+  const antwort = await fetch(url, {
+    ...optionen,
+    headers: { ...(optionen.headers ?? {}), "X-Dashboard-Token": dashboardToken() },
+  });
+  if (antwort.status === 401) localStorage.removeItem("dashboardToken");
+  return antwort;
+}
+
+dashboardToken();
+
 // Restaurantnamen kommen von Google und landen im HTML - ohne Maskierung
 // würde ein Name mit spitzen Klammern die Tabelle zerlegen.
 function esc(wert) {
@@ -526,7 +553,7 @@ document.getElementById("tbody").addEventListener("change", async (event) => {
 
   select.disabled = true;
   try {
-    const antwort = await fetch("/api/kueche", {
+    const antwort = await geschuetzterFetch("/api/kueche", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ placeId: select.dataset.placeid, kueche: select.value }),

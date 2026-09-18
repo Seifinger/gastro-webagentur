@@ -21,6 +21,8 @@ const SIGNATUR_REDUZIERT_REGELN = `
   .sig-lanterns .laterne { animation: none; }
   .sig-lanterns .laterne .glow { animation: none; opacity: .6; }
   .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
+  .sig-tea-form .tee-fluessigkeit, .sig-tea-form .strahl, .sig-tea-form .dampf-tee i { animation: none; }
+  .sig-olive-form { animation: none; }
 `;
 
 const SIGNATUR_CSS = `
@@ -63,6 +65,37 @@ const SIGNATUR_CSS = `
   .sig-spiess { right: -4%; top: 12%; transform: none; width: 34vw; height: 46vw; opacity: .5; }
 }
 
+/* Syrisch: Minztee wird eingegossen, während das Glas selbst leicht "atmet"
+   und Dampf aufsteigt – eine eigene Signatur statt des mit Türkisch
+   geteilten Spießes. Läuft dauerhaft wie der Bierkrug-Überlauf bei
+   Bayerisch, kein einmaliges .bewegt/.da-Ereignis. */
+.sig-tea-form { right: 5%; top: 50%; transform: translateY(-50%);
+                width: clamp(140px, 20vw, 200px); opacity: .95;
+                filter: drop-shadow(0 20px 36px rgba(0,0,0,.35)); }
+.sig-tea-form svg { width: 100%; height: auto; overflow: visible; }
+.sig-tea-form .tee-fluessigkeit { transform-box: fill-box; transform-origin: bottom;
+                                  animation: sig-tee-atmen 14s ease-in-out infinite alternate; }
+@keyframes sig-tee-atmen { to { transform: scaleY(1.05); } }
+.sig-tea-form .strahl { opacity: 0; animation: sig-tee-strahl 8s ease-in-out infinite; }
+@keyframes sig-tee-strahl {
+  0%, 87% { opacity: 0; }
+  91% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+.sig-tea-form .dampf-tee i { position: absolute; bottom: 0; opacity: 0;
+                             animation: sig-tee-dampf 5.5s ease-in infinite; }
+.sig-tea-form .dampf-tee i:nth-child(1) { left: 20%; }
+.sig-tea-form .dampf-tee i:nth-child(2) { left: 50%; animation-delay: 1.6s; }
+.sig-tea-form .dampf-tee i:nth-child(3) { left: 76%; animation-delay: 3.2s; }
+@keyframes sig-tee-dampf {
+  0% { opacity: 0; transform: translateY(0) scale(.7); }
+  25% { opacity: .7; }
+  100% { opacity: 0; transform: translateY(-60px) scale(1.8); }
+}
+@media (max-width: 899px) {
+  .sig-tea-form { right: -2%; top: 12%; transform: none; width: 26vw; opacity: .55; }
+}
+
 /* Bayerisch: die Tagesempfehlung wechselt durch */
 .sig-tafel { right: 5%; top: 50%; transform: translateY(-50%);
              width: clamp(210px, 27vw, 310px); aspect-ratio: 3 / 4; }
@@ -98,6 +131,20 @@ const SIGNATUR_CSS = `
 }
 @media (max-width: 899px) {
   .sig-diashow { right: -8%; top: 12%; transform: none; width: 46vw; opacity: .5; }
+}
+
+/* Griechisch: ein Olivenzweig schaukelt sanft – ein eigenes, kulturell
+   eindeutiges Motiv statt der bisherigen, kulturell neutralen Fotodiashow.
+   Dieselbe Schaukel-Mechanik wie bei den Laternen (sig-laterne-schaukel),
+   angewandt auf den gesamten Zweig statt auf einzelne Elemente. */
+.sig-olive-form { right: 6%; top: 45%; width: clamp(150px, 22vw, 220px);
+                  transform-origin: 10% 90%; opacity: .95;
+                  filter: drop-shadow(0 18px 32px rgba(0,0,0,.3));
+                  animation: sig-oliven-schaukel 7s ease-in-out infinite; }
+.sig-olive-form svg { width: 100%; height: auto; overflow: visible; }
+@keyframes sig-oliven-schaukel { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@media (max-width: 899px) {
+  .sig-olive-form { right: -4%; top: 12%; width: 40vw; opacity: .55; }
 }
 
 /* Café: aufsteigender Dampf über der Tasse */
@@ -415,6 +462,48 @@ function heroLanternGlow() {
     </div>`;
 }
 
+/**
+ * Syrisch: Minztee wird eingegossen, während die Tasse selbst leicht "atmet"
+ * und Dampf aufsteigt. Läuft dauerhaft (kein .bewegt/.da nötig), weil hier
+ * kein einmaliges Ereignis beim Sichtbarwerden gemeint ist, sondern ein sich
+ * wiederholender Vorgang – wie beim Bierkrug-Überlauf bei Bayerisch.
+ */
+function heroMintTeaPour() {
+  return `
+    <div class="sig sig-tea-form" aria-hidden="true">
+      <svg viewBox="0 0 60 100" focusable="false">
+        <path class="glas" d="M14,20 L46,20 L40,90 L20,90 Z" fill="none" stroke="#c9a227" stroke-width="2"></path>
+        <clipPath id="teaClip"><path d="M14,20 L46,20 L40,90 L20,90 Z"></path></clipPath>
+        <rect class="tee-fluessigkeit" x="14" y="34" width="32" height="56" fill="#b5651d" clip-path="url(#teaClip)"></rect>
+        <path class="minze" d="M24,36 C20,30 26,26 30,30 C28,34 26,36 24,36 Z" fill="#4c8c4a"></path>
+        <path class="minze" d="M34,38 C30,32 36,28 40,32 C38,36 36,38 34,38 Z" fill="#5a9e57"></path>
+        <line class="strahl" x1="30" y1="0" x2="30" y2="20" stroke="#b5651d" stroke-width="3"></line>
+        <g class="dampf-tee"><i></i><i></i><i></i></g>
+      </svg>
+    </div>`;
+}
+
+/**
+ * Griechisch: ein Olivenzweig schaukelt sanft – ersetzt die bisherige
+ * fotobasierte Diashow durch ein rein gezeichnetes, kulturell eindeutigeres
+ * Motiv. Läuft dauerhaft wie die Laternen bei Asiatisch (sig-laterne-schaukel
+ * als Vorbild), nicht als einmaliges Aufblüh-Ereignis wie bei der Orchidee.
+ */
+function heroOliveBranch() {
+  return `
+    <div class="sig sig-olive-form" aria-hidden="true">
+      <svg viewBox="0 0 100 100" focusable="false">
+        <path class="zweig" d="M10,80 C30,70 50,50 70,20" stroke="#6b7d3d" stroke-width="3" fill="none"></path>
+        <path class="blatt" d="M28,68 C20,64 20,56 28,54 C32,60 32,64 28,68 Z" fill="#7f9a4a" style="--i:0"></path>
+        <path class="blatt" d="M42,56 C34,52 34,44 42,42 C46,48 46,52 42,56 Z" fill="#8ea85a" style="--i:1"></path>
+        <path class="blatt" d="M56,42 C48,38 48,30 56,28 C60,34 60,38 56,42 Z" fill="#7f9a4a" style="--i:2"></path>
+        <ellipse class="olive" cx="34" cy="66" rx="5" ry="7" fill="#3c4a24" style="--i:0"></ellipse>
+        <ellipse class="olive" cx="50" cy="50" rx="5" ry="7" fill="#4b5c2c" style="--i:1"></ellipse>
+        <ellipse class="olive" cx="63" cy="34" rx="5" ry="7" fill="#3c4a24" style="--i:2"></ellipse>
+      </svg>
+    </div>`;
+}
+
 function heroBeerFoamOverflow() {
   return `
     <div class="sig sig-beer" aria-hidden="true">
@@ -489,14 +578,20 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
       </div>`;
   }
 
-  // Schawarma und Döner drehen sich am selben Spieß – ein eigener Mechanismus
-  // wäre hier erfunden, nicht gefunden.
-  if (cuisine === "tuerkisch" || cuisine === "syrisch") {
+  // Schawarma und Döner drehen sich am Spieß – ein eigener Mechanismus wäre
+  // hier erfunden, nicht gefunden.
+  if (cuisine === "tuerkisch") {
     const spiess = esc(ausKategorie(/spieß|spiess|grill/i, "photo-1529006557810-274b9b2fc783"));
     return `
       <div class="sig sig-spiess" aria-hidden="true">
         <div class="fleisch" style="background-image:url('${spiess}')"></div>
       </div>`;
+  }
+
+  // Eingegossener Minztee statt des mit Türkisch geteilten Spießes – rein
+  // dekorativ, deshalb ohne Abhängigkeit von Gerichtsfotos.
+  if (cuisine === "syrisch") {
+    return heroMintTeaPour();
   }
 
   // Die wechselnde Tagesempfehlung trägt beim Wirtshaus den Braten.
@@ -521,13 +616,10 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
     return heroSpicePuff();
   }
 
+  // Ein schaukelnder Olivenzweig statt der kulturell neutralen Fotodiashow –
+  // rein dekorativ, deshalb ohne Abhängigkeit von Gerichtsfotos.
   if (cuisine === "griechisch") {
-    if (gerichte.length < 3) return "";
-    const bilder = gerichte
-      .slice(0, 3)
-      .map((g) => `<img src="${esc(bild(g.bild, "gericht", bildUrl))}" alt="">`)
-      .join("");
-    return `<div class="sig sig-diashow" aria-hidden="true">${bilder}</div>`;
+    return heroOliveBranch();
   }
 
   // Eine Orchidee, die beim Sichtbarwerden des Heros aufblüht – rein
