@@ -41,9 +41,34 @@ test("Bewegung lässt sich systemweit abstellen", () => {
   assert.match(MOTION_CSS, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(MOTION_SCRIPT, /prefers-reduced-motion: reduce/);
   // Das Skript muss vor dem Verstecken aussteigen, nicht danach.
-  const abbruch = MOTION_SCRIPT.indexOf("if (ruhig.matches) return;");
+  const abbruch = MOTION_SCRIPT.indexOf("if (ruhig.matches || erzwungenRuhig) return;");
   const versteckt = MOTION_SCRIPT.indexOf('classList.add("bewegt")');
   assert.ok(abbruch > -1 && abbruch < versteckt);
+});
+
+test("?bewegung=aus stellt die Seite genauso ruhig wie prefers-reduced-motion", () => {
+  // Kein echter Browser im Testlauf, deshalb Prüfung auf Quelltextebene
+  // (wie beim Test oben) statt auf tatsächlichem DOM-Verhalten. Zusätzlich
+  // manuell mit dem mitgelieferten Chromium verifiziert (siehe Commit): mit
+  // ?bewegung=aus bleibt document.documentElement ohne Klasse "bewegt",
+  // bekommt aber "bewegung-aus" – ohne den Parameter ändert sich nichts.
+  const ausgelesen = MOTION_SCRIPT.indexOf('URLSearchParams(location.search).get("bewegung")');
+  const klasseGesetzt = MOTION_SCRIPT.indexOf('classList.add("bewegung-aus")');
+  const abbruch = MOTION_SCRIPT.indexOf("if (ruhig.matches || erzwungenRuhig) return;");
+  const bewegtGesetzt = MOTION_SCRIPT.indexOf('classList.add("bewegt")');
+
+  assert.ok(ausgelesen > -1, "URL-Parameter wird nicht ausgelesen");
+  assert.ok(klasseGesetzt > -1 && klasseGesetzt < abbruch, ".bewegung-aus muss vor dem Abbruch gesetzt werden");
+  assert.ok(abbruch > -1 && abbruch < bewegtGesetzt, "Abbruch muss vor .bewegt kommen");
+
+  // Dieselben Regeln wie im reduced-motion-Block – per CSS-Nesting
+  // verschachtelt, nicht ein zweites Mal ausgeschrieben.
+  const mediaIndex = MOTION_CSS.indexOf("@media (prefers-reduced-motion: reduce)");
+  const klasseIndex = MOTION_CSS.indexOf(".bewegung-aus {");
+  assert.ok(mediaIndex > -1 && klasseIndex > mediaIndex);
+  const geteilterInhalt = ".hero-media img { animation: none; }";
+  assert.ok(MOTION_CSS.slice(mediaIndex, klasseIndex).includes(geteilterInhalt));
+  assert.ok(MOTION_CSS.slice(klasseIndex).includes(geteilterInhalt));
 });
 
 test("Animiert werden nur transform und opacity", () => {

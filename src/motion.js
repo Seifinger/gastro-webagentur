@@ -10,6 +10,18 @@
 // 3. Wer Bewegung abgestellt hat, bekommt keine. "prefers-reduced-motion" ist
 //    kein Sonderfall, sondern eine Ansage.
 
+// Einmal definiert, zweimal verwendet (siehe unten): einerseits unter der
+// echten Media Query für Besucher mit Systemeinstellung, andererseits unter
+// der Klasse .bewegung-aus für die Verkaufsdemo (?bewegung=aus).
+const MOTION_REDUZIERT_REGELN = `
+  .bewegt .auftritt,
+  .bewegt .auftritt-karte,
+  .bewegt .usp-list span { opacity: 1; transform: none; transition: none; }
+  .hero-media img { animation: none; }
+  .step:not(:last-child)::after,
+  .section-head .eyebrow::after { transform: scaleX(1); transition: none; }
+`;
+
 export const MOTION_CSS = `
 /* --- Einblenden beim Scrollen ------------------------------------------ */
 /* Die Startwerte hängen an .bewegt, das erst das Skript setzt. Bleibt das
@@ -98,12 +110,18 @@ export const MOTION_CSS = `
 
 /* --- Wer keine Bewegung will, bekommt keine ----------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  .bewegt .auftritt,
-  .bewegt .auftritt-karte,
-  .bewegt .usp-list span { opacity: 1; transform: none; transition: none; }
-  .hero-media img { animation: none; }
-  .step:not(:last-child)::after,
-  .section-head .eyebrow::after { transform: scaleX(1); transition: none; }
+  ${MOTION_REDUZIERT_REGELN}
+}
+
+/* Für die Verkaufsdemo: der URL-Parameter ?bewegung=aus (siehe MOTION_SCRIPT)
+   soll die Seite exakt so ruhigstellen wie prefers-reduced-motion – nicht
+   nur ähnlich. Statt die Regeln oben zu wiederholen, verschachtelt natives
+   CSS-Nesting denselben Block einfach unter der Klasse, die das Skript bei
+   erkanntem Parameter setzt. (Die .bewegt-Selektoren darin greifen hier nie
+   – .bewegt wird bei ?bewegung=aus gar nicht erst gesetzt –, sie stehen aber
+   für exakte Gleichheit mit dem reduced-motion-Block trotzdem mit drin.) */
+.bewegung-aus {
+  ${MOTION_REDUZIERT_REGELN}
 }
 `;
 
@@ -111,8 +129,17 @@ export const MOTION_CSS = `
 // nicht erst bei "load": sonst blitzt der unsichtbare Zustand kurz auf.
 export const MOTION_SCRIPT = `
 (function () {
+  // Für Vor-Ort-Demos: "?bewegung=aus" an der URL stellt die Seite exakt so
+  // ruhig wie prefers-reduced-motion – unabhängig von der Systemeinstellung
+  // des Besuchers. Die Klasse greift sofort, auch falls unten aus anderem
+  // Grund (kein IntersectionObserver, keine bewegten Gruppen) weitergemacht
+  // würde – sie ist an die Media-Query-Regeln gekoppelt, nicht an den Ablauf
+  // dieses Skripts.
+  var erzwungenRuhig = new URLSearchParams(location.search).get("bewegung") === "aus";
+  if (erzwungenRuhig) document.documentElement.classList.add("bewegung-aus");
+
   var ruhig = window.matchMedia("(prefers-reduced-motion: reduce)");
-  if (ruhig.matches) return;
+  if (ruhig.matches || erzwungenRuhig) return;
 
   // Browser ohne IntersectionObserver zeigen einfach die fertige Seite.
   if (!("IntersectionObserver" in window)) return;
