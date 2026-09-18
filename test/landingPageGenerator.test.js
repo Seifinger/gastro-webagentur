@@ -9,7 +9,9 @@ import {
   strasseAusAdresse,
   escapeHtml,
 } from "../src/landingPageGenerator.js";
-import { menuForCuisine, highlightCandidates, MENUS } from "../src/menuCatalog.js";
+import { menuForCuisine, highlightCandidates, gerichtId, MENUS } from "../src/menuCatalog.js";
+import { loadLeadEdits } from "../src/leadEdits.js";
+import { assetFileName } from "../src/imageLibrary.js";
 import { STIMMEN } from "../src/testimonials.js";
 import { SIGNATUR_CSS } from "../src/heroSignature.js";
 
@@ -608,4 +610,114 @@ test("das 'minimal'-Preset von bayerisch wirkt vollständig (mehrere Felder glei
   assert.ok(!html.includes('id="mobilebar"'));
   assert.ok(!html.includes('class="veg"'));
   assert.ok(html.indexOf('id="karte"') < html.indexOf('id="highlights"'));
+});
+
+// --- Übersteuerungen je Lead (leadEdits.js) ---------------------------------
+
+const editMenu = {
+  label: "Testküche",
+  tagline: "Test",
+  konzept: "Testkonzept",
+  geschichte: "Wir kochen seit 1950.",
+  usps: ["Frisch gekocht"],
+  kategorien: [
+    {
+      name: "Hauptgerichte",
+      gerichte: [
+        { name: "Erstes Gericht", beschreibung: "Ursprünglich eins", preis: 16.9, bild: "photo-1599921841143-819065a55cc6" },
+        { name: "Zweites Gericht", beschreibung: "Ursprünglich zwei", preis: 12.5, bild: "photo-1558030006-450675393462" },
+      ],
+    },
+  ],
+};
+
+test("ohne lead-edits-Datei entsteht exakt der bisherige Entwurf", () => {
+  const bisher = buildLandingPage(lead, { menu: MENUS.italienisch });
+
+  // Der Normalfall: für diesen Slug liegt keine Datei, loadLeadEdits gibt {}.
+  assert.equal(
+    buildLandingPage(lead, {
+      menu: MENUS.italienisch,
+      editUebersteuerung: loadLeadEdits("gibt-es-garantiert-nicht-0000000"),
+    }),
+    bisher,
+  );
+  assert.equal(
+    buildLandingPage(lead, { menu: MENUS.italienisch, editUebersteuerung: undefined }),
+    bisher,
+  );
+  assert.equal(
+    buildLandingPage(lead, {
+      menu: MENUS.italienisch,
+      editUebersteuerung: { bilder: {}, texte: { highlightBeschreibungen: {} } },
+    }),
+    bisher,
+  );
+});
+
+test("bilder.hero wird unverändert als Hero-Bild eingesetzt", () => {
+  const stockHero = themeForLead(lead).heroImage;
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    editUebersteuerung: { bilder: { hero: "../eigene/wirtshaus-abends.jpg" } },
+  });
+
+  assert.match(
+    html,
+    /<div class="hero-media">\s*<img src="\.\.\/eigene\/wirtshaus-abends\.jpg" alt="Gasthof Zur Post">/,
+  );
+  assert.ok(!html.includes(assetFileName(stockHero, "hero")));
+});
+
+test("gesetzte Bildplätze gewinnen, fehlende bleiben beim Stockfoto", () => {
+  const gestaltung = themeForLead(lead);
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    editUebersteuerung: { bilder: { haus: "../eigene/haus.jpg" } },
+  });
+
+  assert.ok(html.includes('<img src="../eigene/haus.jpg" alt="" loading="lazy">'));
+  // Team und Bestseller sind nicht gesetzt – dort bleibt der bisherige
+  // Fallback aus imageLibrary.js stehen.
+  assert.ok(html.includes(assetFileName(gestaltung.teamBild, "ambiente")));
+  assert.ok(!html.includes(assetFileName(gestaltung.hausBild, "ambiente")));
+});
+
+test("texte.headline und texte.schlagzeile ersetzen nur die Hero-Texte", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    editUebersteuerung: {
+      texte: { headline: "Bei Franz & Fanny", schlagzeile: "Seit 1904 am Stadtplatz." },
+    },
+  });
+
+  assert.ok(html.includes("<h1>Bei Franz &amp; Fanny</h1>"));
+  assert.ok(html.includes('<p class="hero-sub">Seit 1904 am Stadtplatz.</p>'));
+  // Kopfzeile und Fußzeile tragen weiter den Namen aus Google.
+  assert.ok(html.includes('<div class="brand">Gasthof Zur Post</div>'));
+  assert.ok(html.includes("<strong>Gasthof Zur Post</strong>"));
+});
+
+test("highlightBeschreibungen ersetzt gezielt eine einzelne Gericht-ID", () => {
+  const html = buildLandingPage(lead, {
+    menu: editMenu,
+    editUebersteuerung: {
+      texte: { highlightBeschreibungen: { [gerichtId(0, 0)]: "Vom Wirt selbst getextet" } },
+    },
+  });
+
+  // Das Gericht steht in den Highlights und in der Karte – beide Stellen
+  // übernehmen den neuen Text.
+  assert.equal(html.split("Vom Wirt selbst getextet").length - 1, 2);
+  assert.ok(!html.includes("Ursprünglich eins"));
+  assert.equal(html.split("Ursprünglich zwei").length - 1, 2);
+});
+
+test("eine unbekannte Gericht-ID ändert keine Beschreibung", () => {
+  const html = buildLandingPage(lead, {
+    menu: editMenu,
+    editUebersteuerung: { texte: { highlightBeschreibungen: { "9-9": "Ins Leere getextet" } } },
+  });
+
+  assert.equal(html, buildLandingPage(lead, { menu: editMenu }));
 });
