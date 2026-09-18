@@ -141,6 +141,10 @@
     color: var(--text); font-family: inherit; font-size: .85rem; font-weight: 600; cursor: pointer;
   }
   .knopf-verwerfen:hover { border-color: #dc2626; color: #dc2626; }
+
+  .veroeffentlichen-box { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .veroeffentlichen-link { font-size: .85rem; }
+  .veroeffentlichen-link a { color: var(--accent); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -185,6 +189,20 @@
         <button class="knopf-verwerfen" id="prompt-verwerfen" type="button">Verwerfen</button>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="abschnitt" id="veroeffentlichen-abschnitt" style="display:none">
+  <h2 class="abschnitt-titel">🚀 Entwurf veröffentlichen</h2>
+  <p class="abschnitt-hinweis">
+    Baut diesen einen Entwurf mit dem aktuellen Stand (eigene Bilder, übernommene Texte) neu und
+    veröffentlicht ihn per Git-Commit direkt auf GitHub Pages. Nur dieser Entwurf wird angefasst –
+    die anderen bleiben unberührt.
+  </p>
+  <div class="prompt-box veroeffentlichen-box">
+    <button class="knopf-primaer" id="veroeffentlichen-knopf" type="button">Diesen Entwurf veröffentlichen</button>
+    <span class="prompt-status" id="veroeffentlichen-status"></span>
+    <span class="veroeffentlichen-link" id="veroeffentlichen-link"></span>
   </div>
 </section>
 
@@ -332,6 +350,7 @@ async function lade() {
     `${esc(daten.name)} · <a href="${esc(daten.entwurf)}" target="_blank" rel="noopener">Entwurf ansehen</a>`;
   document.getElementById("raster").innerHTML = daten.plaetze.map(platzKarte).join("");
   document.getElementById("prompt-abschnitt").style.display = "block";
+  document.getElementById("veroeffentlichen-abschnitt").style.display = "block";
 }
 
 lade();
@@ -425,6 +444,38 @@ document.getElementById("prompt-verwerfen").addEventListener("click", async () =
   }
   schliesseVorschau();
   document.getElementById("prompt-status").textContent = "";
+});
+
+/* ---------- Veröffentlichen ---------- */
+
+document.getElementById("veroeffentlichen-knopf").addEventListener("click", async () => {
+  if (!confirm("Wirklich veröffentlichen? Änderungen werden live auf GitHub Pages sichtbar.")) return;
+
+  const status = document.getElementById("veroeffentlichen-status");
+  const linkBox = document.getElementById("veroeffentlichen-link");
+  const knopf = document.getElementById("veroeffentlichen-knopf");
+
+  knopf.setAttribute("disabled", "disabled");
+  status.className = "prompt-status";
+  status.textContent = "Wird gebaut und veröffentlicht …";
+  linkBox.innerHTML = "";
+
+  try {
+    const antwort = await fetch(`/intern/lead/${encodeURIComponent(slug)}/veroeffentlichen`, { method: "POST" });
+    const ergebnis = await antwort.json();
+    if (!antwort.ok || !ergebnis.ok) throw new Error(ergebnis.fehler ?? "Veröffentlichen fehlgeschlagen.");
+
+    status.textContent = ergebnis.veraendert
+      ? "Veröffentlicht."
+      : "Keine Änderungen – der Entwurf war bereits aktuell.";
+    linkBox.innerHTML = `<a href="${esc(ergebnis.url)}" target="_blank" rel="noopener">${esc(ergebnis.url)}</a>`;
+    zeigeHinweis(status.textContent);
+  } catch (fehler) {
+    status.className = "prompt-status fehler";
+    status.textContent = fehler.message;
+  } finally {
+    knopf.removeAttribute("disabled");
+  }
 });
 </script>
 
