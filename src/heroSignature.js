@@ -160,6 +160,100 @@ const SIGNATUR_CSS = `
   .sig-schale { right: -6%; top: 12%; transform: none; width: 48vw; opacity: .55; }
 }
 
+/* Thailändisch: eine Orchidee blüht auf, sobald der Hero ins Bild scrollt.
+   Die Blütenblätter nutzen dieselbe Intersection-Observer-Kopplung wie der
+   Rest der Seite (.bewegt/.da aus motion.js) statt einer eigenen Schleife –
+   das Aufblühen soll einmal passieren, nicht dauerhaft laufen. */
+.sig-orchid { right: 6%; top: 50%; transform: translateY(-50%);
+              width: clamp(170px, 24vw, 260px); aspect-ratio: 1; opacity: .95;
+              filter: drop-shadow(0 22px 40px rgba(0,0,0,.35)); }
+.sig-orchid svg { width: 100%; height: 100%; overflow: visible; }
+.sig-orchid .bluete { fill: #c99bdb; transform-box: fill-box; transform-origin: center;
+                      transition: opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1);
+                      transition-delay: calc(var(--i, 0) * .1s); }
+.sig-orchid .bluete-mitte { fill: #f4d35e; }
+/* Vor dem Sichtbarwerden klein und unsichtbar, .da lässt sie zur vollen
+   Größe aufblühen – pro Blütenblatt um .1s versetzt (macht bei .7s
+   Übergang und 6 Blättern 1.2s Gesamtdauer, einmalig). */
+.bewegt .sig-orchid .bluete { opacity: 0; transform: scale(.3); }
+.bewegt .sig-orchid.da .bluete { opacity: 1; transform: scale(1); }
+@media (max-width: 899px) {
+  .sig-orchid { right: -6%; top: 12%; transform: none; width: 40vw; opacity: .6; }
+}
+
+/* Indisch: ein Puder-Wölkchen platzt auf, sobald der Hero ins Bild scrollt –
+   dieselbe .bewegt/.da-Kopplung wie bei der Orchidee, aber als einmalige
+   @keyframes-Animation statt Übergang, weil Start- und Zielwert hier auf
+   zwei verschiedene Zwischenstufen fallen (nicht nur an/aus). */
+.sig-spice { right: 8%; top: 50%; transform: translateY(-50%);
+             width: clamp(160px, 22vw, 240px); aspect-ratio: 1; }
+.sig-spice .puff { position: absolute; border-radius: 50%; filter: blur(7px); }
+.sig-spice .puff-1 { left: 20%; top: 30%; width: 46%; aspect-ratio: 1;
+                      background: radial-gradient(circle, #ffb238, #e2790a 72%); }
+.sig-spice .puff-2 { left: 42%; top: 46%; width: 38%; aspect-ratio: 1;
+                      background: radial-gradient(circle, #ffd27a, #d9660a 72%); }
+.sig-spice .puff-3 { left: 10%; top: 54%; width: 30%; aspect-ratio: 1;
+                      background: radial-gradient(circle, #ffc25c, #c65a06 72%); }
+.bewegt .sig-spice .puff { opacity: 0; transform: scale(.5); }
+.bewegt .sig-spice.da .puff { animation: sig-spice-puff .8s ease-out forwards; }
+@keyframes sig-spice-puff {
+  from { opacity: .8; transform: scale(.5); }
+  to { opacity: 0; transform: scale(1.3); }
+}
+@media (max-width: 899px) {
+  .sig-spice { right: -2%; top: 15%; transform: none; width: 40vw; }
+}
+
+/* Asiatisch (gemischt): ein bis zwei Laternen pulsieren dezent am Rand –
+   nicht mittig über dem Essen wie das Sushi-Band, das Japanisch behält.
+   Statt box-shadow direkt zu animieren (teuer, löst Repaints aus), trägt
+   ein Pseudo-Element mit stärkerem Schein, dessen Opazität pulsiert – der
+   sichtbare Effekt ist derselbe, animiert wird trotzdem nur opacity. */
+.sig-lanterns { left: 3%; top: 14%; display: flex; flex-direction: column; gap: 26px; }
+.sig-lanterns .laterne { position: relative; width: clamp(30px, 4vw, 46px); aspect-ratio: 1;
+                          border-radius: 50%;
+                          background: radial-gradient(circle at 40% 35%, #ffb347, #c8380c 78%);
+                          box-shadow: 0 0 10px 2px rgba(255,130,40,.35);
+                          transform-origin: 50% -14%;
+                          animation: sig-laterne-schaukel 7s ease-in-out infinite; }
+.sig-lanterns .laterne::after { content: ""; position: absolute; inset: -6px; border-radius: 50%;
+                                 box-shadow: 0 0 22px 10px rgba(255,140,40,.85); opacity: 0;
+                                 animation: sig-laterne-puls 4s ease-in-out infinite; }
+.sig-lanterns .laterne:nth-child(2) { width: clamp(22px, 3vw, 34px); animation-delay: 1.6s; }
+.sig-lanterns .laterne:nth-child(2)::after { animation-delay: .8s; }
+@keyframes sig-laterne-puls { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+@keyframes sig-laterne-schaukel { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@media (max-width: 899px) {
+  .sig-lanterns { left: 2%; top: 8%; gap: 16px; }
+}
+
+/* Bayerisch: zusätzlich zur Tagestafel ein kleines Detail – der Bierkrug
+   läuft alle 8s kurz über. Ergänzt die bestehende Signatur, ersetzt sie
+   nicht. */
+.sig-beer { right: 4%; bottom: 6%; width: clamp(40px, 5vw, 60px); aspect-ratio: 1 / 1.4; }
+.sig-beer .schaum { position: absolute; left: 8%; right: 8%; top: -8%; height: 30%;
+                     border-radius: 999px 999px 6px 6px; background: #fdf3d6;
+                     box-shadow: 0 8px 14px -8px rgba(0,0,0,.4);
+                     transform-origin: 50% 100%;
+                     animation: sig-beer-schaum 8s ease-in-out infinite; }
+.sig-beer .tropfen { position: absolute; left: 50%; top: 16%; width: 5px; height: 5px;
+                      border-radius: 50%; background: #fdf3d6; opacity: 0;
+                      animation: sig-beer-tropfen 8s ease-in infinite; }
+.sig-beer .tropfen-2 { left: 64%; animation-delay: .25s; }
+@keyframes sig-beer-schaum {
+  0%, 88% { transform: scaleY(1) translateY(0); }
+  93% { transform: scaleY(1.22) translateY(-12%); }
+  100% { transform: scaleY(1) translateY(0); }
+}
+@keyframes sig-beer-tropfen {
+  0%, 88% { opacity: 0; transform: translateY(0); }
+  90% { opacity: .9; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(20px); }
+}
+@media (max-width: 899px) {
+  .sig-beer { right: 6%; bottom: 5%; width: 32px; }
+}
+
 /* Generische, küchenunabhängige Hero-Varianten – wählbar über das
    Design-Preset-Modell (designPresets.js) für A/B-Tests, ohne die
    küchenspezifischen Signaturen oben zu verändern. */
@@ -195,11 +289,74 @@ const SIGNATUR_CSS = `
   .sig-drehteller .teller, .sig-drehteller img,
   .sig-schale img, .sig-schale .dampf i { animation: none; }
   .sig-tafel .karte:first-child, .sig-diashow img:first-child { opacity: 1; }
+  /* Auch bei einer Umstellung mitten im Besuch (.bewegt bleibt gesetzt) darf
+     die Blüte nicht wieder verschwinden – deshalb hier dieselbe Spezifität
+     wie die .da-Regel, aber als spätere Quelle. */
+  .bewegt .sig-orchid .bluete, .bewegt .sig-orchid.da .bluete {
+    opacity: 1; transform: none; transition: none;
+  }
+  .bewegt .sig-spice .puff, .bewegt .sig-spice.da .puff {
+    opacity: 1; transform: none; animation: none;
+  }
+  .sig-lanterns .laterne { animation: none; }
+  .sig-lanterns .laterne::after { animation: none; opacity: .55; }
+  .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
 }
 `;
 
 function bild(id, rolle, bildUrl) {
   return bildUrl ? bildUrl(id, rolle) : `../assets/${assetFileName(id, rolle)}`;
+}
+
+const ORCHID_BLUETENBLAETTER = 6;
+
+/**
+ * Sechs Blütenblätter (SVG-Pfade) im Kreis um eine Mitte – jedes mit eigenem
+ * --i für den gestaffelten Übergang in der CSS-Regel .bewegt .sig-orchid.
+ */
+function heroOrchidBloom() {
+  const winkel = 360 / ORCHID_BLUETENBLAETTER;
+  const bluetenblaetter = Array.from({ length: ORCHID_BLUETENBLAETTER })
+    .map(
+      (_, i) => `
+        <g transform="rotate(${i * winkel} 50 50)" style="--i:${i}">
+          <path class="bluete" d="M50,50 C38,38 38,18 50,8 C62,18 62,38 50,50 Z"></path>
+        </g>`,
+    )
+    .join("");
+  return `
+    <div class="sig sig-orchid" aria-hidden="true">
+      <svg viewBox="0 0 100 100" focusable="false">
+        ${bluetenblaetter}
+        <circle class="bluete-mitte" cx="50" cy="50" r="6"></circle>
+      </svg>
+    </div>`;
+}
+
+function heroSpicePuff() {
+  return `
+    <div class="sig sig-spice" aria-hidden="true">
+      <div class="puff puff-1"></div>
+      <div class="puff puff-2"></div>
+      <div class="puff puff-3"></div>
+    </div>`;
+}
+
+function heroLanternGlow() {
+  return `
+    <div class="sig sig-lanterns" aria-hidden="true">
+      <div class="laterne"></div>
+      <div class="laterne"></div>
+    </div>`;
+}
+
+function heroBeerFoamOverflow() {
+  return `
+    <div class="sig sig-beer" aria-hidden="true">
+      <div class="schaum"></div>
+      <span class="tropfen tropfen-1"></span>
+      <span class="tropfen tropfen-2"></span>
+    </div>`;
 }
 
 /**
@@ -227,9 +384,8 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
       </div>`;
   }
 
-  // Das Sushi-Band gehört zu Japan, wird aber auch von der panasiatischen
-  // Sammelkategorie genutzt – dort passt nichts Genaueres.
-  if (cuisine === "asiatisch" || cuisine === "japanisch") {
+  // Das Sushi-Band gehört zu Japan.
+  if (cuisine === "japanisch") {
     if (gerichte.length < 3) return "";
     const bilder = gerichte.slice(0, 5);
     // Doppelt ausgeben, damit der Umlauf ohne Sprung schließt.
@@ -237,6 +393,12 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
       .map((g) => `<img src="${esc(bild(g.bild, "gericht", bildUrl))}" alt="">`)
       .join("");
     return `<div class="sig sig-band" aria-hidden="true"><div class="band">${kette}</div></div>`;
+  }
+
+  // Die panasiatische Sammelkategorie bekommt Laternen am Rand statt des
+  // Sushi-Bands – rein dekorativ, deshalb ohne Abhängigkeit von Gerichtsfotos.
+  if (cuisine === "asiatisch") {
+    return heroLanternGlow();
   }
 
   // Der Drehteller in der Tischmitte: drei Schalen, die langsam vorbeiziehen.
@@ -269,9 +431,8 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
       </div>`;
   }
 
-  // Die wechselnde Tagesempfehlung – bei der indischen Karte trägt sie die
-  // Currys, beim Wirtshaus den Braten.
-  if (cuisine === "bayerisch" || cuisine === "indisch") {
+  // Die wechselnde Tagesempfehlung trägt beim Wirtshaus den Braten.
+  if (cuisine === "bayerisch") {
     if (gerichte.length < 3) return "";
     const karten = gerichte
       .slice(0, 3)
@@ -283,16 +444,28 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
         </div>`,
       )
       .join("");
-    return `<div class="sig sig-tafel" aria-hidden="true">${karten}</div>`;
+    return `<div class="sig sig-tafel" aria-hidden="true">${karten}</div>${heroBeerFoamOverflow()}`;
   }
 
-  if (cuisine === "griechisch" || cuisine === "thailaendisch") {
+  // Ein Wölkchen aus Gewürzpuder platzt auf, sobald der Hero ins Bild
+  // scrollt – rein dekorativ, deshalb ohne Abhängigkeit von Gerichtsfotos.
+  if (cuisine === "indisch") {
+    return heroSpicePuff();
+  }
+
+  if (cuisine === "griechisch") {
     if (gerichte.length < 3) return "";
     const bilder = gerichte
       .slice(0, 3)
       .map((g) => `<img src="${esc(bild(g.bild, "gericht", bildUrl))}" alt="">`)
       .join("");
     return `<div class="sig sig-diashow" aria-hidden="true">${bilder}</div>`;
+  }
+
+  // Eine Orchidee, die beim Sichtbarwerden des Heros aufblüht – rein
+  // dekorativ, deshalb ohne Abhängigkeit von Gerichtsfotos.
+  if (cuisine === "thailaendisch") {
+    return heroOrchidBloom();
   }
 
   if (cuisine === "cafe") {

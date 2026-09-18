@@ -412,6 +412,57 @@ test("ein unbekannter hero.type fällt auf die Küchen-Signatur zurück", () => 
   assert.ok(html.includes('class="sig sig-pizza"'));
 });
 
+// --- Küchenspezifische Hero-Signaturen (heroSignature.js) -------------------
+
+test("Thailändisch bekommt die aufblühende Orchidee als eigene Signatur", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.thailaendisch,
+    gestaltung: themeForLead(lead, "thailaendisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-orchid"'));
+  assert.ok(!html.includes('class="sig sig-diashow"'));
+});
+
+test("Indisch bekommt das aufplatzende Gewürzwölkchen als eigene Signatur", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.indisch,
+    gestaltung: themeForLead(lead, "indisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-spice"'));
+  assert.ok(!html.includes('class="sig sig-tafel"'));
+});
+
+test("Asiatisch (gemischt) bekommt pulsierende Laternen statt des Sushi-Bands", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.asiatisch,
+    gestaltung: themeForLead(lead, "asiatisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-lanterns"'));
+  assert.ok(!html.includes('class="sig sig-band"'));
+});
+
+test("Japanisch behält das Sushi-Band als Signatur", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.japanisch,
+    gestaltung: themeForLead(lead, "japanisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-band"'));
+});
+
+test("Bayerisch bekommt den überlaufenden Bierkrug zusätzlich zur Tagestafel", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.bayerisch,
+    gestaltung: themeForLead(lead, "bayerisch"),
+  });
+
+  assert.ok(html.includes('class="sig sig-tafel"'), "Tagestafel muss weiter existieren");
+  assert.ok(html.includes('class="sig sig-beer"'), "Bierkrug-Detail fehlt");
+});
+
 test("hero.primaryAction 'reservation' betont Reservieren, ohne Texte oder Ziele zu ändern", () => {
   const html = buildLandingPage(lead, {
     menu: MENUS.italienisch,
