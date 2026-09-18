@@ -76,6 +76,18 @@
   }
   a.entwurf:hover { background: #1d4ed8; }
 
+  a.bearbeiten {
+    display: inline-block;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  a.bearbeiten:hover { border-color: var(--accent); color: var(--accent); }
+
   select.kueche {
     padding: 4px 8px; border: 1px solid var(--border); border-radius: 7px;
     font-size: 0.82rem; background: var(--card); color: var(--text); font-family: inherit;
@@ -242,6 +254,7 @@
         <th data-key="name">Name</th>
         <th data-key="kueche">Küche</th>
         <th data-key="entwurf">Entwurf</th>
+        <th class="nosort">Bearbeiten</th>
         <th class="nosort">Pitch</th>
         <th data-key="ort">Ort</th>
         <th data-key="adresse">Adresse</th>
@@ -476,6 +489,7 @@ function applyFiltersAndRender() {
       <td>${esc(l.name)}</td>
       <td>${kuecheSelect(l)}</td>
       <td>${l.entwurf ? `<a class="entwurf" href="${esc(l.entwurf)}" target="_blank" rel="noopener">ansehen</a>` : "-"}</td>
+      <td>${l.slug ? `<a class="bearbeiten" href="/bearbeiten.html?lead=${encodeURIComponent(l.slug)}">Bilder</a>` : "-"}</td>
       <td>${l.demoUrl ? `<button class="pitch" data-pitch="${esc(l.placeId)}">QR &amp; Text</button>` : "-"}</td>
       <td>${esc(l.ort)}</td>
       <td>${esc(l.adresse)}</td>

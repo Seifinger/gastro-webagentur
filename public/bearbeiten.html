@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilder bearbeiten – Gastro-Webagentur</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🖼️%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --border: #e3e6ea;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --gut: #16a34a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  header { padding: 24px 20px 8px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; }
+  .zurueck { display: inline-block; font-size: .85rem; margin-bottom: 10px; color: var(--accent); text-decoration: none; }
+  .zurueck:hover { text-decoration: underline; }
+
+  .hinweis {
+    margin: 0 20px 20px;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .hinweis a { color: var(--accent); font-weight: 600; }
+
+  .raster {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    padding: 0 20px 40px;
+  }
+  .platz {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .platz-bild { position: relative; aspect-ratio: 4 / 3; background: #eef0f3; }
+  .platz-bild img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .platz-leer {
+    display: flex; align-items: center; justify-content: center; height: 100%;
+    padding: 20px; text-align: center; font-size: .82rem; color: var(--muted);
+  }
+  .marke {
+    position: absolute; left: 10px; top: 10px;
+    padding: 3px 9px; border-radius: 999px;
+    font-size: .72rem; font-weight: 700; color: #fff; background: var(--muted);
+  }
+  .marke.eigen { background: var(--gut); }
+
+  .platz-koerper { padding: 15px 16px 16px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+  .platz-koerper h2 { margin: 0; font-size: 1rem; }
+  .platz-hinweis { font-size: .82rem; color: var(--muted); }
+  .platz-quelle {
+    font-size: .72rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .04em; font-weight: 700;
+  }
+  .platz-quelle code {
+    text-transform: none; letter-spacing: 0; font-weight: 600;
+    background: #eef0f3; padding: 1px 5px; border-radius: 4px;
+  }
+
+  .platz-aktion { margin-top: auto; padding-top: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  input[type="file"] { display: none; }
+  .knopf {
+    padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);
+    font-family: inherit; font-size: .82rem; font-weight: 600; cursor: pointer; color: var(--text);
+  }
+  .knopf:hover { border-color: var(--accent); color: var(--accent); }
+  .knopf[disabled] { opacity: .5; cursor: progress; }
+  .platz-status { font-size: .8rem; }
+  .platz-status.fehler { color: #dc2626; }
+  .platz-status.erfolg { color: var(--gut); }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px); z-index: 120;
+    background: #1f2430; color: #fff; padding: 11px 18px; border-radius: 9px; font-size: .86rem;
+    opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; max-width: 90vw;
+  }
+  #toast.sichtbar { opacity: 1; transform: translate(-50%, 0); }
+
+  .leer { padding: 40px 20px; text-align: center; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="zurueck" href="/">← Zurück zum Lead-Dashboard</a>
+  <h1>🖼️ Bilder bearbeiten</h1>
+  <div class="subtitle" id="untertitel">Wird geladen …</div>
+</header>
+
+<div class="hinweis" id="hinweis">
+  Hochgeladene Bilder ersetzen die Unsplash-Platzhalter auf diesem einen Entwurf – alle
+  anderen Entwürfe bleiben unberührt. Sie werden im Browser auf 1800 px Breite verkleinert
+  und als JPEG gespeichert. <strong>Die veröffentlichte Fassung ändert sich dadurch noch nicht</strong>,
+  dafür braucht es weiterhin <code>npm run pages</code> bzw. <code>npm run publish-site</code>.
+</div>
+
+<div class="raster" id="raster"></div>
+<div class="leer" id="leer" style="display:none"></div>
+
+<div id="toast"></div>
+
+<script>
+// Breite der Hero-Bilder aus imageLibrary.js. Breiter braucht es die Seite
+// nicht, und der Server lehnt alles darüber ab.
+const MAX_BREITE = 1800;
+
+const slug = new URLSearchParams(location.search).get("lead") ?? "";
+
+function esc(wert) {
+  return String(wert ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function zeigeHinweis(text) {
+  const box = document.getElementById("toast");
+  box.textContent = text;
+  box.classList.add("sichtbar");
+  clearTimeout(box._timer);
+  box._timer = setTimeout(() => box.classList.remove("sichtbar"), 4000);
+}
+
+function platzKarte(platz) {
+  const vorschau = platz.aktuell
+    ? `<img src="${esc(platz.aktuell)}" alt="Aktuelles Bild: ${esc(platz.titel)}">`
+    : `<div class="platz-leer">Noch keine Vorschau – der Platzhalter wird erst
+         beim nächsten <code>npm run pages</code> geladen.</div>`;
+
+  return `
+    <div class="platz" data-rolle="${esc(platz.rolle)}">
+      <div class="platz-bild">
+        ${vorschau}
+        <span class="marke${platz.eigen ? " eigen" : ""}">${platz.eigen ? "Eigenes Bild" : "Platzhalter"}</span>
+      </div>
+      <div class="platz-koerper">
+        <h2>${esc(platz.titel)}</h2>
+        <div class="platz-hinweis">${esc(platz.hinweis)}</div>
+        <div class="platz-quelle">Ersetzt: <code>${esc(platz.platzhalter)}</code></div>
+        <div class="platz-aktion">
+          <input type="file" accept="image/jpeg,image/png,image/webp" id="datei-${esc(platz.rolle)}">
+          <label class="knopf" for="datei-${esc(platz.rolle)}">Bild auswählen</label>
+          <span class="platz-status"></span>
+        </div>
+      </div>
+    </div>`;
+}
+
+/**
+ * Verkleinert das Foto auf MAX_BREITE und gibt es als JPEG zurück. Auch ein
+ * schon kleines Bild wird neu kodiert – so ist die hochgeladene Datei immer
+ * wirklich ein JPEG, passend zum Dateinamen auf dem Server.
+ */
+async function verkleinere(datei) {
+  const bitmap = await createImageBitmap(datei);
+  const faktor = Math.min(1, MAX_BREITE / bitmap.width);
+  const leinwand = document.createElement("canvas");
+  leinwand.width = Math.round(bitmap.width * faktor);
+  leinwand.height = Math.round(bitmap.height * faktor);
+  leinwand.getContext("2d").drawImage(bitmap, 0, 0, leinwand.width, leinwand.height);
+  bitmap.close();
+
+  const blob = await new Promise((fertig) => leinwand.toBlob(fertig, "image/jpeg", 0.85));
+  if (!blob) throw new Error("Das Bild ließ sich nicht umwandeln.");
+  return blob;
+}
+
+async function ladeHoch(karte, datei) {
+  const rolle = karte.dataset.rolle;
+  const status = karte.querySelector(".platz-status");
+  const knopf = karte.querySelector("label.knopf");
+
+  status.className = "platz-status";
+  status.textContent = "Wird verkleinert …";
+  knopf.setAttribute("disabled", "disabled");
+
+  try {
+    const blob = await verkleinere(datei);
+    status.textContent = "Wird hochgeladen …";
+
+    const formular = new FormData();
+    formular.set("rolle", rolle);
+    formular.set("datei", blob, `${rolle}.jpg`);
+
+    const antwort = await fetch(`/intern/lead/${encodeURIComponent(slug)}/bild`, {
+      method: "POST",
+      body: formular,
+    });
+    const ergebnis = await antwort.json();
+    if (!antwort.ok || !ergebnis.ok) throw new Error(ergebnis.fehler ?? "Upload fehlgeschlagen.");
+
+    // Gleicher Pfad wie vorher – ohne Zeitstempel zeigte der Browser das alte
+    // Bild aus seinem Zwischenspeicher.
+    const bild = karte.querySelector(".platz-bild");
+    bild.innerHTML =
+      `<img src="${esc(ergebnis.pfad)}?t=${Date.now()}" alt="Eigenes Bild">` +
+      `<span class="marke eigen">Eigenes Bild</span>`;
+
+    status.className = "platz-status erfolg";
+    status.textContent = `Gespeichert (${ergebnis.breite} × ${ergebnis.hoehe} px)`;
+    zeigeHinweis("Bild gespeichert. Für den Entwurf noch \"npm run pages\" ausführen.");
+  } catch (fehler) {
+    status.className = "platz-status fehler";
+    status.textContent = fehler.message;
+  } finally {
+    knopf.removeAttribute("disabled");
+  }
+}
+
+document.getElementById("raster").addEventListener("change", (event) => {
+  const eingabe = event.target.closest('input[type="file"]');
+  if (!eingabe || !eingabe.files[0]) return;
+
+  const datei = eingabe.files[0];
+  // Zurücksetzen, damit dieselbe Datei nach einem Fehler erneut gewählt
+  // werden kann – ohne das feuert "change" kein zweites Mal.
+  eingabe.value = "";
+  ladeHoch(eingabe.closest(".platz"), datei);
+});
+
+async function lade() {
+  const leer = document.getElementById("leer");
+
+  if (!slug) {
+    leer.textContent = "Kein Entwurf angegeben. Diese Seite wird aus dem Dashboard heraus geöffnet.";
+    leer.style.display = "block";
+    return;
+  }
+
+  const antwort = await fetch(`/api/lead/${encodeURIComponent(slug)}/bilder`);
+  if (!antwort.ok) {
+    leer.textContent = "Zu diesem Entwurf gibt es keinen Lead. Vielleicht wurde er neu erzeugt – dann bitte im Dashboard neu öffnen.";
+    leer.style.display = "block";
+    return;
+  }
+
+  const daten = await antwort.json();
+  document.getElementById("untertitel").innerHTML =
+    `${esc(daten.name)} · <a href="${esc(daten.entwurf)}" target="_blank" rel="noopener">Entwurf ansehen</a>`;
+  document.getElementById("raster").innerHTML = daten.plaetze.map(platzKarte).join("");
+}
+
+lade();
+</script>
+
+</body>
+</html>
