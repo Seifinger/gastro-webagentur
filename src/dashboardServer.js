@@ -13,12 +13,32 @@ import {
 import { kuechenAuswahl } from "./menuCatalog.js";
 import { anschreiben } from "./outreach.js";
 import { ageInDays, isStale, isAgingSoon } from "./leadFreshness.js";
+import { FOTO_SLOTS, platzhalterBilder } from "./landingPageGenerator.js";
+import { assetFileName } from "./imageLibrary.js";
+import { loadLeadEdits } from "./leadEdits.js";
+import {
+  BILD_ROLLEN,
+  MAX_BYTES,
+  bildMasse,
+  leseBinaerKoerper,
+  parseMultipart,
+  speichereLeadBild,
+  uploadsDir,
+} from "./bildUpload.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dashboardHtmlPath = path.join(__dirname, "..", "public", "dashboard.html");
+const publicDir = path.join(__dirname, "..", "public");
+const dashboardHtmlPath = path.join(publicDir, "dashboard.html");
+const bearbeitenHtmlPath = path.join(publicDir, "bearbeiten.html");
 const manifestPath = path.join(landingPagesDir, "entwuerfe.json");
 
 const ENTWURF_PREFIX = "/entwuerfe/";
+const UPLOAD_PREFIX = "/uploads/";
+
+// Der Upload-Endpoint trägt ein "/intern/", weil er – anders als die
+// Entwürfe – nur für den Betreiber gedacht ist.
+const BILD_UPLOAD = /^\/intern\/lead\/([^/]+)\/bild$/;
+const LEAD_BILDER = /^\/api\/lead\/([^/]+)\/bilder$/;
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -76,6 +96,7 @@ function leadsMitZusatz() {
         ...lead,
         kueche: kuecheFuerLead(lead, zuordnungen),
         kuecheManuell: Boolean(zuordnungen[lead.placeId]),
+        slug: slug ?? "",
         entwurf: slug ? `${ENTWURF_PREFIX}${slug}/` : "",
         demoUrl,
         veroeffentlicht,
@@ -92,23 +113,80 @@ function leadsMitZusatz() {
 }
 
 /**
- * Löst einen /entwuerfe/-Pfad auf eine Datei im Entwurfsordner auf.
- * Gibt null zurück, wenn der Pfad aus dem Ordner herausführt – sonst könnte
- * über "../" jede Datei auf der Platte abgerufen werden.
+ * Löst einen URL-Pfad innerhalb eines Ordners auf. Gibt null zurück, wenn er
+ * aus dem Ordner herausführt – sonst könnte über "../" jede Datei auf der
+ * Platte abgerufen werden.
  */
-function resolveEntwurfFile(pathname) {
-  const relative = decodeURIComponent(pathname.slice(ENTWURF_PREFIX.length));
-  const target = path.resolve(landingPagesDir, relative);
+function dateiImOrdner(ordner, relativ) {
+  const target = path.resolve(ordner, decodeURIComponent(relativ));
+  const erlaubt = path.resolve(ordner);
 
-  const erlaubt = path.resolve(landingPagesDir);
   if (target !== erlaubt && !target.startsWith(erlaubt + path.sep)) return null;
-  if (!existsSync(target)) return null;
+  return existsSync(target) ? target : null;
+}
+
+function resolveEntwurfFile(pathname) {
+  const target = dateiImOrdner(landingPagesDir, pathname.slice(ENTWURF_PREFIX.length));
+  if (!target) return null;
 
   const datei = statSync(target).isDirectory() ? path.join(target, "index.html") : target;
   if (!existsSync(datei)) return null;
 
   const type = MIME_TYPES[path.extname(datei).toLowerCase()];
   return type ? { datei, type } : null;
+}
+
+/**
+ * Beschriftung der vier Bildplätze. Haus, Team und Bestseller kommen wörtlich
+ * aus FOTO_SLOTS in landingPageGenerator.js, damit Bearbeitungsansicht und
+ * Entwurf dasselbe versprechen.
+ */
+function bildPlaetze() {
+  const [haus, team, bestseller] = FOTO_SLOTS;
+  return [
+    {
+      rolle: "hero",
+      titel: "Titelbild",
+      hinweis: "Das große Bild ganz oben, hinter Name und Bewertung",
+      platzhalter: "Hero-Bild aus imageLibrary.js",
+    },
+    { rolle: "haus", ...haus, platzhalter: "1. Bildplatz in renderFotoSlots()" },
+    { rolle: "team", ...team, platzhalter: "2. Bildplatz in renderFotoSlots()" },
+    { rolle: "bestseller", ...bestseller, platzhalter: "3. Bildplatz in renderFotoSlots()" },
+  ];
+}
+
+/**
+ * Was auf der Seite dieses Entwurfs gerade an den vier Bildplätzen steht:
+ * entweder ein eigenes Foto aus den lead-edits oder der Stock-Platzhalter.
+ */
+function leadBilder(slug) {
+  const manifest = readManifest();
+  const placeId = Object.keys(manifest).find((id) => manifest[id] === slug);
+  const lead = placeId ? readAllLeads().find((l) => l.placeId === placeId) : null;
+  if (!lead) return null;
+
+  const kueche = kuecheFuerLead(lead, ladeZuordnungen());
+  const platzhalter = platzhalterBilder(lead, kueche);
+  const eigene = loadLeadEdits(slug).bilder ?? {};
+
+  const plaetze = bildPlaetze().map((platz) => {
+    const stock = platzhalter[platz.rolle];
+    const stockDatei = assetFileName(stock.id, stock.role);
+    // Ohne "npm run pages" liegt das Stockfoto noch nicht auf der Platte –
+    // dann gibt es schlicht keine Vorschau statt eines kaputten Bildes.
+    const stockUrl = existsSync(path.join(landingPagesDir, "assets", stockDatei))
+      ? `${ENTWURF_PREFIX}assets/${stockDatei}`
+      : null;
+
+    return {
+      ...platz,
+      eigen: Boolean(eigene[platz.rolle]),
+      aktuell: eigene[platz.rolle] ?? stockUrl,
+    };
+  });
+
+  return { slug, name: lead.name, entwurf: `${ENTWURF_PREFIX}${slug}/`, plaetze };
 }
 
 function sendeJson(res, status, daten) {
@@ -130,7 +208,7 @@ function leseKoerper(req) {
   });
 }
 
-const server = createServer(async (req, res) => {
+export const handler = async (req, res) => {
   const { pathname, searchParams } = new URL(
     req.url,
     `http://${req.headers.host ?? "localhost"}`,
@@ -139,6 +217,58 @@ const server = createServer(async (req, res) => {
   if (pathname === "/" || pathname === "/index.html") {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     res.end(readFileSync(dashboardHtmlPath, "utf-8"));
+    return;
+  }
+
+  if (pathname === "/bearbeiten.html") {
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(readFileSync(bearbeitenHtmlPath, "utf-8"));
+    return;
+  }
+
+  if (pathname.startsWith(UPLOAD_PREFIX)) {
+    const datei = dateiImOrdner(uploadsDir, pathname.slice(UPLOAD_PREFIX.length));
+    if (!datei || statSync(datei).isDirectory()) {
+      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end("Bild nicht gefunden");
+      return;
+    }
+
+    // Der Typ kommt aus den Bytes, nicht aus der Endung: gespeichert wird
+    // immer als .jpg, ein PNG bliebe sonst falsch ausgezeichnet.
+    const inhalt = readFileSync(datei);
+    res.writeHead(200, { "Content-Type": bildMasse(inhalt)?.typ ?? "image/jpeg" });
+    res.end(inhalt);
+    return;
+  }
+
+  const bilderTreffer = LEAD_BILDER.exec(pathname);
+  if (bilderTreffer) {
+    const daten = leadBilder(decodeURIComponent(bilderTreffer[1]));
+    if (!daten) {
+      sendeJson(res, 404, { fehler: "Zu diesem Entwurf gibt es keinen Lead." });
+      return;
+    }
+    sendeJson(res, 200, daten);
+    return;
+  }
+
+  const uploadTreffer = BILD_UPLOAD.exec(pathname);
+  if (uploadTreffer && req.method === "POST") {
+    try {
+      // Etwas Luft über der Bildgrenze für den multipart-Rahmen; die harte
+      // Grenze für das Bild selbst zieht speichereLeadBild.
+      const koerper = await leseBinaerKoerper(req, MAX_BYTES + 64 * 1024);
+      const { felder, dateien } = parseMultipart(koerper, req.headers["content-type"]);
+      const ergebnis = speichereLeadBild(
+        decodeURIComponent(uploadTreffer[1]),
+        felder.rolle,
+        dateien.datei,
+      );
+      sendeJson(res, 200, { ok: true, ...ergebnis });
+    } catch (fehler) {
+      sendeJson(res, 400, { ok: false, fehler: fehler.message });
+    }
     return;
   }
 
@@ -191,21 +321,27 @@ const server = createServer(async (req, res) => {
 
   res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
   res.end("Nicht gefunden");
-});
+};
 
+// Nur beim direkten Start (npm run dashboard) wird auch gelauscht. Der Test
+// importiert denselben Handler und hängt ihn an einen eigenen Port, statt
+// dem laufenden Dashboard den Platz wegzunehmen.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const server = createServer(handler);
 
-// Ein belegter Port ist der häufigste Stolperstein beim Start. Die Meldung
-// von Node ("EADDRINUSE") sagt nicht, was zu tun ist – diese hier schon.
-server.on("error", (fehler) => {
-  if (fehler.code === "EADDRINUSE") {
-    console.log(`\n⚠️  Port ${port} ist schon belegt – dort läuft bereits etwas.`);
-    console.log(`   Anderen Port wählen:  npm run dashboard -- --port ${port + 1}\n`);
-    process.exitCode = 1;
-    return;
-  }
-  throw fehler;
-});
+  // Ein belegter Port ist der häufigste Stolperstein beim Start. Die Meldung
+  // von Node ("EADDRINUSE") sagt nicht, was zu tun ist – diese hier schon.
+  server.on("error", (fehler) => {
+    if (fehler.code === "EADDRINUSE") {
+      console.log(`\n⚠️  Port ${port} ist schon belegt – dort läuft bereits etwas.`);
+      console.log(`   Anderen Port wählen:  npm run dashboard -- --port ${port + 1}\n`);
+      process.exitCode = 1;
+      return;
+    }
+    throw fehler;
+  });
 
-server.listen(port, () => {
-  console.log(`\n📊 Dashboard läuft: http://localhost:${port}\n`);
-});
+  server.listen(port, () => {
+    console.log(`\n📊 Dashboard läuft: http://localhost:${port}\n`);
+  });
+}
