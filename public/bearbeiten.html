@@ -99,6 +99,48 @@
   #toast.sichtbar { opacity: 1; transform: translate(-50%, 0); }
 
   .leer { padding: 40px 20px; text-align: center; color: var(--muted); }
+
+  .abschnitt { margin: 0 20px 40px; }
+  .abschnitt-titel { font-size: 1.1rem; margin: 0 0 6px; }
+  .abschnitt-hinweis { font-size: .85rem; color: var(--muted); margin: 0 0 16px; max-width: 720px; }
+
+  .prompt-box {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 18px 20px 20px; max-width: 720px;
+  }
+  .prompt-box textarea {
+    width: 100%; min-height: 84px; resize: vertical; padding: 11px 13px;
+    border: 1px solid var(--border); border-radius: 8px; font-family: inherit;
+    font-size: .9rem; color: var(--text); background: #fbfcfd;
+  }
+  .prompt-box textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .prompt-zeile { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+  .knopf-primaer {
+    padding: 9px 16px; border: 1px solid var(--accent); border-radius: 8px; background: var(--accent);
+    color: #fff; font-family: inherit; font-size: .85rem; font-weight: 600; cursor: pointer;
+  }
+  .knopf-primaer:hover { background: #1d4ed8; }
+  .knopf-primaer[disabled] { opacity: .5; cursor: progress; }
+  .prompt-status { font-size: .82rem; }
+  .prompt-status.fehler { color: #dc2626; }
+
+  .vorschau-bereich { margin-top: 18px; display: none; }
+  .vorschau-bereich.offen { display: block; }
+  .vorschau-aenderungen {
+    font-size: .82rem; color: var(--text); background: #fbfcfd; border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 13px; margin-bottom: 12px; line-height: 1.6;
+  }
+  .vorschau-aenderungen b { font-weight: 700; }
+  .vorschau-rahmen {
+    width: 100%; height: 480px; border: 1px solid var(--border); border-radius: 8px;
+    background: #fff;
+  }
+  .vorschau-knoepfe { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .knopf-verwerfen {
+    padding: 9px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--card);
+    color: var(--text); font-family: inherit; font-size: .85rem; font-weight: 600; cursor: pointer;
+  }
+  .knopf-verwerfen:hover { border-color: #dc2626; color: #dc2626; }
 </style>
 </head>
 <body>
@@ -118,6 +160,33 @@
 
 <div class="raster" id="raster"></div>
 <div class="leer" id="leer" style="display:none"></div>
+
+<section class="abschnitt" id="prompt-abschnitt" style="display:none">
+  <h2 class="abschnitt-titel">✏️ Texte per Prompt anpassen</h2>
+  <p class="abschnitt-hinweis">
+    Beschreiben Sie in eigenen Worten, was sich ändern soll (z. B. "Schlagzeile persönlicher formulieren"
+    oder "Beschreibung vom Schweinsbraten appetitlicher schreiben"). Das Sprachmodell schlägt nur Headline,
+    Schlagzeile und einzelne Gerichtsbeschreibungen vor – nie Bilder, Preise oder Struktur der Seite.
+    Nichts wird live geschaltet, bevor Sie die Vorschau unten ausdrücklich <strong>übernehmen</strong>.
+  </p>
+
+  <div class="prompt-box">
+    <textarea id="prompt-wunsch" placeholder="Was soll sich an den Texten ändern?"></textarea>
+    <div class="prompt-zeile">
+      <button class="knopf-primaer" id="prompt-generieren" type="button">Vorschlag generieren</button>
+      <span class="prompt-status" id="prompt-status"></span>
+    </div>
+
+    <div class="vorschau-bereich" id="vorschau-bereich">
+      <div class="vorschau-aenderungen" id="vorschau-aenderungen"></div>
+      <iframe class="vorschau-rahmen" id="vorschau-rahmen" title="Vorschau der neuen Texte"></iframe>
+      <div class="vorschau-knoepfe">
+        <button class="knopf-primaer" id="prompt-uebernehmen" type="button">Übernehmen</button>
+        <button class="knopf-verwerfen" id="prompt-verwerfen" type="button">Verwerfen</button>
+      </div>
+    </div>
+  </div>
+</section>
 
 <div id="toast"></div>
 
@@ -262,9 +331,101 @@ async function lade() {
   document.getElementById("untertitel").innerHTML =
     `${esc(daten.name)} · <a href="${esc(daten.entwurf)}" target="_blank" rel="noopener">Entwurf ansehen</a>`;
   document.getElementById("raster").innerHTML = daten.plaetze.map(platzKarte).join("");
+  document.getElementById("prompt-abschnitt").style.display = "block";
 }
 
 lade();
+
+/* ---------- Textvorschläge per Prompt ---------- */
+
+function beschreibeAenderungen(vorschlag) {
+  const zeilen = [];
+  if (vorschlag.headline !== undefined) zeilen.push(`<div><b>Headline:</b> ${esc(vorschlag.headline)}</div>`);
+  if (vorschlag.schlagzeile !== undefined) zeilen.push(`<div><b>Schlagzeile:</b> ${esc(vorschlag.schlagzeile)}</div>`);
+  const anzahlGerichte = Object.keys(vorschlag.highlightBeschreibungen ?? {}).length;
+  if (anzahlGerichte > 0) {
+    zeilen.push(`<div><b>${anzahlGerichte} Gerichtsbeschreibung(en)</b> angepasst – sichtbar in der Vorschau.</div>`);
+  }
+  return zeilen.join("");
+}
+
+function schliesseVorschau() {
+  document.getElementById("vorschau-bereich").classList.remove("offen");
+  document.getElementById("vorschau-rahmen").src = "about:blank";
+}
+
+document.getElementById("prompt-generieren").addEventListener("click", async () => {
+  const wunsch = document.getElementById("prompt-wunsch").value.trim();
+  const status = document.getElementById("prompt-status");
+  const knopf = document.getElementById("prompt-generieren");
+
+  if (!wunsch) {
+    status.className = "prompt-status fehler";
+    status.textContent = "Bitte zuerst beschreiben, was sich ändern soll.";
+    return;
+  }
+
+  status.className = "prompt-status";
+  status.textContent = "Vorschlag wird erzeugt …";
+  knopf.setAttribute("disabled", "disabled");
+  schliesseVorschau();
+
+  try {
+    const antwort = await fetch(`/intern/lead/${encodeURIComponent(slug)}/prompt`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wunsch }),
+    });
+    const ergebnis = await antwort.json();
+    if (!antwort.ok || !ergebnis.ok) throw new Error(ergebnis.fehler ?? "Der Vorschlag konnte nicht erzeugt werden.");
+
+    document.getElementById("vorschau-aenderungen").innerHTML = beschreibeAenderungen(ergebnis.vorschlag);
+    // Zeitstempel verhindert, dass der Browser eine ältere Vorschau desselben
+    // Rahmens aus dem Zwischenspeicher zeigt.
+    document.getElementById("vorschau-rahmen").src = `${ergebnis.vorschauUrl}?t=${Date.now()}`;
+    document.getElementById("vorschau-bereich").classList.add("offen");
+    status.textContent = "Vorschlag erzeugt – unten prüfen und übernehmen oder verwerfen.";
+  } catch (fehler) {
+    status.className = "prompt-status fehler";
+    status.textContent = fehler.message;
+  } finally {
+    knopf.removeAttribute("disabled");
+  }
+});
+
+document.getElementById("prompt-uebernehmen").addEventListener("click", async () => {
+  const status = document.getElementById("prompt-status");
+  const knopf = document.getElementById("prompt-uebernehmen");
+
+  knopf.setAttribute("disabled", "disabled");
+  try {
+    const antwort = await fetch(`/intern/lead/${encodeURIComponent(slug)}/prompt/uebernehmen`, { method: "POST" });
+    const ergebnis = await antwort.json();
+    if (!antwort.ok || !ergebnis.ok) throw new Error(ergebnis.fehler ?? "Übernehmen fehlgeschlagen.");
+
+    schliesseVorschau();
+    document.getElementById("prompt-wunsch").value = "";
+    status.className = "prompt-status";
+    status.textContent = "";
+    zeigeHinweis("Texte übernommen. Für den Entwurf noch \"npm run pages\" ausführen.");
+  } catch (fehler) {
+    status.className = "prompt-status fehler";
+    status.textContent = fehler.message;
+  } finally {
+    knopf.removeAttribute("disabled");
+  }
+});
+
+document.getElementById("prompt-verwerfen").addEventListener("click", async () => {
+  try {
+    await fetch(`/intern/lead/${encodeURIComponent(slug)}/prompt/verwerfen`, { method: "POST" });
+  } catch {
+    // Verwerfen ist reine Aufräumarbeit – schlägt der Aufruf fehl, bleibt der
+    // Vorschlag serverseitig einfach ungenutzt liegen, bis der nächste ihn ersetzt.
+  }
+  schliesseVorschau();
+  document.getElementById("prompt-status").textContent = "";
+});
 </script>
 
 </body>
