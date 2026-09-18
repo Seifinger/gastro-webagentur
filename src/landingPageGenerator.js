@@ -242,6 +242,30 @@ export function imageSpecsForLead(lead, cuisineOverride) {
   });
 }
 
+/**
+ * Die vier Stock-Motive, die eine Seite ohne eigene Bilder zeigt: das
+ * Titelbild und die drei Plätze aus renderFotoSlots(). Die Bearbeitungsansicht
+ * im Dashboard zeigt damit genau das an, was gerade auf der Seite steht.
+ */
+export function platzhalterBilder(lead, cuisineOverride) {
+  const gestaltung = themeForLead(lead, cuisineOverride);
+  const menu = cuisineOverride ? menuForCuisine(cuisineOverride) : menuForLead(lead);
+
+  // Dieselbe Auswahl wie in buildLandingPage: der Bestseller ist das erste
+  // Highlight, und ohne bebildertes Gericht bleibt es beim Haus-Bild.
+  const kandidaten = highlightCandidates(menu);
+  const bestseller = kandidaten[gestaltung.seed % Math.max(1, kandidaten.length)];
+
+  return {
+    hero: { id: gestaltung.heroImage, role: "hero" },
+    haus: { id: gestaltung.hausBild, role: "ambiente" },
+    team: { id: gestaltung.teamBild, role: "ambiente" },
+    bestseller: bestseller?.bild
+      ? { id: bestseller.bild, role: "gericht" }
+      : { id: gestaltung.hausBild, role: "ambiente" },
+  };
+}
+
 const PAGE_STYLES = `
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
