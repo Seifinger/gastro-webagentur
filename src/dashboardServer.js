@@ -33,6 +33,7 @@ import {
   uploadsDir,
 } from "./bildUpload.js";
 import { erzeugeTextVorschlag, letzterVorschlag, vergissVorschlag } from "./promptEdits.js";
+import { veroeffentlicheEntwurf } from "./veroeffentlichung.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -51,6 +52,7 @@ const PROMPT_VORSCHLAG = /^\/intern\/lead\/([^/]+)\/prompt$/;
 const PROMPT_VORSCHAU = /^\/intern\/lead\/([^/]+)\/prompt\/vorschau$/;
 const PROMPT_UEBERNEHMEN = /^\/intern\/lead\/([^/]+)\/prompt\/uebernehmen$/;
 const PROMPT_VERWERFEN = /^\/intern\/lead\/([^/]+)\/prompt\/verwerfen$/;
+const VEROEFFENTLICHEN = /^\/intern\/lead\/([^/]+)\/veroeffentlichen$/;
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -416,6 +418,20 @@ export const handler = async (req, res) => {
   if (verwerfenTreffer && req.method === "POST") {
     vergissVorschlag(decodeURIComponent(verwerfenTreffer[1]));
     sendeJson(res, 200, { ok: true });
+    return;
+  }
+
+  const veroeffentlichenTreffer = VEROEFFENTLICHEN.exec(pathname);
+  if (veroeffentlichenTreffer && req.method === "POST") {
+    const slug = decodeURIComponent(veroeffentlichenTreffer[1]);
+    try {
+      const ergebnis = await veroeffentlicheEntwurf(slug);
+      sendeJson(res, 200, { ok: true, ...ergebnis });
+    } catch (fehler) {
+      // Merge-Konflikt, kein Internetzugang, unbekannter Slug: alles landet
+      // hier – die Route darf dabei nie den Server mitreißen.
+      sendeJson(res, 400, { ok: false, fehler: fehler.message });
+    }
     return;
   }
 
