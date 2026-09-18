@@ -69,11 +69,14 @@ export const designPresets = {
 
   thailaendisch: {
     // Orientiert an Rabiang Thai / Spicery: dichte, bunte Kartenoptik im Grid.
+    // Rabiang Thai bewirbt eine eigene "24 Stunden online reservieren"-Seite
+    // als zentrales Alleinstellungsmerkmal (Live-Recherche) – deshalb hier
+    // das auffälligere Hero-Widget statt des unscheinbaren Inline-Formulars.
     hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
     header: { sticky: true, ctaButton: "Tisch reservieren", phoneVisible: true, trustStrip: true },
     layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "normal" },
     menu: { layout: "grid", showBadges: true, highlightMostLoved: true },
-    reservation: { widgetVariant: "inline", externalSystem: null },
+    reservation: { widgetVariant: "hero_widget", externalSystem: null },
     ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
     social: { layout: "carousel", includeRatingStrip: true },
     mobile: { stickyActionBar: true },
@@ -117,13 +120,16 @@ export const designPresets = {
 
   japanisch: {
     // Orientiert an sansaro / RAYA: reduziertes Fine-Dining-Layout, eine
-    // hervorgehobene Stimme statt vieler kleiner Karten.
+    // hervorgehobene Stimme statt vieler kleiner Karten. sansaro trägt seit
+    // 2022 den Michelin-Teller (Live-Recherche) – ein echtes Trust-Signal,
+    // deshalb trustStrip hier an, anders als bei anderen Fine-Dining-Presets.
+    // Sie liefern seit 2021 zusätzlich zur Abholung auch aus (mode: "both").
     hero: { type: "classic", primaryAction: "Zur Abholung bestellen", secondaryAction: "Tisch reservieren" },
-    header: { sticky: true, ctaButton: "Omakase reservieren", phoneVisible: true, trustStrip: false },
+    header: { sticky: true, ctaButton: "Omakase reservieren", phoneVisible: true, trustStrip: true },
     layout: { sectionOrder: ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"], sectionSpacing: "reduziert" },
     menu: { layout: "list", showBadges: false, highlightMostLoved: true },
     reservation: { widgetVariant: "hero_widget", externalSystem: null },
-    ordering: { enabled: true, mode: "pickup", ctaPlacement: "hero" },
+    ordering: { enabled: true, mode: "both", ctaPlacement: "hero" },
     social: { layout: "featured_quote", includeRatingStrip: true },
     mobile: { stickyActionBar: true },
   },
