@@ -125,6 +125,145 @@ export const MOTION_CSS = `
 }
 `;
 
+/* ======================================================================== *
+ * Erweiterung (opt-in)                                                      *
+ * ------------------------------------------------------------------------ *
+ * Alles ab hier gehört NICHT zu MOTION_CSS/MOTION_SCRIPT. Die beiden Blöcke
+ * oben stecken unverändert in jeder bereits veröffentlichten Kundenseite –
+ * würde man sie erweitern, änderte sich mit dem nächsten Publish jede Seite.
+ * Die neuen Effekte kommen deshalb als eigener Block, den der Generator nur
+ * dort einsetzt, wo ein Preset sie anfordert (Editorial-Archetyp, Video-Hero).
+ *
+ * Es gelten dieselben drei Regeln wie oben: nur transform/opacity, ohne
+ * JavaScript ist alles sichtbar, und wer keine Bewegung will, bekommt keine.
+ * ======================================================================== */
+
+// Derselbe Aufbau wie MOTION_REDUZIERT_REGELN: einmal geschrieben, unten
+// zweimal eingehängt (Media Query für die Systemeinstellung, .bewegung-aus
+// für die Verkaufsdemo).
+const MOTION_EXTRA_REDUZIERT_REGELN = `
+  .zeile { opacity: 1; transform: none; transition: none; }
+  .bild-zoom img, .bild-zoom > picture > img { transform: none; transition: none; }
+  .link-strich::after { transform: scaleX(1); transition: none; }
+  .hero-video { display: none; }
+  .hero-video-fallback { display: block; }
+`;
+
+export const MOTION_EXTRA_CSS = `
+/* --- Zeilenweiser Auftritt der Überschrift ------------------------------ */
+/* Die Zeilen werden beim Rendern serverseitig in <span class="zeile"> gelegt
+   (siehe sections/hero.js) – kein Zerlegen von Text im Browser, das je nach
+   Schriftgröße anders ausfällt und beim Laden sichtbar springt.
+   Ohne Skript steht die Überschrift ganz normal da: die Startwerte hängen an
+   .bewegt, das erst das Skript setzt. */
+.zeilen { display: block; }
+.zeile { display: block; }
+.bewegt .auftritt-zeile .zeile { opacity: 0; transform: translateY(0.38em);
+                                 transition: opacity .66s cubic-bezier(.22,.61,.36,1),
+                                             transform .66s cubic-bezier(.22,.61,.36,1);
+                                 transition-delay: calc(var(--takt, 0) * 105ms); }
+.bewegt .auftritt-zeile.da .zeile { opacity: 1; transform: none; }
+
+/* --- Bild-Zoom beim Überfahren ----------------------------------------- */
+/* Nur für Geräte mit echtem Zeiger: Auf dem Handy gibt es kein "hover", der
+   Effekt bliebe dort nach dem Antippen hängen. */
+@media (hover: hover) {
+  .bild-zoom { overflow: hidden; }
+  .bild-zoom img { transition: transform .62s cubic-bezier(.22,.61,.36,1); will-change: transform; }
+  .bild-zoom:hover img, .bild-zoom:focus-within img { transform: scale(1.06); }
+}
+
+/* --- Unterstrich, der sich aufzieht ------------------------------------ */
+@media (hover: hover) {
+  .link-strich { position: relative; text-decoration: none; }
+  .link-strich::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px;
+                        background: currentColor; transform: scaleX(0); transform-origin: left;
+                        transition: transform .38s cubic-bezier(.22,.61,.36,1); }
+  .link-strich:hover::after, .link-strich:focus-visible::after { transform: scaleX(1); }
+}
+
+/* --- Video-Hero --------------------------------------------------------- */
+/* Das Poster ist dasselbe Bild, das der Hero ohne Video zeigt. Fehlt das
+   Video oder will der Besucher keine Bewegung, bleibt genau dieses Bild
+   stehen – der Hero ist also nie leer. */
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-video-fallback { display: none; }
+/* Angehalten wird das Video vom Skript (MOTION_EXTRA_SKRIPT) über einen
+   IntersectionObserver – genau wie die Hero-Fahrt oben, nur dass ein Video
+   mehr kostet als eine CSS-Animation. Ohne Skript läuft es einfach weiter,
+   ohne Skript UND ohne Bewegungswunsch greift die Regel im Block unten. */
+
+/* --- Wer keine Bewegung will, bekommt keine ----------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .bewegt .auftritt-zeile .zeile { opacity: 1; transform: none; transition: none; }
+  ${MOTION_EXTRA_REDUZIERT_REGELN}
+}
+
+/* Verkaufsdemo (?bewegung=aus): derselbe Regelblock, verschachtelt. Der
+   .bewegt-Selektor fehlt hier bewusst – bei ?bewegung=aus wird .bewegt gar
+   nicht gesetzt. */
+.bewegung-aus {
+  ${MOTION_EXTRA_REDUZIERT_REGELN}
+}
+`;
+
+// Ergänzendes Skript für die neuen Effekte. Eigenständig: Es prüft selbst auf
+// prefers-reduced-motion und ?bewegung=aus und setzt .bewegt notfalls selbst,
+// damit es nicht von der Reihenfolge der Skriptblöcke abhängt.
+export const MOTION_EXTRA_SKRIPT = `
+(function () {
+  var erzwungenRuhig = new URLSearchParams(location.search).get("bewegung") === "aus";
+  if (erzwungenRuhig) document.documentElement.classList.add("bewegung-aus");
+
+  var ruhig = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var video = document.querySelector(".hero-video");
+
+  // Ohne Bewegung bleibt das Poster stehen: Das Video wird per CSS versteckt,
+  // hier wird es zusätzlich angehalten, damit es keine Daten nachlädt.
+  if (ruhig.matches || erzwungenRuhig) {
+    if (video) { video.pause(); video.removeAttribute("autoplay"); }
+    return;
+  }
+
+  if (!("IntersectionObserver" in window)) return;
+
+  // Video anhalten, sobald der Hero durch ist – wie die Hero-Fahrt oben.
+  if (video) {
+    new IntersectionObserver(function (eintraege) {
+      if (eintraege[0].isIntersecting) {
+        var versuch = video.play();
+        if (versuch && versuch.catch) versuch.catch(function () {});
+      } else {
+        video.pause();
+      }
+    }, { threshold: 0 }).observe(video);
+  }
+
+  var zeilenBloecke = document.querySelectorAll(".auftritt-zeile");
+  if (zeilenBloecke.length === 0) return;
+  document.documentElement.classList.add("bewegt");
+
+  var beobachter = new IntersectionObserver(function (eintraege) {
+    eintraege.forEach(function (eintrag) {
+      if (!eintrag.isIntersecting) return;
+      eintrag.target.classList.add("da");
+      beobachter.unobserve(eintrag.target);
+    });
+  }, { threshold: 0.1 });
+
+  Array.prototype.forEach.call(zeilenBloecke, function (el) { beobachter.observe(el); });
+
+  // Stellt jemand die Bewegung mitten im Besuch ab, wird sofort alles gezeigt.
+  var aus = function () {
+    if (!ruhig.matches) return;
+    beobachter.disconnect();
+    Array.prototype.forEach.call(zeilenBloecke, function (el) { el.classList.add("da"); });
+    if (video) video.pause();
+  };
+  if (ruhig.addEventListener) ruhig.addEventListener("change", aus);
+})();
+`;
+
 // Wird als eigener Block in die Seite geschrieben. Bewusst früh ausgeführt und
 // nicht erst bei "load": sonst blitzt der unsichtbare Zustand kurz auf.
 export const MOTION_SCRIPT = `

@@ -14,6 +14,8 @@
 // über alle drei Stimmungen dieselbe: Sie ist die Identität der Küche, nicht
 // die der Stimmung.
 
+import { boldAccent } from "./colorMath.js";
+
 const SANS = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 
 // Sechs Anzeigeschriften für zwölf Küchen. Alle liegen lokal (fontLibrary.js),
@@ -25,12 +27,18 @@ const SERIF_KONTRAST = "'DM Serif Display', Georgia, 'Times New Roman', serif";
 const SANS_GEOMETRISCH = "'Montserrat', 'Inter', Helvetica, Arial, sans-serif";
 const SANS_SCHMAL = "'Oswald', 'Inter', Helvetica, Arial, sans-serif";
 
-export const ARCHETYPEN = ["traditionell", "abend", "hell"];
+export const ARCHETYPEN = ["traditionell", "abend", "hell", "editorial"];
+
+// Die drei Archetypen, die je Küche von Hand ausgearbeitet sind. "editorial"
+// steht bewusst nicht darin: Diese Welt wird aus der traditionellen abgeleitet
+// (siehe editorialStimmung weiter unten) und teilt sich deren Farben.
+export const GRUND_ARCHETYPEN = ["traditionell", "abend", "hell"];
 
 export const ARCHETYP_LABEL = {
   traditionell: "Traditionell",
   abend: "Abend",
   hell: "Hell & modern",
+  editorial: "Editorial",
 };
 
 // Helle und dunkle Grundgerüste. Die Stimmung setzt darauf nur noch ihre
@@ -131,7 +139,7 @@ function stimmung(id, label, archetyp, basis, extras) {
   };
 }
 
-export const STIMMUNGEN = {
+const GRUND_STIMMUNGEN = {
   bayerisch: [
     stimmung("wirtshaus", "Wirtshaus", "traditionell", LEINEN, {
       display: SERIF_RUSTIKAL,
@@ -421,6 +429,56 @@ export const STIMMUNGEN = {
   ],
 };
 
+/* ---------- Abgeleitete Schicht: kräftigerer Akzent + Editorial ---------- */
+
+/**
+ * Der kräftigere Akzent jeder Stimmung. Statt 36 (jetzt 48) Farbwerte von Hand
+ * nachzuziehen, hebt colorMath.boldAccent Sättigung und – falls nötig –
+ * Helligkeit an, bis der Ton mindestens 4.5:1 gegen den eigenen Grund steht.
+ *
+ * Der rohe accent bleibt unangetastet daneben stehen: Er steckt in jeder
+ * bereits veröffentlichten Seite, und die Knopfschrift (onAccent) ist gegen
+ * genau ihn geprüft. accentBold ist die zusätzliche Ebene, die der
+ * Editorial-Archetyp für große Flächen und Schrift nutzt.
+ */
+function mitBoldAccent(s) {
+  return {
+    ...s,
+    accentBold: boldAccent(s.accent, { against: s.bg, saturationBoost: 18, targetContrast: 4.5 }),
+  };
+}
+
+/**
+ * Die Editorial-Welt einer Küche. Sie erfindet keine neuen Farben, sondern
+ * nimmt die der traditionellen Stimmung – die Identität der Küche bleibt also
+ * dieselbe – und stellt nur die Form härter: keine runden Ecken, engere
+ * Laufweite. Alles Weitere (Größe, Raster, Vollbild) steckt im Layout des
+ * Archetyps, nicht in der Farbwelt.
+ *
+ * Sie greift auf alle drei Bildpaare zu (je ein Bild pro Grundstimmung): Ein
+ * Magazin-Layout lebt vom Bild, da wäre eine Auswahl aus zwei Aufnahmen zu
+ * knapp.
+ */
+function editorialStimmung(liste) {
+  const basis = liste.find((s) => s.archetyp === "traditionell") ?? liste[0];
+  return {
+    ...basis,
+    id: `${basis.id}-editorial`,
+    label: `${basis.label} Editorial`,
+    archetyp: "editorial",
+    radius: "0px",
+    displayTracking: "-0.03em",
+    bilder: [0, 2, 4],
+  };
+}
+
+export const STIMMUNGEN = Object.fromEntries(
+  Object.entries(GRUND_STIMMUNGEN).map(([cuisine, liste]) => [
+    cuisine,
+    [...liste, editorialStimmung(liste)].map(mitBoldAccent),
+  ]),
+);
+
 const FALLBACK_KUECHE = "bayerisch";
 
 export function stimmungenFuer(cuisine) {
@@ -455,5 +513,12 @@ export function istStimmungsId(cuisine, id) {
 export function resolveStimmung(cuisine, { id, seed = 0 } = {}) {
   const liste = stimmungenFuer(cuisine);
   const gewaehlt = id ? liste.find((s) => s.id === id) : null;
-  return gewaehlt ?? liste[seed % liste.length];
+  if (gewaehlt) return gewaehlt;
+
+  // Ohne Auswahl bleibt der Seed bei den drei ausgearbeiteten Welten. Editorial
+  // ist eine bewusste Entscheidung des Wirts, keine Zufallszuteilung – und ein
+  // vierter Eintrag im Zufallstopf hätte jedem bestehenden Lead über Nacht eine
+  // andere Stimmung gegeben.
+  const grund = liste.filter((s) => GRUND_ARCHETYPEN.includes(s.archetyp));
+  return grund[seed % grund.length];
 }
