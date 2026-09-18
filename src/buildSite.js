@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { readAllLeads } from "./csvImport.js";
 import {
@@ -11,13 +11,25 @@ import { menuForCuisine, MENUS } from "./menuCatalog.js";
 import { ladeZuordnungen, kuecheFuerLead } from "./cuisineOverrides.js";
 import { ensureAssets } from "./imageLibrary.js";
 import { ensureFonts, fontFaceCss } from "./fontLibrary.js";
+import { landingPagesDir } from "./config.js";
 
 // Gemeinsamer Unterbau für die lokale Fassung (npm run pages) und die
 // veröffentlichte Fassung (npm run publish-site). Beide sollen denselben
 // Entwurf ergeben – deshalb liegt die Auswahl- und Schreiblogik hier.
 
 export function parseArgs(argv) {
-  const args = { region: null, limit: null, minScore: 0, email: "", cuisine: null, kontakt: "", api: "" };
+  const args = {
+    region: null,
+    limit: null,
+    minScore: 0,
+    email: "",
+    cuisine: null,
+    kontakt: "",
+    api: "",
+    // Nur diesen einen Entwurf neu bauen (siehe leadFuerSlug unten) – für
+    // Änderungen an einem einzelnen Lead, ohne die übrigen ~55 anzufassen.
+    only: null,
+  };
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === "--region") args.region = argv[++i];
     if (argv[i] === "--limit") args.limit = Number(argv[++i]);
@@ -26,6 +38,7 @@ export function parseArgs(argv) {
     if (argv[i] === "--cuisine") args.cuisine = argv[++i];
     if (argv[i] === "--kontakt") args.kontakt = argv[++i];
     if (argv[i] === "--api") args.api = argv[++i];
+    if (argv[i] === "--only") args.only = argv[++i];
   }
   return args;
 }
@@ -92,6 +105,28 @@ export function baueEintraege(leads, cuisineOverride) {
       slug: uniqueSlug(lead, taken),
     };
   });
+}
+
+/**
+ * Findet den Lead zu einem Entwurfs-Slug über data/landingpages/entwuerfe.json
+ * – die Zuordnung, die baueEintraege() bei einem vollständigen Lauf erzeugt.
+ * Grundlage für "--only <slug>": uniqueSlug() vergibt für denselben Lead
+ * (dieselbe placeId) immer denselben Slug, ein Lauf mit nur diesem einen Lead
+ * trifft also wieder genau diesen Slug – die Kollisions-Zählung in
+ * uniqueSlug() greift nur, wenn zwei verschiedene Leads zufällig denselben
+ * Namen und Hash ergeben, praktisch ausgeschlossen bei eindeutigen placeIds.
+ */
+export function leadFuerSlug(slug) {
+  let manifest;
+  try {
+    manifest = JSON.parse(readFileSync(path.join(landingPagesDir, "entwuerfe.json"), "utf-8"));
+  } catch {
+    return null;
+  }
+
+  const placeId = Object.keys(manifest).find((id) => manifest[id] === slug);
+  if (!placeId) return null;
+  return readAllLeads().find((lead) => lead.placeId === placeId) ?? null;
 }
 
 export async function ladeBilder(entries, assetsDir) {
