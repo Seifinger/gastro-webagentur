@@ -1,13 +1,15 @@
-import { mkdirSync, writeFileSync, readdirSync, rmSync } from "node:fs";
+import { mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { landingPagesDir } from "./config.js";
 import { escapeHtml } from "./landingPageGenerator.js";
 import { assetFileName } from "./imageLibrary.js";
+import { loadLeadEdits } from "./leadEdits.js";
 import {
   parseArgs,
   pruefeKueche,
   waehleLeads,
   baueEintraege,
+  leadFuerSlug,
   ladeBilder,
   ladeSchriften,
   schreibeSeiten,
@@ -78,6 +80,62 @@ async function run() {
     return;
   }
 
+  mkdirSync(landingPagesDir, { recursive: true });
+
+  // --only <slug>: ausschließlich diesen einen Entwurf neu bauen. Die
+  // Aufräum- und Übersichtsschritte weiter unten setzen eine vollständige
+  // Lead-Liste voraus und würden sonst die übrigen ~55 Entwürfe aus dem
+  // Manifest werfen bzw. deren Ordner löschen – deshalb ein eigener,
+  // kurzer Zweig, der nur den einen Ordner anfasst.
+  if (args.only) {
+    const lead = leadFuerSlug(args.only);
+    if (!lead) {
+      console.log(
+        `\nKein Lead für Slug "${args.only}" gefunden. Erst einen vollständigen Lauf ("npm run pages") ausführen.\n`,
+      );
+      process.exitCode = 1;
+      return;
+    }
+
+    const [entry] = baueEintraege([lead], args.cuisine).map((entry) => ({
+      ...entry,
+      editUebersteuerung: loadLeadEdits(entry.slug),
+    }));
+
+    if (entry.slug !== args.only) {
+      console.log(
+        `\nDer errechnete Slug ("${entry.slug}") weicht von "${args.only}" ab – nichts geändert.\n`,
+      );
+      process.exitCode = 1;
+      return;
+    }
+
+    const assetsDir = path.join(landingPagesDir, "assets");
+    console.log(`\n📷 Prüfe Bildmaterial für "${entry.slug}" ...`);
+    await ladeBilder([entry], assetsDir);
+    console.log("🔤 Prüfe Schriften ...");
+    const fontCss = await ladeSchriften(path.join(assetsDir, "fonts"));
+
+    schreibeSeiten([entry], landingPagesDir, { kontaktEmail: args.email, fontCss, apiUrl: args.api });
+
+    // Nur den einen Eintrag im Manifest aktualisieren – die Zuordnung der
+    // übrigen Leads bleibt unverändert erhalten.
+    const manifestPath = path.join(landingPagesDir, "entwuerfe.json");
+    let manifest = {};
+    try {
+      manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+    } catch {
+      // Erster Lauf überhaupt, oder Manifest noch nicht vorhanden – ein
+      // leeres Manifest ist dann der richtige Ausgangspunkt.
+    }
+    if (lead.placeId) manifest[lead.placeId] = entry.slug;
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf-8");
+
+    console.log(`\n✅ Entwurf "${entry.slug}" neu gebaut.`);
+    console.log(`   Ordner: ${path.join(landingPagesDir, entry.slug)}\n`);
+    return;
+  }
+
   const leads = waehleLeads(args);
   if (leads.length === 0) {
     console.log(
@@ -86,8 +144,12 @@ async function run() {
     return;
   }
 
-  mkdirSync(landingPagesDir, { recursive: true });
-  const entries = baueEintraege(leads, args.cuisine);
+  // Was ein Kunde für seinen Entwurf selbst eingepflegt hat. Ohne Datei bleibt
+  // es beim generischen Entwurf – der Normalfall für die übrigen Leads.
+  const entries = baueEintraege(leads, args.cuisine).map((entry) => ({
+    ...entry,
+    editUebersteuerung: loadLeadEdits(entry.slug),
+  }));
 
   // Entwurfsordner aus früheren Läufen entfernen – sonst bleiben Seiten mit
   // veralteter Küche oder altem Namen liegen und das Dashboard verlinkt sie

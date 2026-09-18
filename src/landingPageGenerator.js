@@ -1,4 +1,10 @@
-import { menuForLead, menuForCuisine, highlightCandidates, detectCuisine } from "./menuCatalog.js";
+import {
+  menuForLead,
+  menuForCuisine,
+  highlightCandidates,
+  detectCuisine,
+  gerichtId,
+} from "./menuCatalog.js";
 import { HERO_IMAGES, INTERIOR_IMAGES, TEAM_IMAGES, assetFileName } from "./imageLibrary.js";
 import { resolveTheme, THEMES, themeNameForCuisine } from "./themes.js";
 import {
@@ -72,6 +78,11 @@ export function themeForLead(lead, cuisineOverride) {
 function resolveDesignPreset(cuisine, options) {
   if (options.preset) return withDesignDefaults(options.preset);
   return getPresetVariant(cuisine, options.designVariant);
+}
+
+// Ohne Übersteuerung bleibt jede Gerichtsbeschreibung die aus menuCatalog.js.
+function beschreibungUnveraendert(_gerichtId, beschreibung) {
+  return beschreibung;
 }
 
 /**
@@ -229,6 +240,30 @@ export function imageSpecsForLead(lead, cuisineOverride) {
     seen.add(key);
     return true;
   });
+}
+
+/**
+ * Die vier Stock-Motive, die eine Seite ohne eigene Bilder zeigt: das
+ * Titelbild und die drei Plätze aus renderFotoSlots(). Die Bearbeitungsansicht
+ * im Dashboard zeigt damit genau das an, was gerade auf der Seite steht.
+ */
+export function platzhalterBilder(lead, cuisineOverride) {
+  const gestaltung = themeForLead(lead, cuisineOverride);
+  const menu = cuisineOverride ? menuForCuisine(cuisineOverride) : menuForLead(lead);
+
+  // Dieselbe Auswahl wie in buildLandingPage: der Bestseller ist das erste
+  // Highlight, und ohne bebildertes Gericht bleibt es beim Haus-Bild.
+  const kandidaten = highlightCandidates(menu);
+  const bestseller = kandidaten[gestaltung.seed % Math.max(1, kandidaten.length)];
+
+  return {
+    hero: { id: gestaltung.heroImage, role: "hero" },
+    haus: { id: gestaltung.hausBild, role: "ambiente" },
+    team: { id: gestaltung.teamBild, role: "ambiente" },
+    bestseller: bestseller?.bild
+      ? { id: bestseller.bild, role: "gericht" }
+      : { id: gestaltung.hausBild, role: "ambiente" },
+  };
 }
 
 const PAGE_STYLES = `
@@ -894,7 +929,7 @@ const PAGE_SCRIPT = `
 })();
 `;
 
-function renderHighlights(highlights, bildUrl, showBadges = true) {
+function renderHighlights(highlights, bildUrl, showBadges = true, beschreibungFuer = beschreibungUnveraendert) {
   return highlights
     .map((gericht) => {
       const veg = showBadges && gericht.vegetarisch ? '<span class="veg">vegetarisch</span>' : "";
@@ -906,7 +941,7 @@ function renderHighlights(highlights, bildUrl, showBadges = true) {
         </div>
         <div class="hl-body">
           <h3 class="hl-name">${escapeHtml(gericht.name)}</h3>
-          <p class="hl-desc">${escapeHtml(gericht.beschreibung)}</p>
+          <p class="hl-desc">${escapeHtml(beschreibungFuer(gericht.id, gericht.beschreibung))}</p>
           <div class="hl-foot">
             <span class="hl-preis">${formatPrice(gericht.preis)}</span>
             ${veg}
@@ -924,21 +959,22 @@ function renderHighlights(highlights, bildUrl, showBadges = true) {
  * Die vollständige Karte als aufklappbare Liste – direkt im HTML statt als
  * PDF, damit sie auf dem Handy lesbar ist und Google sie indexieren kann.
  */
-function renderMenuAccordion(menu, showBadges = true) {
+function renderMenuAccordion(menu, showBadges = true, beschreibungFuer = beschreibungUnveraendert) {
   return menu.kategorien
     .map((kategorie, katIndex) => {
       const gerichte = kategorie.gerichte
         .map((gericht, gerichtIndex) => {
           const veg = showBadges && gericht.vegetarisch ? ' <span class="veg">vegetarisch</span>' : "";
+          const id = gerichtId(katIndex, gerichtIndex);
           return `
           <div class="gericht">
             <div class="gericht-body">
               <div class="gericht-name">${escapeHtml(gericht.name)}${veg}</div>
-              <div class="gericht-desc">${escapeHtml(gericht.beschreibung)}</div>
+              <div class="gericht-desc">${escapeHtml(beschreibungFuer(id, gericht.beschreibung))}</div>
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">${formatPrice(gericht.preis)}</span>
-              <button class="mini-add" type="button" data-add="${katIndex}-${gerichtIndex}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}" aria-label="${escapeHtml(gericht.name)} vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="${id}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}" aria-label="${escapeHtml(gericht.name)} vorbestellen">+</button>
             </div>
           </div>`;
         })
@@ -958,11 +994,12 @@ function renderMenuAccordion(menu, showBadges = true) {
  * zur Beschriftung passt, damit der Wirt sofort sieht, welches eigene Foto
  * dort hingehört.
  */
-function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl) {
+function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl, eigeneBilder = {}) {
   const quellen = [
-    bildUrl(hausBild, "ambiente"),
-    bildUrl(teamBild, "ambiente"),
-    bestsellerBild ? bildUrl(bestsellerBild, "gericht") : bildUrl(hausBild, "ambiente"),
+    eigeneBilder.haus ?? bildUrl(hausBild, "ambiente"),
+    eigeneBilder.team ?? bildUrl(teamBild, "ambiente"),
+    eigeneBilder.bestseller ??
+      (bestsellerBild ? bildUrl(bestsellerBild, "gericht") : bildUrl(hausBild, "ambiente")),
   ];
 
   return FOTO_SLOTS.map(
@@ -1077,6 +1114,14 @@ export function buildLandingPage(lead, options = {}) {
   const veroeffentlicht = options.veroeffentlicht ?? false;
   const fiktiv = options.fiktiv ?? false;
 
+  // Was der Kunde selbst eingepflegt hat (siehe leadEdits.js). Jedes Feld darf
+  // fehlen; wo nichts gesetzt ist, bleibt es beim generischen Entwurf mitsamt
+  // seinen Stockfotos aus imageLibrary.js.
+  const eigeneBilder = options.editUebersteuerung?.bilder ?? {};
+  const eigeneTexte = options.editUebersteuerung?.texte ?? {};
+  const eigeneBeschreibungen = eigeneTexte.highlightBeschreibungen ?? {};
+  const beschreibungFuer = (id, beschreibung) => eigeneBeschreibungen[id] ?? beschreibung;
+
   const name = lead.name || "Ihr Restaurant";
   const ort = lead.ort || "";
   const adresse = lead.adresse || "";
@@ -1088,6 +1133,11 @@ export function buildLandingPage(lead, options = {}) {
 
   const lage = ortsbezug(adresse, ort);
   const schlagzeile = lage ? `${menu.tagline} – ${lage}.` : `${menu.tagline}.`;
+
+  // Nur der Hero zeigt die eigenen Formulierungen: Titel, Kopfzeile und Fußzeile
+  // tragen weiter den Namen aus Google, damit die Seite zuordenbar bleibt.
+  const heroHeadline = eigeneTexte.headline ?? name;
+  const heroSchlagzeile = eigeneTexte.schlagzeile ?? schlagzeile;
 
   // Aus der vollen Karte wird für die Highlights nur ein Auszug bebildert.
   const kandidaten = highlightCandidates(menu);
@@ -1192,7 +1242,7 @@ ${
 
 <section class="hero">
   <div class="hero-media">
-    <img src="${escapeHtml(bildUrl(gestaltung.heroImage, "hero"))}" alt="${escapeHtml(name)}">
+    <img src="${escapeHtml(eigeneBilder.hero ?? bildUrl(gestaltung.heroImage, "hero"))}" alt="${escapeHtml(name)}">
   </div>
   <div class="hero-overlay"></div>
   ${renderHeroFeature(preset.hero.type, {
@@ -1204,9 +1254,9 @@ ${
   })}
   <div class="hero-inner">
     <div class="hero-kicker">${escapeHtml(menu.konzept ?? menu.label)}${ort ? ` · in ${escapeHtml(ort)}` : ""}</div>
-    <h1>${escapeHtml(name)}</h1>
+    <h1>${escapeHtml(heroHeadline)}</h1>
     ${renderRating(lead)}
-    <p class="hero-sub">${escapeHtml(schlagzeile)}</p>
+    <p class="hero-sub">${escapeHtml(heroSchlagzeile)}</p>
     <div class="hero-actions">${heroActionButtons(preset.hero.primaryAction)}</div>
   </div>
 </section>
@@ -1230,7 +1280,7 @@ ${(() => {
       <p>Alles frisch zubereitet. Zum Abholen einfach vorbestellen und zur Wunschzeit mitnehmen.</p>
     </div>
 
-    <div class="hl-grid ${spalten}">${renderHighlights(highlights, bildUrl, preset.menu.showBadges)}</div>
+    <div class="hl-grid ${spalten}">${renderHighlights(highlights, bildUrl, preset.menu.showBadges, beschreibungFuer)}</div>
 
     <div class="steps">
       <div class="step">
@@ -1257,7 +1307,7 @@ ${(() => {
       <h2>Unsere ganze Karte</h2>
       <p>Kategorie antippen zum Aufklappen. Jedes Gericht lässt sich direkt zur Abholung vorbestellen.</p>
     </div>
-    ${renderMenuAccordion(menu, preset.menu.showBadges)}
+    ${renderMenuAccordion(menu, preset.menu.showBadges, beschreibungFuer)}
   </div>
 </section>`,
 
@@ -1276,6 +1326,7 @@ ${(() => {
         bestsellerBild: highlights[0]?.bild,
       },
       bildUrl,
+      eigeneBilder,
     )}</div>
   </div>
 </section>`,

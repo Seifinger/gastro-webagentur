@@ -1,16 +1,19 @@
 import { mkdirSync, writeFileSync, rmSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { docsDir } from "./config.js";
 import { escapeHtml } from "./landingPageGenerator.js";
 import { remoteImageUrl } from "./imageLibrary.js";
 import { menuForCuisine } from "./menuCatalog.js";
 import { themeForLead } from "./landingPageGenerator.js";
 import { DEMO_LEADS } from "./demoLeads.js";
+import { loadLeadEdits } from "./leadEdits.js";
 import {
   parseArgs,
   pruefeKueche,
   waehleLeads,
   baueEintraege,
+  leadFuerSlug,
   ladeSchriften,
   schreibeSeiten,
 } from "./buildSite.js";
@@ -96,6 +99,42 @@ function buildShowcasePage(entries, kontakt) {
 `;
 }
 
+/**
+ * Baut genau einen Entwurf und schreibt ihn nach zielordner/<slug>/ – ohne
+ * den Rest von zielordner anzufassen. Grundlage für "npm run publish-site --
+ * --only <slug>" (unten) und für den Veröffentlichen-Knopf im
+ * Bearbeiten-Dashboard (siehe src/veroeffentlichung.js). zielordner ist
+ * überschreibbar, damit Tests gegen ein leeres Verzeichnis prüfen können,
+ * ohne das echte docs/ anzufassen – im Betrieb ist es immer docsDir.
+ */
+export async function baueUndSchreibeEinzelnenEntwurf(slug, { cuisine, email = "", api = "", zielordner = docsDir } = {}) {
+  const lead = leadFuerSlug(slug);
+  if (!lead) throw new Error(`Kein Lead für Slug "${slug}" gefunden.`);
+
+  const [entry] = baueEintraege([lead], cuisine).map((entry) => ({
+    ...entry,
+    editUebersteuerung: loadLeadEdits(entry.slug),
+  }));
+
+  if (entry.slug !== slug) {
+    throw new Error(`Der errechnete Slug ("${entry.slug}") weicht von "${slug}" ab.`);
+  }
+
+  mkdirSync(zielordner, { recursive: true });
+  const fontCss = await ladeSchriften(path.join(zielordner, "assets", "fonts"));
+
+  schreibeSeiten([entry], zielordner, {
+    kontaktEmail: email,
+    fontCss,
+    veroeffentlicht: true,
+    apiUrl: api,
+    // Wie beim vollständigen Lauf: Bilder kommen im Netz direkt von Unsplash.
+    bildUrl: remoteImageUrl,
+  });
+
+  return { slug: entry.slug, ordner: path.join(zielordner, entry.slug) };
+}
+
 async function run() {
   const args = parseArgs(process.argv.slice(2));
 
@@ -103,6 +142,26 @@ async function run() {
   if (fehler) {
     console.log(`\n${fehler}\n`);
     process.exitCode = 1;
+    return;
+  }
+
+  // --only <slug>: ausschließlich diesen einen Entwurf veröffentlichen. Der
+  // gesamte übrige docs/-Ordner (die anderen Entwürfe, die Demo-Seiten, die
+  // Übersichtsseite) bleibt dabei unangetastet – anders als beim
+  // vollständigen Lauf unten, der docs/ komplett neu aufbaut.
+  if (args.only) {
+    try {
+      const { slug, ordner } = await baueUndSchreibeEinzelnenEntwurf(args.only, {
+        cuisine: args.cuisine,
+        email: args.email,
+        api: args.api,
+      });
+      console.log(`\n✅ Entwurf "${slug}" veröffentlicht (nur dieser Ordner wurde geschrieben).`);
+      console.log(`   Ordner: ${ordner}\n`);
+    } catch (error) {
+      console.log(`\n${error.message}\n`);
+      process.exitCode = 1;
+    }
     return;
   }
 
@@ -117,7 +176,10 @@ async function run() {
   rmSync(docsDir, { recursive: true, force: true });
   mkdirSync(docsDir, { recursive: true });
 
-  const entries = baueEintraege(leads, args.cuisine);
+  const entries = baueEintraege(leads, args.cuisine).map((entry) => ({
+    ...entry,
+    editUebersteuerung: loadLeadEdits(entry.slug),
+  }));
 
   console.log("\n🔤 Prüfe Schriften ...");
   const fontCss = await ladeSchriften(path.join(docsDir, "assets", "fonts"));
@@ -162,4 +224,10 @@ async function run() {
   console.log("   \"Deploy from a branch\", Branch: main, Ordner: /docs auswählen.\n");
 }
 
-run();
+// Nur beim direkten Start läuft der volle Publish-Lauf. dashboardServer.js
+// (über veroeffentlichung.js) importiert baueUndSchreibeEinzelnenEntwurf
+// direkt – ohne diesen Schutz würde schon der Import einen kompletten,
+// unerwünschten docs/-Neuaufbau auslösen.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  run();
+}
