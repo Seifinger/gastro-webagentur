@@ -187,18 +187,17 @@ const SIGNATUR_CSS = `
 /* Indisch: ein Puder-Wölkchen platzt auf, sobald der Hero ins Bild scrollt –
    dieselbe .bewegt/.da-Kopplung wie bei der Orchidee, aber als einmalige
    @keyframes-Animation statt Übergang, weil Start- und Zielwert hier auf
-   zwei verschiedene Zwischenstufen fallen (nicht nur an/aus). */
+   zwei verschiedene Zwischenstufen fallen (nicht nur an/aus). Die Wolke
+   trägt jetzt eine gezeichnete Kontur (.puff) mit Gewürz-Flecken
+   (.fleck), die leicht gestaffelt zeitgleich mit ihr aufplatzen. */
 .sig-spice { right: 8%; top: 50%; transform: translateY(-50%);
              width: clamp(160px, 22vw, 240px); aspect-ratio: 1; }
-.sig-spice .puff { position: absolute; border-radius: 50%; filter: blur(7px); }
-.sig-spice .puff-1 { left: 20%; top: 30%; width: 46%; aspect-ratio: 1;
-                      background: radial-gradient(circle, #ffb238, #e2790a 72%); }
-.sig-spice .puff-2 { left: 42%; top: 46%; width: 38%; aspect-ratio: 1;
-                      background: radial-gradient(circle, #ffd27a, #d9660a 72%); }
-.sig-spice .puff-3 { left: 10%; top: 54%; width: 30%; aspect-ratio: 1;
-                      background: radial-gradient(circle, #ffc25c, #c65a06 72%); }
-.bewegt .sig-spice .puff { opacity: 0; transform: scale(.5); }
+.sig-spice svg { width: 100%; height: 100%; overflow: visible; }
+.sig-spice .puff, .sig-spice .fleck { transform-box: fill-box; transform-origin: center; }
+.bewegt .sig-spice .puff, .bewegt .sig-spice .fleck { opacity: 0; transform: scale(.5); }
 .bewegt .sig-spice.da .puff { animation: sig-spice-puff .8s ease-out forwards; }
+.bewegt .sig-spice.da .fleck { animation: sig-spice-puff .8s ease-out forwards;
+                                animation-delay: calc(var(--i, 0) * .05s); }
 @keyframes sig-spice-puff {
   from { opacity: .8; transform: scale(.5); }
   to { opacity: 0; transform: scale(1.3); }
@@ -299,7 +298,8 @@ const SIGNATUR_CSS = `
   .bewegt .sig-orchid .bluete, .bewegt .sig-orchid.da .bluete {
     opacity: 1; transform: none; transition: none;
   }
-  .bewegt .sig-spice .puff, .bewegt .sig-spice.da .puff {
+  .bewegt .sig-spice .puff, .bewegt .sig-spice.da .puff,
+  .bewegt .sig-spice .fleck, .bewegt .sig-spice.da .fleck {
     opacity: 1; transform: none; animation: none;
   }
   .sig-lanterns .laterne { animation: none; }
@@ -345,12 +345,25 @@ function heroOrchidBloom() {
     </div>`;
 }
 
+const SPICE_FLECKEN = [
+  { cx: 30, cy: 40, r: 3, farbe: "#c1502a" },
+  { cx: 55, cy: 34, r: 2.4, farbe: "#7a3b12" },
+  { cx: 68, cy: 50, r: 3, farbe: "#c1502a" },
+  { cx: 42, cy: 58, r: 2, farbe: "#7a3b12" },
+  { cx: 58, cy: 62, r: 2.6, farbe: "#c1502a" },
+];
+
 function heroSpicePuff() {
+  const flecken = SPICE_FLECKEN.map(
+    ({ cx, cy, r, farbe }, i) =>
+      `<circle class="fleck" cx="${cx}" cy="${cy}" r="${r}" fill="${farbe}" style="--i:${i}"></circle>`,
+  ).join("");
   return `
     <div class="sig sig-spice" aria-hidden="true">
-      <div class="puff puff-1"></div>
-      <div class="puff puff-2"></div>
-      <div class="puff puff-3"></div>
+      <svg viewBox="0 0 100 100" focusable="false">
+        <path class="puff" d="M20,60 C10,50 14,30 32,28 C36,14 58,12 66,26 C82,24 92,40 82,52 C88,64 78,78 62,74 C54,86 30,84 24,72 C10,72 8,58 20,60 Z" fill="#e0a63a"></path>
+        ${flecken}
+      </svg>
     </div>`;
 }
 
