@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Graminger Weissbräu – Wok, Dim Sum &amp; Ente in Altötting</title>
-<meta name="description" content="Graminger Weissbräu in Altötting: Wok, Dim Sum &amp; Ente. Aus dem Wok, bei voller Hitze – mitten in Altötting. Jetzt Tisch reservieren oder zur Abholung vorbestellen.">
+<title>Graminger Weissbräu – Wirtshausküche &amp; Biergarten in Altötting</title>
+<meta name="description" content="Graminger Weissbräu in Altötting: Wirtshausküche &amp; Biergarten. Bodenständig, ehrlich und frisch aus der Region – mitten in Altötting. Jetzt Tisch reservieren oder zur Abholung vorbestellen.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
 <meta name="robots" content="noindex, nofollow">
 <style>
@@ -23,23 +23,23 @@
 @font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;src:url('../assets/fonts/montserrat-700-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
 @font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;src:url('../assets/fonts/montserrat-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
 :root {
-  --bg: #0f1012;
-  --surface: #17181c;
-  --soft: #141519;
-  --ink: #f4f4f6;
-  --ink-soft: #a0a0ac;
-  --line: #2a2b33;
-  --accent: #f36d1f;
-  --accent-dark: #cc5512;
-  --on-accent: #1a0d05;
-  --gold: #e3a13a;
-  --tint: #0b0a0a;
-  --tint-rgb: 11,10,10;
-  --display: 'Montserrat', 'Inter', Helvetica, Arial, sans-serif;
+  --bg: #fbf8f2;
+  --surface: #ffffff;
+  --soft: #f4efe4;
+  --ink: #241f18;
+  --ink-soft: #675b4c;
+  --line: #e6dccb;
+  --accent: #9a6428;
+  --accent-dark: #7a4e1c;
+  --on-accent: #ffffff;
+  --gold: #c08a33;
+  --tint: #2b2013;
+  --tint-rgb: 43,32,19;
+  --display: 'Merriweather', Georgia, 'Times New Roman', serif;
   --body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --display-transform: uppercase;
-  --display-tracking: 0.01em;
-  --radius: 6px;
+  --display-transform: none;
+  --display-tracking: -0.005em;
+  --radius: 12px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -504,11 +504,12 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
               filter: drop-shadow(0 22px 40px rgba(0,0,0,.35)); }
 .sig-orchid svg { width: 100%; height: 100%; overflow: visible; }
 .sig-orchid .bluete { transform-box: fill-box; transform-origin: center;
-                      transition: opacity .7s ease, transform .7s cubic-bezier(.22,.61,.36,1);
-                      transition-delay: calc(var(--i, 0) * .1s); }
+                      transition: opacity 1.4s ease, transform 1.4s cubic-bezier(.22,.61,.36,1);
+                      transition-delay: calc(var(--i, 0) * .25s); }
 /* Vor dem Sichtbarwerden klein und unsichtbar, .da lässt sie zur vollen
-   Größe aufblühen – pro Element (5 Blütenblätter + Lippe) um .1s versetzt
-   (macht bei .7s Übergang und 6 Elementen 1.2s Gesamtdauer, einmalig). */
+   Größe aufblühen – pro Element (5 Blütenblätter + Lippe) um .25s versetzt
+   (macht bei 1.4s Übergang und 6 Elementen 2.65s Gesamtdauer, einmalig –
+   bewusst langsam, damit das Aufblühen fürs Auge nachvollziehbar bleibt). */
 .bewegt .sig-orchid .bluete { opacity: 0; transform: scale(.3); }
 .bewegt .sig-orchid.da .bluete { opacity: 1; transform: scale(1); }
 @media (max-width: 899px) {
@@ -526,12 +527,17 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 .sig-spice svg { width: 100%; height: 100%; overflow: visible; }
 .sig-spice .puff, .sig-spice .fleck { transform-box: fill-box; transform-origin: center; }
 .bewegt .sig-spice .puff, .bewegt .sig-spice .fleck { opacity: 0; transform: scale(.5); }
-.bewegt .sig-spice.da .puff { animation: sig-spice-puff .8s ease-out forwards; }
-.bewegt .sig-spice.da .fleck { animation: sig-spice-puff .8s ease-out forwards;
-                                animation-delay: calc(var(--i, 0) * .05s); }
+.bewegt .sig-spice.da .puff { animation: sig-spice-puff 2.2s ease-out forwards; }
+.bewegt .sig-spice.da .fleck { animation: sig-spice-puff 2.2s ease-out forwards;
+                                animation-delay: calc(var(--i, 0) * .12s); }
+/* Statt gleich von "da" zu "weg" zu blenden, hält die Wolke kurz bei voller
+   Größe, bevor sie verblasst – sonst ist sie beim ersten Sichtbarwerden des
+   Heros (Hero steht ja schon beim Laden im Bild) fürs Auge kaum zu fassen. */
 @keyframes sig-spice-puff {
-  from { opacity: .8; transform: scale(.5); }
-  to { opacity: 0; transform: scale(1.3); }
+  0% { opacity: .8; transform: scale(.5); }
+  35% { opacity: 1; transform: scale(1.05); }
+  65% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1.3); }
 }
 @media (max-width: 899px) {
   .sig-spice { right: -2%; top: 15%; transform: none; width: 40vw; }
@@ -547,10 +553,10 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
                           transform-origin: 50% 4%;
                           animation: sig-laterne-schaukel 7s ease-in-out infinite; }
 .sig-lanterns .laterne .sig-lantern-form { width: 100%; height: 100%; display: block; overflow: visible; }
-.sig-lanterns .laterne .glow { animation: sig-laterne-puls 4s ease-in-out infinite; }
+.sig-lanterns .laterne .glow { animation: sig-laterne-puls 6s ease-in-out infinite; }
 .sig-lanterns .laterne:nth-child(2) { height: clamp(54px, 7vw, 80px); animation-delay: 1.6s; }
-.sig-lanterns .laterne:nth-child(2) .glow { animation-delay: .8s; }
-@keyframes sig-laterne-puls { 0%, 100% { opacity: .35; } 50% { opacity: .85; } }
+.sig-lanterns .laterne:nth-child(2) .glow { animation-delay: 1.2s; }
+@keyframes sig-laterne-puls { 0%, 100% { opacity: .35; } 50% { opacity: .9; } }
 @keyframes sig-laterne-schaukel { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 @media (max-width: 899px) {
   .sig-lanterns { left: 2%; top: 8%; gap: 16px; }
@@ -574,14 +580,16 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
                       border-radius: 50%; background: #fdf3d6; opacity: 0;
                       animation: sig-beer-tropfen 8s ease-in infinite; }
 .sig-beer .tropfen-2 { left: 64%; animation-delay: .25s; }
+/* Der eigentliche Überlauf-Moment (82–100 %) ist bewusst breiter als der
+   Rest des Zyklus, damit er als Ereignis lesbar ist statt nur als Zucken. */
 @keyframes sig-beer-schaum {
-  0%, 88% { transform: scaleY(1) translateY(0); }
-  93% { transform: scaleY(1.22) translateY(-12%); }
+  0%, 82% { transform: scaleY(1) translateY(0); }
+  91% { transform: scaleY(1.22) translateY(-12%); }
   100% { transform: scaleY(1) translateY(0); }
 }
 @keyframes sig-beer-tropfen {
-  0%, 88% { opacity: 0; transform: translateY(0); }
-  90% { opacity: .9; transform: translateY(0); }
+  0%, 82% { opacity: 0; transform: translateY(0); }
+  87% { opacity: .9; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(20px); }
 }
 @media (max-width: 899px) {
@@ -788,25 +796,45 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 
 <section class="hero">
   <div class="hero-media">
-    <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?w=1800&amp;h=1000&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Graminger Weissbräu">
+    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1800&amp;h=1000&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Graminger Weissbräu">
   </div>
   <div class="hero-overlay"></div>
-  <div class="sig sig-drehteller" aria-hidden="true"><div class="teller"><div class="schale"><img src="https://images.unsplash.com/photo-1523905330026-b8bd1f5f320e?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""></div><div class="schale"><img src="https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""></div><div class="schale"><img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""></div></div></div>
+  <div class="sig sig-tafel" aria-hidden="true">
+        <div class="karte">
+          <img src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="">
+          <div class="schild"><small>Heute empfohlen</small>Schweinsbraten mit Knödel</div>
+        </div>
+        <div class="karte">
+          <img src="https://images.unsplash.com/photo-1599921841143-819065a55cc6?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="">
+          <div class="schild"><small>Heute empfohlen</small>Wiener Schnitzel vom Kalb</div>
+        </div>
+        <div class="karte">
+          <img src="https://images.unsplash.com/photo-1558030006-450675393462?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="">
+          <div class="schild"><small>Heute empfohlen</small>Krustenbraten vom Schwein</div>
+        </div></div>
+    <div class="sig sig-beer" aria-hidden="true">
+      <svg class="sig-beer-glas" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17 2a2 2 0 0 1 1.995 1.85L19 4v4c0 1.335-.229 2.386-.774 3.692l-.157.363l-.31.701a8.9 8.9 0 0 0-.751 3.242l-.008.377V20a2 2 0 0 1-1.85 1.995L15 22H9a2 2 0 0 1-1.995-1.85L7 20v-3.625c0-1.132-.21-2.25-.617-3.28l-.142-.34l-.31-.699c-.604-1.358-.883-2.41-.925-3.698L5 8V4a2 2 0 0 1 1.85-1.995L7 2z"></path>
+      </svg>
+      <div class="schaum"></div>
+      <span class="tropfen tropfen-1"></span>
+      <span class="tropfen tropfen-2"></span>
+    </div>
   <div class="hero-inner">
-    <div class="hero-kicker">Wok, Dim Sum &amp; Ente · in Altötting</div>
+    <div class="hero-kicker">Wirtshausküche &amp; Biergarten · in Altötting</div>
     <h1>Graminger Weissbräu</h1>
     
     <div class="rating">
       <span class="stars" aria-hidden="true">★★★★★</span>
       <span><strong>4,5/5</strong> auf Google (409 Bewertungen)</span>
     </div>
-    <p class="hero-sub">Aus dem Wok, bei voller Hitze – mitten in Altötting.</p>
+    <p class="hero-sub">Bodenständig, ehrlich und frisch aus der Region – mitten in Altötting.</p>
     <div class="hero-actions"><a class="btn btn-light" href="#karte">Zur Abholung bestellen</a><a class="btn btn-outline-light" href="#reservierung">Tisch reservieren</a></div>
   </div>
 </section>
 
 <section class="usp-strip">
-  <div class="wrap"><div class="usp-list"><span><span aria-hidden="true">✓</span> Erst auf Bestellung im Wok</span><span><span aria-hidden="true">✓</span> Abholung in 20 Minuten</span><span><span aria-hidden="true">✓</span> Direkt bei uns, ohne Vermittlungsgebühr</span></div></div>
+  <div class="wrap"><div class="usp-list"><span><span aria-hidden="true">✓</span> Abholung in 20 Minuten</span><span><span aria-hidden="true">✓</span> Fleisch vom Metzger im Ort</span><span><span aria-hidden="true">✓</span> Direkt beim Wirt, ohne Vermittlungsgebühr</span></div></div>
 </section>
 
 
@@ -821,16 +849,16 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
     <div class="hl-grid ">
       <article class="hl-card">
         <div class="hl-media">
-          <img src="https://images.unsplash.com/photo-1523905330026-b8bd1f5f320e?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Jiaozi (8 Stück)" loading="lazy">
-          <span class="hl-kat">Dim Sum &amp; Vorspeisen</span>
+          <img src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Schweinsbraten mit Knödel" loading="lazy">
+          <span class="hl-kat">Hauptgerichte</span>
         </div>
         <div class="hl-body">
-          <h3 class="hl-name">Jiaozi (8 Stück)</h3>
-          <p class="hl-desc">Teigtaschen mit Schwein und Chinakohl, dazu Chili-Essig</p>
+          <h3 class="hl-name">Schweinsbraten mit Knödel</h3>
+          <p class="hl-desc">Dunkle Biersoße, Semmelknödel, Krautsalat</p>
           <div class="hl-foot">
-            <span class="hl-preis">8,90 €</span>
+            <span class="hl-preis">16,90 €</span>
             
-            <button class="add-btn" type="button" data-add="0-0" data-name="Jiaozi (8 Stück)" data-preis="8.9">
+            <button class="add-btn" type="button" data-add="1-0" data-name="Schweinsbraten mit Knödel" data-preis="16.9">
               <span aria-hidden="true">+</span> Vorbestellen
             </button>
           </div>
@@ -838,33 +866,16 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
       </article>
       <article class="hl-card">
         <div class="hl-media">
-          <img src="https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Gedämpfte Gemüsetaschen (6 Stück)" loading="lazy">
-          <span class="hl-kat">Dim Sum &amp; Vorspeisen</span>
+          <img src="https://images.unsplash.com/photo-1599921841143-819065a55cc6?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Wiener Schnitzel vom Kalb" loading="lazy">
+          <span class="hl-kat">Hauptgerichte</span>
         </div>
         <div class="hl-body">
-          <h3 class="hl-name">Gedämpfte Gemüsetaschen (6 Stück)</h3>
-          <p class="hl-desc">Shiitake, Frühlingszwiebel, Ingwer</p>
+          <h3 class="hl-name">Wiener Schnitzel vom Kalb</h3>
+          <p class="hl-desc">Mit Preiselbeeren, Petersilienkartoffeln</p>
           <div class="hl-foot">
-            <span class="hl-preis">7,90 €</span>
-            <span class="veg">vegetarisch</span>
-            <button class="add-btn" type="button" data-add="0-1" data-name="Gedämpfte Gemüsetaschen (6 Stück)" data-preis="7.9">
-              <span aria-hidden="true">+</span> Vorbestellen
-            </button>
-          </div>
-        </div>
-      </article>
-      <article class="hl-card">
-        <div class="hl-media">
-          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Rindfleisch Szechuan" loading="lazy">
-          <span class="hl-kat">Aus dem Wok</span>
-        </div>
-        <div class="hl-body">
-          <h3 class="hl-name">Rindfleisch Szechuan</h3>
-          <p class="hl-desc">Scharf, mit Paprika, Bambus und Szechuanpfeffer</p>
-          <div class="hl-foot">
-            <span class="hl-preis">17,50 €</span>
+            <span class="hl-preis">22,50 €</span>
             
-            <button class="add-btn" type="button" data-add="1-0" data-name="Rindfleisch Szechuan" data-preis="17.5">
+            <button class="add-btn" type="button" data-add="1-1" data-name="Wiener Schnitzel vom Kalb" data-preis="22.5">
               <span aria-hidden="true">+</span> Vorbestellen
             </button>
           </div>
@@ -872,16 +883,33 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
       </article>
       <article class="hl-card">
         <div class="hl-media">
-          <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Gebratener Reis mit Ei und Gemüse" loading="lazy">
-          <span class="hl-kat">Aus dem Wok</span>
+          <img src="https://images.unsplash.com/photo-1558030006-450675393462?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Krustenbraten vom Schwein" loading="lazy">
+          <span class="hl-kat">Hauptgerichte</span>
         </div>
         <div class="hl-body">
-          <h3 class="hl-name">Gebratener Reis mit Ei und Gemüse</h3>
-          <p class="hl-desc">Mit Erbsen, Karotten und Frühlingszwiebel</p>
+          <h3 class="hl-name">Krustenbraten vom Schwein</h3>
+          <p class="hl-desc">Knusprige Kruste, dunkle Biersoße, Kartoffelknödel</p>
           <div class="hl-foot">
-            <span class="hl-preis">11,90 €</span>
-            <span class="veg">vegetarisch</span>
-            <button class="add-btn" type="button" data-add="1-3" data-name="Gebratener Reis mit Ei und Gemüse" data-preis="11.9">
+            <span class="hl-preis">18,90 €</span>
+            
+            <button class="add-btn" type="button" data-add="1-2" data-name="Krustenbraten vom Schwein" data-preis="18.9">
+              <span aria-hidden="true">+</span> Vorbestellen
+            </button>
+          </div>
+        </div>
+      </article>
+      <article class="hl-card">
+        <div class="hl-media">
+          <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Grillrippchen" loading="lazy">
+          <span class="hl-kat">Hauptgerichte</span>
+        </div>
+        <div class="hl-body">
+          <h3 class="hl-name">Grillrippchen</h3>
+          <p class="hl-desc">Mit Barbecuesoße, Kartoffelwedges und Krautsalat</p>
+          <div class="hl-foot">
+            <span class="hl-preis">16,50 €</span>
+            
+            <button class="add-btn" type="button" data-add="1-4" data-name="Grillrippchen" data-preis="16.5">
               <span aria-hidden="true">+</span> Vorbestellen
             </button>
           </div>
@@ -915,124 +943,124 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
     </div>
     
       <details class="kat" open>
-        <summary>Dim Sum &amp; Vorspeisen <span class="kat-anzahl">4 Gerichte</span></summary>
+        <summary>Zum Anfangen <span class="kat-anzahl">3 Gerichte</span></summary>
         <div class="kat-body">
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Jiaozi (8 Stück)</div>
-              <div class="gericht-desc">Teigtaschen mit Schwein und Chinakohl, dazu Chili-Essig</div>
+              <div class="gericht-name">Obatzda mit Brezn <span class="veg">vegetarisch</span></div>
+              <div class="gericht-desc">Hausgemacht, mit roten Zwiebeln und frischer Laugenbrezn</div>
             </div>
             <div class="gericht-seite">
-              <span class="gericht-preis">8,90 €</span>
-              <button class="mini-add" type="button" data-add="0-0" data-name="Jiaozi (8 Stück)" data-preis="8.9" aria-label="Jiaozi (8 Stück) vorbestellen">+</button>
+              <span class="gericht-preis">8,50 €</span>
+              <button class="mini-add" type="button" data-add="0-0" data-name="Obatzda mit Brezn" data-preis="8.5" aria-label="Obatzda mit Brezn vorbestellen">+</button>
             </div>
           </div>
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Gedämpfte Gemüsetaschen (6 Stück) <span class="veg">vegetarisch</span></div>
-              <div class="gericht-desc">Shiitake, Frühlingszwiebel, Ingwer</div>
+              <div class="gericht-name">Leberknödelsuppe</div>
+              <div class="gericht-desc">Kräftige Rinderbrühe, Schnittlauch</div>
             </div>
             <div class="gericht-seite">
-              <span class="gericht-preis">7,90 €</span>
-              <button class="mini-add" type="button" data-add="0-1" data-name="Gedämpfte Gemüsetaschen (6 Stück)" data-preis="7.9" aria-label="Gedämpfte Gemüsetaschen (6 Stück) vorbestellen">+</button>
+              <span class="gericht-preis">6,90 €</span>
+              <button class="mini-add" type="button" data-add="0-1" data-name="Leberknödelsuppe" data-preis="6.9" aria-label="Leberknödelsuppe vorbestellen">+</button>
             </div>
           </div>
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Wan-Tan-Suppe</div>
-              <div class="gericht-desc">Klare Brühe, gefüllte Teigtaschen, Frühlingszwiebel</div>
+              <div class="gericht-name">Bayerischer Wurstsalat</div>
+              <div class="gericht-desc">Mit Essiggurken, Zwiebeln und Bauernbrot</div>
             </div>
             <div class="gericht-seite">
-              <span class="gericht-preis">6,50 €</span>
-              <button class="mini-add" type="button" data-add="0-2" data-name="Wan-Tan-Suppe" data-preis="6.5" aria-label="Wan-Tan-Suppe vorbestellen">+</button>
-            </div>
-          </div>
-          <div class="gericht">
-            <div class="gericht-body">
-              <div class="gericht-name">Sesam-Gurken <span class="veg">vegetarisch</span></div>
-              <div class="gericht-desc">Eingelegt mit Knoblauch und Reisessig</div>
-            </div>
-            <div class="gericht-seite">
-              <span class="gericht-preis">5,50 €</span>
-              <button class="mini-add" type="button" data-add="0-3" data-name="Sesam-Gurken" data-preis="5.5" aria-label="Sesam-Gurken vorbestellen">+</button>
+              <span class="gericht-preis">9,50 €</span>
+              <button class="mini-add" type="button" data-add="0-2" data-name="Bayerischer Wurstsalat" data-preis="9.5" aria-label="Bayerischer Wurstsalat vorbestellen">+</button>
             </div>
           </div></div>
       </details>
       <details class="kat">
-        <summary>Aus dem Wok <span class="kat-anzahl">4 Gerichte</span></summary>
+        <summary>Hauptgerichte <span class="kat-anzahl">6 Gerichte</span></summary>
         <div class="kat-body">
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Rindfleisch Szechuan</div>
-              <div class="gericht-desc">Scharf, mit Paprika, Bambus und Szechuanpfeffer</div>
+              <div class="gericht-name">Schweinsbraten mit Knödel</div>
+              <div class="gericht-desc">Dunkle Biersoße, Semmelknödel, Krautsalat</div>
             </div>
             <div class="gericht-seite">
-              <span class="gericht-preis">17,50 €</span>
-              <button class="mini-add" type="button" data-add="1-0" data-name="Rindfleisch Szechuan" data-preis="17.5" aria-label="Rindfleisch Szechuan vorbestellen">+</button>
+              <span class="gericht-preis">16,90 €</span>
+              <button class="mini-add" type="button" data-add="1-0" data-name="Schweinsbraten mit Knödel" data-preis="16.9" aria-label="Schweinsbraten mit Knödel vorbestellen">+</button>
             </div>
           </div>
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Hähnchen Gong Bao</div>
-              <div class="gericht-desc">Erdnüsse, getrocknete Chili, Frühlingszwiebel</div>
+              <div class="gericht-name">Wiener Schnitzel vom Kalb</div>
+              <div class="gericht-desc">Mit Preiselbeeren, Petersilienkartoffeln</div>
             </div>
             <div class="gericht-seite">
-              <span class="gericht-preis">15,90 €</span>
-              <button class="mini-add" type="button" data-add="1-1" data-name="Hähnchen Gong Bao" data-preis="15.9" aria-label="Hähnchen Gong Bao vorbestellen">+</button>
+              <span class="gericht-preis">22,50 €</span>
+              <button class="mini-add" type="button" data-add="1-1" data-name="Wiener Schnitzel vom Kalb" data-preis="22.5" aria-label="Wiener Schnitzel vom Kalb vorbestellen">+</button>
             </div>
           </div>
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Mapo Tofu <span class="veg">vegetarisch</span></div>
-              <div class="gericht-desc">Seidentofu in scharfer Bohnensoße</div>
+              <div class="gericht-name">Krustenbraten vom Schwein</div>
+              <div class="gericht-desc">Knusprige Kruste, dunkle Biersoße, Kartoffelknödel</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">18,90 €</span>
+              <button class="mini-add" type="button" data-add="1-2" data-name="Krustenbraten vom Schwein" data-preis="18.9" aria-label="Krustenbraten vom Schwein vorbestellen">+</button>
+            </div>
+          </div>
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">Käsespätzle <span class="veg">vegetarisch</span></div>
+              <div class="gericht-desc">Mit Bergkäse und Röstzwiebeln</div>
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">13,50 €</span>
-              <button class="mini-add" type="button" data-add="1-2" data-name="Mapo Tofu" data-preis="13.5" aria-label="Mapo Tofu vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="1-3" data-name="Käsespätzle" data-preis="13.5" aria-label="Käsespätzle vorbestellen">+</button>
             </div>
           </div>
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Gebratener Reis mit Ei und Gemüse <span class="veg">vegetarisch</span></div>
-              <div class="gericht-desc">Mit Erbsen, Karotten und Frühlingszwiebel</div>
+              <div class="gericht-name">Grillrippchen</div>
+              <div class="gericht-desc">Mit Barbecuesoße, Kartoffelwedges und Krautsalat</div>
             </div>
             <div class="gericht-seite">
-              <span class="gericht-preis">11,90 €</span>
-              <button class="mini-add" type="button" data-add="1-3" data-name="Gebratener Reis mit Ei und Gemüse" data-preis="11.9" aria-label="Gebratener Reis mit Ei und Gemüse vorbestellen">+</button>
+              <span class="gericht-preis">16,50 €</span>
+              <button class="mini-add" type="button" data-add="1-4" data-name="Grillrippchen" data-preis="16.5" aria-label="Grillrippchen vorbestellen">+</button>
+            </div>
+          </div>
+          <div class="gericht">
+            <div class="gericht-body">
+              <div class="gericht-name">Forelle Müllerin</div>
+              <div class="gericht-desc">Aus heimischer Zucht, Butter, Mandeln, Salzkartoffeln</div>
+            </div>
+            <div class="gericht-seite">
+              <span class="gericht-preis">19,50 €</span>
+              <button class="mini-add" type="button" data-add="1-5" data-name="Forelle Müllerin" data-preis="19.5" aria-label="Forelle Müllerin vorbestellen">+</button>
             </div>
           </div></div>
       </details>
       <details class="kat">
-        <summary>Ente &amp; Nudeln <span class="kat-anzahl">3 Gerichte</span></summary>
+        <summary>Nachspeisen <span class="kat-anzahl">2 Gerichte</span></summary>
         <div class="kat-body">
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Knusprige Ente auf Mie-Nudeln</div>
-              <div class="gericht-desc">Mit Pak Choi und Austernsoße</div>
+              <div class="gericht-name">Kaiserschmarrn <span class="veg">vegetarisch</span></div>
+              <div class="gericht-desc">Mit Apfelmus und Puderzucker</div>
             </div>
             <div class="gericht-seite">
-              <span class="gericht-preis">19,90 €</span>
-              <button class="mini-add" type="button" data-add="2-0" data-name="Knusprige Ente auf Mie-Nudeln" data-preis="19.9" aria-label="Knusprige Ente auf Mie-Nudeln vorbestellen">+</button>
+              <span class="gericht-preis">9,50 €</span>
+              <button class="mini-add" type="button" data-add="2-0" data-name="Kaiserschmarrn" data-preis="9.5" aria-label="Kaiserschmarrn vorbestellen">+</button>
             </div>
           </div>
           <div class="gericht">
             <div class="gericht-body">
-              <div class="gericht-name">Gebratene Nudeln Chow Mein</div>
-              <div class="gericht-desc">Mit Hähnchen, Sojasprossen und Sesam</div>
+              <div class="gericht-name">Apfelstrudel <span class="veg">vegetarisch</span></div>
+              <div class="gericht-desc">Warm, mit Vanillesoße</div>
             </div>
             <div class="gericht-seite">
-              <span class="gericht-preis">14,50 €</span>
-              <button class="mini-add" type="button" data-add="2-1" data-name="Gebratene Nudeln Chow Mein" data-preis="14.5" aria-label="Gebratene Nudeln Chow Mein vorbestellen">+</button>
-            </div>
-          </div>
-          <div class="gericht">
-            <div class="gericht-body">
-              <div class="gericht-name">Gebackene Banane <span class="veg">vegetarisch</span></div>
-              <div class="gericht-desc">Mit Honig und Sesam</div>
-            </div>
-            <div class="gericht-seite">
-              <span class="gericht-preis">6,50 €</span>
-              <button class="mini-add" type="button" data-add="2-2" data-name="Gebackene Banane" data-preis="6.5" aria-label="Gebackene Banane vorbestellen">+</button>
+              <span class="gericht-preis">7,50 €</span>
+              <button class="mini-add" type="button" data-add="2-1" data-name="Apfelstrudel" data-preis="7.5" aria-label="Apfelstrudel vorbestellen">+</button>
             </div>
           </div></div>
       </details>
@@ -1044,12 +1072,12 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   <div class="wrap">
     <div class="section-head mitte">
       <div class="eyebrow">Bei uns</div>
-      <h2>Wok, Dim Sum &amp; Ente in Altötting</h2>
-      <p>Der Wok steht bei über 300 Grad. Was hineinkommt, ist in zwei Minuten fertig – deshalb wird bei uns erst gebraten, wenn Sie bestellt haben. Die Teigtaschen falten wir jeden Morgen von Hand.</p>
+      <h2>Wirtshausküche &amp; Biergarten in Altötting</h2>
+      <p>Seit Generationen kochen wir, was hier wächst: Fleisch vom Metzger im Ort, Fisch aus heimischer Zucht und Bier aus der Region. Kein Schnickschnack – dafür Portionen, die satt machen.</p>
     </div>
     <div class="foto-grid">
       <figure class="foto-slot" style="margin:0">
-        <img src="https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=900&amp;h=700&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1528605248644-14dd04022da1?w=900&amp;h=700&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="" loading="lazy">
         <span class="foto-badge">Platzhalter</span>
         <figcaption class="foto-text">
           <strong>Unser Haus</strong>
@@ -1065,7 +1093,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
         </figcaption>
       </figure>
       <figure class="foto-slot" style="margin:0">
-        <img src="https://images.unsplash.com/photo-1523905330026-b8bd1f5f320e?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="" loading="lazy">
         <span class="foto-badge">Platzhalter</span>
         <figcaption class="foto-text">
           <strong>Unser Bestseller</strong>
