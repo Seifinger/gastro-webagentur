@@ -1,9 +1,16 @@
 import { menuForLead, menuForCuisine, highlightCandidates, detectCuisine } from "./menuCatalog.js";
 import { HERO_IMAGES, INTERIOR_IMAGES, TEAM_IMAGES, assetFileName } from "./imageLibrary.js";
 import { resolveTheme, THEMES, themeNameForCuisine } from "./themes.js";
-import { heroSignatur, SIGNATUR_CSS } from "./heroSignature.js";
+import {
+  heroSignatur,
+  heroDishPhoto,
+  heroAmbiencePhoto,
+  heroReservationHero,
+  SIGNATUR_CSS,
+} from "./heroSignature.js";
 import { MOTION_CSS, MOTION_SCRIPT } from "./motion.js";
 import { stimmenFuer, PLATZHALTER_ERKLAERUNG } from "./testimonials.js";
+import { getPresetVariant, withDesignDefaults } from "./designPresets.js";
 
 // Standard-Öffnungszeiten für den Entwurf. Google liefert diese Felder in
 // unserer Suchabfrage nicht mit, deshalb sind es bewusst Platzhalter, die auf
@@ -52,6 +59,59 @@ export function themeForLead(lead, cuisineOverride) {
     hausBild: interiorPool[(seed >>> 9) % interiorPool.length],
     teamBild: TEAM_IMAGES[(seed >>> 15) % TEAM_IMAGES.length],
   };
+}
+
+/**
+ * Löst das Design-Preset für eine Seite auf: eine eigene Vorgabe
+ * (options.preset) gewinnt und wird mit den Standardwerten aufgefüllt, sonst
+ * die benannte Variante der Küche (options.designVariant, Standard
+ * "default"). Fehlt ein Feld, greift in jedem Fall der bisherige
+ * Standardwert aus designPresets.js – das bisherige Verhalten bleibt also
+ * ohne Angaben unverändert.
+ */
+function resolveDesignPreset(cuisine, options) {
+  if (options.preset) return withDesignDefaults(options.preset);
+  return getPresetVariant(cuisine, options.designVariant);
+}
+
+/**
+ * Wählt das Hero-Element passend zu preset.hero.type. "signature" (Standard)
+ * und jeder unbekannte Wert fallen auf die bisherige, küchenspezifische
+ * Animation zurück – ein Tippfehler im Preset darf den Hero nie leeren.
+ */
+function renderHeroFeature(type, ctx) {
+  if (type === "dish_photo") return heroDishPhoto(ctx);
+  if (type === "ambience_photo") return heroAmbiencePhoto(ctx);
+  if (type === "reservation_hero") return heroReservationHero(ctx);
+  return heroSignatur(ctx.cuisine, ctx);
+}
+
+/**
+ * Die beiden Hero-CTAs ("Zur Abholung bestellen" / "Tisch reservieren").
+ * Bei primaryAction "order" (Standard) exakt die bisherige Reihenfolge und
+ * Optik; bei "reservation" tauschen Reihenfolge und Betonung (nicht Ziel
+ * oder Text).
+ */
+function heroActionButtons(primaryAction) {
+  const bestellen = (cls) => `<a class="btn ${cls}" href="#karte">Zur Abholung bestellen</a>`;
+  const reservieren = (cls) => `<a class="btn ${cls}" href="#reservierung">Tisch reservieren</a>`;
+  if (primaryAction === "reservation") {
+    return `${reservieren("btn-light")}${bestellen("btn-outline-light")}`;
+  }
+  return `${bestellen("btn-light")}${reservieren("btn-outline-light")}`;
+}
+
+/**
+ * Die beiden Knöpfe der mobilen Aktionsleiste. Die ID "bar-order" bleibt in
+ * jedem Fall am Bestell-Knopf – daran hängt das Warenkorb-Skript.
+ */
+function mobilebarButtons(primaryAction) {
+  const bestellen = (cls) => `<button class="btn ${cls}" id="bar-order" type="button">Bestellen</button>`;
+  const reservieren = (cls) => `<a class="btn ${cls}" href="#reservierung">Reservieren</a>`;
+  if (primaryAction === "reservation") {
+    return `${reservieren("btn-primary")}${bestellen("btn-ghost")}`;
+  }
+  return `${bestellen("btn-primary")}${reservieren("btn-ghost")}`;
 }
 
 export function slugify(value) {
@@ -232,6 +292,8 @@ body.veroeffentlicht .topbar { top: 38px; }
 .topnav a { text-decoration: none; color: rgba(255,255,255,.9); }
 .topnav a:hover { color: #fff; }
 @media (min-width: 940px) { .topnav { display: flex; } }
+/* header.sticky: false im Design-Preset – Kopfzeile scrollt mit statt fest zu bleiben. */
+.topbar-static { position: absolute; }
 .topbar.scrolled { background: var(--surface); box-shadow: 0 1px 0 var(--line); }
 .topbar.scrolled .brand { color: var(--ink); }
 .topbar.scrolled .topnav a { color: var(--ink-soft); }
@@ -357,6 +419,9 @@ body.veroeffentlicht .topbar { top: 38px; }
 .stimmen-note .sterne { color: var(--gold); letter-spacing: 2px; font-size: 19px; }
 .stimmen-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
 @media (min-width: 820px) { .stimmen-grid { grid-template-columns: repeat(3, 1fr); } }
+/* social.layout: "list" im Design-Preset – eine gestapelte Spalte statt drei. */
+.stimmen-grid--list { max-width: 640px; margin-left: auto; margin-right: auto; }
+@media (min-width: 820px) { .stimmen-grid--list { grid-template-columns: 1fr; } }
 .stimme { position: relative; background: var(--surface); border: 1px solid var(--line);
           border-radius: var(--radius); padding: 26px 24px 22px; display: flex; flex-direction: column; gap: 14px; }
 .stimme .sterne { color: var(--gold); letter-spacing: 2px; font-size: 15px; }
@@ -688,10 +753,16 @@ const PAGE_SCRIPT = `
     onScroll();
 
     byId("cart-fab").addEventListener("click", openDrawer);
-    byId("bar-order").addEventListener("click", function () {
-      if (lines().length === 0) byId("karte").scrollIntoView({ behavior: "smooth" });
-      else openDrawer();
-    });
+    // "bar-order" fehlt, wenn das Design-Preset die mobile Aktionsleiste
+    // abschaltet (mobile.stickyActionBar: false) - dann bleibt es beim
+    // Warenkorb-Symbol als Bestellweg auf dem Handy.
+    var barOrder = byId("bar-order");
+    if (barOrder) {
+      barOrder.addEventListener("click", function () {
+        if (lines().length === 0) byId("karte").scrollIntoView({ behavior: "smooth" });
+        else openDrawer();
+      });
+    }
     byId("drawer-close").addEventListener("click", closeDrawer);
     byId("overlay").addEventListener("click", function () { closeDrawer(); closeConfirm(); });
     byId("confirm-close").addEventListener("click", closeConfirm);
@@ -823,10 +894,10 @@ const PAGE_SCRIPT = `
 })();
 `;
 
-function renderHighlights(highlights, bildUrl) {
+function renderHighlights(highlights, bildUrl, showBadges = true) {
   return highlights
     .map((gericht) => {
-      const veg = gericht.vegetarisch ? '<span class="veg">vegetarisch</span>' : "";
+      const veg = showBadges && gericht.vegetarisch ? '<span class="veg">vegetarisch</span>' : "";
       return `
       <article class="hl-card">
         <div class="hl-media">
@@ -853,12 +924,12 @@ function renderHighlights(highlights, bildUrl) {
  * Die vollständige Karte als aufklappbare Liste – direkt im HTML statt als
  * PDF, damit sie auf dem Handy lesbar ist und Google sie indexieren kann.
  */
-function renderMenuAccordion(menu) {
+function renderMenuAccordion(menu, showBadges = true) {
   return menu.kategorien
     .map((kategorie, katIndex) => {
       const gerichte = kategorie.gerichte
         .map((gericht, gerichtIndex) => {
-          const veg = gericht.vegetarisch ? ' <span class="veg">vegetarisch</span>' : "";
+          const veg = showBadges && gericht.vegetarisch ? ' <span class="veg">vegetarisch</span>' : "";
           return `
           <div class="gericht">
             <div class="gericht-body">
@@ -912,7 +983,7 @@ function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl) {
  * dürfen nicht gespeichert werden, und fremde Bewertungen auf einer
  * unbeauftragten Seite wären ohnehin nicht in Ordnung.
  */
-function renderStimmen(cuisine, lead, fiktiv) {
+function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3") {
   const { stimmen, slots, platzhalter } = stimmenFuer(cuisine, { fiktiv });
 
   // Leere Plätze statt erfundener Zitate: ohne Sterne und ohne Namen ist
@@ -949,6 +1020,10 @@ function renderStimmen(cuisine, lead, fiktiv) {
        </div>`
     : "";
 
+  // "grid-3" ist das bisherige Verhalten und bekommt keine Zusatzklasse –
+  // nur abweichende Layouts (bisher: "list") erhalten einen Modifier.
+  const gridClass = socialLayout && socialLayout !== "grid-3" ? ` stimmen-grid--${socialLayout}` : "";
+
   return `
   <section class="section stimmen-section" id="stimmen">
     <div class="wrap">
@@ -957,7 +1032,7 @@ function renderStimmen(cuisine, lead, fiktiv) {
         <h2>Was unsere Gäste sagen</h2>
       </div>
       ${note}
-      <div class="stimmen-grid">${karten}</div>
+      <div class="stimmen-grid${gridClass}">${karten}</div>
       ${platzhalter ? `<p class="stimmen-erklaerung">${escapeHtml(PLATZHALTER_ERKLAERUNG)}</p>` : ""}
     </div>
   </section>`;
@@ -991,6 +1066,7 @@ export function buildLandingPage(lead, options = {}) {
   const menu = options.menu ?? menuForLead(lead);
   const gestaltung = options.gestaltung ?? themeForLead(lead);
   const t = gestaltung.theme;
+  const preset = resolveDesignPreset(gestaltung.cuisine, options);
   const openingHours = options.öffnungszeiten ?? DEFAULT_OPENING_HOURS;
   const kontaktEmail = options.kontaktEmail ?? "";
   const assets = options.assetsPath ?? "../assets";
@@ -1101,7 +1177,7 @@ ${
       }</span></div>`
     : ""
 }
-<header class="topbar" id="topbar">
+<header class="${preset.header.sticky === false ? "topbar topbar-static" : "topbar"}" id="topbar">
   <div class="wrap topbar-inner">
     <div class="brand">${escapeHtml(name)}</div>
     <nav class="topnav">
@@ -1119,16 +1195,19 @@ ${
     <img src="${escapeHtml(bildUrl(gestaltung.heroImage, "hero"))}" alt="${escapeHtml(name)}">
   </div>
   <div class="hero-overlay"></div>
-  ${heroSignatur(gestaltung.cuisine, { highlights, bildUrl, escape: escapeHtml })}
+  ${renderHeroFeature(preset.hero.type, {
+    cuisine: gestaltung.cuisine,
+    highlights,
+    hausBild: gestaltung.hausBild,
+    bildUrl,
+    escape: escapeHtml,
+  })}
   <div class="hero-inner">
     <div class="hero-kicker">${escapeHtml(menu.konzept ?? menu.label)}${ort ? ` · in ${escapeHtml(ort)}` : ""}</div>
     <h1>${escapeHtml(name)}</h1>
     ${renderRating(lead)}
     <p class="hero-sub">${escapeHtml(schlagzeile)}</p>
-    <div class="hero-actions">
-      <a class="btn btn-light" href="#karte">Zur Abholung bestellen</a>
-      <a class="btn btn-outline-light" href="#reservierung">Tisch reservieren</a>
-    </div>
+    <div class="hero-actions">${heroActionButtons(preset.hero.primaryAction)}</div>
   </div>
 </section>
 
@@ -1136,6 +1215,13 @@ ${
   <div class="wrap"><div class="usp-list">${uspBadges}</div></div>
 </section>
 
+${(() => {
+  // Reihenfolge der Hauptsektionen kommt aus preset.layout.sectionOrder.
+  // Eine unbekannte oder unvollständige Vorgabe verliert nie eine Sektion:
+  // alles, was in der Vorgabe fehlt, wird in der bisherigen Reihenfolge
+  // angehängt (das bisherige, feste Verhalten als Fallback).
+  const sectionsById = {
+    highlights: `
 <section class="section" id="highlights">
   <div class="wrap">
     <div class="section-head mitte">
@@ -1144,7 +1230,7 @@ ${
       <p>Alles frisch zubereitet. Zum Abholen einfach vorbestellen und zur Wunschzeit mitnehmen.</p>
     </div>
 
-    <div class="hl-grid ${spalten}">${renderHighlights(highlights, bildUrl)}</div>
+    <div class="hl-grid ${spalten}">${renderHighlights(highlights, bildUrl, preset.menu.showBadges)}</div>
 
     <div class="steps">
       <div class="step">
@@ -1161,19 +1247,21 @@ ${
       </div>
     </div>
   </div>
-</section>
+</section>`,
 
-<section class="section karte-section" id="karte">
+    karte: `
+<section class="section karte-section" id="karte" data-menu-layout="${escapeHtml(preset.menu.layout)}">
   <div class="wrap">
     <div class="section-head mitte">
       <div class="eyebrow">Speisekarte</div>
       <h2>Unsere ganze Karte</h2>
       <p>Kategorie antippen zum Aufklappen. Jedes Gericht lässt sich direkt zur Abholung vorbestellen.</p>
     </div>
-    ${renderMenuAccordion(menu)}
+    ${renderMenuAccordion(menu, preset.menu.showBadges)}
   </div>
-</section>
+</section>`,
 
+    ambiente: `
 <section class="section" id="ambiente">
   <div class="wrap">
     <div class="section-head mitte">
@@ -1190,11 +1278,12 @@ ${
       bildUrl,
     )}</div>
   </div>
-</section>
+</section>`,
 
-${renderStimmen(gestaltung.cuisine, lead, fiktiv)}
+    stimmen: renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social.layout),
 
-<section class="section reserve-section" id="reservierung">
+    reservierung: `
+<section class="section reserve-section" id="reservierung" data-reservation-variant="${escapeHtml(preset.reservation.widgetVariant)}">
   <div class="wrap">
     <div class="reserve-grid">
       <div>
@@ -1254,8 +1343,9 @@ ${renderStimmen(gestaltung.cuisine, lead, fiktiv)}
       </form>
     </div>
   </div>
-</section>
+</section>`,
 
+    kontakt: `
 <section class="section" id="kontakt">
   <div class="wrap">
     <div class="section-head">
@@ -1270,7 +1360,13 @@ ${renderStimmen(gestaltung.cuisine, lead, fiktiv)}
       </div>
     </div>
   </div>
-</section>
+</section>`,
+  };
+
+  const konfigurierteReihenfolge = (preset.layout.sectionOrder ?? []).filter((id) => sectionsById[id]);
+  const restlicheIds = Object.keys(sectionsById).filter((id) => !konfigurierteReihenfolge.includes(id));
+  return [...konfigurierteReihenfolge, ...restlicheIds].map((id) => sectionsById[id]).join("\n\n");
+})()}
 
 <button class="cart-fab" id="cart-fab" type="button">
   <span>Warenkorb</span>
@@ -1278,10 +1374,11 @@ ${renderStimmen(gestaltung.cuisine, lead, fiktiv)}
   <span id="fab-total">0,00 €</span>
 </button>
 
-<div class="mobilebar" id="mobilebar">
-  <button class="btn btn-primary" id="bar-order" type="button">Bestellen</button>
-  <a class="btn btn-ghost" href="#reservierung">Reservieren</a>
-</div>
+${
+  preset.mobile.stickyActionBar === false
+    ? ""
+    : `<div class="mobilebar" id="mobilebar">${mobilebarButtons(preset.hero.primaryAction)}</div>`
+}
 
 <div class="overlay" id="overlay"></div>
 

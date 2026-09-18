@@ -345,3 +345,191 @@ test("imageSpecsForLead deckt die Bilder der vorgegebenen Küche ab", () => {
     assert.ok(ids.has(gericht.bild), `Bild für ${gericht.name} fehlt`);
   }
 });
+
+// --- Design-Preset-Modell (designPresets.js) --------------------------------
+// Ohne eigenes Preset darf sich am bisherigen Verhalten nichts ändern; die
+// folgenden Tests sichern das ab und prüfen zusätzlich, dass sich einzelne
+// Preset-Felder gezielt und ohne Seiteneffekte umschalten lassen.
+
+test("buildLandingPage ohne Preset-Angabe entspricht exakt dem bisherigen Verhalten", () => {
+  const html = buildLandingPage(lead, { menu: MENUS.italienisch });
+
+  assert.ok(html.includes('<header class="topbar" id="topbar">'));
+  assert.match(
+    html,
+    /<div class="hero-actions"><a class="btn btn-light" href="#karte">Zur Abholung bestellen<\/a><a class="btn btn-outline-light" href="#reservierung">Tisch reservieren<\/a><\/div>/,
+  );
+  assert.match(
+    html,
+    /<div class="mobilebar" id="mobilebar"><button class="btn btn-primary" id="bar-order" type="button">Bestellen<\/button><a class="btn btn-ghost" href="#reservierung">Reservieren<\/a><\/div>/,
+  );
+  assert.ok(!html.includes('class="topbar topbar-static"'));
+  assert.ok(!html.includes('class="stimmen-grid stimmen-grid--'));
+});
+
+test("ein leeres options.preset ändert nichts gegenüber gar keinem Preset", () => {
+  const ohnePreset = buildLandingPage(lead, { menu: MENUS.italienisch });
+  const leeresPreset = buildLandingPage(lead, { menu: MENUS.italienisch, preset: {} });
+
+  assert.equal(ohnePreset, leeresPreset);
+});
+
+test("hero.type 'dish_photo' zeigt ein einzelnes Gerichtsfoto statt der Küchen-Signatur", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { hero: { type: "dish_photo" } },
+  });
+
+  assert.ok(html.includes('class="sig sig-dish"'));
+  assert.ok(!html.includes('class="sig sig-pizza"'));
+});
+
+test("hero.type 'ambience_photo' zeigt das Haus-Bild im Hero", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { hero: { type: "ambience_photo" } },
+  });
+
+  assert.ok(html.includes('class="sig sig-ambience"'));
+});
+
+test("hero.type 'reservation_hero' zeigt den Reservierungs-Teaser", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { hero: { type: "reservation_hero" } },
+  });
+
+  assert.ok(html.includes('class="sig sig-reservation"'));
+  assert.ok(html.includes("Tisch sichern"));
+});
+
+test("ein unbekannter hero.type fällt auf die Küchen-Signatur zurück", () => {
+  const html = buildLandingPage(
+    { ...lead, name: "Ristorante Test" },
+    { menu: MENUS.italienisch, preset: { hero: { type: "irgendwas-erfundenes" } } },
+  );
+
+  assert.ok(html.includes('class="sig sig-pizza"'));
+});
+
+test("hero.primaryAction 'reservation' betont Reservieren, ohne Texte oder Ziele zu ändern", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { hero: { primaryAction: "reservation" } },
+  });
+
+  assert.match(html, /id="bar-order"[^>]*>Bestellen</, "Bestellen-Knopf muss weiter existieren");
+  assert.match(html, /href="#reservierung"[^>]*>Reservieren</);
+  // Reservieren steht jetzt zuerst und ist der betonte (primary) Knopf.
+  const reservierenIndex = html.indexOf('id="mobilebar"');
+  const mobilebarAusschnitt = html.slice(reservierenIndex, reservierenIndex + 400);
+  assert.match(mobilebarAusschnitt, /btn-primary"[^>]*href="#reservierung"/);
+  assert.match(mobilebarAusschnitt, /id="bar-order"[^>]*class="btn btn-ghost"|class="btn btn-ghost"[^>]*id="bar-order"/);
+});
+
+test("header.sticky false schaltet die feste Kopfzeile ab", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { header: { sticky: false } },
+  });
+
+  assert.ok(html.includes('<header class="topbar topbar-static" id="topbar">'));
+});
+
+test("mobile.stickyActionBar false entfernt die mobile Aktionsleiste", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { mobile: { stickyActionBar: false } },
+  });
+
+  assert.ok(!html.includes('id="mobilebar"'));
+  // Der Bestell-Knopf im Skript wird trotzdem sicher (null-geprüft) angesprochen.
+  assert.ok(html.includes('var barOrder = byId("bar-order")'));
+});
+
+test("layout.sectionOrder bestimmt die Reihenfolge der Hauptsektionen", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { layout: { sectionOrder: ["reservierung", "kontakt", "karte", "highlights", "ambiente", "stimmen"] } },
+  });
+
+  const reihenfolge = ["reservierung", "kontakt", "karte", "highlights", "ambiente", "stimmen"].map((id) =>
+    html.indexOf(`id="${id}"`),
+  );
+
+  for (let i = 1; i < reihenfolge.length; i += 1) {
+    assert.ok(reihenfolge[i - 1] < reihenfolge[i], `Reihenfolge an Position ${i} stimmt nicht`);
+  }
+});
+
+test("eine unvollständige sectionOrder verliert keine Sektion", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { layout: { sectionOrder: ["kontakt"] } },
+  });
+
+  for (const id of ["highlights", "karte", "ambiente", "stimmen", "reservierung", "kontakt"]) {
+    assert.ok(html.includes(`id="${id}"`), `Sektion "${id}" fehlt`);
+  }
+  // Die explizit genannte Sektion steht vorne, der Rest folgt in bisheriger Reihenfolge.
+  assert.ok(html.indexOf('id="kontakt"') < html.indexOf('id="highlights"'));
+});
+
+test("menu.showBadges false blendet das 'vegetarisch'-Abzeichen aus", () => {
+  const mitBadges = buildLandingPage(lead, { menu: MENUS.italienisch });
+  const ohneBadges = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { menu: { showBadges: false } },
+  });
+
+  assert.ok(mitBadges.includes('class="veg"'));
+  assert.ok(!ohneBadges.includes('class="veg"'));
+});
+
+test("menu.layout landet als data-Attribut auf der Speisekarten-Sektion", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { menu: { layout: "grid" } },
+  });
+
+  assert.ok(html.includes('data-menu-layout="grid"'));
+  // Nicht implementierte Layouts fallen weiterhin auf das Akkordeon zurück.
+  assert.ok(html.includes('<details class="kat" open>'));
+});
+
+test("reservation.widgetVariant landet als data-Attribut auf der Reservierungs-Sektion", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { reservation: { widgetVariant: "modal" } },
+  });
+
+  assert.ok(html.includes('data-reservation-variant="modal"'));
+  assert.ok(html.includes('id="reservation-form"'));
+});
+
+test("social.layout 'list' fügt die stimmen-grid--list-Klasse hinzu", () => {
+  const html = buildLandingPage(lead, {
+    menu: MENUS.italienisch,
+    preset: { social: { layout: "list" } },
+  });
+
+  assert.ok(html.includes('class="stimmen-grid stimmen-grid--list"'));
+});
+
+test("getPresetVariant über die Küche liefert dieselbe alternative Variante wie ein eigenes Preset", () => {
+  const html = buildLandingPage(
+    { ...lead, name: "Ristorante Test" },
+    { menu: MENUS.italienisch, designVariant: "photo-hero" },
+  );
+
+  assert.ok(html.includes('class="sig sig-dish"'));
+});
+
+test("das 'minimal'-Preset von bayerisch wirkt vollständig (mehrere Felder gleichzeitig)", () => {
+  const html = buildLandingPage({ name: "Gasthof Huber" }, { designVariant: "minimal" });
+
+  assert.ok(html.includes('<header class="topbar topbar-static" id="topbar">'));
+  assert.ok(!html.includes('id="mobilebar"'));
+  assert.ok(!html.includes('class="veg"'));
+  assert.ok(html.indexOf('id="karte"') < html.indexOf('id="highlights"'));
+});
