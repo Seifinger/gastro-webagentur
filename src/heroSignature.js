@@ -229,14 +229,19 @@ const SIGNATUR_CSS = `
 
 /* Bayerisch: zusätzlich zur Tagestafel ein kleines Detail – der Bierkrug
    läuft alle 8s kurz über. Ergänzt die bestehende Signatur, ersetzt sie
-   nicht. */
-.sig-beer { right: 4%; bottom: 6%; width: clamp(40px, 5vw, 60px); aspect-ratio: 1 / 1.4; }
-.sig-beer .schaum { position: absolute; left: 8%; right: 8%; top: -8%; height: 30%;
+   nicht. Das Glas selbst (sig-beer-glas) ist ein statisches SVG-Icon,
+   Schaum und Tropfen sitzen als eigene Elemente darauf. */
+.sig-beer { position: relative; right: 4%; bottom: 6%; width: clamp(80px, 8vw, 110px);
+            aspect-ratio: 1 / 1.4; }
+.sig-beer-glas { position: absolute; inset: 0; width: 100%; height: 100%;
+                 color: rgba(255, 226, 150, .3);
+                 filter: drop-shadow(0 12px 18px rgba(0,0,0,.4)); }
+.sig-beer .schaum { position: absolute; left: 16%; right: 16%; top: 3%; height: 20%;
                      border-radius: 999px 999px 6px 6px; background: #fdf3d6;
                      box-shadow: 0 8px 14px -8px rgba(0,0,0,.4);
                      transform-origin: 50% 100%;
                      animation: sig-beer-schaum 8s ease-in-out infinite; }
-.sig-beer .tropfen { position: absolute; left: 50%; top: 16%; width: 5px; height: 5px;
+.sig-beer .tropfen { position: absolute; left: 50%; top: 18%; width: 5px; height: 5px;
                       border-radius: 50%; background: #fdf3d6; opacity: 0;
                       animation: sig-beer-tropfen 8s ease-in infinite; }
 .sig-beer .tropfen-2 { left: 64%; animation-delay: .25s; }
@@ -353,6 +358,9 @@ function heroLanternGlow() {
 function heroBeerFoamOverflow() {
   return `
     <div class="sig sig-beer" aria-hidden="true">
+      <svg class="sig-beer-glas" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17 2a2 2 0 0 1 1.995 1.85L19 4v4c0 1.335-.229 2.386-.774 3.692l-.157.363l-.31.701a8.9 8.9 0 0 0-.751 3.242l-.008.377V20a2 2 0 0 1-1.85 1.995L15 22H9a2 2 0 0 1-1.995-1.85L7 20v-3.625c0-1.132-.21-2.25-.617-3.28l-.142-.34l-.31-.699c-.604-1.358-.883-2.41-.925-3.698L5 8V4a2 2 0 0 1 1.85-1.995L7 2z"></path>
+      </svg>
       <div class="schaum"></div>
       <span class="tropfen tropfen-1"></span>
       <span class="tropfen tropfen-2"></span>
