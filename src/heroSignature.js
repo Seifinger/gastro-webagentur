@@ -206,22 +206,18 @@ const SIGNATUR_CSS = `
 
 /* Asiatisch (gemischt): ein bis zwei Laternen pulsieren dezent am Rand –
    nicht mittig über dem Essen wie das Sushi-Band, das Japanisch behält.
-   Statt box-shadow direkt zu animieren (teuer, löst Repaints aus), trägt
-   ein Pseudo-Element mit stärkerem Schein, dessen Opazität pulsiert – der
-   sichtbare Effekt ist derselbe, animiert wird trotzdem nur opacity. */
+   Statt box-shadow direkt zu animieren (teuer, löst Repaints aus), pulsiert
+   die Opazität des .glow-Elements im SVG – der sichtbare Effekt ist
+   derselbe, animiert wird trotzdem nur opacity. */
 .sig-lanterns { left: 3%; top: 14%; display: flex; flex-direction: column; gap: 26px; }
-.sig-lanterns .laterne { position: relative; width: clamp(30px, 4vw, 46px); aspect-ratio: 1;
-                          border-radius: 50%;
-                          background: radial-gradient(circle at 40% 35%, #ffb347, #c8380c 78%);
-                          box-shadow: 0 0 10px 2px rgba(255,130,40,.35);
-                          transform-origin: 50% -14%;
+.sig-lanterns .laterne { position: relative; height: clamp(70px, 9vw, 104px); aspect-ratio: 60 / 110;
+                          transform-origin: 50% 4%;
                           animation: sig-laterne-schaukel 7s ease-in-out infinite; }
-.sig-lanterns .laterne::after { content: ""; position: absolute; inset: -6px; border-radius: 50%;
-                                 box-shadow: 0 0 22px 10px rgba(255,140,40,.85); opacity: 0;
-                                 animation: sig-laterne-puls 4s ease-in-out infinite; }
-.sig-lanterns .laterne:nth-child(2) { width: clamp(22px, 3vw, 34px); animation-delay: 1.6s; }
-.sig-lanterns .laterne:nth-child(2)::after { animation-delay: .8s; }
-@keyframes sig-laterne-puls { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+.sig-lanterns .laterne .sig-lantern-form { width: 100%; height: 100%; display: block; overflow: visible; }
+.sig-lanterns .laterne .glow { animation: sig-laterne-puls 4s ease-in-out infinite; }
+.sig-lanterns .laterne:nth-child(2) { height: clamp(54px, 7vw, 80px); animation-delay: 1.6s; }
+.sig-lanterns .laterne:nth-child(2) .glow { animation-delay: .8s; }
+@keyframes sig-laterne-puls { 0%, 100% { opacity: .35; } 50% { opacity: .85; } }
 @keyframes sig-laterne-schaukel { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 @media (max-width: 899px) {
   .sig-lanterns { left: 2%; top: 8%; gap: 16px; }
@@ -304,7 +300,7 @@ const SIGNATUR_CSS = `
     opacity: 1; transform: none; animation: none;
   }
   .sig-lanterns .laterne { animation: none; }
-  .sig-lanterns .laterne::after { animation: none; opacity: .55; }
+  .sig-lanterns .laterne .glow { animation: none; opacity: .6; }
   .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
 }
 `;
@@ -347,11 +343,26 @@ function heroSpicePuff() {
     </div>`;
 }
 
+const LATERNE_SVG = `
+      <svg class="sig-lantern-form" viewBox="0 0 60 110" aria-hidden="true">
+        <rect x="20" y="4" width="20" height="6" rx="2" fill="#8a4a1c"></rect>
+        <ellipse cx="30" cy="14" rx="16" ry="5" fill="#8a4a1c"></ellipse>
+        <path d="M14,16 C4,30 4,60 14,80 C20,90 40,90 46,80 C56,60 56,30 46,16 Z" fill="#e2461f"></path>
+        <path d="M20,18 C12,32 12,62 20,78" stroke="#b23414" stroke-width="1.5" fill="none"></path>
+        <path d="M30,16 C24,32 24,64 30,84" stroke="#b23414" stroke-width="1.5" fill="none"></path>
+        <path d="M40,18 C48,32 48,62 40,78" stroke="#b23414" stroke-width="1.5" fill="none"></path>
+        <ellipse class="glow" cx="30" cy="48" rx="10" ry="18" fill="#ffd27a" opacity=".6"></ellipse>
+        <ellipse cx="30" cy="82" rx="16" ry="5" fill="#8a4a1c"></ellipse>
+        <rect x="20" y="88" width="20" height="6" rx="2" fill="#8a4a1c"></rect>
+        <line x1="30" x2="30" y1="94" y2="104" stroke="#8a4a1c" stroke-width="2"></line>
+        <circle cx="30" cy="106" r="4" fill="#8a4a1c"></circle>
+      </svg>`;
+
 function heroLanternGlow() {
   return `
     <div class="sig sig-lanterns" aria-hidden="true">
-      <div class="laterne"></div>
-      <div class="laterne"></div>
+      <div class="laterne">${LATERNE_SVG}</div>
+      <div class="laterne">${LATERNE_SVG}</div>
     </div>`;
 }
 
