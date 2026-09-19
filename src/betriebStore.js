@@ -29,6 +29,7 @@ function leererBetrieb() {
     zusaetzlicheWartezeitMinuten: 0,
     pushSubscriptions: [],
     telegramChatId: "",
+    wartezeitLernenAktiv: false,
   };
 }
 
@@ -248,6 +249,18 @@ export function setzeWartezeit(slug, minuten) {
   });
 }
 
+/**
+ * Schaltet das lernende Wartezeit-System für einen Betrieb ein oder aus.
+ * Default aus, damit bestehende Betriebe sich nicht plötzlich anders
+ * verhalten – siehe wartezeitLernStore.js für die gelernten Werte selbst.
+ */
+export function setzeWartezeitLernenAktiv(slug, aktiv) {
+  return aendere(slug, (daten) => {
+    daten.wartezeitLernenAktiv = Boolean(aktiv);
+    return daten.wartezeitLernenAktiv;
+  });
+}
+
 function zeitString(minutenSeitMitternacht) {
   const normiert = ((minutenSeitMitternacht % 1440) + 1440) % 1440;
   const hh = String(Math.floor(normiert / 60)).padStart(2, "0");
@@ -451,6 +464,14 @@ export function setzeBestellungStatus(slug, id, status) {
     const b = daten.bestellungen.find((x) => x.id === id);
     if (!b) throw new Error("Bestellung nicht gefunden.");
     b.status = status;
+    // Für das lernende Wartezeit-System (wartezeitLernStore.js): der
+    // Zeitpunkt, zu dem die Bestellung wirklich fertig war, im Vergleich zur
+    // versprochenen Abholzeit. Nur beim ersten Wechsel auf "abgeholt"
+    // gesetzt – ein erneuter Aufruf (z. B. Doppelklick) darf ihn nicht
+    // nachträglich verschieben.
+    if (status === "abgeholt" && !b.tatsaechlichFertigUm) {
+      b.tatsaechlichFertigUm = new Date().toISOString();
+    }
     return b;
   });
 }

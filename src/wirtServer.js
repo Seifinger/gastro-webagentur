@@ -20,10 +20,12 @@ import {
   setzeWartezeit,
   fuegePushSubscriptionHinzu,
   setzeTelegramChatId,
+  setzeWartezeitLernenAktiv,
 } from "./betriebStore.js";
 import { benachrichtigeBetrieb, oeffentlicherVapidSchluessel } from "./pushNotify.js";
 import { benachrichtigeUeberTelegram } from "./telegramNotify.js";
 import { informiereUeberVerzoegerung } from "./kundenBenachrichtigung.js";
+import { beobachteAbholung, lernUebersicht } from "./wartezeitLernStore.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const seite = path.join(__dirname, "..", "public", "wirt.html");
@@ -110,6 +112,7 @@ function uebersicht() {
     tischKonflikte: tischKonflikte(daten),
     zusaetzlicheWartezeitMinuten: daten.zusaetzlicheWartezeitMinuten ?? 0,
     telegramChatId: daten.telegramChatId ?? "",
+    wartezeitLernenAktiv: Boolean(daten.wartezeitLernenAktiv),
     heute,
   };
 }
@@ -221,6 +224,14 @@ export const handler = async (req, res) => {
     return;
   }
 
+  // read-only Übersicht der gelernten Zuschläge, unabhängig davon, ob das
+  // Lernsystem gerade aktiv ist – der Wirt soll auch nach dem Abschalten
+  // sehen können, was bereits gelernt wurde.
+  if (pathname === "/api/wartezeit-lernen") {
+    json(res, 200, { eintraege: lernUebersicht(slug) });
+    return;
+  }
+
   if (pathname === "/api/frei") {
     const daten = ladeBetrieb(slug);
     json(res, 200, {
@@ -259,7 +270,19 @@ export const handler = async (req, res) => {
         return;
       }
       if (pathname === "/api/bestellung/status") {
-        json(res, 200, { ok: true, bestellung: setzeBestellungStatus(slug, eingabe.id, eingabe.status) });
+        const bestellung = setzeBestellungStatus(slug, eingabe.id, eingabe.status);
+
+        // Nur beim Wechsel auf "abgeholt" gibt es einen Ist-Wert zum Lernen –
+        // und nur, wenn der Betrieb das Lernsystem eingeschaltet hat (Default
+        // aus, siehe wartezeitLernenAktiv in betriebStore.js).
+        if (eingabe.status === "abgeholt") {
+          const betrieb = ladeBetrieb(slug);
+          if (betrieb.wartezeitLernenAktiv && bestellung.tatsaechlichFertigUm) {
+            beobachteAbholung(slug, betrieb, bestellung, new Date(bestellung.tatsaechlichFertigUm));
+          }
+        }
+
+        json(res, 200, { ok: true, bestellung });
         return;
       }
 
@@ -274,6 +297,12 @@ export const handler = async (req, res) => {
       if (pathname === "/intern/push/subscribe") {
         const gespeichert = fuegePushSubscriptionHinzu(slug, eingabe);
         json(res, 200, { ok: true, ...gespeichert });
+        return;
+      }
+
+      if (pathname === "/intern/wartezeit-lernen/aktiv") {
+        const aktiv = setzeWartezeitLernenAktiv(slug, eingabe.aktiv);
+        json(res, 200, { ok: true, wartezeitLernenAktiv: aktiv });
         return;
       }
 

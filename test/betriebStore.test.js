@@ -26,6 +26,7 @@ import {
   fuegePushSubscriptionHinzu,
   entfernePushSubscription,
   setzeTelegramChatId,
+  setzeWartezeitLernenAktiv,
 } from "../src/betriebStore.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -378,4 +379,28 @@ test("unbekannte Status werden nicht gesetzt", () => {
 
   assert.throws(() => setzeBestellungStatus(SLUG, b.id, "verschimmelt"), /Unbekannter Status/);
   assert.equal(setzeBestellungStatus(SLUG, b.id, "abgeholt").status, "abgeholt");
+});
+
+test("der Wechsel auf 'abgeholt' stempelt tatsaechlichFertigUm genau einmal", () => {
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "18:30",
+    name: "X",
+  });
+  assert.equal(b.tatsaechlichFertigUm, undefined);
+
+  const abgeholt = setzeBestellungStatus(SLUG, b.id, "abgeholt");
+  assert.ok(abgeholt.tatsaechlichFertigUm);
+
+  const ersterZeitstempel = abgeholt.tatsaechlichFertigUm;
+  const nochmal = setzeBestellungStatus(SLUG, b.id, "abgeholt");
+  assert.equal(nochmal.tatsaechlichFertigUm, ersterZeitstempel, "ein erneuter Aufruf verschiebt ihn nicht");
+});
+
+test("ein frischer Betrieb hat das Lernsystem aus, der Schalter wirkt", () => {
+  assert.equal(ladeBetrieb(SLUG).wartezeitLernenAktiv, false);
+  assert.equal(setzeWartezeitLernenAktiv(SLUG, true), true);
+  assert.equal(ladeBetrieb(SLUG).wartezeitLernenAktiv, true);
+  assert.equal(setzeWartezeitLernenAktiv(SLUG, false), false);
+  assert.equal(ladeBetrieb(SLUG).wartezeitLernenAktiv, false);
 });

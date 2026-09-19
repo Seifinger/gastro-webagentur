@@ -15,9 +15,13 @@ const { ladeBetrieb, speichereBetrieb, legeTischAn } = await import("../src/betr
 const { pushSendenHook } = await import("../src/pushNotify.js");
 const { telegramSendenHook } = await import("../src/telegramNotify.js");
 const { smsHook, emailHook } = await import("../src/kundenBenachrichtigung.js");
+const { ladeLernTabelle, lerneAusBeobachtung, wochentag, zeitfenster } = await import(
+  "../src/wartezeitLernStore.js"
+);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dateiPfad = path.join(__dirname, "..", "data", "betrieb", `${SLUG}.json`);
+const lernDateiPfad = path.join(__dirname, "..", "data", "wartezeitLernen", `${SLUG}.json`);
 
 // Voller Reset vor jedem Testfall: Push-Subscriptions und Bestellungen aus
 // einem Test dürfen die Zähl-Assertions eines späteren Tests nicht
@@ -25,10 +29,12 @@ const dateiPfad = path.join(__dirname, "..", "data", "betrieb", `${SLUG}.json`);
 beforeEach(() => {
   speichereBetrieb(SLUG, { tische: [], reservierungen: [], bestellungen: [], pushSubscriptions: [] });
   legeTischAn(SLUG, { name: "Tisch 1", plaetze: 4 });
+  rmSync(lernDateiPfad, { force: true });
 });
 
 after(() => {
   rmSync(dateiPfad, { force: true });
+  rmSync(lernDateiPfad, { force: true });
 });
 
 async function mitServer(fn) {
@@ -485,5 +491,93 @@ test("POST /intern/bestellung/:id/verzoegerung mit unbekannter ID antwortet mit 
 
     assert.equal(antwort.status, 400);
     assert.match(ergebnis.fehler, /nicht gefunden/);
+  });
+});
+
+test("POST /intern/wartezeit-lernen/aktiv schaltet das Lernsystem um", async () => {
+  await mitServer(async (basis) => {
+    const antwort = await fetch(`${basis}/intern/wartezeit-lernen/aktiv`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ aktiv: true }),
+    });
+    const ergebnis = await antwort.json();
+
+    assert.equal(antwort.status, 200);
+    assert.equal(ergebnis.wartezeitLernenAktiv, true);
+    assert.equal(ladeBetrieb(SLUG).wartezeitLernenAktiv, true);
+
+    const betrieb = await (await fetch(`${basis}/api/betrieb`)).json();
+    assert.equal(betrieb.wartezeitLernenAktiv, true);
+  });
+});
+
+test("GET /api/wartezeit-lernen liefert die gelernten Zuschläge", async () => {
+  lerneAusBeobachtung(SLUG, { datum: "2026-09-20", uhrzeit: "19:00", auslastung: "niedrig", differenzMinuten: 7 });
+
+  await mitServer(async (basis) => {
+    const antwort = await fetch(`${basis}/api/wartezeit-lernen`);
+    const ergebnis = await antwort.json();
+
+    assert.equal(antwort.status, 200);
+    assert.equal(ergebnis.eintraege.length, 1);
+    assert.equal(ergebnis.eintraege[0].beobachtungen, 1);
+    assert.equal(ergebnis.eintraege[0].gelernt, false);
+  });
+});
+
+test("eine abgeholte Bestellung fließt bei aktiviertem Lernsystem in die Tabelle ein", async () => {
+  await mitServer(async (basis) => {
+    await fetch(`${basis}/intern/wartezeit-lernen/aktiv`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ aktiv: true }),
+    });
+
+    const bestellAntwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+        abholzeit: "18:30",
+        name: "Testgast",
+      }),
+    });
+    const { id } = (await bestellAntwort.json()).bestellung;
+
+    await fetch(`${basis}/api/bestellung/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status: "abgeholt" }),
+    });
+
+    const wt = wochentag(new Date().toISOString().slice(0, 10));
+    const fenster = zeitfenster("18:30");
+    const tabelle = ladeLernTabelle(SLUG);
+    const treffer = Object.keys(tabelle).some((key) => key.startsWith(`${wt}|${fenster}|`));
+    assert.ok(treffer, "die passende Tabellenzeile sollte jetzt eine Beobachtung haben");
+  });
+});
+
+test("eine abgeholte Bestellung fließt ohne aktiviertes Lernsystem nicht in die Tabelle ein", async () => {
+  await mitServer(async (basis) => {
+    const bestellAntwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+        abholzeit: "18:30",
+        name: "Testgast",
+      }),
+    });
+    const { id } = (await bestellAntwort.json()).bestellung;
+
+    await fetch(`${basis}/api/bestellung/status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status: "abgeholt" }),
+    });
+
+    assert.deepEqual(ladeLernTabelle(SLUG), {});
   });
 });
