@@ -21,17 +21,25 @@ import {
   fuegePushSubscriptionHinzu,
   setzeTelegramChatId,
   setzeWartezeitLernenAktiv,
+  setzeNoShowSchutz,
+  setzeBankverbindung,
+  storniereBestellung,
+  bestaetigeNoShow,
 } from "./betriebStore.js";
 import { benachrichtigeBetrieb, oeffentlicherVapidSchluessel } from "./pushNotify.js";
 import { benachrichtigeUeberTelegram } from "./telegramNotify.js";
-import { informiereUeberVerzoegerung } from "./kundenBenachrichtigung.js";
+import { informiereUeberVerzoegerung, versendeRechnung } from "./kundenBenachrichtigung.js";
 import { beobachteAbholung, lernUebersicht } from "./wartezeitLernStore.js";
+import { vermerkeNoShow, warnhinweisNoetig } from "./zuverlaessigkeitStore.js";
+import { erzeugeNoShowRechnung } from "./rechnungGenerator.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const seite = path.join(__dirname, "..", "public", "wirt.html");
 const serviceWorker = path.join(__dirname, "..", "public", "sw.js");
 
 const VERZOEGERUNG = /^\/intern\/bestellung\/([^/]+)\/verzoegerung$/;
+const STORNIEREN = /^\/oeffentlich\/bestellung\/([^/]+)\/stornieren$/;
+const NO_SHOW = /^\/intern\/bestellung\/([^/]+)\/no-show$/;
 
 function parseFlag(argv, name, standard) {
   const i = argv.indexOf(name);
@@ -98,6 +106,15 @@ function uebersicht() {
   const daten = ladeBetrieb(slug);
   const heute = new Date().toISOString().slice(0, 10);
 
+  // Kein automatischer Filter, nur ein Hinweis fürs Dashboard – die
+  // Entscheidung, eine Bestellung trotzdem anzunehmen, bleibt beim Wirt.
+  const bestellungenMitHinweis = daten.bestellungen.map((b) => ({
+    ...b,
+    unzuverlaessig: b.telefon
+      ? warnhinweisNoetig(slug, b.telefon, daten.noShowWarnSchwelle ?? 2)
+      : false,
+  }));
+
   return {
     betrieb: slug,
     tische: daten.tische,
@@ -105,7 +122,7 @@ function uebersicht() {
     reservierungen: daten.reservierungen.sort(
       (a, b) => `${a.datum}${a.uhrzeit}`.localeCompare(`${b.datum}${b.uhrzeit}`),
     ),
-    bestellungen: daten.bestellungen.sort((a, b) => b.eingegangen.localeCompare(a.eingegangen)),
+    bestellungen: bestellungenMitHinweis.sort((a, b) => b.eingegangen.localeCompare(a.eingegangen)),
     offeneReservierungen: daten.reservierungen.filter((r) => r.status === "neu").length,
     offeneBestellungen: daten.bestellungen.filter((b) => b.status === "neu").length,
     // Zeitpunkte, an denen die Plätze zwar reichen, die Tische aber nicht.
@@ -113,7 +130,13 @@ function uebersicht() {
     zusaetzlicheWartezeitMinuten: daten.zusaetzlicheWartezeitMinuten ?? 0,
     telegramChatId: daten.telegramChatId ?? "",
     wartezeitLernenAktiv: Boolean(daten.wartezeitLernenAktiv),
+    noShowSchutzAktiv: Boolean(daten.noShowSchutzAktiv),
+    noShowGebuehrBetrag: daten.noShowGebuehrBetrag ?? 0,
+    noShowStornofensterMinuten: daten.noShowStornofensterMinuten ?? 30,
+    noShowWarnSchwelle: daten.noShowWarnSchwelle ?? 2,
+    bankverbindung: daten.bankverbindung ?? "",
     heute,
+    jetztIso: new Date().toISOString(),
   };
 }
 
@@ -180,6 +203,42 @@ export const handler = async (req, res) => {
           await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
         }
         json(res, 200, { ok: true, bestellung: { id: b.id, nummer: b.nummer } }, CORS);
+        return;
+      }
+
+      if (pathname === "/oeffentlich/no-show-einstellungen") {
+        const stand = ladeBetrieb(slug);
+        json(
+          res,
+          200,
+          {
+            ok: true,
+            aktiv: Boolean(stand.noShowSchutzAktiv),
+            gebuehrBetrag: stand.noShowGebuehrBetrag ?? 0,
+            stornofensterMinuten: stand.noShowStornofensterMinuten ?? 30,
+          },
+          CORS,
+        );
+        return;
+      }
+
+      const stornierenTreffer = STORNIEREN.exec(pathname);
+      if (stornierenTreffer) {
+        const id = decodeURIComponent(stornierenTreffer[1]);
+        const { kostenfrei, minutenBisAbholung } = storniereBestellung(slug, id);
+        json(
+          res,
+          200,
+          {
+            ok: true,
+            kostenfrei,
+            minutenBisAbholung,
+            hinweis: kostenfrei
+              ? "Ihre Bestellung wurde kostenfrei storniert."
+              : "Ihre Bestellung wurde storniert. Da das Stornofenster bereits verstrichen ist, kann eine Ausfallpauschale anfallen.",
+          },
+          CORS,
+        );
         return;
       }
 
@@ -297,6 +356,54 @@ export const handler = async (req, res) => {
       if (pathname === "/intern/push/subscribe") {
         const gespeichert = fuegePushSubscriptionHinzu(slug, eingabe);
         json(res, 200, { ok: true, ...gespeichert });
+        return;
+      }
+
+      if (pathname === "/intern/no-show-schutz") {
+        const ergebnis = setzeNoShowSchutz(slug, {
+          aktiv: eingabe.aktiv,
+          gebuehrBetrag: eingabe.gebuehrBetrag,
+          stornofensterMinuten: eingabe.stornofensterMinuten,
+          warnSchwelle: eingabe.warnSchwelle,
+        });
+        json(res, 200, { ok: true, ...ergebnis });
+        return;
+      }
+
+      if (pathname === "/intern/bankverbindung") {
+        const bankverbindung = setzeBankverbindung(slug, eingabe.bankverbindung);
+        json(res, 200, { ok: true, bankverbindung });
+        return;
+      }
+
+      const noShowTreffer = NO_SHOW.exec(pathname);
+      if (noShowTreffer) {
+        const id = decodeURIComponent(noShowTreffer[1]);
+        const bestellung = bestaetigeNoShow(slug, id, eingabe.betrag);
+
+        // Zuverlässigkeits-Store: zählt für künftige Bestellungen derselben
+        // Nummer mit, unabhängig davon, ob der Rechnungsversand klappt.
+        if (bestellung.telefon) vermerkeNoShow(slug, bestellung.telefon);
+
+        const betrieb = ladeBetrieb(slug);
+        const rechnungPdf = await erzeugeNoShowRechnung({
+          betrieb: slug,
+          bestellung,
+          betrag: bestellung.noShowBetrag,
+          bankverbindung: betrieb.bankverbindung,
+        });
+
+        const email = await versendeRechnung({
+          email: bestellung.email,
+          betreff: `Rechnung: Ausfallpauschale zu Bestellung ${bestellung.nummer}`,
+          text:
+            `Hallo ${bestellung.name},\n\nzu Ihrer Bestellung ${bestellung.nummer} stellen wir die vereinbarte ` +
+            `Ausfallpauschale in Höhe von ${Number(bestellung.noShowBetrag).toFixed(2)} € in Rechnung. ` +
+            "Die Rechnung finden Sie im Anhang.",
+          anhaenge: [{ dateiname: "rechnung.pdf", inhalt: rechnungPdf, contentType: "application/pdf" }],
+        });
+
+        json(res, 200, { ok: true, bestellung, rechnungVersendet: email.versendet });
         return;
       }
 

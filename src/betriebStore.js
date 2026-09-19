@@ -15,7 +15,10 @@ const betriebeDir = path.join(__dirname, "..", "data", "betrieb");
 export const BELEGDAUER_MINUTEN = 120;
 
 export const RESERVIERUNG_STATUS = ["neu", "bestaetigt", "abgesagt"];
-export const BESTELLUNG_STATUS = ["neu", "bestaetigt", "abgeholt", "abgelehnt"];
+export const BESTELLUNG_STATUS = ["neu", "bestaetigt", "abgeholt", "abgelehnt", "storniert"];
+
+export const NO_SHOW_STORNOFENSTER_MINUTEN_DEFAULT = 30;
+export const NO_SHOW_WARN_SCHWELLE_DEFAULT = 2;
 
 function datei(slug) {
   return path.join(betriebeDir, `${slug}.json`);
@@ -30,6 +33,11 @@ function leererBetrieb() {
     pushSubscriptions: [],
     telegramChatId: "",
     wartezeitLernenAktiv: false,
+    noShowSchutzAktiv: false,
+    noShowGebuehrBetrag: 0,
+    noShowStornofensterMinuten: NO_SHOW_STORNOFENSTER_MINUTEN_DEFAULT,
+    noShowWarnSchwelle: NO_SHOW_WARN_SCHWELLE_DEFAULT,
+    bankverbindung: "",
   };
 }
 
@@ -261,6 +269,63 @@ export function setzeWartezeitLernenAktiv(slug, aktiv) {
   });
 }
 
+/* ---------- No-Show-Schutz ---------- */
+
+/**
+ * Der exakte Zustimmungstext für eine gegebene Konfiguration – identisch
+ * auf der Bestellseite (landingPageGenerator.js, dort clientseitig
+ * nachgebaut) und hier serverseitig als Beweistext gespeichert.
+ */
+export function noShowZustimmungstext({ noShowStornofensterMinuten, noShowGebuehrBetrag }) {
+  const betrag = Number(noShowGebuehrBetrag || 0).toFixed(2).replace(".", ",");
+  return (
+    `Ich stimme zu: Bei Nichtabholung ohne Stornierung bis ${noShowStornofensterMinuten} Minuten vor der ` +
+    `Abholzeit wird eine Ausfallpauschale von ${betrag} € in Rechnung gestellt.`
+  );
+}
+
+/**
+ * Setzt die No-Show-Schutz-Einstellungen eines Betriebs. Default aus
+ * (noShowSchutzAktiv: false), damit bestehende Betriebe sich nicht
+ * plötzlich anders verhalten.
+ */
+export function setzeNoShowSchutz(slug, { aktiv, gebuehrBetrag, stornofensterMinuten, warnSchwelle } = {}) {
+  const betrag = Number(gebuehrBetrag);
+  const fenster = Number(stornofensterMinuten);
+  const schwelle = Number(warnSchwelle);
+
+  if (!Number.isFinite(betrag) || betrag < 0) {
+    throw new Error("Die Ausfallpauschale muss ein Betrag ab 0 € sein.");
+  }
+  if (!Number.isInteger(fenster) || fenster < 0 || fenster > 1440) {
+    throw new Error("Das Stornofenster muss zwischen 0 und 1440 Minuten liegen.");
+  }
+  if (!Number.isInteger(schwelle) || schwelle < 1) {
+    throw new Error("Die Warn-Schwelle muss mindestens 1 sein.");
+  }
+
+  return aendere(slug, (daten) => {
+    daten.noShowSchutzAktiv = Boolean(aktiv);
+    daten.noShowGebuehrBetrag = betrag;
+    daten.noShowStornofensterMinuten = fenster;
+    daten.noShowWarnSchwelle = schwelle;
+    return {
+      noShowSchutzAktiv: daten.noShowSchutzAktiv,
+      noShowGebuehrBetrag: daten.noShowGebuehrBetrag,
+      noShowStornofensterMinuten: daten.noShowStornofensterMinuten,
+      noShowWarnSchwelle: daten.noShowWarnSchwelle,
+    };
+  });
+}
+
+export function setzeBankverbindung(slug, text) {
+  const sauber = String(text ?? "").trim();
+  return aendere(slug, (daten) => {
+    daten.bankverbindung = sauber;
+    return sauber;
+  });
+}
+
 function zeitString(minutenSeitMitternacht) {
   const normiert = ((minutenSeitMitternacht % 1440) + 1440) % 1440;
   const hh = String(Math.floor(normiert / 60)).padStart(2, "0");
@@ -419,6 +484,23 @@ export function legeBestellungAn(slug, eingabe) {
   }));
 
   return aendere(slug, (daten) => {
+    // Ist die Funktion aktiv, ist die Zustimmung Pflicht – ohne Häkchen keine
+    // Bestellung. Der Text wird serverseitig aus der aktuellen Konfiguration
+    // gebaut, nicht vom Client übernommen: Beweistext und tatsächlich
+    // geltende Bedingungen dürfen nie auseinanderlaufen.
+    let noShowZustimmung = null;
+    let noShowGebuehrBetragVereinbart = null;
+    if (daten.noShowSchutzAktiv) {
+      if (eingabe.noShowZustimmung !== true) {
+        throw new Error("Bitte stimmen Sie der Ausfallpauschale zu, um fortzufahren.");
+      }
+      noShowZustimmung = {
+        text: noShowZustimmungstext(daten),
+        zeitpunkt: new Date().toISOString(),
+      };
+      noShowGebuehrBetragVereinbart = daten.noShowGebuehrBetrag;
+    }
+
     const bestellung = {
       id: randomUUID(),
       nummer: `AB-${String(Math.floor(1000 + Math.random() * 9000))}`,
@@ -433,10 +515,87 @@ export function legeBestellungAn(slug, eingabe) {
       hinweis: String(eingabe.hinweis ?? "").trim(),
       status: "neu",
       eingegangen: new Date().toISOString(),
+      // Beweis für eine spätere Forderung: exakter Text, Zeitpunkt, dazu
+      // Name/Kontakt – die stehen ohnehin schon oben auf der Bestellung.
+      noShowZustimmung,
+      noShowGebuehrBetragVereinbart,
+      storniertAm: "",
+      noShowBestaetigtAm: "",
+      noShowBetrag: null,
     };
 
     daten.bestellungen.push(bestellung);
     return bestellung;
+  });
+}
+
+/**
+ * Der Zeitpunkt, den die Bestellung dem Gast versprochen hat (bestätigt oder,
+ * falls noch offen, gewünscht) – kombiniert mit dem Eingangsdatum, weil
+ * Abholzeiten nur "HH:MM" ohne Datum sind (Abholung ist immer am selben Tag).
+ */
+function versprochenerAbholZeitpunkt(bestellung) {
+  const zeit = bestellung.bestaetigteAbholzeit || bestellung.abholzeit;
+  const datum = String(bestellung.eingegangen ?? "").slice(0, 10);
+  if (!zeit || !datum) return null;
+  const zeitpunkt = new Date(`${datum}T${zeit}:00`);
+  return Number.isNaN(zeitpunkt.getTime()) ? null : zeitpunkt;
+}
+
+/**
+ * Kunden-Storno per Link aus der Bestellbestätigung. Innerhalb des
+ * Stornofensters kostenfrei, danach nur ein Hinweis auf eine mögliche
+ * Gebühr – eine Stornierung selbst löst nie automatisch eine Forderung aus,
+ * das entscheidet der Wirt über "Kunde nicht erschienen" (bestaetigeNoShow).
+ */
+export function storniereBestellung(slug, id, jetzt = new Date()) {
+  return aendere(slug, (daten) => {
+    const b = daten.bestellungen.find((x) => x.id === id);
+    if (!b) throw new Error("Bestellung nicht gefunden.");
+    if (b.storniertAm) throw new Error("Diese Bestellung wurde bereits storniert.");
+    if (b.status === "abgeholt") throw new Error("Diese Bestellung wurde bereits abgeholt.");
+
+    const versprochen = versprochenerAbholZeitpunkt(b);
+    const minutenBisAbholung = versprochen ? (versprochen.getTime() - jetzt.getTime()) / 60000 : Infinity;
+    const kostenfrei = minutenBisAbholung >= Number(daten.noShowStornofensterMinuten ?? 0);
+
+    b.status = "storniert";
+    b.storniertAm = jetzt.toISOString();
+
+    return { bestellung: b, kostenfrei, minutenBisAbholung: Math.round(minutenBisAbholung) };
+  });
+}
+
+/**
+ * Der Wirt bestätigt, dass der Gast nicht erschienen ist. Der Betrag ist nur
+ * nach unten korrigierbar (nie über den bei der Bestellung vereinbarten
+ * Betrag hinaus) – damit kann nie versehentlich mehr verlangt werden, als
+ * der Gast zugestimmt hat.
+ */
+export function bestaetigeNoShow(slug, id, betrag, jetzt = new Date()) {
+  const wert = Number(betrag);
+  if (!Number.isFinite(wert) || wert < 0) {
+    throw new Error("Der Betrag muss eine Zahl ab 0 € sein.");
+  }
+
+  return aendere(slug, (daten) => {
+    const b = daten.bestellungen.find((x) => x.id === id);
+    if (!b) throw new Error("Bestellung nicht gefunden.");
+    if (b.storniertAm) throw new Error("Diese Bestellung wurde vom Gast storniert – keine Ausfallpauschale möglich.");
+    if (b.noShowBestaetigtAm) throw new Error("Für diese Bestellung wurde bereits eine Ausfallpauschale bestätigt.");
+    if (!b.noShowZustimmung) {
+      throw new Error("Für diese Bestellung liegt keine Zustimmung zur Ausfallpauschale vor.");
+    }
+    if (wert > Number(b.noShowGebuehrBetragVereinbart ?? 0)) {
+      throw new Error(
+        `Der Betrag darf höchstens ${Number(b.noShowGebuehrBetragVereinbart).toFixed(2)} € betragen ` +
+          "(der bei der Bestellung vereinbarte Betrag) – nur eine Korrektur nach unten ist möglich.",
+      );
+    }
+
+    b.noShowBestaetigtAm = jetzt.toISOString();
+    b.noShowBetrag = wert;
+    return b;
   });
 }
 

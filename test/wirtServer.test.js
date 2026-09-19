@@ -22,6 +22,7 @@ const { ladeLernTabelle, lerneAusBeobachtung, wochentag, zeitfenster } = await i
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dateiPfad = path.join(__dirname, "..", "data", "betrieb", `${SLUG}.json`);
 const lernDateiPfad = path.join(__dirname, "..", "data", "wartezeitLernen", `${SLUG}.json`);
+const zuverlaessigkeitDateiPfad = path.join(__dirname, "..", "data", "zuverlaessigkeit", `${SLUG}.json`);
 
 // Voller Reset vor jedem Testfall: Push-Subscriptions und Bestellungen aus
 // einem Test dürfen die Zähl-Assertions eines späteren Tests nicht
@@ -30,11 +31,13 @@ beforeEach(() => {
   speichereBetrieb(SLUG, { tische: [], reservierungen: [], bestellungen: [], pushSubscriptions: [] });
   legeTischAn(SLUG, { name: "Tisch 1", plaetze: 4 });
   rmSync(lernDateiPfad, { force: true });
+  rmSync(zuverlaessigkeitDateiPfad, { force: true });
 });
 
 after(() => {
   rmSync(dateiPfad, { force: true });
   rmSync(lernDateiPfad, { force: true });
+  rmSync(zuverlaessigkeitDateiPfad, { force: true });
 });
 
 async function mitServer(fn) {
@@ -579,5 +582,240 @@ test("eine abgeholte Bestellung fließt ohne aktiviertes Lernsystem nicht in die
     });
 
     assert.deepEqual(ladeLernTabelle(SLUG), {});
+  });
+});
+
+/* ---------- No-Show-Schutz ---------- */
+
+async function aktiviereNoShow(basis, betrag = 10, fenster = 30, schwelle = 2) {
+  await fetch(`${basis}/intern/no-show-schutz`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ aktiv: true, gebuehrBetrag: betrag, stornofensterMinuten: fenster, warnSchwelle: schwelle }),
+  });
+}
+
+test("POST /oeffentlich/no-show-einstellungen liefert die aktuelle Konfiguration", async () => {
+  await mitServer(async (basis) => {
+    await aktiviereNoShow(basis, 9.5, 20);
+    const antwort = await fetch(`${basis}/oeffentlich/no-show-einstellungen`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    });
+    const ergebnis = await antwort.json();
+
+    assert.equal(ergebnis.aktiv, true);
+    assert.equal(ergebnis.gebuehrBetrag, 9.5);
+    assert.equal(ergebnis.stornofensterMinuten, 20);
+  });
+});
+
+test("eine Bestellung ohne Häkchen wird bei aktiviertem No-Show-Schutz abgelehnt", async () => {
+  await mitServer(async (basis) => {
+    await aktiviereNoShow(basis);
+    const antwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+        abholzeit: "18:30",
+        name: "Testgast",
+      }),
+    });
+    const ergebnis = await antwort.json();
+
+    assert.equal(antwort.status, 400);
+    assert.match(ergebnis.fehler, /Ausfallpauschale zu/);
+  });
+});
+
+test("eine Bestellung mit Häkchen wird angenommen, die Zustimmung wird gespeichert", async () => {
+  await mitServer(async (basis) => {
+    await aktiviereNoShow(basis, 10, 30);
+    const antwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+        abholzeit: "18:30",
+        name: "Testgast",
+        telefon: "0170 999",
+        noShowZustimmung: true,
+      }),
+    });
+    const { bestellung } = await antwort.json();
+    assert.equal(antwort.status, 200);
+
+    const gespeichert = ladeBetrieb(SLUG).bestellungen.find((x) => x.id === bestellung.id);
+    assert.ok(gespeichert.noShowZustimmung);
+    assert.match(gespeichert.noShowZustimmung.text, /10,00 €/);
+    assert.ok(gespeichert.noShowZustimmung.zeitpunkt);
+  });
+});
+
+test("Stornieren über /oeffentlich/bestellung/:id/stornieren meldet, ob es gebührenfrei war", async () => {
+  await mitServer(async (basis) => {
+    await aktiviereNoShow(basis, 10, 30);
+    const bestellAntwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+        abholzeit: "18:30",
+        name: "Testgast",
+        noShowZustimmung: true,
+      }),
+    });
+    const { bestellung } = await bestellAntwort.json();
+
+    const stornoAntwort = await fetch(`${basis}/oeffentlich/bestellung/${bestellung.id}/stornieren`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    });
+    const ergebnis = await stornoAntwort.json();
+
+    assert.equal(stornoAntwort.status, 200);
+    assert.equal(typeof ergebnis.kostenfrei, "boolean");
+    assert.match(ergebnis.hinweis, /storniert/);
+    assert.equal(ladeBetrieb(SLUG).bestellungen.find((x) => x.id === bestellung.id).status, "storniert");
+  });
+});
+
+test("'Kunde nicht erschienen' erzeugt mit gemocktem E-Mail-Hook eine Rechnung und versendet sie", async () => {
+  await mitServer(async (basis) => {
+    await aktiviereNoShow(basis, 12, 30);
+    const bestellAntwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+        abholzeit: "18:30",
+        name: "Testgast",
+        telefon: "0170 555",
+        email: "gast@beispiel.de",
+        noShowZustimmung: true,
+      }),
+    });
+    const { bestellung } = await bestellAntwort.json();
+
+    const emailAufrufe = [];
+    const altEmail = emailHook.aktuell;
+    emailHook.aktuell = async (empfaenger, betreff, text, anhaenge) => {
+      emailAufrufe.push({ empfaenger, betreff, text, anhaenge });
+    };
+
+    try {
+      const antwort = await fetch(`${basis}/intern/bestellung/${bestellung.id}/no-show`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ betrag: 12 }),
+      });
+      const ergebnis = await antwort.json();
+
+      assert.equal(antwort.status, 200);
+      assert.equal(ergebnis.rechnungVersendet, true);
+      assert.equal(ergebnis.bestellung.noShowBetrag, 12);
+      assert.equal(emailAufrufe.length, 1);
+      assert.equal(emailAufrufe[0].empfaenger, "gast@beispiel.de");
+      assert.equal(emailAufrufe[0].anhaenge[0].dateiname, "rechnung.pdf");
+      assert.ok(Buffer.isBuffer(emailAufrufe[0].anhaenge[0].inhalt));
+      assert.equal(emailAufrufe[0].anhaenge[0].inhalt.subarray(0, 5).toString("latin1"), "%PDF-");
+    } finally {
+      emailHook.aktuell = altEmail;
+    }
+  });
+});
+
+test("'Kunde nicht erschienen' meldet rechnungVersendet:false ohne konfigurierten E-Mail-Hook", async () => {
+  await mitServer(async (basis) => {
+    await aktiviereNoShow(basis, 12, 30);
+    const bestellAntwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+        abholzeit: "18:30",
+        name: "Testgast",
+        noShowZustimmung: true,
+      }),
+    });
+    const { bestellung } = await bestellAntwort.json();
+
+    const antwort = await fetch(`${basis}/intern/bestellung/${bestellung.id}/no-show`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ betrag: 12 }),
+    });
+    const ergebnis = await antwort.json();
+
+    assert.equal(antwort.status, 200);
+    assert.equal(ergebnis.rechnungVersendet, false);
+  });
+});
+
+test("der Warnhinweis im Dashboard erscheint erst ab der eingestellten Schwelle", async () => {
+  await mitServer(async (basis) => {
+    await aktiviereNoShow(basis, 10, 30, 2);
+
+    async function neueBestellung() {
+      const antwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+          abholzeit: "18:30",
+          name: "Testgast",
+          telefon: "0170 777",
+          noShowZustimmung: true,
+        }),
+      });
+      return (await antwort.json()).bestellung;
+    }
+
+    async function alsNoShowBestaetigen(id) {
+      await fetch(`${basis}/intern/bestellung/${id}/no-show`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ betrag: 10 }),
+      });
+    }
+
+    const erste = await neueBestellung();
+    await alsNoShowBestaetigen(erste.id);
+
+    const zweite = await neueBestellung();
+    let uebersicht = await (await fetch(`${basis}/api/betrieb`)).json();
+    assert.equal(
+      uebersicht.bestellungen.find((b) => b.id === zweite.id).unzuverlaessig,
+      false,
+      "nach nur einem bestätigten No-Show noch keine Warnung (Schwelle 2)",
+    );
+
+    await alsNoShowBestaetigen(zweite.id);
+
+    const dritte = await neueBestellung();
+    uebersicht = await (await fetch(`${basis}/api/betrieb`)).json();
+    assert.equal(
+      uebersicht.bestellungen.find((b) => b.id === dritte.id).unzuverlaessig,
+      true,
+      "ab dem zweiten bestätigten No-Show greift die Warnung",
+    );
+  });
+});
+
+test("POST /intern/bankverbindung speichert und liefert den Text", async () => {
+  await mitServer(async (basis) => {
+    const antwort = await fetch(`${basis}/intern/bankverbindung`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bankverbindung: "Musterbetrieb, DE00 1234 5678" }),
+    });
+    const ergebnis = await antwort.json();
+
+    assert.equal(antwort.status, 200);
+    assert.equal(ergebnis.bankverbindung, "Musterbetrieb, DE00 1234 5678");
+    assert.equal(ladeBetrieb(SLUG).bankverbindung, "Musterbetrieb, DE00 1234 5678");
   });
 });

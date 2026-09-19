@@ -49,3 +49,21 @@ export async function informiereUeberVerzoegerung({ telefon, email, nachricht })
 
   return { kanal: "keiner" };
 }
+
+/**
+ * Versendet die No-Show-Rechnung (PDF, siehe rechnungGenerator.js) an den
+ * Gast – über denselben austauschbaren E-Mail-Hook wie oben. Ohne
+ * konfigurierten Versanddienst oder ohne hinterlegte Adresse passiert
+ * nichts; das Dashboard zeigt dann, dass die Rechnung manuell verschickt
+ * werden muss (siehe wirtServer.js).
+ */
+export async function versendeRechnung({ email, betreff, text, anhaenge }) {
+  if (!emailKonfiguriert() || !String(email ?? "").trim()) return { versendet: false };
+
+  try {
+    await emailHook.aktuell(email, betreff, text, anhaenge);
+    return { versendet: true };
+  } catch {
+    return { versendet: false };
+  }
+}

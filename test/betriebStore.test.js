@@ -27,6 +27,11 @@ import {
   entfernePushSubscription,
   setzeTelegramChatId,
   setzeWartezeitLernenAktiv,
+  setzeNoShowSchutz,
+  setzeBankverbindung,
+  noShowZustimmungstext,
+  storniereBestellung,
+  bestaetigeNoShow,
 } from "../src/betriebStore.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -403,4 +408,180 @@ test("ein frischer Betrieb hat das Lernsystem aus, der Schalter wirkt", () => {
   assert.equal(ladeBetrieb(SLUG).wartezeitLernenAktiv, true);
   assert.equal(setzeWartezeitLernenAktiv(SLUG, false), false);
   assert.equal(ladeBetrieb(SLUG).wartezeitLernenAktiv, false);
+});
+
+/* ---------- No-Show-Schutz ---------- */
+
+function aktiviereNoShowSchutz(betrag = 10, fenster = 30, schwelle = 2) {
+  return setzeNoShowSchutz(SLUG, {
+    aktiv: true,
+    gebuehrBetrag: betrag,
+    stornofensterMinuten: fenster,
+    warnSchwelle: schwelle,
+  });
+}
+
+test("ein frischer Betrieb hat den No-Show-Schutz aus", () => {
+  const daten = ladeBetrieb(SLUG);
+  assert.equal(daten.noShowSchutzAktiv, false);
+  assert.equal(daten.noShowStornofensterMinuten, 30);
+});
+
+test("setzeNoShowSchutz validiert die Werte", () => {
+  assert.throws(
+    () => setzeNoShowSchutz(SLUG, { aktiv: true, gebuehrBetrag: -1, stornofensterMinuten: 30, warnSchwelle: 2 }),
+    /Ausfallpauschale/,
+  );
+  assert.throws(
+    () => setzeNoShowSchutz(SLUG, { aktiv: true, gebuehrBetrag: 10, stornofensterMinuten: -5, warnSchwelle: 2 }),
+    /Stornofenster/,
+  );
+  assert.throws(
+    () => setzeNoShowSchutz(SLUG, { aktiv: true, gebuehrBetrag: 10, stornofensterMinuten: 30, warnSchwelle: 0 }),
+    /Schwelle/,
+  );
+});
+
+test("ohne aktivierten No-Show-Schutz ist keine Zustimmung nötig", () => {
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "18:30",
+    name: "X",
+  });
+  assert.equal(b.noShowZustimmung, null);
+});
+
+test("bei aktiviertem No-Show-Schutz wird eine Bestellung ohne Häkchen abgelehnt", () => {
+  aktiviereNoShowSchutz();
+  const gueltig = { positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }], abholzeit: "18:30", name: "X" };
+
+  assert.throws(() => legeBestellungAn(SLUG, gueltig), /Ausfallpauschale zu/);
+  assert.throws(() => legeBestellungAn(SLUG, { ...gueltig, noShowZustimmung: false }), /Ausfallpauschale zu/);
+  assert.throws(
+    () => legeBestellungAn(SLUG, { ...gueltig, noShowZustimmung: "true" }),
+    /Ausfallpauschale zu/,
+    "nur echtes true zählt",
+  );
+});
+
+test("mit Häkchen wird die Zustimmung korrekt gespeichert: Text, Zeitpunkt, Kontakt", () => {
+  aktiviereNoShowSchutz(12.5, 45, 2);
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "18:30",
+    name: "Bauer",
+    telefon: "0170 111",
+    noShowZustimmung: true,
+  });
+
+  assert.equal(
+    b.noShowZustimmung.text,
+    "Ich stimme zu: Bei Nichtabholung ohne Stornierung bis 45 Minuten vor der Abholzeit wird eine " +
+      "Ausfallpauschale von 12,50 € in Rechnung gestellt.",
+  );
+  assert.ok(b.noShowZustimmung.zeitpunkt, "der Zeitpunkt der Zustimmung wird festgehalten");
+  assert.equal(b.noShowGebuehrBetragVereinbart, 12.5);
+  // Name/Kontakt stehen ohnehin schon auf der Bestellung - der Beweis ist vollständig.
+  assert.equal(b.name, "Bauer");
+  assert.equal(b.telefon, "0170 111");
+});
+
+test("eine Stornierung innerhalb des Fensters ist gebührenfrei", () => {
+  aktiviereNoShowSchutz(10, 30);
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "23:50",
+    name: "X",
+    noShowZustimmung: true,
+  });
+  const abholzeitpunkt = new Date(`${b.eingegangen.slice(0, 10)}T23:50:00`);
+  const vierzigMinutenVorher = new Date(abholzeitpunkt.getTime() - 40 * 60_000);
+
+  const ergebnis = storniereBestellung(SLUG, b.id, vierzigMinutenVorher);
+  assert.equal(ergebnis.kostenfrei, true);
+  assert.equal(ladeBetrieb(SLUG).bestellungen.find((x) => x.id === b.id).status, "storniert");
+});
+
+test("eine Stornierung nach Ablauf des Fensters wird nicht als gebührenfrei markiert", () => {
+  aktiviereNoShowSchutz(10, 30);
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "23:50",
+    name: "X",
+    noShowZustimmung: true,
+  });
+  const abholzeitpunkt = new Date(`${b.eingegangen.slice(0, 10)}T23:50:00`);
+  const zehnMinutenVorher = new Date(abholzeitpunkt.getTime() - 10 * 60_000);
+
+  const ergebnis = storniereBestellung(SLUG, b.id, zehnMinutenVorher);
+  assert.equal(ergebnis.kostenfrei, false);
+});
+
+test("eine Bestellung kann nicht zweimal storniert werden", () => {
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "18:30",
+    name: "X",
+  });
+  storniereBestellung(SLUG, b.id);
+  assert.throws(() => storniereBestellung(SLUG, b.id), /bereits storniert/);
+});
+
+test("bestaetigeNoShow lässt den Betrag nur nach unten korrigieren", () => {
+  aktiviereNoShowSchutz(20, 30);
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "18:30",
+    name: "X",
+    noShowZustimmung: true,
+  });
+
+  assert.throws(() => bestaetigeNoShow(SLUG, b.id, 25), /höchstens 20.00/);
+
+  const ergebnis = bestaetigeNoShow(SLUG, b.id, 15);
+  assert.equal(ergebnis.noShowBetrag, 15);
+  assert.ok(ergebnis.noShowBestaetigtAm);
+});
+
+test("bestaetigeNoShow lehnt eine vom Gast stornierte Bestellung ab", () => {
+  aktiviereNoShowSchutz(20, 30);
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "18:30",
+    name: "X",
+    noShowZustimmung: true,
+  });
+  storniereBestellung(SLUG, b.id);
+  assert.throws(() => bestaetigeNoShow(SLUG, b.id, 10), /storniert/);
+});
+
+test("bestaetigeNoShow lehnt eine Bestellung ohne Zustimmung ab", () => {
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "18:30",
+    name: "X",
+  });
+  assert.throws(() => bestaetigeNoShow(SLUG, b.id, 10), /keine Zustimmung/);
+});
+
+test("bestaetigeNoShow verhindert eine doppelte Bestätigung", () => {
+  aktiviereNoShowSchutz(20, 30);
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "18:30",
+    name: "X",
+    noShowZustimmung: true,
+  });
+  bestaetigeNoShow(SLUG, b.id, 10);
+  assert.throws(() => bestaetigeNoShow(SLUG, b.id, 5), /bereits/);
+});
+
+test("noShowZustimmungstext rundet den Betrag deutsch", () => {
+  const text = noShowZustimmungstext({ noShowStornofensterMinuten: 30, noShowGebuehrBetrag: 9 });
+  assert.match(text, /9,00 €/);
+});
+
+test("setzeBankverbindung speichert freien Text", () => {
+  assert.equal(setzeBankverbindung(SLUG, "  Muster GmbH, DE00 1234  "), "Muster GmbH, DE00 1234");
+  assert.equal(ladeBetrieb(SLUG).bankverbindung, "Muster GmbH, DE00 1234");
 });
