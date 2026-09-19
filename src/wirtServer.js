@@ -23,10 +23,13 @@ import {
 } from "./betriebStore.js";
 import { benachrichtigeBetrieb, oeffentlicherVapidSchluessel } from "./pushNotify.js";
 import { benachrichtigeUeberTelegram } from "./telegramNotify.js";
+import { informiereUeberVerzoegerung } from "./kundenBenachrichtigung.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const seite = path.join(__dirname, "..", "public", "wirt.html");
 const serviceWorker = path.join(__dirname, "..", "public", "sw.js");
+
+const VERZOEGERUNG = /^\/intern\/bestellung\/([^/]+)\/verzoegerung$/;
 
 function parseFlag(argv, name, standard) {
   const i = argv.indexOf(name);
@@ -277,6 +280,26 @@ export const handler = async (req, res) => {
       if (pathname === "/intern/telegram/chat-id") {
         const chatId = setzeTelegramChatId(slug, eingabe.chatId);
         json(res, 200, { ok: true, telegramChatId: chatId });
+        return;
+      }
+
+      const verzoegerungTreffer = VERZOEGERUNG.exec(pathname);
+      if (verzoegerungTreffer) {
+        const id = decodeURIComponent(verzoegerungTreffer[1]);
+        const grund = String(eingabe.grund ?? "").trim();
+        const bestellung = bestaetigeBestellung(slug, id, eingabe.neueZeit);
+
+        const nachricht = grund
+          ? `Ihre Bestellung ${bestellung.nummer}: neue Abholzeit ${bestellung.bestaetigteAbholzeit} (${grund}).`
+          : `Ihre Bestellung ${bestellung.nummer}: neue Abholzeit ${bestellung.bestaetigteAbholzeit}.`;
+
+        const { kanal } = await informiereUeberVerzoegerung({
+          telefon: bestellung.telefon,
+          email: bestellung.email,
+          nachricht,
+        });
+
+        json(res, 200, { ok: true, bestellung, kanal });
         return;
       }
     } catch (fehler) {

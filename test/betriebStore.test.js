@@ -186,6 +186,23 @@ test("eine Bestellung rechnet die Summe aus den Positionen", () => {
   assert.match(b.nummer, /^AB-\d{4}$/);
 });
 
+test("eine Bestellung merkt sich optional die E-Mail-Adresse des Gastes", () => {
+  const mit = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "18:30",
+    name: "Bauer",
+    email: " gast@beispiel.de ",
+  });
+  assert.equal(mit.email, "gast@beispiel.de");
+
+  const ohne = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "18:30",
+    name: "Bauer",
+  });
+  assert.equal(ohne.email, "");
+});
+
 test("leere oder namenlose Bestellungen werden abgewiesen", () => {
   assert.throws(() => legeBestellungAn(SLUG, { positionen: [], abholzeit: "18:30", name: "X" }), /leer/);
   assert.throws(

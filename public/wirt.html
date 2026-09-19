@@ -365,6 +365,12 @@ function renderBestellungen() {
           ${b.status !== "abgeholt" && b.status !== "abgelehnt" ? `<button class="knopf klein stumm" data-best-status="abgeholt" data-id="${esc(b.id)}">Abgeholt</button>` : ""}
           ${b.status === "neu" ? `<button class="knopf klein gefahr" data-best-status="abgelehnt" data-id="${esc(b.id)}">Ablehnen</button>` : ""}
         </div>
+        ${b.status === "bestaetigt" ? `
+        <div class="abholzeile" style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)">
+          <input type="text" class="verzoegerung-zeit" data-id="${esc(b.id)}" placeholder="neue Uhrzeit" style="max-width:130px">
+          <input type="text" class="verzoegerung-grund" data-id="${esc(b.id)}" placeholder="Grund (optional)" style="max-width:180px">
+          <button class="knopf klein stumm" data-verzoegerung="${esc(b.id)}">Verzögerung dem Gast melden</button>
+        </div>` : ""}
       </div>
     </div>`;
   }).join("")}</div>`;
@@ -504,6 +510,18 @@ document.addEventListener("click", async (e) => {
     } else if (ziel.dataset.kopiere) {
       await navigator.clipboard.writeText(ziel.dataset.kopiere);
       melde("Nachricht kopiert.");
+    } else if (ziel.dataset.verzoegerung) {
+      const id = ziel.dataset.verzoegerung;
+      const neueZeit = document.querySelector(`.verzoegerung-zeit[data-id="${id}"]`).value;
+      const grund = document.querySelector(`.verzoegerung-grund[data-id="${id}"]`).value;
+      const ergebnis = await ruf(`/intern/bestellung/${encodeURIComponent(id)}/verzoegerung`, { neueZeit, grund });
+      await lade();
+      const meldungJeKanal = {
+        sms: "Gast per SMS informiert.",
+        email: "Gast per E-Mail informiert.",
+        keiner: "Kein automatischer Kanal verfügbar – bitte telefonisch informieren.",
+      };
+      melde(meldungJeKanal[ergebnis.kanal] ?? "Abholzeit aktualisiert.", false, ergebnis.kanal === "keiner");
     }
   } catch (fehler) {
     melde(fehler.message, true);

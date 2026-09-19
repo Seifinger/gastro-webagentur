@@ -416,6 +416,7 @@ export function legeBestellungAn(slug, eingabe) {
       bestaetigteAbholzeit: "",
       name: String(eingabe.name).trim(),
       telefon: String(eingabe.telefon ?? "").trim(),
+      email: String(eingabe.email ?? "").trim(),
       hinweis: String(eingabe.hinweis ?? "").trim(),
       status: "neu",
       eingegangen: new Date().toISOString(),

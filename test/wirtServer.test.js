@@ -14,6 +14,7 @@ const { handler } = await import("../src/wirtServer.js");
 const { ladeBetrieb, speichereBetrieb, legeTischAn } = await import("../src/betriebStore.js");
 const { pushSendenHook } = await import("../src/pushNotify.js");
 const { telegramSendenHook } = await import("../src/telegramNotify.js");
+const { smsHook, emailHook } = await import("../src/kundenBenachrichtigung.js");
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dateiPfad = path.join(__dirname, "..", "data", "betrieb", `${SLUG}.json`);
@@ -372,3 +373,117 @@ test(
     }),
   ),
 );
+
+async function bestellungAnlegen(basis, zusatz = {}) {
+  const antwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+      abholzeit: "18:30",
+      name: "Testgast",
+      telefon: "0170 1234567",
+      email: "gast@beispiel.de",
+      ...zusatz,
+    }),
+  });
+  return (await antwort.json()).bestellung;
+}
+
+test("POST /intern/bestellung/:id/verzoegerung setzt die neue Abholzeit und meldet den Kanal (SMS)", async () => {
+  await mitServer(async (basis) => {
+    const { id } = await bestellungAnlegen(basis);
+
+    const aufrufe = [];
+    const altSms = smsHook.aktuell;
+    smsHook.aktuell = async (telefon, text) => aufrufe.push({ telefon, text });
+
+    try {
+      const antwort = await fetch(`${basis}/intern/bestellung/${id}/verzoegerung`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ neueZeit: "19:15", grund: "Küche im Rückstand" }),
+      });
+      const ergebnis = await antwort.json();
+
+      assert.equal(antwort.status, 200);
+      assert.equal(ergebnis.kanal, "sms");
+      assert.equal(ergebnis.bestellung.bestaetigteAbholzeit, "19:15");
+      assert.equal(ergebnis.bestellung.status, "bestaetigt");
+      assert.equal(aufrufe.length, 1);
+      assert.equal(aufrufe[0].telefon, "0170 1234567");
+      assert.match(aufrufe[0].text, /19:15/);
+      assert.match(aufrufe[0].text, /Küche im Rückstand/);
+    } finally {
+      smsHook.aktuell = altSms;
+    }
+  });
+});
+
+test("POST /intern/bestellung/:id/verzoegerung fällt ohne SMS-Hook auf E-Mail zurück", async () => {
+  await mitServer(async (basis) => {
+    const { id } = await bestellungAnlegen(basis);
+
+    const emailAufrufe = [];
+    const altSms = smsHook.aktuell;
+    const altEmail = emailHook.aktuell;
+    smsHook.aktuell = null;
+    emailHook.aktuell = async (empfaenger, betreff, text) => emailAufrufe.push({ empfaenger, betreff, text });
+
+    try {
+      const antwort = await fetch(`${basis}/intern/bestellung/${id}/verzoegerung`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ neueZeit: "19:15", grund: "" }),
+      });
+      const ergebnis = await antwort.json();
+
+      assert.equal(ergebnis.kanal, "email");
+      assert.equal(emailAufrufe.length, 1);
+      assert.equal(emailAufrufe[0].empfaenger, "gast@beispiel.de");
+    } finally {
+      smsHook.aktuell = altSms;
+      emailHook.aktuell = altEmail;
+    }
+  });
+});
+
+test("POST /intern/bestellung/:id/verzoegerung meldet 'keiner' ohne jeden konfigurierten Kanal", async () => {
+  await mitServer(async (basis) => {
+    const { id } = await bestellungAnlegen(basis, { email: "" });
+
+    const altSms = smsHook.aktuell;
+    const altEmail = emailHook.aktuell;
+    smsHook.aktuell = null;
+    emailHook.aktuell = null;
+
+    try {
+      const antwort = await fetch(`${basis}/intern/bestellung/${id}/verzoegerung`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ neueZeit: "19:15" }),
+      });
+      const ergebnis = await antwort.json();
+
+      assert.equal(antwort.status, 200);
+      assert.equal(ergebnis.kanal, "keiner");
+    } finally {
+      smsHook.aktuell = altSms;
+      emailHook.aktuell = altEmail;
+    }
+  });
+});
+
+test("POST /intern/bestellung/:id/verzoegerung mit unbekannter ID antwortet mit 400", async () => {
+  await mitServer(async (basis) => {
+    const antwort = await fetch(`${basis}/intern/bestellung/unbekannt/verzoegerung`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ neueZeit: "19:15" }),
+    });
+    const ergebnis = await antwort.json();
+
+    assert.equal(antwort.status, 400);
+    assert.match(ergebnis.fehler, /nicht gefunden/);
+  });
+});
