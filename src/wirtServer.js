@@ -17,6 +17,7 @@ import {
   gesamtPlaetze,
   tischKonflikte,
   tischVerteilung,
+  setzeWartezeit,
 } from "./betriebStore.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -99,11 +100,15 @@ function uebersicht() {
     offeneBestellungen: daten.bestellungen.filter((b) => b.status === "neu").length,
     // Zeitpunkte, an denen die Plätze zwar reichen, die Tische aber nicht.
     tischKonflikte: tischKonflikte(daten),
+    zusaetzlicheWartezeitMinuten: daten.zusaetzlicheWartezeitMinuten ?? 0,
     heute,
   };
 }
 
-const server = createServer(async (req, res) => {
+// Als eigene Funktion exportiert, damit Tests einen Server auf einem
+// zufälligen Port starten können, statt den festen Port aus argv/env zu
+// belegen – siehe dashboardServer.js für dasselbe Muster.
+export const handler = async (req, res) => {
   const { pathname, searchParams } = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
 
   if (req.method === "OPTIONS") {
@@ -217,6 +222,14 @@ const server = createServer(async (req, res) => {
         json(res, 200, { ok: true, bestellung: setzeBestellungStatus(slug, eingabe.id, eingabe.status) });
         return;
       }
+
+      /* ----- Intern: Einstellungen des Wirt-Dashboards ----- */
+
+      if (pathname === "/intern/wartezeit") {
+        const wert = setzeWartezeit(slug, eingabe.minuten);
+        json(res, 200, { ok: true, zusaetzlicheWartezeitMinuten: wert });
+        return;
+      }
     } catch (fehler) {
       json(res, 400, { ok: false, fehler: fehler.message });
       return;
@@ -225,22 +238,28 @@ const server = createServer(async (req, res) => {
 
   res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
   res.end("Nicht gefunden");
-});
+};
 
+// Nur beim direkten Start (npm run wirt) wird auch gelauscht. Der Test
+// importiert denselben Handler und hängt ihn an einen eigenen Port, statt
+// dem laufenden Wirt-Dashboard den Platz wegzunehmen (siehe dashboardServer.js).
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const server = createServer(handler);
 
-// Ein belegter Port ist der häufigste Stolperstein beim Start. Die Meldung
-// von Node ("EADDRINUSE") sagt nicht, was zu tun ist – diese hier schon.
-server.on("error", (fehler) => {
-  if (fehler.code === "EADDRINUSE") {
-    console.log(`\n⚠️  Port ${port} ist schon belegt – dort läuft bereits etwas.`);
-    console.log(`   Anderen Port wählen:  npm run wirt -- --port ${port + 1}\n`);
-    process.exitCode = 1;
-    return;
-  }
-  throw fehler;
-});
+  // Ein belegter Port ist der häufigste Stolperstein beim Start. Die Meldung
+  // von Node ("EADDRINUSE") sagt nicht, was zu tun ist – diese hier schon.
+  server.on("error", (fehler) => {
+    if (fehler.code === "EADDRINUSE") {
+      console.log(`\n⚠️  Port ${port} ist schon belegt – dort läuft bereits etwas.`);
+      console.log(`   Anderen Port wählen:  npm run wirt -- --port ${port + 1}\n`);
+      process.exitCode = 1;
+      return;
+    }
+    throw fehler;
+  });
 
-server.listen(port, dashboardHost, () => {
-  console.log(`\n🍽️  Wirt-Dashboard für "${slug}": http://${dashboardHost}:${port}`);
-  console.log(`    Reservierungen der Seite gehen an: http://${dashboardHost}:${port}/oeffentlich/\n`);
-});
+  server.listen(port, dashboardHost, () => {
+    console.log(`\n🍽️  Wirt-Dashboard für "${slug}": http://${dashboardHost}:${port}`);
+    console.log(`    Reservierungen der Seite gehen an: http://${dashboardHost}:${port}/oeffentlich/\n`);
+  });
+}

@@ -18,6 +18,11 @@ import {
   bestaetigeBestellung,
   setzeBestellungStatus,
   BELEGDAUER_MINUTEN,
+  setzeWartezeit,
+  verfuegbareAbholzeiten,
+  ABHOL_VORLAUF_MINUTEN,
+  ABHOL_FENSTER_MINUTEN,
+  ABHOL_SCHRITT_MINUTEN,
 } from "../src/betriebStore.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -219,6 +224,56 @@ test("Bestellmengen werden auf einen sinnvollen Bereich begrenzt", () => {
 
   assert.equal(b.positionen[0].menge, 99);
   assert.equal(b.positionen[1].menge, 1);
+});
+
+test("ein frischer Betrieb hat keine Zusatz-Wartezeit", () => {
+  assert.equal(ladeBetrieb(SLUG).zusaetzlicheWartezeitMinuten, 0);
+});
+
+test("die Zusatz-Wartezeit wird geprüft und gespeichert", () => {
+  assert.throws(() => setzeWartezeit(SLUG, -5), /zwischen 0 und 180/);
+  assert.throws(() => setzeWartezeit(SLUG, 181), /zwischen 0 und 180/);
+  assert.throws(() => setzeWartezeit(SLUG, 7.5), /zwischen 0 und 180/);
+  assert.throws(() => setzeWartezeit(SLUG, "viel"), /zwischen 0 und 180/);
+
+  assert.equal(setzeWartezeit(SLUG, 20), 20);
+  assert.equal(ladeBetrieb(SLUG).zusaetzlicheWartezeitMinuten, 20);
+});
+
+test("verfuegbareAbholzeiten liegt im 120-Minuten-Fenster nach Vorlauf und Raster", () => {
+  const jetzt = new Date(2026, 8, 20, 12, 3);
+  const slots = verfuegbareAbholzeiten({ zusaetzlicheWartezeitMinuten: 0 }, jetzt);
+
+  assert.equal(ABHOL_VORLAUF_MINUTEN, 20);
+  assert.equal(ABHOL_FENSTER_MINUTEN, 120);
+  assert.equal(ABHOL_SCHRITT_MINUTEN, 15);
+
+  // 12:03 + 20 Minuten Vorlauf = 12:23, aufgerundet aufs 15-Minuten-Raster: 12:30.
+  assert.equal(slots[0], "12:30");
+  assert.equal(slots.at(-1), "14:30");
+  assert.equal(slots.length, 9);
+});
+
+test("die Zusatz-Wartezeit verschiebt neu berechnete Abholzeiten, bestehende Bestellungen bleiben unberührt", () => {
+  const jetzt = new Date(2026, 8, 20, 12, 3);
+  const ohneZusatz = verfuegbareAbholzeiten({ zusaetzlicheWartezeitMinuten: 0 }, jetzt);
+  const mitZusatz = verfuegbareAbholzeiten({ zusaetzlicheWartezeitMinuten: 15 }, jetzt);
+
+  assert.equal(ohneZusatz[0], "12:30");
+  assert.equal(mitZusatz[0], "12:45", "die gesetzte Zusatz-Wartezeit schiebt die erste Zeit nach hinten");
+
+  const b = legeBestellungAn(SLUG, {
+    positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+    abholzeit: "12:30",
+    name: "Bestandskunde",
+  });
+  const bestaetigt = bestaetigeBestellung(SLUG, b.id, "12:30");
+
+  setzeWartezeit(SLUG, 45);
+
+  const nachher = ladeBetrieb(SLUG).bestellungen.find((x) => x.id === b.id);
+  assert.equal(nachher.abholzeit, "12:30", "der ursprüngliche Wunsch bleibt stehen");
+  assert.equal(nachher.bestaetigteAbholzeit, "12:30", "eine bereits bestätigte Zeit läuft nicht mit");
 });
 
 test("unbekannte Status werden nicht gesetzt", () => {

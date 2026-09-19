@@ -22,7 +22,7 @@ function datei(slug) {
 }
 
 function leererBetrieb() {
-  return { tische: [], reservierungen: [], bestellungen: [] };
+  return { tische: [], reservierungen: [], bestellungen: [], zusaetzlicheWartezeitMinuten: 0 };
 }
 
 export function ladeBetrieb(slug) {
@@ -210,6 +210,60 @@ export function tischKonflikte(daten) {
   }
 
   return konflikte.sort((a, b) => `${a.datum}${a.uhrzeit}`.localeCompare(`${b.datum}${b.uhrzeit}`));
+}
+
+/* ---------- Abholzeiten ---------- */
+
+// Grundvorlauf der Küche, bevor die erste Zeit überhaupt angeboten wird.
+export const ABHOL_VORLAUF_MINUTEN = 20;
+// Wie weit im Voraus Abholzeiten angeboten werden – dasselbe Kapazitätsfenster
+// wie bei Tischreservierungen (BELEGDAUER_MINUTEN), hier für die Küche statt
+// den Tischplan.
+export const ABHOL_FENSTER_MINUTEN = 120;
+export const ABHOL_SCHRITT_MINUTEN = 15;
+
+export const WARTEZEIT_MAX_MINUTEN = 180;
+
+/**
+ * Setzt die Zusatz-Wartezeit, die der Wirt bei Rückstand in der Küche selbst
+ * hochsetzt. Wirkt nur auf neu berechnete Abholzeiten (verfuegbareAbholzeiten)
+ * – bereits bestätigte Bestellungen behalten ihre einmal zugesagte Zeit.
+ */
+export function setzeWartezeit(slug, minuten) {
+  const wert = Number(minuten);
+  if (!Number.isInteger(wert) || wert < 0 || wert > WARTEZEIT_MAX_MINUTEN) {
+    throw new Error(`Die Zusatz-Wartezeit muss zwischen 0 und ${WARTEZEIT_MAX_MINUTEN} Minuten liegen.`);
+  }
+
+  return aendere(slug, (daten) => {
+    daten.zusaetzlicheWartezeitMinuten = wert;
+    return wert;
+  });
+}
+
+function zeitString(minutenSeitMitternacht) {
+  const normiert = ((minutenSeitMitternacht % 1440) + 1440) % 1440;
+  const hh = String(Math.floor(normiert / 60)).padStart(2, "0");
+  const mm = String(normiert % 60).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
+
+/**
+ * Die als Nächstes anbietbaren Abholzeiten: ab jetzt plus Grundvorlauf plus
+ * die vom Wirt gesetzte Zusatz-Wartezeit, im 15-Minuten-Raster, für ein
+ * 120-Minuten-Fenster. Reine Berechnung ohne Bezug zu bestehenden
+ * Bestellungen – eine bereits bestätigte Abholzeit läuft nie nachträglich mit.
+ */
+export function verfuegbareAbholzeiten(daten, jetzt = new Date()) {
+  const zusatz = Number(daten.zusaetzlicheWartezeitMinuten) || 0;
+  const abMinuten = jetzt.getHours() * 60 + jetzt.getMinutes() + ABHOL_VORLAUF_MINUTEN + zusatz;
+  const start = Math.ceil(abMinuten / ABHOL_SCHRITT_MINUTEN) * ABHOL_SCHRITT_MINUTEN;
+
+  const slots = [];
+  for (let m = start; m <= start + ABHOL_FENSTER_MINUTEN; m += ABHOL_SCHRITT_MINUTEN) {
+    slots.push(zeitString(m));
+  }
+  return slots;
 }
 
 /* ---------- Reservierungen ---------- */

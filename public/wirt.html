@@ -173,6 +173,20 @@
     </section>
 
     <section id="tab-bestellungen" hidden>
+      <div class="balken" id="wartezeit-block">
+        <label for="wartezeit-wert" style="margin-bottom:8px">Aktuelle Zusatz-Wartezeit</label>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <button class="knopf klein stumm" type="button" id="wartezeit-minus">−5</button>
+          <input type="number" id="wartezeit-wert" min="0" max="180" step="5" value="0" style="width:76px;text-align:center">
+          <span style="color:var(--muted)">Minuten</span>
+          <button class="knopf klein stumm" type="button" id="wartezeit-plus">+5</button>
+          <button class="knopf klein" type="button" id="wartezeit-speichern">Übernehmen</button>
+        </div>
+        <div style="color:var(--muted);font-size:.85rem;margin-top:8px">
+          Wird auf alle neu angebotenen Abholzeiten aufgeschlagen, z. B. bei Rückstand in der Küche.
+          Bereits bestätigte Bestellungen bleiben unverändert.
+        </div>
+      </div>
       <div id="best-liste"></div>
     </section>
 
@@ -341,6 +355,21 @@ function renderBestellungen() {
   }).join("")}</div>`;
 }
 
+/* ---------- Wartezeit ---------- */
+
+function renderWartezeit() {
+  const feld = document.getElementById("wartezeit-wert");
+  // Während der Wirt tippt, nicht durch das automatische Nachladen (alle
+  // 20 Sekunden) überschreiben.
+  if (document.activeElement !== feld) {
+    feld.value = stand.zusaetzlicheWartezeitMinuten ?? 0;
+  }
+}
+
+function wartezeitKlemmen(wert) {
+  return Math.min(180, Math.max(0, Math.round(wert / 5) * 5));
+}
+
 /* ---------- Tischplan ---------- */
 
 function renderTischplan() {
@@ -409,6 +438,7 @@ async function lade() {
   renderReservierungen();
   renderBestellungen();
   renderTischplan();
+  renderWartezeit();
 }
 
 document.querySelectorAll("nav button").forEach((knopf) => {
@@ -495,6 +525,27 @@ document.getElementById("manuell-form").addEventListener("submit", async (e) => 
     } else {
       melde("Reservierung eingetragen.");
     }
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+document.getElementById("wartezeit-minus").addEventListener("click", () => {
+  const feld = document.getElementById("wartezeit-wert");
+  feld.value = wartezeitKlemmen(Number(feld.value) - 5);
+});
+document.getElementById("wartezeit-plus").addEventListener("click", () => {
+  const feld = document.getElementById("wartezeit-wert");
+  feld.value = wartezeitKlemmen(Number(feld.value) + 5);
+});
+document.getElementById("wartezeit-speichern").addEventListener("click", async () => {
+  const feld = document.getElementById("wartezeit-wert");
+  const minuten = wartezeitKlemmen(Number(feld.value));
+  feld.value = minuten;
+  try {
+    await ruf("/intern/wartezeit", { minuten });
+    await lade();
+    melde(minuten === 0 ? "Zusatz-Wartezeit aufgehoben." : `Zusatz-Wartezeit: +${minuten} Minuten.`);
   } catch (fehler) {
     melde(fehler.message, true);
   }
