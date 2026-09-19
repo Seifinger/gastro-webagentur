@@ -14,7 +14,7 @@
 // über alle drei Stimmungen dieselbe: Sie ist die Identität der Küche, nicht
 // die der Stimmung.
 
-import { boldAccent } from "./colorMath.js";
+import { boldAccent, mixColors } from "./colorMath.js";
 
 const SANS = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
 
@@ -454,6 +454,28 @@ function mitBoldAccent(s) {
     accentLesbar: boldAccent(s.accent, {
       against: [s.bg, s.surface, s.soft],
       saturationBoost: 18,
+      targetContrast: 4.5,
+    }),
+    // Gold ist der zweite Ton, der Text trägt: das "Platzhalter"-Abzeichen,
+    // die Sterne der Bewertung, die Kicker-Zeile im Hero. Auf hellem Grund
+    // erreicht es 2.0-3.1:1, also keine einzige Stimmung über AA; auf dem
+    // dunklen Hero-Ton reicht es zwar, aber nur knapp - und dort liegt es auf
+    // einem Foto, das der Wirt austauschen darf.
+    //
+    // Deshalb zwei abgeleitete Töne statt einem: einer dunkel genug für
+    // helle Flächen, einer hell genug für den Hero. Die Sättigung bleibt
+    // unangetastet (saturationBoost 0) - Gold soll Gold bleiben.
+    goldDunkel: boldAccent(s.gold, {
+      against: [s.bg, s.surface, s.soft],
+      saturationBoost: 0,
+      targetContrast: 4.5,
+    }),
+    // Der ungünstigste Grund im Hero: der Tint-Schleier mit 80 % Deckkraft
+    // über einem hellen Foto. Gegen den reinen Tint zu prüfen, würde die
+    // Seite schöner rechnen, als sie bei einem ausgetauschten Bild ist.
+    goldAufTint: boldAccent(s.gold, {
+      against: [s.tint, mixColors(s.tint, "#ffffff", 0.8)],
+      saturationBoost: 0,
       targetContrast: 4.5,
     }),
   };

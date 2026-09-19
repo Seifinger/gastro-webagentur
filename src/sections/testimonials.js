@@ -11,13 +11,19 @@ export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3", ha
 
   // Leere Plätze statt erfundener Zitate: ohne Sterne und ohne Namen ist
   // nichts behauptet, der Aufbau ist trotzdem zu sehen.
+  // Die fünf grauen Sterne des Platzhalters stehen mit 1.14:1 auf ihrem Grund
+  // und behaupten nichts, was der Titel nicht schon sagt. Mit Handschrift
+  // fallen sie weg; ohne sie bleibt alles wie bisher.
+  const leereSterne = handschrift === "traditionell"
+    ? ""
+    : '<span class="sterne leer" aria-hidden="true">★★★★★</span>\n        ';
+
   const karten = platzhalter
     ? slots
         .map(
           (titel) => `
       <div class="stimme ist-platzhalter">
-        <span class="sterne leer" aria-hidden="true">★★★★★</span>
-        <p class="slot-titel">${escapeHtml(titel)}</p>
+        ${leereSterne}<p class="slot-titel">${escapeHtml(titel)}</p>
         <footer><span>wird aus Ihren Google-Bewertungen übernommen</span></footer>
       </div>`,
         )

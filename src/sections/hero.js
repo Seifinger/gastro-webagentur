@@ -169,7 +169,7 @@ export function renderHeroEditorial(ctx) {
  * @param {Function} ctx.bildUrl
  */
 export function renderHero(ctx) {
-  const { lead, preset, name, ort, heroImageSrc, heroVideoSrc, konzeptLabel, heroHeadline, heroSchlagzeile, cuisine, highlights, hausBild, bildUrl } = ctx;
+  const { lead, preset, name, ort, heroImageSrc, heroVideoSrc, konzeptLabel, heroHeadline, heroSchlagzeile, cuisine, highlights, hausBild, bildUrl, handschrift } = ctx;
 
   // Der Editorial-Archetyp bringt einen eigenen Hero mit – große Typografie,
   // asymmetrisches Raster. Alles andere läuft weiter durch den bisherigen.
@@ -189,6 +189,7 @@ export function renderHero(ctx) {
     hausBild,
     bildUrl,
     escape: escapeHtml,
+    handschrift,
   })}
   <div class="hero-inner">
     <div class="hero-kicker">${escapeHtml(konzeptLabel)}${ort ? ` · in ${escapeHtml(ort)}` : ""}</div>

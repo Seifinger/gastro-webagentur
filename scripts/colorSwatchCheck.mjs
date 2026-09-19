@@ -17,13 +17,20 @@
 // Beendet mit Code 1, sobald eine Prüfung mit Rang "muss" durchfällt.
 
 import { STIMMUNGEN } from "../src/stimmungen.js";
-import { contrastRatio } from "../src/colorMath.js";
+import { contrastRatio, mixColors } from "../src/colorMath.js";
 
 const ZIEL = 4.5;
 const ALLE = process.argv.includes("--alle");
 
 const alle = Object.entries(STIMMUNGEN).flatMap(([cuisine, liste]) =>
-  liste.map((s) => ({ cuisine, ...s })),
+  liste.map((s) => ({
+    cuisine,
+    ...s,
+    // Der ungünstigste Grund im Hero: Tint mit 80 % Deckkraft über einem
+    // hellen Foto. Kein Token der Palette, sondern das, was der Besucher
+    // wirklich sieht.
+    tintHell: mixColors(s.tint, "#ffffff", 0.8),
+  })),
 );
 
 /**
@@ -49,6 +56,14 @@ const ANWENDUNGEN = [
   { rang: "muss", was: "Akzenttext (Handschrift)", vorn: "accentLesbar", hinten: "bg" },
   { rang: "muss", was: "Akzenttext auf Fläche (Handschrift)", vorn: "accentLesbar", hinten: "surface" },
   { rang: "muss", was: "Akzenttext auf Sektionsfläche (Handschrift)", vorn: "accentLesbar", hinten: "soft" },
+  // Gold trägt das "Platzhalter"-Abzeichen, die Sterne und die Kicker-Zeile.
+  { rang: "muss", was: "Goldtext auf hellem Grund", vorn: "goldDunkel", hinten: "bg" },
+  { rang: "muss", was: "Goldtext auf Fläche", vorn: "goldDunkel", hinten: "surface" },
+  { rang: "muss", was: "Goldtext auf Sektionsfläche", vorn: "goldDunkel", hinten: "soft" },
+  { rang: "muss", was: "Goldtext im Hero", vorn: "goldAufTint", hinten: "tint" },
+  { rang: "muss", was: "Goldtext im Hero über hellem Foto", vorn: "goldAufTint", hinten: "tintHell" },
+  { rang: "alt", was: "Gold ohne Handschrift", vorn: "gold", hinten: "bg" },
+  { rang: "alt", was: "Gold ohne Handschrift auf Sektionsfläche", vorn: "gold", hinten: "soft" },
   // Das Magazin nutzt accentBold für große Flächen und große Schrift; dort
   // gilt die Schwelle für große Schrift (3:1). Der Vollständigkeit halber
   // steht der Wert gegen bg trotzdem auf 4.5:1.

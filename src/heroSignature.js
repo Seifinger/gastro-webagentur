@@ -504,6 +504,43 @@ function heroOliveBranch() {
     </div>`;
 }
 
+/**
+ * Der Maßkrug mit Henkel und Noppen – gezeichnet, nicht aus einer
+ * Icon-Bibliothek genommen. Er ersetzt heroBeerFoamOverflow() überall dort,
+ * wo ein Archetyp seine Handschrift mitbringt.
+ *
+ * Warum überhaupt ein zweiter: Die bisherige Form ist ein gefüllter Pfad aus
+ * einer Icon-Sammlung – ein henkelloses, tailliertes Glas, also ein Pint und
+ * kein Maßkrug. An der prominentesten Stelle einer bayerischen Wirtshausseite
+ * ist das das falsche Gefäß.
+ *
+ * Schaum und Tropfen bleiben eigene Elemente (kein SVG), weil sie sich
+ * bewegen: Sie nutzen dieselben Keyframes wie bisher (sig-beer-schaum,
+ * sig-beer-tropfen, siehe SIGNATUR_CSS) – es kommt also keine Animation dazu,
+ * es wird nur eine andere Zeichnung bewegt. Die Maße stehen in der
+ * Handschrift des jeweiligen Archetyps, damit Schaum und Tropfen an der
+ * Glaskontur sitzen statt daneben.
+ */
+function heroBierkrug() {
+  return `
+    <div class="sig sig-krug" aria-hidden="true">
+      <svg class="sig-krug-form" viewBox="0 0 64 86" fill="none" stroke="currentColor"
+           stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+        <path class="henkel" d="M49,30 C60,29 62.5,34 62.5,42 C62.5,52 57,58.5 47.2,58.5"></path>
+        <path class="glas" d="M14,16 L50,16 L46,76 Q45.6,79.4 42,79.4 L22,79.4 Q18.4,79.4 18,76 Z"></path>
+        <path class="rand" d="M12,16 H52"></path>
+        <circle class="noppe" cx="25.5" cy="37" r="3.1"></circle>
+        <circle class="noppe" cx="38.5" cy="37" r="3.1"></circle>
+        <circle class="noppe" cx="32" cy="50" r="3.1"></circle>
+        <circle class="noppe" cx="26" cy="63" r="3.1"></circle>
+        <circle class="noppe" cx="38" cy="63" r="3.1"></circle>
+      </svg>
+      <div class="schaum"></div>
+      <span class="tropfen tropfen-1"></span>
+      <span class="tropfen tropfen-2"></span>
+    </div>`;
+}
+
 function heroBeerFoamOverflow() {
   return `
     <div class="sig sig-beer" aria-hidden="true">
@@ -520,7 +557,7 @@ function heroBeerFoamOverflow() {
  * Liefert das bewegte Hero-Element zur Küche. Ohne passende Bilder bleibt es
  * weg – lieber kein Effekt als ein leerer Rahmen.
  */
-export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {}) {
+export function heroSignatur(cuisine, { highlights = [], bildUrl, escape, handschrift = null } = {}) {
   const esc = escape ?? ((v) => String(v));
   const gerichte = highlights.filter((g) => g.bild);
 
@@ -607,7 +644,10 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
         </div>`,
       )
       .join("");
-    return `<div class="sig sig-tafel" aria-hidden="true">${karten}</div>${heroBeerFoamOverflow()}`;
+    // Mit Handschrift der gezeichnete Maßkrug, ohne sie das bisherige Glas –
+    // die Archetypen ohne Handschrift bleiben Zeichen für Zeichen gleich.
+    const krug = handschrift ? heroBierkrug() : heroBeerFoamOverflow();
+    return `<div class="sig sig-tafel" aria-hidden="true">${karten}</div>${krug}`;
   }
 
   // Ein Wölkchen aus Gewürzpuder platzt auf, sobald der Hero ins Bild

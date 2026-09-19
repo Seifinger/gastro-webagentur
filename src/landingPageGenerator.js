@@ -1022,12 +1022,14 @@ export function buildLandingPage(lead, options = {}) {
 ${accentBoldRegel}`
     : handschriftStil
       ? `
-/* Der kräftigere Akzent aus colorMath.boldAccent – mindestens 4.5:1 gegen den
-   eigenen Grund. Die Handschrift dieses Archetyps setzt ihn überall dort ein,
-   wo accent Text trägt und gegen den eigenen Grund unter 4.5:1 läge. Geprüft
-   ist er gegen alle drei Gründe, auf denen Text steht: bg, surface und soft.
-   Flächen behalten accent – dagegen ist onAccent geprüft. */
-${accentLesbarRegel}`
+/* Die beiden abgeleiteten Töne der Handschrift (siehe stimmungen.js):
+   --accent-bold trägt jeden Text, der sonst in accent stünde und gegen bg,
+   surface oder soft unter 4.5:1 läge. --gold-dunkel und --gold-hell sind
+   dasselbe für Gold: einer für helle Flächen, einer für den Hero, wo Gold auf
+   einem Foto unter einem Schleier liegt. Flächen behalten accent und gold –
+   dagegen ist onAccent geprüft. */
+${accentLesbarRegel}
+:root { --gold-dunkel: ${t.goldDunkel ?? t.gold}; --gold-hell: ${t.goldAufTint ?? t.gold}; }`
       : "";
 
   const bodyKlassen = [
@@ -1100,6 +1102,7 @@ ${renderHero({
   highlights,
   hausBild: gestaltung.hausBild,
   bildUrl,
+  handschrift,
 })}
 
 ${renderUspStrip(menu.usps, handschrift)}
@@ -1130,7 +1133,7 @@ ${(() => {
 
     reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant, handschrift }),
 
-    kontakt: renderContact({ kontaktZeilen, hoursRows }),
+    kontakt: renderContact({ kontaktZeilen, hoursRows, strasse: strasseAusAdresse(adresse), ort, handschrift }),
   };
 
   const konfigurierteReihenfolge = (preset.layout.sectionOrder ?? []).filter((id) => sectionsById[id]);

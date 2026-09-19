@@ -71,9 +71,11 @@ export function haken() {
 // ohne den Namen zu lesen.
 
 const MARKEN = {
-  // Hopfendolde – was im Krug ist, bevor es im Krug ist.
+  // Hopfendolde – was im Krug ist, bevor es im Krug ist. Bewusst nur zwei
+  // Schuppenpaare und eine Spitze: Mit fünf wurde sie bei 20 px zum
+  // Tannenzweig.
   bayerisch:
-    '<path d="M14 4.6v3.1"/><path d="M14 8c-2.6.3-4.3 2-4.6 4.6 2.6-.3 4.3-2 4.6-4.6Z"/><path d="M14 8c2.6.3 4.3 2 4.6 4.6-2.6-.3-4.3-2-4.6-4.6Z"/><path d="M14 13.2c-2.6.3-4.3 2-4.6 4.6 2.6-.3 4.3-2 4.6-4.6Z"/><path d="M14 13.2c2.6.3 4.3 2 4.6 4.6-2.6-.3-4.3-2-4.6-4.6Z"/><path d="M14 18.6c-1.5 1.4-2.2 3-2.2 4.8 1.8-.6 3-2.2 3.4-4.8"/>',
+    '<path d="M14 3v3.6"/><path d="M14 6.6c-5 .7-7.6 3.5-7.8 8.4 5-.7 7.6-3.5 7.8-8.4Z"/><path d="M14 6.6c5 .7 7.6 3.5 7.8 8.4-5-.7-7.6-3.5-7.8-8.4Z"/><path d="M14 14c-4.4.6-6.7 3.2-6.9 7.6 4.4-.6 6.7-3.2 6.9-7.6Z"/><path d="M14 14c4.4.6 6.7 3.2 6.9 7.6-4.4-.6-6.7-3.2-6.9-7.6Z"/>',
   // Basilikumzweig – der Duft, der aus einer Trattoria auf die Straße kommt.
   italienisch:
     '<path d="M14 23V9.4"/><path d="M14 12.8c-2.9.6-4.6-.5-5.2-3.4 2.9-.6 4.6.5 5.2 3.4Z"/><path d="M14 10.3c2.7-.9 3.9-2.6 3.5-5.2-2.7.9-3.9 2.6-3.5 5.2Z"/><path d="M14 17.1c-2.5.4-4-.6-4.5-2.9 2.5-.4 4 .6 4.5 2.9Z"/>',
@@ -135,6 +137,6 @@ export function ikonenCss(klasse) {
   return `
 .${klasse} .ikon { width: 1.35em; height: 1.35em; flex: none; vertical-align: -.26em; }
 .${klasse} .ikon-haken { width: 1.05em; height: 1.05em; opacity: .9; }
-.${klasse} .marke { width: 1.5em; height: 1.5em; flex: none; vertical-align: -.34em; }
+.${klasse} .marke { width: 1.9em; height: 1.9em; flex: none; vertical-align: -.48em; }
 `;
 }

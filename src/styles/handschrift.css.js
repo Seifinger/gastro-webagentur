@@ -74,6 +74,50 @@ const TRADITIONELL = `
 .hs-traditionell .mini-add { color: var(--accent-bold); }
 .hs-traditionell .add-btn, .hs-traditionell .mini-add { border-color: var(--accent-bold); }
 .hs-traditionell .kat > summary:hover { color: var(--accent-bold); }
+/* Gold trug Text mit 2.0-3.1:1 auf hellem Grund. Auf heller Fläche der
+   dunklere Ton, im Hero (Gold auf Foto unter Schleier) der hellere. */
+.hs-traditionell .placeholder-badge,
+.hs-traditionell .stimmen-note .sterne,
+.hs-traditionell .stimme .sterne { color: var(--gold-dunkel); }
+.hs-traditionell .hero-kicker,
+.hs-traditionell .rating .stars { color: var(--gold-hell); }
+
+/* --- Schriftskala und Rhythmus ------------------------------------------ */
+/* Gemessen standen 19 verschiedene Schriftgrade auf der Seite, mit 13/14/15
+   und 17/18/19/20 direkt nebeneinander – Stufen ohne unterscheidbare Aufgabe
+   sind keine Skala, sondern Zufall. Hier gelten sieben:
+   12 / 14 / 15 / 17 / 20 / 25 / 34, dazu die beiden clamp-Größen für H1 und
+   H2. Jede Stufe hat eine Rolle, nachzulesen in
+   docs-intern/design-tokens/traditionell.md. */
+.hs-traditionell .hl-kat,
+.hs-traditionell .veg,
+.hs-traditionell .foto-badge,
+.hs-traditionell .placeholder-badge { font-size: 12px; }
+.hs-traditionell .hint,
+.hs-traditionell .error,
+.hs-traditionell .footer-note,
+.hs-traditionell .foto-text span,
+.hs-traditionell .demo-note { font-size: 14px; }
+.hs-traditionell .stimme p { font-size: 17px; }
+.hs-traditionell .section-head p,
+.hs-traditionell .brand,
+.hs-traditionell .foto-text strong,
+.hs-traditionell .hl-preis { font-size: 20px; }
+
+/* Und der Abstand: Vorher bekam jede der sechs Sektionen dieselben 84px vor
+   und nach sich, jede H2 dieselben 42px. Damit sagt die Seite nirgends, wo
+   sie Luft holt. Die Highlights sind die laute Sektion (dort steht die
+   Empfehlung des Hauses), Stimmen und Kontakt sind die leisen. */
+.hs-traditionell .section { padding: 96px 0; }
+.hs-traditionell #highlights { padding: 104px 0 96px; }
+.hs-traditionell #stimmen,
+.hs-traditionell #kontakt { padding: 68px 0; }
+.hs-traditionell #highlights .section-head h2 { font-size: clamp(32px, 5.2vw, 52px); }
+.hs-traditionell #stimmen .section-head h2,
+.hs-traditionell #kontakt .section-head h2 { font-size: clamp(25px, 3.4vw, 34px); }
+.hs-traditionell #highlights .section-head { margin-bottom: 52px; }
+.hs-traditionell #stimmen .section-head,
+.hs-traditionell #kontakt .section-head { margin-bottom: 36px; }
 
 /* --- Keine Mittelachse: kein Inhalt hier ist symmetrisch gewichtet ------ */
 .hs-traditionell .section-head.mitte { margin-left: 0; margin-right: 0; text-align: left; }
@@ -145,6 +189,10 @@ const TRADITIONELL = `
 .hs-traditionell .stimmen-erklaerung { margin-top: 22px; }
 @media (min-width: 880px) {
   .hs-traditionell .stimmen-blatt { grid-template-columns: 4fr 8fr; column-gap: 60px; align-items: start; }
+  /* Die Note ist 111px hoch, die Zitate daneben rund 490px – ohne das hier
+     bleiben drei Viertel der linken Spalte leer. Klebend wird aus der Leere
+     Führung: Die Zahl steht neben jedem Zitat, das man gerade liest. */
+  .hs-traditionell .stimmen-note-spalte { position: sticky; top: 104px; }
 }
 
 /* --- Kontakt: Adresse und Telefon sind die Handlung, die Zeiten sind ----- */
@@ -152,24 +200,62 @@ const TRADITIONELL = `
 @media (min-width: 860px) {
   .hs-traditionell .contact-grid { grid-template-columns: 7fr 5fr; gap: 64px; }
 }
+/* Die Überschrift der Kontaktsektion ist die Straße dieses Hauses, nicht
+   "So finden Sie uns" – derselbe Satz, den jede Seite trägt. */
+.hs-traditionell .kontakt-adresse { display: flex; flex-direction: column; gap: 6px; }
+.hs-traditionell .kontakt-adresse .kontakt-ort { font-family: var(--body); font-size: 14px;
+                                                 font-weight: 700; letter-spacing: .16em;
+                                                 text-transform: uppercase; color: var(--ink-soft); }
 .hs-traditionell .contact-list li { gap: 18px; padding: 18px 0; align-items: flex-start; }
 .hs-traditionell .contact-list li:first-child { font-size: 20px; }
 .hs-traditionell .contact-list .k { font-size: inherit; display: inline-flex; padding-top: .1em; }
 .hs-traditionell .contact-list .k .ikon { width: 1.5em; height: 1.5em; }
 .hs-traditionell .hours-row { font-variant-numeric: tabular-nums; }
 
-/* --- Der Krug steht wieder im Bild, und sieht aus wie einer -------------- */
-/* .sig-beer überschrieb das position: absolute aus .sig mit relative und
-   rutschte dadurch halb aus dem Bild (x = -58 bei 1440px). Aus der gefüllten
-   Silhouette wird hier eine Strichzeichnung. Beides bleibt bewusst auf diesen
-   Archetyp begrenzt: SIGNATUR_CSS teilen sich alle vier. */
-.hs-traditionell .sig-beer { position: absolute; right: 7%; bottom: 5%; }
-.hs-traditionell .sig-beer-glas { color: rgba(255, 234, 178, .92);
-                                  fill: none; stroke: currentColor; stroke-width: 1.1px;
-                                  stroke-linejoin: round; stroke-linecap: round; }
-.hs-traditionell .sig-beer .schaum { left: 26%; right: 26%; top: 7%; height: 14%;
-                                     background: rgba(253, 243, 214, .92); }
-.hs-traditionell .sig-beer .tropfen { background: rgba(253, 243, 214, .92); }
+/* --- Der Maßkrug (heroSignature.js: heroBierkrug) ------------------------ */
+/* Die Glaskontur liegt im viewBox 0 0 64 86 bei x 14…50 und beginnt bei
+   y = 16. Schaum und Tropfen sitzen deshalb bei 23 % / 23 % und am Rand –
+   beim bisherigen Glas standen sie breiter als die Kontur und begannen
+   darüber, der Schaum lag wie ein Deckel auf.
+   Keine neue Animation: Es laufen dieselben Keyframes wie bisher
+   (sig-beer-schaum, sig-beer-tropfen aus SIGNATUR_CSS). */
+/* Der Krug steht unter der Tafel, nicht vor ihr: Die Tafel sitzt mittig
+   (top 50 %, translateY(-50 %)) und endet bei 1440x900 auf y = 599. */
+.hs-traditionell .sig-krug { position: absolute; right: 6.5%; bottom: 2.5%;
+                             width: clamp(86px, 8.6vw, 118px); aspect-ratio: 64 / 86;
+                             color: var(--gold-hell);
+                             filter: drop-shadow(0 14px 20px rgba(0,0,0,.45)); }
+.hs-traditionell .sig-krug-form { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.hs-traditionell .sig-krug .noppe { opacity: .55; }
+.hs-traditionell .sig-krug .schaum { position: absolute; left: 23%; right: 23%; top: 3%; height: 14%;
+                                     border-radius: 999px 999px 5px 5px; background: #fdf3d6;
+                                     transform-origin: 50% 100%;
+                                     animation: sig-beer-schaum 8s ease-in-out infinite; }
+.hs-traditionell .sig-krug .tropfen { position: absolute; top: 16%; width: 5px; height: 5px;
+                                      border-radius: 50%; background: #fdf3d6; opacity: 0;
+                                      animation: sig-beer-tropfen 8s ease-in infinite; }
+.hs-traditionell .sig-krug .tropfen-1 { left: 25%; }
+.hs-traditionell .sig-krug .tropfen-2 { left: 68%; animation-delay: .25s; }
+@media (max-width: 899px) {
+  .hs-traditionell .sig-krug { right: 6%; bottom: 4%; width: 46px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hs-traditionell .sig-krug .schaum,
+  .hs-traditionell .sig-krug .tropfen { animation: none; }
+}
+.bewegung-aus .hs-traditionell .sig-krug .schaum,
+.bewegung-aus .hs-traditionell .sig-krug .tropfen { animation: none; }
+
+/* --- Ambiente: ein Bildband statt dreier gleicher Kacheln --------------- */
+/* Das Haus ist wichtiger als Team und Bestseller – es ist das, woran der Gast
+   die Tür erkennt. Auf dem Handy bleibt es beim Stapel: Ein verschobenes
+   Raster auf 390px ist nur eng. */
+@media (min-width: 760px) {
+  .hs-traditionell .foto-grid { grid-template-columns: 1.4fr 1fr 1fr; gap: 22px;
+                                height: clamp(320px, 32vw, 440px); }
+  .hs-traditionell .foto-slot { height: 100%; }
+  .hs-traditionell .foto-slot img { height: 100%; aspect-ratio: auto; object-fit: cover; }
+}
 
 /* --- Gezeichnete Zeichen (signaturIcons.js) ----------------------------- */
 .hs-traditionell .usp-list span { gap: 10px; }

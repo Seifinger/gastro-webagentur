@@ -13,7 +13,7 @@ export const FOTO_SLOTS = [
  * zur Beschriftung passt, damit der Wirt sofort sieht, welches eigene Foto
  * dort hingehört.
  */
-function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl, eigeneBilder = {}) {
+function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl, eigeneBilder = {}, handschrift = null) {
   const quellen = [
     eigeneBilder.haus ?? bildUrl(hausBild, "ambiente"),
     eigeneBilder.team ?? bildUrl(teamBild, "ambiente"),
@@ -21,14 +21,18 @@ function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl, eigene
       (bestsellerBild ? bildUrl(bestsellerBild, "gericht") : bildUrl(hausBild, "ambiente")),
   ];
 
+  // Das Abzeichen auf dem Foto ist eine Pille über einem Bild – dasselbe
+  // Muster wie in jeder Vorlage. Mit Handschrift steht dasselbe Wort in der
+  // Bildunterschrift, wo es ohnehin hingehört.
+  const gezeichnet = handschrift === "traditionell";
+
   return FOTO_SLOTS.map(
     ({ titel, hinweis }, index) => `
       <figure class="foto-slot" style="margin:0">
         <img src="${escapeHtml(quellen[index])}" alt="" loading="lazy">
-        <span class="foto-badge">Platzhalter</span>
-        <figcaption class="foto-text">
+        ${gezeichnet ? "" : '<span class="foto-badge">Platzhalter</span>\n        '}<figcaption class="foto-text">
           <strong>${escapeHtml(titel)}</strong>
-          <span>${escapeHtml(hinweis)}</span>
+          <span>${gezeichnet ? "Platzhalter · " : ""}${escapeHtml(hinweis)}</span>
         </figcaption>
       </figure>`,
   ).join("");
@@ -60,6 +64,7 @@ export function renderAmbiente({ konzeptLabel, ort, geschichte, hausBild, teamBi
       { hausBild, teamBild, bestsellerBild },
       bildUrl,
       eigeneBilder,
+      handschrift,
     )}</div>
   </div>
 </section>`;
@@ -68,17 +73,33 @@ export function renderAmbiente({ konzeptLabel, ort, geschichte, hausBild, teamBi
 /**
  * Kontakt-Sektion: Adresse/Telefon/Abholhinweis plus Öffnungszeiten.
  *
+ * Mit Handschrift trägt die Überschrift die Straße dieses Hauses statt des
+ * Satzes „So finden Sie uns", der für jedes Lokal derselbe wäre. Die Straße
+ * steht ohnehin in den Daten; sie hier zu setzen, macht aus einem generischen
+ * Sektionstitel die Adresse genau dieses Lokals. Ohne brauchbare Straße (die
+ * Google-Adresse ist nicht immer eine) bleibt es beim bisherigen Satz.
+ *
  * @param {object} ctx
  * @param {string} ctx.kontaktZeilen - fertiges <li>-Markup.
  * @param {string} ctx.hoursRows - fertiges .hours-row-Markup.
+ * @param {string} [ctx.strasse] - aus strasseAusAdresse().
+ * @param {string} [ctx.ort]
+ * @param {string|null} [ctx.handschrift]
  */
-export function renderContact({ kontaktZeilen, hoursRows }) {
+export function renderContact({ kontaktZeilen, hoursRows, strasse, ort, handschrift }) {
+  const ueberschrift =
+    handschrift === "traditionell" && strasse
+      ? `<h2 class="kontakt-adresse"><span class="kontakt-strasse">${escapeHtml(strasse)}</span>${
+          ort ? `<span class="kontakt-ort">${escapeHtml(ort)}</span>` : ""
+        }</h2>`
+      : "<h2>So finden Sie uns</h2>";
+
   return `
 <section class="section" id="kontakt">
   <div class="wrap">
     <div class="section-head">
       <div class="eyebrow">Kontakt</div>
-      <h2>So finden Sie uns</h2>
+      ${ueberschrift}
     </div>
     <div class="contact-grid">
       <ul class="contact-list">${kontaktZeilen}</ul>

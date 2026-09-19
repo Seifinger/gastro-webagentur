@@ -159,7 +159,14 @@ test("buildLandingPage bietet drei beschriftete Bildplätze für eigene Fotos", 
   assert.ok(html.includes("Unser Haus"));
   assert.ok(html.includes("Ihr Team"));
   assert.ok(html.includes("Unser Bestseller"));
-  assert.equal((html.match(/class="foto-badge">Platzhalter</g) ?? []).length, 3);
+  // Jeder Platz ist als Platzhalter gekennzeichnet. Mit der Handschrift des
+  // traditionellen Archetyps steht das Wort in der Bildunterschrift statt als
+  // Pille auf dem Foto; ohne Handschrift bleibt es die Pille.
+  assert.equal((html.match(/Platzhalter · /g) ?? []).length, 3);
+  assert.ok(!html.includes('class="foto-badge"'));
+
+  const ohneHandschrift = buildLandingPage(lead, { preset: {} });
+  assert.equal((ohneHandschrift.match(/class="foto-badge">Platzhalter</g) ?? []).length, 3);
 });
 
 test("buildLandingPage bindet Bilder aus dem Asset-Ordner ein", () => {
@@ -537,7 +544,18 @@ test("Bayerisch bekommt den überlaufenden Bierkrug zusätzlich zur Tagestafel",
   });
 
   assert.ok(html.includes('class="sig sig-tafel"'), "Tagestafel muss weiter existieren");
-  assert.ok(html.includes('class="sig sig-beer"'), "Bierkrug-Detail fehlt");
+  // Mit Handschrift der gezeichnete Maßkrug (Henkel, Noppen), ohne sie das
+  // bisherige Glas aus der Icon-Sammlung.
+  assert.ok(html.includes('class="sig sig-krug"'), "Maßkrug fehlt");
+  assert.ok(html.includes('class="henkel"'), "der Krug hat keinen Henkel");
+
+  const ohneHandschrift = buildLandingPage(lead, {
+    menu: MENUS.bayerisch,
+    gestaltung: themeForLead(lead, "bayerisch"),
+    preset: {},
+  });
+  assert.ok(ohneHandschrift.includes('class="sig sig-beer"'), "Bierkrug-Detail fehlt");
+  assert.ok(!ohneHandschrift.includes("sig-krug"));
 });
 
 test("?bewegung=aus schaltet dieselben Signatur-Animationen ab wie prefers-reduced-motion", () => {

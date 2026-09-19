@@ -104,6 +104,27 @@ export function meetsWcagAA(hexA, hexB, { largeText = false } = {}) {
 }
 
 /**
+ * Mischt zwei Farben im sRGB-Raum. Gebraucht für Gründe, die in Wirklichkeit
+ * ein Schleier über einem Foto sind: Der Hero-Text steht nicht auf --tint,
+ * sondern auf --tint mit einer Deckkraft darüber. Gegen den reinen Ton zu
+ * prüfen, rechnet sich die Seite schöner, als sie ist.
+ *
+ * @param {string} hexA
+ * @param {string} hexB
+ * @param {number} anteilA - 0…1, Anteil von hexA an der Mischung.
+ */
+export function mixColors(hexA, hexB, anteilA) {
+  const a = hexToRgb(hexA);
+  const b = hexToRgb(hexB);
+  const t = Math.max(0, Math.min(1, anteilA));
+  return rgbToHex({
+    r: a.r * t + b.r * (1 - t),
+    g: a.g * t + b.g * (1 - t),
+    b: a.b * t + b.b * (1 - t),
+  });
+}
+
+/**
  * Hebt Sättigung und (falls nötig) den Kontrast eines Akzenttons gegenüber
  * einer Hintergrundfarbe an – Grundlage für Phase 4 ("mutigere Farben"),
  * hier bewusst als reine, seiteneffektfreie Funktion.
