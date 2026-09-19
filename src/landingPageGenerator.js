@@ -514,6 +514,7 @@ const PAGE_SCRIPT = `
 (function () {
   var data = window.PAGE_DATA;
   var cart = {};
+  var noShowEinstellungen = null;
 
   function euro(value) { return value.toFixed(2).replace(".", ",") + " \\u20AC"; }
   function byId(id) { return document.getElementById(id); }
@@ -718,7 +719,40 @@ const PAGE_SCRIPT = `
     showConfirm("Das hat nicht geklappt", text, [], "", true);
   }
 
+  /**
+   * Holt beim Laden der Seite die aktuellen No-Show-Einstellungen des
+   * Betriebs (falls das Lokal die Funktion eingeschaltet hat) und zeigt bei
+   * Bedarf die Zustimmungs-Checkbox mit dem exakten, serverseitig
+   * mitgeführten Text an. Ohne apiUrl (Vorschau) oder ohne aktivierten
+   * Schutz bleibt das Formular unverändert wie zuvor.
+   */
+  function ladeNoShowEinstellungen() {
+    if (!data.apiUrl) return;
+
+    fetch(data.apiUrl + "/oeffentlich/no-show-einstellungen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    })
+      .then(function (antwort) { return antwort.json(); })
+      .then(function (ergebnis) {
+        if (!ergebnis || !ergebnis.aktiv) return;
+        noShowEinstellungen = ergebnis;
+
+        var betrag = Number(ergebnis.gebuehrBetrag || 0).toFixed(2).replace(".", ",");
+        byId("ord-noshow-text").textContent =
+          "Ich stimme zu: Bei Nichtabholung ohne Stornierung bis " + ergebnis.stornofensterMinuten +
+          " Minuten vor der Abholzeit wird eine Ausfallpauschale von " + betrag + " \\u20AC in Rechnung gestellt.";
+        byId("ord-noshow-feld").style.display = "block";
+      })
+      .catch(function () {
+        // Ohne Antwort bleibt die Checkbox einfach aus - keine Bestellung
+        // darf an einem nicht erreichbaren Einstellungs-Abruf scheitern.
+      });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    ladeNoShowEinstellungen();
     Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function (button) {
       button.addEventListener("click", function () {
         addToCart(button.getAttribute("data-add"), button.getAttribute("data-name"), Number(button.getAttribute("data-preis")));
@@ -765,6 +799,14 @@ const PAGE_SCRIPT = `
       if (lines().length === 0) return;
       if (!validate(form, ["name", "telefon", "abholzeit"])) return;
 
+      var noShowFeld = byId("ord-noshow-feld");
+      var noShowAktiv = noShowEinstellungen && noShowEinstellungen.aktiv;
+      if (noShowAktiv) {
+        var angehakt = byId("ord-noshow").checked;
+        noShowFeld.className = angehakt ? "field" : "field invalid";
+        if (!angehakt) return;
+      }
+
       var nummer = referenz("AB");
       var zeit = form.elements.abholzeit.value;
       var summary = lines().map(function (line) {
@@ -789,7 +831,8 @@ const PAGE_SCRIPT = `
         abholzeit: zeit,
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
-        hinweis: form.elements.hinweis.value
+        hinweis: form.elements.hinweis.value,
+        noShowZustimmung: noShowAktiv ? true : false
       }, byId("order-submit")).then(function (ergebnis) {
         // Die Abholzeit ist zun\\u00E4chst nur ein Wunsch: ob sie machbar ist,
         // best\\u00E4tigt die K\\u00FCche.
@@ -1111,6 +1154,13 @@ ${
           <label for="ord-hinweis">Hinweis <span class="hint">(optional)</span></label>
           <textarea id="ord-hinweis" name="hinweis" placeholder="Allergien, Sonderwünsche ..."></textarea>
         </div>
+      </div>
+      <div class="field" id="ord-noshow-feld" style="display:none;margin-top:14px">
+        <label style="display:flex;align-items:flex-start;gap:8px;font-weight:400;text-transform:none;letter-spacing:normal">
+          <input type="checkbox" id="ord-noshow" name="noShowZustimmung" style="margin-top:3px">
+          <span id="ord-noshow-text"></span>
+        </label>
+        <span class="error">Bitte stimmen Sie zu, um die Bestellung abzuschicken.</span>
       </div>
       <div class="drawer-foot" style="margin:24px -22px -22px">
         <div class="totals"><span>Gesamt</span><span id="cart-total">0,00 €</span></div>

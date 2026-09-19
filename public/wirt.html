@@ -173,6 +173,76 @@
     </section>
 
     <section id="tab-bestellungen" hidden>
+      <div class="balken" id="wartezeit-block">
+        <label for="wartezeit-wert" style="margin-bottom:8px">Aktuelle Zusatz-Wartezeit</label>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <button class="knopf klein stumm" type="button" id="wartezeit-minus">−5</button>
+          <input type="number" id="wartezeit-wert" min="0" max="180" step="5" value="0" style="width:76px;text-align:center">
+          <span style="color:var(--muted)">Minuten</span>
+          <button class="knopf klein stumm" type="button" id="wartezeit-plus">+5</button>
+          <button class="knopf klein" type="button" id="wartezeit-speichern">Übernehmen</button>
+        </div>
+        <div style="color:var(--muted);font-size:.85rem;margin-top:8px">
+          Wird auf alle neu angebotenen Abholzeiten aufgeschlagen, z. B. bei Rückstand in der Küche.
+          Bereits bestätigte Bestellungen bleiben unverändert.
+        </div>
+      </div>
+
+      <div class="balken" id="lernen-block">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <label style="margin-bottom:0">Lernendes Wartezeit-System</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);text-transform:none;font-weight:400">
+            <input type="checkbox" id="lernen-aktiv"> aktiv
+          </label>
+        </div>
+        <div style="color:var(--muted);font-size:.85rem;margin:6px 0 10px">
+          Lernt aus tatsächlichen Abholzeiten, wie viel länger es je nach Wochentag, Zeitfenster und Auslastung im
+          Schnitt dauert, und schlägt das automatisch auf neu angebotene Abholzeiten auf – zusätzlich zur manuellen
+          Zusatz-Wartezeit oben, nie anstelle davon.
+        </div>
+        <div id="lernen-tabelle"></div>
+      </div>
+
+      <div class="balken" id="noshow-block">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <label style="margin-bottom:0">No-Show-Schutz</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);text-transform:none;font-weight:400">
+            <input type="checkbox" id="noshow-aktiv"> aktiv
+          </label>
+        </div>
+        <div style="color:var(--muted);font-size:.85rem;margin:6px 0 10px">
+          Aktiviert stimmen Gäste beim Bestellen einer Ausfallpauschale zu. Bei Nichtabholung können Sie unten je
+          Bestellung eine Rechnung auslösen – der Betrag ist dabei nur nach unten korrigierbar.
+        </div>
+        <div class="felder" style="grid-template-columns:repeat(3,1fr);gap:10px">
+          <div><label for="noshow-betrag">Ausfallpauschale (€)</label><input type="number" id="noshow-betrag" min="0" step="0.5"></div>
+          <div><label for="noshow-fenster">Stornofenster (Min.)</label><input type="number" id="noshow-fenster" min="0" step="5"></div>
+          <div><label for="noshow-schwelle">Warnschwelle (No-Shows)</label><input type="number" id="noshow-schwelle" min="1" step="1"></div>
+        </div>
+        <button class="knopf klein" type="button" id="noshow-speichern" style="margin-top:10px">Einstellungen speichern</button>
+
+        <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)">
+          <label for="bankverbindung">Bankverbindung (auf der Rechnung)</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input type="text" id="bankverbindung" placeholder="Empfänger, IBAN ..." style="width:100%;max-width:420px">
+            <button class="knopf klein stumm" type="button" id="bankverbindung-speichern">Speichern</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="balken" id="telegram-block">
+        <label for="telegram-chatid" style="margin-bottom:8px">Telegram als Rückkanal</label>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">
+          Für Geräte ohne funktionierendes Web Push: Telegram-Bot öffnen, <code>/start</code> senden – die dort
+          angezeigte Chat-ID hier eintragen. Greift automatisch, sobald auf keinem Gerät Push-Benachrichtigungen
+          aktiv sind.
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="text" id="telegram-chatid" placeholder="z. B. 123456789" style="max-width:200px">
+          <button class="knopf klein" type="button" id="telegram-speichern">Speichern</button>
+        </div>
+      </div>
+
       <div id="best-liste"></div>
     </section>
 
@@ -197,6 +267,7 @@
 </div>
 
 <div id="toast"></div>
+<div id="push-hinweis" class="fehler" style="display:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:92vw;z-index:59"></div>
 
 <script>
 let stand = { tische: [], reservierungen: [], bestellungen: [], plaetzeGesamt: 0 };
@@ -312,18 +383,30 @@ function renderBestellungen() {
     return;
   }
 
-  const beschriftung = { neu: "Neu", bestaetigt: "Bestätigt", abgeholt: "Abgeholt", abgelehnt: "Abgelehnt" };
+  const beschriftung = {
+    neu: "Neu",
+    bestaetigt: "Bestätigt",
+    abgeholt: "Abgeholt",
+    abgelehnt: "Abgelehnt",
+    storniert: "Storniert",
+  };
 
   ziel.innerHTML = `<div class="karten">${stand.bestellungen.map((b) => {
     const zeit = b.bestaetigteAbholzeit || b.abholzeit;
     const nachricht = `Hallo ${b.name}, Ihre Bestellung ${b.nummer} ist bestätigt. Abholung: ${zeit}. Bis gleich!`;
+    const kannNochNoShow =
+      !b.storniertAm && !b.noShowBestaetigtAm && b.noShowZustimmung &&
+      b.status !== "abgeholt" && b.status !== "abgelehnt" && b.status !== "storniert" &&
+      istAbholzeitVorbei(b);
     return `
     <div class="karte ${b.status === "neu" ? "ist-neu" : ""}">
       <h3>${esc(b.nummer)} <span class="marke ${esc(b.status)}">${beschriftung[b.status]}</span></h3>
       <div class="meta">${esc(b.name)}${b.telefon ? ` · <a href="tel:${esc(b.telefon.replace(/[^\\d+]/g, ""))}">${esc(b.telefon)}</a>` : ""}</div>
+      ${b.unzuverlaessig ? `<p class="hinweis-gast" style="color:var(--danger)">⚠️ Diese Nummer ist mehrfach nicht erschienen.</p>` : ""}
       <ul>${b.positionen.map((p) => `<li><span>${p.menge} × ${esc(p.name)}</span><span>${euro(p.preis * p.menge)}</span></li>`).join("")}</ul>
       <div class="summe"><span>Gesamt</span><span>${euro(b.gesamt)}</span></div>
       ${b.hinweis ? `<p class="hinweis-gast">Hinweis: ${esc(b.hinweis)}</p>` : ""}
+      ${b.noShowBestaetigtAm ? `<p class="hinweis-gast">Ausfallpauschale bestätigt: ${euro(b.noShowBetrag)}</p>` : ""}
 
       <div class="abholblock">
         <div class="wunsch">Gewünschte Abholzeit: <strong>${esc(b.abholzeit)}</strong>${
@@ -336,9 +419,138 @@ function renderBestellungen() {
           ${b.status !== "abgeholt" && b.status !== "abgelehnt" ? `<button class="knopf klein stumm" data-best-status="abgeholt" data-id="${esc(b.id)}">Abgeholt</button>` : ""}
           ${b.status === "neu" ? `<button class="knopf klein gefahr" data-best-status="abgelehnt" data-id="${esc(b.id)}">Ablehnen</button>` : ""}
         </div>
+        ${b.status === "bestaetigt" ? `
+        <div class="abholzeile" style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)">
+          <input type="text" class="verzoegerung-zeit" data-id="${esc(b.id)}" placeholder="neue Uhrzeit" style="max-width:130px">
+          <input type="text" class="verzoegerung-grund" data-id="${esc(b.id)}" placeholder="Grund (optional)" style="max-width:180px">
+          <button class="knopf klein stumm" data-verzoegerung="${esc(b.id)}">Verzögerung dem Gast melden</button>
+        </div>` : ""}
+        ${kannNochNoShow ? `
+        <div class="abholzeile" style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)">
+          <button class="knopf klein gefahr" data-noshow="${esc(b.id)}" data-betrag="${esc(String(b.noShowGebuehrBetragVereinbart ?? 0))}">Kunde nicht erschienen</button>
+        </div>` : ""}
       </div>
     </div>`;
   }).join("")}</div>`;
+}
+
+/* ---------- Wartezeit ---------- */
+
+function renderWartezeit() {
+  const feld = document.getElementById("wartezeit-wert");
+  // Während der Wirt tippt, nicht durch das automatische Nachladen (alle
+  // 20 Sekunden) überschreiben.
+  if (document.activeElement !== feld) {
+    feld.value = stand.zusaetzlicheWartezeitMinuten ?? 0;
+  }
+}
+
+function wartezeitKlemmen(wert) {
+  return Math.min(180, Math.max(0, Math.round(wert / 5) * 5));
+}
+
+const WOCHENTAGE_KURZ = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
+
+function renderLernenSchalter() {
+  const box = document.getElementById("lernen-aktiv");
+  if (document.activeElement !== box) box.checked = Boolean(stand.wartezeitLernenAktiv);
+}
+
+async function ladeLernUebersicht() {
+  let daten;
+  try {
+    daten = await (await fetch("/api/wartezeit-lernen")).json();
+  } catch {
+    return;
+  }
+  const ziel = document.getElementById("lernen-tabelle");
+  if (!daten.eintraege || daten.eintraege.length === 0) {
+    ziel.innerHTML = `<p class="leer" style="padding:10px 0">Noch keine Beobachtungen.</p>`;
+    return;
+  }
+
+  ziel.innerHTML = `
+    <table>
+      <thead><tr><th>Tag</th><th>Zeitfenster</th><th>Auslastung</th><th>Zuschlag</th><th>Beobachtungen</th></tr></thead>
+      <tbody>${daten.eintraege.map((e) => `
+        <tr>
+          <td>${esc(WOCHENTAGE_KURZ[e.wochentag])}</td>
+          <td>${String(e.fenster * 2).padStart(2, "0")}–${String((e.fenster * 2 + 2) % 24).padStart(2, "0")} Uhr</td>
+          <td>${esc(e.auslastung)}</td>
+          <td>${e.gelernt ? `+${e.zuschlagMinuten} Min` : "noch nicht genug Daten"}</td>
+          <td>${e.beobachtungen}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table>`;
+}
+
+document.getElementById("lernen-aktiv").addEventListener("change", async (e) => {
+  const checkbox = e.target;
+  try {
+    await ruf("/intern/wartezeit-lernen/aktiv", { aktiv: checkbox.checked });
+    await lade();
+    await ladeLernUebersicht();
+    melde(checkbox.checked ? "Lernsystem aktiviert." : "Lernsystem deaktiviert – nur Basis und manuelle Zeit zählen.");
+  } catch (fehler) {
+    checkbox.checked = !checkbox.checked;
+    melde(fehler.message, true);
+  }
+});
+
+function renderNoShowEinstellungen() {
+  const felder = ["noshow-aktiv", "noshow-betrag", "noshow-fenster", "noshow-schwelle", "bankverbindung"];
+  if (felder.some((id) => document.activeElement === document.getElementById(id))) return;
+
+  document.getElementById("noshow-aktiv").checked = Boolean(stand.noShowSchutzAktiv);
+  document.getElementById("noshow-betrag").value = stand.noShowGebuehrBetrag ?? 0;
+  document.getElementById("noshow-fenster").value = stand.noShowStornofensterMinuten ?? 30;
+  document.getElementById("noshow-schwelle").value = stand.noShowWarnSchwelle ?? 2;
+  document.getElementById("bankverbindung").value = stand.bankverbindung ?? "";
+}
+
+document.getElementById("noshow-speichern").addEventListener("click", async () => {
+  try {
+    await ruf("/intern/no-show-schutz", {
+      aktiv: document.getElementById("noshow-aktiv").checked,
+      gebuehrBetrag: Number(document.getElementById("noshow-betrag").value),
+      stornofensterMinuten: Number(document.getElementById("noshow-fenster").value),
+      warnSchwelle: Number(document.getElementById("noshow-schwelle").value),
+    });
+    await lade();
+    melde("No-Show-Einstellungen gespeichert.");
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+document.getElementById("bankverbindung-speichern").addEventListener("click", async () => {
+  try {
+    await ruf("/intern/bankverbindung", { bankverbindung: document.getElementById("bankverbindung").value });
+    await lade();
+    melde("Bankverbindung gespeichert.");
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+/**
+ * Ob die (bestätigte oder gewünschte) Abholzeit bereits verstrichen ist –
+ * Grundlage dafür, ob "Kunde nicht erschienen" überhaupt sichtbar wird.
+ */
+function istAbholzeitVorbei(b) {
+  const zeit = b.bestaetigteAbholzeit || b.abholzeit;
+  if (!zeit) return false;
+  const datum = String(b.eingegangen || "").slice(0, 10);
+  const zeitpunkt = new Date(`${datum}T${zeit}:00`);
+  const jetzt = stand.jetztIso ? new Date(stand.jetztIso) : new Date();
+  return zeitpunkt.getTime() < jetzt.getTime();
+}
+
+function renderTelegram() {
+  const feld = document.getElementById("telegram-chatid");
+  if (document.activeElement !== feld) {
+    feld.value = stand.telegramChatId ?? "";
+  }
 }
 
 /* ---------- Tischplan ---------- */
@@ -409,6 +621,10 @@ async function lade() {
   renderReservierungen();
   renderBestellungen();
   renderTischplan();
+  renderWartezeit();
+  renderLernenSchalter();
+  renderNoShowEinstellungen();
+  renderTelegram();
 }
 
 document.querySelectorAll("nav button").forEach((knopf) => {
@@ -451,6 +667,42 @@ document.addEventListener("click", async (e) => {
     } else if (ziel.dataset.kopiere) {
       await navigator.clipboard.writeText(ziel.dataset.kopiere);
       melde("Nachricht kopiert.");
+    } else if (ziel.dataset.verzoegerung) {
+      const id = ziel.dataset.verzoegerung;
+      const neueZeit = document.querySelector(`.verzoegerung-zeit[data-id="${id}"]`).value;
+      const grund = document.querySelector(`.verzoegerung-grund[data-id="${id}"]`).value;
+      const ergebnis = await ruf(`/intern/bestellung/${encodeURIComponent(id)}/verzoegerung`, { neueZeit, grund });
+      await lade();
+      const meldungJeKanal = {
+        sms: "Gast per SMS informiert.",
+        email: "Gast per E-Mail informiert.",
+        keiner: "Kein automatischer Kanal verfügbar – bitte telefonisch informieren.",
+      };
+      melde(meldungJeKanal[ergebnis.kanal] ?? "Abholzeit aktualisiert.", false, ergebnis.kanal === "keiner");
+    } else if (ziel.dataset.noshow) {
+      const id = ziel.dataset.noshow;
+      const vereinbart = Number(ziel.dataset.betrag) || 0;
+      const eingabeText = prompt(
+        `Betrag der Ausfallpauschale (höchstens ${vereinbart.toFixed(2)} €, nur nach unten korrigierbar):`,
+        vereinbart.toFixed(2),
+      );
+      if (eingabeText === null) return; // Dialog abgebrochen
+
+      const betrag = Number(String(eingabeText).replace(",", "."));
+      if (!Number.isFinite(betrag) || betrag < 0 || betrag > vereinbart) {
+        melde("Ungültiger Betrag – höchstens der vereinbarte Betrag ist möglich.", true);
+        return;
+      }
+
+      const ergebnis = await ruf(`/intern/bestellung/${id}/no-show`, { betrag });
+      await lade();
+      melde(
+        ergebnis.rechnungVersendet
+          ? "Ausfallpauschale bestätigt, Rechnung per E-Mail versendet."
+          : "Ausfallpauschale bestätigt. Kein E-Mail-Kanal verfügbar – Rechnung bitte manuell zustellen.",
+        false,
+        !ergebnis.rechnungVersendet,
+      );
     }
   } catch (fehler) {
     melde(fehler.message, true);
@@ -500,6 +752,38 @@ document.getElementById("manuell-form").addEventListener("submit", async (e) => 
   }
 });
 
+document.getElementById("wartezeit-minus").addEventListener("click", () => {
+  const feld = document.getElementById("wartezeit-wert");
+  feld.value = wartezeitKlemmen(Number(feld.value) - 5);
+});
+document.getElementById("wartezeit-plus").addEventListener("click", () => {
+  const feld = document.getElementById("wartezeit-wert");
+  feld.value = wartezeitKlemmen(Number(feld.value) + 5);
+});
+document.getElementById("wartezeit-speichern").addEventListener("click", async () => {
+  const feld = document.getElementById("wartezeit-wert");
+  const minuten = wartezeitKlemmen(Number(feld.value));
+  feld.value = minuten;
+  try {
+    await ruf("/intern/wartezeit", { minuten });
+    await lade();
+    melde(minuten === 0 ? "Zusatz-Wartezeit aufgehoben." : `Zusatz-Wartezeit: +${minuten} Minuten.`);
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+document.getElementById("telegram-speichern").addEventListener("click", async () => {
+  const feld = document.getElementById("telegram-chatid");
+  try {
+    await ruf("/intern/telegram/chat-id", { chatId: feld.value.trim() });
+    await lade();
+    melde(feld.value.trim() ? "Telegram-Chat-ID gespeichert." : "Telegram-Rückkanal deaktiviert.");
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
 document.getElementById("tisch-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   try {
@@ -515,7 +799,73 @@ document.getElementById("tisch-form").addEventListener("submit", async (e) => {
   }
 });
 
+/* ---------- Push-Benachrichtigungen ---------- */
+
+// Auf dem iPhone liefert Safari Push-Nachrichten nur an Seiten, die zuvor
+// über "Zum Home-Bildschirm hinzufügen" installiert wurden (dann läuft die
+// Seite "standalone") - ganz normal im Safari-Tab bleibt es aus, ohne dass
+// der Browser das meldet. window.navigator.standalone gibt es nur auf iOS.
+function istIosOhneInstallation() {
+  const istIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  return istIos && window.navigator.standalone !== true;
+}
+
+function urlBase64ZuUint8Array(base64) {
+  const polster = "=".repeat((4 - (base64.length % 4)) % 4);
+  const sicher = (base64 + polster).replace(/-/g, "+").replace(/_/g, "/");
+  const roh = atob(sicher);
+  return Uint8Array.from([...roh].map((zeichen) => zeichen.charCodeAt(0)));
+}
+
+const PUSH_GEFRAGT_KEY = "wirt-push-gefragt";
+
+async function richtePushEin() {
+  if (istIosOhneInstallation()) {
+    const hinweis = document.getElementById("push-hinweis");
+    hinweis.textContent =
+      'Für Benachrichtigungen auf dem iPhone diese Seite zuerst über "Zum Home-Bildschirm hinzufügen" installieren und von dort erneut öffnen.';
+    hinweis.style.display = "block";
+    return;
+  }
+
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+
+  let bereitsGefragt = false;
+  try {
+    bereitsGefragt = Boolean(localStorage.getItem(PUSH_GEFRAGT_KEY));
+  } catch {
+    // Privater Modus oder blockierter Storage - dann eben bei jedem Öffnen
+    // erneut fragen, statt die Funktion ganz auszulassen.
+  }
+  if (bereitsGefragt) return;
+
+  try {
+    const { publicKey } = await (await fetch("/api/push/public-key")).json();
+    if (!publicKey) return; // Server ohne VAPID-Schlüssel: Feature bleibt aus.
+
+    try {
+      localStorage.setItem(PUSH_GEFRAGT_KEY, "1");
+    } catch {
+      // s.o.
+    }
+
+    const registration = await navigator.serviceWorker.register("/sw.js");
+    const erlaubnis = await Notification.requestPermission();
+    if (erlaubnis !== "granted") return;
+
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ZuUint8Array(publicKey),
+    });
+    await ruf("/intern/push/subscribe", subscription.toJSON());
+  } catch (fehler) {
+    console.warn("Push-Registrierung fehlgeschlagen:", fehler.message);
+  }
+}
+
 lade();
+ladeLernUebersicht();
+richtePushEin();
 // Im Betrieb liegt das Tablet offen herum - regelmäßig nachladen, damit neue
 // Bestellungen auftauchen, ohne dass jemand die Seite neu lädt.
 setInterval(lade, 20000);

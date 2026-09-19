@@ -15,14 +15,30 @@ const betriebeDir = path.join(__dirname, "..", "data", "betrieb");
 export const BELEGDAUER_MINUTEN = 120;
 
 export const RESERVIERUNG_STATUS = ["neu", "bestaetigt", "abgesagt"];
-export const BESTELLUNG_STATUS = ["neu", "bestaetigt", "abgeholt", "abgelehnt"];
+export const BESTELLUNG_STATUS = ["neu", "bestaetigt", "abgeholt", "abgelehnt", "storniert"];
+
+export const NO_SHOW_STORNOFENSTER_MINUTEN_DEFAULT = 30;
+export const NO_SHOW_WARN_SCHWELLE_DEFAULT = 2;
 
 function datei(slug) {
   return path.join(betriebeDir, `${slug}.json`);
 }
 
 function leererBetrieb() {
-  return { tische: [], reservierungen: [], bestellungen: [] };
+  return {
+    tische: [],
+    reservierungen: [],
+    bestellungen: [],
+    zusaetzlicheWartezeitMinuten: 0,
+    pushSubscriptions: [],
+    telegramChatId: "",
+    wartezeitLernenAktiv: false,
+    noShowSchutzAktiv: false,
+    noShowGebuehrBetrag: 0,
+    noShowStornofensterMinuten: NO_SHOW_STORNOFENSTER_MINUTEN_DEFAULT,
+    noShowWarnSchwelle: NO_SHOW_WARN_SCHWELLE_DEFAULT,
+    bankverbindung: "",
+  };
 }
 
 export function ladeBetrieb(slug) {
@@ -212,6 +228,129 @@ export function tischKonflikte(daten) {
   return konflikte.sort((a, b) => `${a.datum}${a.uhrzeit}`.localeCompare(`${b.datum}${b.uhrzeit}`));
 }
 
+/* ---------- Abholzeiten ---------- */
+
+// Grundvorlauf der Küche, bevor die erste Zeit überhaupt angeboten wird.
+export const ABHOL_VORLAUF_MINUTEN = 20;
+// Wie weit im Voraus Abholzeiten angeboten werden – dasselbe Kapazitätsfenster
+// wie bei Tischreservierungen (BELEGDAUER_MINUTEN), hier für die Küche statt
+// den Tischplan.
+export const ABHOL_FENSTER_MINUTEN = 120;
+export const ABHOL_SCHRITT_MINUTEN = 15;
+
+export const WARTEZEIT_MAX_MINUTEN = 180;
+
+/**
+ * Setzt die Zusatz-Wartezeit, die der Wirt bei Rückstand in der Küche selbst
+ * hochsetzt. Wirkt nur auf neu berechnete Abholzeiten (verfuegbareAbholzeiten)
+ * – bereits bestätigte Bestellungen behalten ihre einmal zugesagte Zeit.
+ */
+export function setzeWartezeit(slug, minuten) {
+  const wert = Number(minuten);
+  if (!Number.isInteger(wert) || wert < 0 || wert > WARTEZEIT_MAX_MINUTEN) {
+    throw new Error(`Die Zusatz-Wartezeit muss zwischen 0 und ${WARTEZEIT_MAX_MINUTEN} Minuten liegen.`);
+  }
+
+  return aendere(slug, (daten) => {
+    daten.zusaetzlicheWartezeitMinuten = wert;
+    return wert;
+  });
+}
+
+/**
+ * Schaltet das lernende Wartezeit-System für einen Betrieb ein oder aus.
+ * Default aus, damit bestehende Betriebe sich nicht plötzlich anders
+ * verhalten – siehe wartezeitLernStore.js für die gelernten Werte selbst.
+ */
+export function setzeWartezeitLernenAktiv(slug, aktiv) {
+  return aendere(slug, (daten) => {
+    daten.wartezeitLernenAktiv = Boolean(aktiv);
+    return daten.wartezeitLernenAktiv;
+  });
+}
+
+/* ---------- No-Show-Schutz ---------- */
+
+/**
+ * Der exakte Zustimmungstext für eine gegebene Konfiguration – identisch
+ * auf der Bestellseite (landingPageGenerator.js, dort clientseitig
+ * nachgebaut) und hier serverseitig als Beweistext gespeichert.
+ */
+export function noShowZustimmungstext({ noShowStornofensterMinuten, noShowGebuehrBetrag }) {
+  const betrag = Number(noShowGebuehrBetrag || 0).toFixed(2).replace(".", ",");
+  return (
+    `Ich stimme zu: Bei Nichtabholung ohne Stornierung bis ${noShowStornofensterMinuten} Minuten vor der ` +
+    `Abholzeit wird eine Ausfallpauschale von ${betrag} € in Rechnung gestellt.`
+  );
+}
+
+/**
+ * Setzt die No-Show-Schutz-Einstellungen eines Betriebs. Default aus
+ * (noShowSchutzAktiv: false), damit bestehende Betriebe sich nicht
+ * plötzlich anders verhalten.
+ */
+export function setzeNoShowSchutz(slug, { aktiv, gebuehrBetrag, stornofensterMinuten, warnSchwelle } = {}) {
+  const betrag = Number(gebuehrBetrag);
+  const fenster = Number(stornofensterMinuten);
+  const schwelle = Number(warnSchwelle);
+
+  if (!Number.isFinite(betrag) || betrag < 0) {
+    throw new Error("Die Ausfallpauschale muss ein Betrag ab 0 € sein.");
+  }
+  if (!Number.isInteger(fenster) || fenster < 0 || fenster > 1440) {
+    throw new Error("Das Stornofenster muss zwischen 0 und 1440 Minuten liegen.");
+  }
+  if (!Number.isInteger(schwelle) || schwelle < 1) {
+    throw new Error("Die Warn-Schwelle muss mindestens 1 sein.");
+  }
+
+  return aendere(slug, (daten) => {
+    daten.noShowSchutzAktiv = Boolean(aktiv);
+    daten.noShowGebuehrBetrag = betrag;
+    daten.noShowStornofensterMinuten = fenster;
+    daten.noShowWarnSchwelle = schwelle;
+    return {
+      noShowSchutzAktiv: daten.noShowSchutzAktiv,
+      noShowGebuehrBetrag: daten.noShowGebuehrBetrag,
+      noShowStornofensterMinuten: daten.noShowStornofensterMinuten,
+      noShowWarnSchwelle: daten.noShowWarnSchwelle,
+    };
+  });
+}
+
+export function setzeBankverbindung(slug, text) {
+  const sauber = String(text ?? "").trim();
+  return aendere(slug, (daten) => {
+    daten.bankverbindung = sauber;
+    return sauber;
+  });
+}
+
+function zeitString(minutenSeitMitternacht) {
+  const normiert = ((minutenSeitMitternacht % 1440) + 1440) % 1440;
+  const hh = String(Math.floor(normiert / 60)).padStart(2, "0");
+  const mm = String(normiert % 60).padStart(2, "0");
+  return `${hh}:${mm}`;
+}
+
+/**
+ * Die als Nächstes anbietbaren Abholzeiten: ab jetzt plus Grundvorlauf plus
+ * die vom Wirt gesetzte Zusatz-Wartezeit, im 15-Minuten-Raster, für ein
+ * 120-Minuten-Fenster. Reine Berechnung ohne Bezug zu bestehenden
+ * Bestellungen – eine bereits bestätigte Abholzeit läuft nie nachträglich mit.
+ */
+export function verfuegbareAbholzeiten(daten, jetzt = new Date()) {
+  const zusatz = Number(daten.zusaetzlicheWartezeitMinuten) || 0;
+  const abMinuten = jetzt.getHours() * 60 + jetzt.getMinutes() + ABHOL_VORLAUF_MINUTEN + zusatz;
+  const start = Math.ceil(abMinuten / ABHOL_SCHRITT_MINUTEN) * ABHOL_SCHRITT_MINUTEN;
+
+  const slots = [];
+  for (let m = start; m <= start + ABHOL_FENSTER_MINUTEN; m += ABHOL_SCHRITT_MINUTEN) {
+    slots.push(zeitString(m));
+  }
+  return slots;
+}
+
 /* ---------- Reservierungen ---------- */
 
 function pruefeReservierung(daten, eingabe, { ignoriereId, quelle } = {}) {
@@ -345,6 +484,23 @@ export function legeBestellungAn(slug, eingabe) {
   }));
 
   return aendere(slug, (daten) => {
+    // Ist die Funktion aktiv, ist die Zustimmung Pflicht – ohne Häkchen keine
+    // Bestellung. Der Text wird serverseitig aus der aktuellen Konfiguration
+    // gebaut, nicht vom Client übernommen: Beweistext und tatsächlich
+    // geltende Bedingungen dürfen nie auseinanderlaufen.
+    let noShowZustimmung = null;
+    let noShowGebuehrBetragVereinbart = null;
+    if (daten.noShowSchutzAktiv) {
+      if (eingabe.noShowZustimmung !== true) {
+        throw new Error("Bitte stimmen Sie der Ausfallpauschale zu, um fortzufahren.");
+      }
+      noShowZustimmung = {
+        text: noShowZustimmungstext(daten),
+        zeitpunkt: new Date().toISOString(),
+      };
+      noShowGebuehrBetragVereinbart = daten.noShowGebuehrBetrag;
+    }
+
     const bestellung = {
       id: randomUUID(),
       nummer: `AB-${String(Math.floor(1000 + Math.random() * 9000))}`,
@@ -355,13 +511,91 @@ export function legeBestellungAn(slug, eingabe) {
       bestaetigteAbholzeit: "",
       name: String(eingabe.name).trim(),
       telefon: String(eingabe.telefon ?? "").trim(),
+      email: String(eingabe.email ?? "").trim(),
       hinweis: String(eingabe.hinweis ?? "").trim(),
       status: "neu",
       eingegangen: new Date().toISOString(),
+      // Beweis für eine spätere Forderung: exakter Text, Zeitpunkt, dazu
+      // Name/Kontakt – die stehen ohnehin schon oben auf der Bestellung.
+      noShowZustimmung,
+      noShowGebuehrBetragVereinbart,
+      storniertAm: "",
+      noShowBestaetigtAm: "",
+      noShowBetrag: null,
     };
 
     daten.bestellungen.push(bestellung);
     return bestellung;
+  });
+}
+
+/**
+ * Der Zeitpunkt, den die Bestellung dem Gast versprochen hat (bestätigt oder,
+ * falls noch offen, gewünscht) – kombiniert mit dem Eingangsdatum, weil
+ * Abholzeiten nur "HH:MM" ohne Datum sind (Abholung ist immer am selben Tag).
+ */
+function versprochenerAbholZeitpunkt(bestellung) {
+  const zeit = bestellung.bestaetigteAbholzeit || bestellung.abholzeit;
+  const datum = String(bestellung.eingegangen ?? "").slice(0, 10);
+  if (!zeit || !datum) return null;
+  const zeitpunkt = new Date(`${datum}T${zeit}:00`);
+  return Number.isNaN(zeitpunkt.getTime()) ? null : zeitpunkt;
+}
+
+/**
+ * Kunden-Storno per Link aus der Bestellbestätigung. Innerhalb des
+ * Stornofensters kostenfrei, danach nur ein Hinweis auf eine mögliche
+ * Gebühr – eine Stornierung selbst löst nie automatisch eine Forderung aus,
+ * das entscheidet der Wirt über "Kunde nicht erschienen" (bestaetigeNoShow).
+ */
+export function storniereBestellung(slug, id, jetzt = new Date()) {
+  return aendere(slug, (daten) => {
+    const b = daten.bestellungen.find((x) => x.id === id);
+    if (!b) throw new Error("Bestellung nicht gefunden.");
+    if (b.storniertAm) throw new Error("Diese Bestellung wurde bereits storniert.");
+    if (b.status === "abgeholt") throw new Error("Diese Bestellung wurde bereits abgeholt.");
+
+    const versprochen = versprochenerAbholZeitpunkt(b);
+    const minutenBisAbholung = versprochen ? (versprochen.getTime() - jetzt.getTime()) / 60000 : Infinity;
+    const kostenfrei = minutenBisAbholung >= Number(daten.noShowStornofensterMinuten ?? 0);
+
+    b.status = "storniert";
+    b.storniertAm = jetzt.toISOString();
+
+    return { bestellung: b, kostenfrei, minutenBisAbholung: Math.round(minutenBisAbholung) };
+  });
+}
+
+/**
+ * Der Wirt bestätigt, dass der Gast nicht erschienen ist. Der Betrag ist nur
+ * nach unten korrigierbar (nie über den bei der Bestellung vereinbarten
+ * Betrag hinaus) – damit kann nie versehentlich mehr verlangt werden, als
+ * der Gast zugestimmt hat.
+ */
+export function bestaetigeNoShow(slug, id, betrag, jetzt = new Date()) {
+  const wert = Number(betrag);
+  if (!Number.isFinite(wert) || wert < 0) {
+    throw new Error("Der Betrag muss eine Zahl ab 0 € sein.");
+  }
+
+  return aendere(slug, (daten) => {
+    const b = daten.bestellungen.find((x) => x.id === id);
+    if (!b) throw new Error("Bestellung nicht gefunden.");
+    if (b.storniertAm) throw new Error("Diese Bestellung wurde vom Gast storniert – keine Ausfallpauschale möglich.");
+    if (b.noShowBestaetigtAm) throw new Error("Für diese Bestellung wurde bereits eine Ausfallpauschale bestätigt.");
+    if (!b.noShowZustimmung) {
+      throw new Error("Für diese Bestellung liegt keine Zustimmung zur Ausfallpauschale vor.");
+    }
+    if (wert > Number(b.noShowGebuehrBetragVereinbart ?? 0)) {
+      throw new Error(
+        `Der Betrag darf höchstens ${Number(b.noShowGebuehrBetragVereinbart).toFixed(2)} € betragen ` +
+          "(der bei der Bestellung vereinbarte Betrag) – nur eine Korrektur nach unten ist möglich.",
+      );
+    }
+
+    b.noShowBestaetigtAm = jetzt.toISOString();
+    b.noShowBetrag = wert;
+    return b;
   });
 }
 
@@ -389,6 +623,71 @@ export function setzeBestellungStatus(slug, id, status) {
     const b = daten.bestellungen.find((x) => x.id === id);
     if (!b) throw new Error("Bestellung nicht gefunden.");
     b.status = status;
+    // Für das lernende Wartezeit-System (wartezeitLernStore.js): der
+    // Zeitpunkt, zu dem die Bestellung wirklich fertig war, im Vergleich zur
+    // versprochenen Abholzeit. Nur beim ersten Wechsel auf "abgeholt"
+    // gesetzt – ein erneuter Aufruf (z. B. Doppelklick) darf ihn nicht
+    // nachträglich verschieben.
+    if (status === "abgeholt" && !b.tatsaechlichFertigUm) {
+      b.tatsaechlichFertigUm = new Date().toISOString();
+    }
     return b;
+  });
+}
+
+/* ---------- Push-Benachrichtigungen ---------- */
+
+/**
+ * Merkt sich, auf welchem Gerät des Wirts neue Bestellungen/Reservierungen
+ * ankommen sollen (siehe pushNotify.js für den eigentlichen Versand). Nur die
+ * Datenhaltung liegt hier – dieselbe Trennung wie überall in diesem Modul,
+ * das keine eigenen Netzwerkaufrufe macht.
+ */
+export function fuegePushSubscriptionHinzu(slug, subscription) {
+  const endpoint = String(subscription?.endpoint ?? "").trim();
+  const p256dh = subscription?.keys?.p256dh;
+  const auth = subscription?.keys?.auth;
+
+  if (!endpoint || !p256dh || !auth) {
+    throw new Error("Ungültige Push-Subscription.");
+  }
+
+  return aendere(slug, (daten) => {
+    daten.pushSubscriptions ??= [];
+    // Dasselbe Gerät kann sich mehrfach registrieren (Seite neu geladen,
+    // Berechtigung erneut erteilt) – der Endpoint bleibt dabei gleich und
+    // ersetzt den alten Eintrag statt ihn zu verdoppeln.
+    daten.pushSubscriptions = daten.pushSubscriptions.filter((s) => s.endpoint !== endpoint);
+    daten.pushSubscriptions.push({ endpoint, keys: { p256dh, auth } });
+    return { endpoint };
+  });
+}
+
+/**
+ * Entfernt eine Subscription, die der Push-Dienst als ungültig gemeldet hat
+ * (Gerät lange offline, Berechtigung entzogen, Browser-Daten gelöscht) –
+ * sonst würde jeder weitere Versand an diesen Eintrag wieder fehlschlagen.
+ */
+export function entfernePushSubscription(slug, endpoint) {
+  return aendere(slug, (daten) => {
+    daten.pushSubscriptions = (daten.pushSubscriptions ?? []).filter((s) => s.endpoint !== endpoint);
+    return true;
+  });
+}
+
+/**
+ * Die eigene Telegram-Chat-ID des Wirts, als Rückkanal für Geräte ohne
+ * funktionierendes Web Push (siehe telegramNotify.js). Eine leere Zeichenkette
+ * schaltet den Kanal wieder ab.
+ */
+export function setzeTelegramChatId(slug, chatId) {
+  const sauber = String(chatId ?? "").trim();
+  if (sauber && !/^-?\d+$/.test(sauber)) {
+    throw new Error("Die Telegram-Chat-ID besteht nur aus Ziffern.");
+  }
+
+  return aendere(slug, (daten) => {
+    daten.telegramChatId = sauber;
+    return sauber;
   });
 }

@@ -17,10 +17,29 @@ import {
   gesamtPlaetze,
   tischKonflikte,
   tischVerteilung,
+  setzeWartezeit,
+  fuegePushSubscriptionHinzu,
+  setzeTelegramChatId,
+  setzeWartezeitLernenAktiv,
+  setzeNoShowSchutz,
+  setzeBankverbindung,
+  storniereBestellung,
+  bestaetigeNoShow,
 } from "./betriebStore.js";
+import { benachrichtigeBetrieb, oeffentlicherVapidSchluessel } from "./pushNotify.js";
+import { benachrichtigeUeberTelegram } from "./telegramNotify.js";
+import { informiereUeberVerzoegerung, versendeRechnung } from "./kundenBenachrichtigung.js";
+import { beobachteAbholung, lernUebersicht } from "./wartezeitLernStore.js";
+import { vermerkeNoShow, warnhinweisNoetig } from "./zuverlaessigkeitStore.js";
+import { erzeugeNoShowRechnung } from "./rechnungGenerator.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const seite = path.join(__dirname, "..", "public", "wirt.html");
+const serviceWorker = path.join(__dirname, "..", "public", "sw.js");
+
+const VERZOEGERUNG = /^\/intern\/bestellung\/([^/]+)\/verzoegerung$/;
+const STORNIEREN = /^\/oeffentlich\/bestellung\/([^/]+)\/stornieren$/;
+const NO_SHOW = /^\/intern\/bestellung\/([^/]+)\/no-show$/;
 
 function parseFlag(argv, name, standard) {
   const i = argv.indexOf(name);
@@ -87,6 +106,15 @@ function uebersicht() {
   const daten = ladeBetrieb(slug);
   const heute = new Date().toISOString().slice(0, 10);
 
+  // Kein automatischer Filter, nur ein Hinweis fürs Dashboard – die
+  // Entscheidung, eine Bestellung trotzdem anzunehmen, bleibt beim Wirt.
+  const bestellungenMitHinweis = daten.bestellungen.map((b) => ({
+    ...b,
+    unzuverlaessig: b.telefon
+      ? warnhinweisNoetig(slug, b.telefon, daten.noShowWarnSchwelle ?? 2)
+      : false,
+  }));
+
   return {
     betrieb: slug,
     tische: daten.tische,
@@ -94,16 +122,28 @@ function uebersicht() {
     reservierungen: daten.reservierungen.sort(
       (a, b) => `${a.datum}${a.uhrzeit}`.localeCompare(`${b.datum}${b.uhrzeit}`),
     ),
-    bestellungen: daten.bestellungen.sort((a, b) => b.eingegangen.localeCompare(a.eingegangen)),
+    bestellungen: bestellungenMitHinweis.sort((a, b) => b.eingegangen.localeCompare(a.eingegangen)),
     offeneReservierungen: daten.reservierungen.filter((r) => r.status === "neu").length,
     offeneBestellungen: daten.bestellungen.filter((b) => b.status === "neu").length,
     // Zeitpunkte, an denen die Plätze zwar reichen, die Tische aber nicht.
     tischKonflikte: tischKonflikte(daten),
+    zusaetzlicheWartezeitMinuten: daten.zusaetzlicheWartezeitMinuten ?? 0,
+    telegramChatId: daten.telegramChatId ?? "",
+    wartezeitLernenAktiv: Boolean(daten.wartezeitLernenAktiv),
+    noShowSchutzAktiv: Boolean(daten.noShowSchutzAktiv),
+    noShowGebuehrBetrag: daten.noShowGebuehrBetrag ?? 0,
+    noShowStornofensterMinuten: daten.noShowStornofensterMinuten ?? 30,
+    noShowWarnSchwelle: daten.noShowWarnSchwelle ?? 2,
+    bankverbindung: daten.bankverbindung ?? "",
     heute,
+    jetztIso: new Date().toISOString(),
   };
 }
 
-const server = createServer(async (req, res) => {
+// Als eigene Funktion exportiert, damit Tests einen Server auf einem
+// zufälligen Port starten können, statt den festen Port aus argv/env zu
+// belegen – siehe dashboardServer.js für dasselbe Muster.
+export const handler = async (req, res) => {
   const { pathname, searchParams } = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
 
   if (req.method === "OPTIONS") {
@@ -115,6 +155,14 @@ const server = createServer(async (req, res) => {
   if (pathname === "/" || pathname === "/index.html") {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     res.end(readFileSync(seite, "utf-8"));
+    return;
+  }
+
+  // Ohne Auslieferung von der Wurzel aus reicht der Geltungsbereich des
+  // Service Workers nicht bis zu den Push-Registrierungen von wirt.html.
+  if (pathname === "/sw.js") {
+    res.writeHead(200, { "Content-Type": "application/javascript; charset=utf-8" });
+    res.end(readFileSync(serviceWorker, "utf-8"));
     return;
   }
 
@@ -132,13 +180,65 @@ const server = createServer(async (req, res) => {
 
       if (pathname === "/oeffentlich/reservierung") {
         const r = legeReservierungAn(slug, daten, "online");
+        // Von Hand eingetragene Reservierungen (quelle "manuell") lösen
+        // bewusst keinen Push/Telegram aus – der Wirt kennt die eigene
+        // Eingabe schon.
+        const text = `Neue Reservierung: ${r.personen} Personen am ${r.datum} um ${r.uhrzeit}, ${r.name}`;
+        const push = await benachrichtigeBetrieb(slug, { titel: "Neue Reservierung", text });
+        // Telegram ist der Fallback-Kanal: er greift nur, wenn kein Gerät für
+        // Web Push registriert ist (siehe pushNotify.js – "versucht": 0 heißt
+        // entweder kein VAPID-Schlüssel hinterlegt oder keine Subscription).
+        if (!push.versucht) {
+          await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
+        }
         json(res, 200, { ok: true, reservierung: { id: r.id, datum: r.datum, uhrzeit: r.uhrzeit } }, CORS);
         return;
       }
 
       if (pathname === "/oeffentlich/bestellung") {
         const b = legeBestellungAn(slug, daten);
+        const text = `Neue Bestellung ${b.nummer} · Abholung gewünscht um ${b.abholzeit}, ${b.name}`;
+        const push = await benachrichtigeBetrieb(slug, { titel: "Neue Bestellung", text });
+        if (!push.versucht) {
+          await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
+        }
         json(res, 200, { ok: true, bestellung: { id: b.id, nummer: b.nummer } }, CORS);
+        return;
+      }
+
+      if (pathname === "/oeffentlich/no-show-einstellungen") {
+        const stand = ladeBetrieb(slug);
+        json(
+          res,
+          200,
+          {
+            ok: true,
+            aktiv: Boolean(stand.noShowSchutzAktiv),
+            gebuehrBetrag: stand.noShowGebuehrBetrag ?? 0,
+            stornofensterMinuten: stand.noShowStornofensterMinuten ?? 30,
+          },
+          CORS,
+        );
+        return;
+      }
+
+      const stornierenTreffer = STORNIEREN.exec(pathname);
+      if (stornierenTreffer) {
+        const id = decodeURIComponent(stornierenTreffer[1]);
+        const { kostenfrei, minutenBisAbholung } = storniereBestellung(slug, id);
+        json(
+          res,
+          200,
+          {
+            ok: true,
+            kostenfrei,
+            minutenBisAbholung,
+            hinweis: kostenfrei
+              ? "Ihre Bestellung wurde kostenfrei storniert."
+              : "Ihre Bestellung wurde storniert. Da das Stornofenster bereits verstrichen ist, kann eine Ausfallpauschale anfallen.",
+          },
+          CORS,
+        );
         return;
       }
 
@@ -173,6 +273,21 @@ const server = createServer(async (req, res) => {
 
   if (pathname === "/api/betrieb") {
     json(res, 200, uebersicht());
+    return;
+  }
+
+  // Der öffentliche VAPID-Schlüssel ist unkritisch (er identifiziert nur den
+  // Absender, nicht den Betrieb) – wirt.html braucht ihn vorm Registrieren.
+  if (pathname === "/api/push/public-key") {
+    json(res, 200, { publicKey: oeffentlicherVapidSchluessel() });
+    return;
+  }
+
+  // read-only Übersicht der gelernten Zuschläge, unabhängig davon, ob das
+  // Lernsystem gerade aktiv ist – der Wirt soll auch nach dem Abschalten
+  // sehen können, was bereits gelernt wurde.
+  if (pathname === "/api/wartezeit-lernen") {
+    json(res, 200, { eintraege: lernUebersicht(slug) });
     return;
   }
 
@@ -214,7 +329,113 @@ const server = createServer(async (req, res) => {
         return;
       }
       if (pathname === "/api/bestellung/status") {
-        json(res, 200, { ok: true, bestellung: setzeBestellungStatus(slug, eingabe.id, eingabe.status) });
+        const bestellung = setzeBestellungStatus(slug, eingabe.id, eingabe.status);
+
+        // Nur beim Wechsel auf "abgeholt" gibt es einen Ist-Wert zum Lernen –
+        // und nur, wenn der Betrieb das Lernsystem eingeschaltet hat (Default
+        // aus, siehe wartezeitLernenAktiv in betriebStore.js).
+        if (eingabe.status === "abgeholt") {
+          const betrieb = ladeBetrieb(slug);
+          if (betrieb.wartezeitLernenAktiv && bestellung.tatsaechlichFertigUm) {
+            beobachteAbholung(slug, betrieb, bestellung, new Date(bestellung.tatsaechlichFertigUm));
+          }
+        }
+
+        json(res, 200, { ok: true, bestellung });
+        return;
+      }
+
+      /* ----- Intern: Einstellungen des Wirt-Dashboards ----- */
+
+      if (pathname === "/intern/wartezeit") {
+        const wert = setzeWartezeit(slug, eingabe.minuten);
+        json(res, 200, { ok: true, zusaetzlicheWartezeitMinuten: wert });
+        return;
+      }
+
+      if (pathname === "/intern/push/subscribe") {
+        const gespeichert = fuegePushSubscriptionHinzu(slug, eingabe);
+        json(res, 200, { ok: true, ...gespeichert });
+        return;
+      }
+
+      if (pathname === "/intern/no-show-schutz") {
+        const ergebnis = setzeNoShowSchutz(slug, {
+          aktiv: eingabe.aktiv,
+          gebuehrBetrag: eingabe.gebuehrBetrag,
+          stornofensterMinuten: eingabe.stornofensterMinuten,
+          warnSchwelle: eingabe.warnSchwelle,
+        });
+        json(res, 200, { ok: true, ...ergebnis });
+        return;
+      }
+
+      if (pathname === "/intern/bankverbindung") {
+        const bankverbindung = setzeBankverbindung(slug, eingabe.bankverbindung);
+        json(res, 200, { ok: true, bankverbindung });
+        return;
+      }
+
+      const noShowTreffer = NO_SHOW.exec(pathname);
+      if (noShowTreffer) {
+        const id = decodeURIComponent(noShowTreffer[1]);
+        const bestellung = bestaetigeNoShow(slug, id, eingabe.betrag);
+
+        // Zuverlässigkeits-Store: zählt für künftige Bestellungen derselben
+        // Nummer mit, unabhängig davon, ob der Rechnungsversand klappt.
+        if (bestellung.telefon) vermerkeNoShow(slug, bestellung.telefon);
+
+        const betrieb = ladeBetrieb(slug);
+        const rechnungPdf = await erzeugeNoShowRechnung({
+          betrieb: slug,
+          bestellung,
+          betrag: bestellung.noShowBetrag,
+          bankverbindung: betrieb.bankverbindung,
+        });
+
+        const email = await versendeRechnung({
+          email: bestellung.email,
+          betreff: `Rechnung: Ausfallpauschale zu Bestellung ${bestellung.nummer}`,
+          text:
+            `Hallo ${bestellung.name},\n\nzu Ihrer Bestellung ${bestellung.nummer} stellen wir die vereinbarte ` +
+            `Ausfallpauschale in Höhe von ${Number(bestellung.noShowBetrag).toFixed(2)} € in Rechnung. ` +
+            "Die Rechnung finden Sie im Anhang.",
+          anhaenge: [{ dateiname: "rechnung.pdf", inhalt: rechnungPdf, contentType: "application/pdf" }],
+        });
+
+        json(res, 200, { ok: true, bestellung, rechnungVersendet: email.versendet });
+        return;
+      }
+
+      if (pathname === "/intern/wartezeit-lernen/aktiv") {
+        const aktiv = setzeWartezeitLernenAktiv(slug, eingabe.aktiv);
+        json(res, 200, { ok: true, wartezeitLernenAktiv: aktiv });
+        return;
+      }
+
+      if (pathname === "/intern/telegram/chat-id") {
+        const chatId = setzeTelegramChatId(slug, eingabe.chatId);
+        json(res, 200, { ok: true, telegramChatId: chatId });
+        return;
+      }
+
+      const verzoegerungTreffer = VERZOEGERUNG.exec(pathname);
+      if (verzoegerungTreffer) {
+        const id = decodeURIComponent(verzoegerungTreffer[1]);
+        const grund = String(eingabe.grund ?? "").trim();
+        const bestellung = bestaetigeBestellung(slug, id, eingabe.neueZeit);
+
+        const nachricht = grund
+          ? `Ihre Bestellung ${bestellung.nummer}: neue Abholzeit ${bestellung.bestaetigteAbholzeit} (${grund}).`
+          : `Ihre Bestellung ${bestellung.nummer}: neue Abholzeit ${bestellung.bestaetigteAbholzeit}.`;
+
+        const { kanal } = await informiereUeberVerzoegerung({
+          telefon: bestellung.telefon,
+          email: bestellung.email,
+          nachricht,
+        });
+
+        json(res, 200, { ok: true, bestellung, kanal });
         return;
       }
     } catch (fehler) {
@@ -225,22 +446,28 @@ const server = createServer(async (req, res) => {
 
   res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
   res.end("Nicht gefunden");
-});
+};
 
+// Nur beim direkten Start (npm run wirt) wird auch gelauscht. Der Test
+// importiert denselben Handler und hängt ihn an einen eigenen Port, statt
+// dem laufenden Wirt-Dashboard den Platz wegzunehmen (siehe dashboardServer.js).
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const server = createServer(handler);
 
-// Ein belegter Port ist der häufigste Stolperstein beim Start. Die Meldung
-// von Node ("EADDRINUSE") sagt nicht, was zu tun ist – diese hier schon.
-server.on("error", (fehler) => {
-  if (fehler.code === "EADDRINUSE") {
-    console.log(`\n⚠️  Port ${port} ist schon belegt – dort läuft bereits etwas.`);
-    console.log(`   Anderen Port wählen:  npm run wirt -- --port ${port + 1}\n`);
-    process.exitCode = 1;
-    return;
-  }
-  throw fehler;
-});
+  // Ein belegter Port ist der häufigste Stolperstein beim Start. Die Meldung
+  // von Node ("EADDRINUSE") sagt nicht, was zu tun ist – diese hier schon.
+  server.on("error", (fehler) => {
+    if (fehler.code === "EADDRINUSE") {
+      console.log(`\n⚠️  Port ${port} ist schon belegt – dort läuft bereits etwas.`);
+      console.log(`   Anderen Port wählen:  npm run wirt -- --port ${port + 1}\n`);
+      process.exitCode = 1;
+      return;
+    }
+    throw fehler;
+  });
 
-server.listen(port, dashboardHost, () => {
-  console.log(`\n🍽️  Wirt-Dashboard für "${slug}": http://${dashboardHost}:${port}`);
-  console.log(`    Reservierungen der Seite gehen an: http://${dashboardHost}:${port}/oeffentlich/\n`);
-});
+  server.listen(port, dashboardHost, () => {
+    console.log(`\n🍽️  Wirt-Dashboard für "${slug}": http://${dashboardHost}:${port}`);
+    console.log(`    Reservierungen der Seite gehen an: http://${dashboardHost}:${port}/oeffentlich/\n`);
+  });
+}
