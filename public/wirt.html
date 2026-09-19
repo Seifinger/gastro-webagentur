@@ -187,6 +187,20 @@
           Bereits bestätigte Bestellungen bleiben unverändert.
         </div>
       </div>
+
+      <div class="balken" id="telegram-block">
+        <label for="telegram-chatid" style="margin-bottom:8px">Telegram als Rückkanal</label>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">
+          Für Geräte ohne funktionierendes Web Push: Telegram-Bot öffnen, <code>/start</code> senden – die dort
+          angezeigte Chat-ID hier eintragen. Greift automatisch, sobald auf keinem Gerät Push-Benachrichtigungen
+          aktiv sind.
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="text" id="telegram-chatid" placeholder="z. B. 123456789" style="max-width:200px">
+          <button class="knopf klein" type="button" id="telegram-speichern">Speichern</button>
+        </div>
+      </div>
+
       <div id="best-liste"></div>
     </section>
 
@@ -371,6 +385,13 @@ function wartezeitKlemmen(wert) {
   return Math.min(180, Math.max(0, Math.round(wert / 5) * 5));
 }
 
+function renderTelegram() {
+  const feld = document.getElementById("telegram-chatid");
+  if (document.activeElement !== feld) {
+    feld.value = stand.telegramChatId ?? "";
+  }
+}
+
 /* ---------- Tischplan ---------- */
 
 function renderTischplan() {
@@ -440,6 +461,7 @@ async function lade() {
   renderBestellungen();
   renderTischplan();
   renderWartezeit();
+  renderTelegram();
 }
 
 document.querySelectorAll("nav button").forEach((knopf) => {
@@ -547,6 +569,17 @@ document.getElementById("wartezeit-speichern").addEventListener("click", async (
     await ruf("/intern/wartezeit", { minuten });
     await lade();
     melde(minuten === 0 ? "Zusatz-Wartezeit aufgehoben." : `Zusatz-Wartezeit: +${minuten} Minuten.`);
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+document.getElementById("telegram-speichern").addEventListener("click", async () => {
+  const feld = document.getElementById("telegram-chatid");
+  try {
+    await ruf("/intern/telegram/chat-id", { chatId: feld.value.trim() });
+    await lade();
+    melde(feld.value.trim() ? "Telegram-Chat-ID gespeichert." : "Telegram-Rückkanal deaktiviert.");
   } catch (fehler) {
     melde(fehler.message, true);
   }

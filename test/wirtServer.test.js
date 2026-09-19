@@ -13,6 +13,7 @@ process.env.BETRIEB = SLUG;
 const { handler } = await import("../src/wirtServer.js");
 const { ladeBetrieb, speichereBetrieb, legeTischAn } = await import("../src/betriebStore.js");
 const { pushSendenHook } = await import("../src/pushNotify.js");
+const { telegramSendenHook } = await import("../src/telegramNotify.js");
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dateiPfad = path.join(__dirname, "..", "data", "betrieb", `${SLUG}.json`);
@@ -58,6 +59,19 @@ function mitVapid(fn) {
       else process.env.VAPID_PUBLIC_KEY = alterPublic;
       if (alterPrivate === undefined) delete process.env.VAPID_PRIVATE_KEY;
       else process.env.VAPID_PRIVATE_KEY = alterPrivate;
+    }
+  };
+}
+
+function mitTelegramToken(fn) {
+  return async (...args) => {
+    const alt = process.env.TELEGRAM_BOT_TOKEN;
+    process.env.TELEGRAM_BOT_TOKEN = "test-token";
+    try {
+      return await fn(...args);
+    } finally {
+      if (alt === undefined) delete process.env.TELEGRAM_BOT_TOKEN;
+      else process.env.TELEGRAM_BOT_TOKEN = alt;
     }
   };
 }
@@ -230,4 +244,131 @@ test(
       assert.equal(aufrufe.length, 0);
     });
   }),
+);
+
+test("POST /intern/telegram/chat-id speichert und liefert den neuen Wert", async () => {
+  await mitServer(async (basis) => {
+    const antwort = await fetch(`${basis}/intern/telegram/chat-id`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chatId: "987654321" }),
+    });
+    const ergebnis = await antwort.json();
+
+    assert.equal(antwort.status, 200);
+    assert.equal(ergebnis.telegramChatId, "987654321");
+    assert.equal(ladeBetrieb(SLUG).telegramChatId, "987654321");
+  });
+});
+
+test("POST /intern/telegram/chat-id weist eine ungültige Chat-ID ab", async () => {
+  await mitServer(async (basis) => {
+    const antwort = await fetch(`${basis}/intern/telegram/chat-id`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chatId: "keine-zahl" }),
+    });
+    const ergebnis = await antwort.json();
+
+    assert.equal(antwort.status, 400);
+    assert.match(ergebnis.fehler, /nur aus Ziffern/);
+  });
+});
+
+test("GET /api/betrieb liefert die aktuelle Telegram-Chat-ID mit", async () => {
+  await mitServer(async (basis) => {
+    await fetch(`${basis}/intern/telegram/chat-id`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chatId: "42" }),
+    });
+    const antwort = await fetch(`${basis}/api/betrieb`);
+    assert.equal((await antwort.json()).telegramChatId, "42");
+  });
+});
+
+test(
+  "ohne funktionierendes Web Push springt Telegram als Fallback ein",
+  mitTelegramToken(async () => {
+    await mitServer(async (basis) => {
+      await fetch(`${basis}/intern/telegram/chat-id`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chatId: "555" }),
+      });
+      // Bewusst keine VAPID-Konfiguration und keine Push-Subscription –
+      // Web Push ist also nicht verfügbar.
+
+      const telegramAufrufe = [];
+      const altTelegram = telegramSendenHook.aktuell;
+      telegramSendenHook.aktuell = async (chatId, text) => {
+        telegramAufrufe.push({ chatId, text });
+      };
+
+      try {
+        const antwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+            abholzeit: "18:30",
+            name: "Testgast",
+          }),
+        });
+        assert.equal(antwort.status, 200);
+      } finally {
+        telegramSendenHook.aktuell = altTelegram;
+      }
+
+      assert.equal(telegramAufrufe.length, 1);
+      assert.equal(telegramAufrufe[0].chatId, "555");
+      assert.match(telegramAufrufe[0].text, /Neue Bestellung/);
+    });
+  }),
+);
+
+test(
+  "mit funktionierendem Web Push bleibt Telegram stumm",
+  mitVapid(
+    mitTelegramToken(async () => {
+      await mitServer(async (basis) => {
+        await fetch(`${basis}/intern/telegram/chat-id`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chatId: "555" }),
+        });
+        await fetch(`${basis}/intern/push/subscribe`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ endpoint: "https://push.beispiel.de/aktiv", keys: { p256dh: "p", auth: "a" } }),
+        });
+
+        const altPush = pushSendenHook.aktuell;
+        const altTelegram = telegramSendenHook.aktuell;
+        const telegramAufrufe = [];
+        pushSendenHook.aktuell = async () => {};
+        telegramSendenHook.aktuell = async (chatId, text) => {
+          telegramAufrufe.push({ chatId, text });
+        };
+
+        try {
+          const antwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+              abholzeit: "18:30",
+              name: "Testgast",
+            }),
+          });
+          assert.equal(antwort.status, 200);
+        } finally {
+          pushSendenHook.aktuell = altPush;
+          telegramSendenHook.aktuell = altTelegram;
+        }
+
+        assert.equal(telegramAufrufe.length, 0, "Web Push war verfügbar – Telegram darf nicht zusätzlich feuern");
+      });
+    }),
+  ),
 );

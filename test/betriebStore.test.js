@@ -25,6 +25,7 @@ import {
   ABHOL_SCHRITT_MINUTEN,
   fuegePushSubscriptionHinzu,
   entfernePushSubscription,
+  setzeTelegramChatId,
 } from "../src/betriebStore.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -328,6 +329,27 @@ test("entfernePushSubscription löscht gezielt einen Endpoint", () => {
   const subscriptions = ladeBetrieb(SLUG).pushSubscriptions;
   assert.equal(subscriptions.length, 1);
   assert.equal(subscriptions[0].endpoint, "b");
+});
+
+test("ein frischer Betrieb hat keine Telegram-Chat-ID", () => {
+  assert.equal(ladeBetrieb(SLUG).telegramChatId, "");
+});
+
+test("die Telegram-Chat-ID wird geprüft und gespeichert", () => {
+  assert.throws(() => setzeTelegramChatId(SLUG, "keine-zahl"), /nur aus Ziffern/);
+  assert.throws(() => setzeTelegramChatId(SLUG, "123 456"), /nur aus Ziffern/);
+
+  assert.equal(setzeTelegramChatId(SLUG, "123456789"), "123456789");
+  assert.equal(ladeBetrieb(SLUG).telegramChatId, "123456789");
+
+  // Gruppen-Chats haben bei Telegram negative IDs.
+  assert.equal(setzeTelegramChatId(SLUG, "-100123456"), "-100123456");
+});
+
+test("eine leere Telegram-Chat-ID schaltet den Rückkanal wieder ab", () => {
+  setzeTelegramChatId(SLUG, "123456789");
+  assert.equal(setzeTelegramChatId(SLUG, ""), "");
+  assert.equal(ladeBetrieb(SLUG).telegramChatId, "");
 });
 
 test("unbekannte Status werden nicht gesetzt", () => {

@@ -19,8 +19,10 @@ import {
   tischVerteilung,
   setzeWartezeit,
   fuegePushSubscriptionHinzu,
+  setzeTelegramChatId,
 } from "./betriebStore.js";
 import { benachrichtigeBetrieb, oeffentlicherVapidSchluessel } from "./pushNotify.js";
+import { benachrichtigeUeberTelegram } from "./telegramNotify.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const seite = path.join(__dirname, "..", "public", "wirt.html");
@@ -104,6 +106,7 @@ function uebersicht() {
     // Zeitpunkte, an denen die Plätze zwar reichen, die Tische aber nicht.
     tischKonflikte: tischKonflikte(daten),
     zusaetzlicheWartezeitMinuten: daten.zusaetzlicheWartezeitMinuten ?? 0,
+    telegramChatId: daten.telegramChatId ?? "",
     heute,
   };
 }
@@ -149,21 +152,27 @@ export const handler = async (req, res) => {
       if (pathname === "/oeffentlich/reservierung") {
         const r = legeReservierungAn(slug, daten, "online");
         // Von Hand eingetragene Reservierungen (quelle "manuell") lösen
-        // bewusst keinen Push aus – der Wirt kennt die eigene Eingabe schon.
-        await benachrichtigeBetrieb(slug, {
-          titel: "Neue Reservierung",
-          text: `${r.personen} Personen am ${r.datum} um ${r.uhrzeit}, ${r.name}`,
-        });
+        // bewusst keinen Push/Telegram aus – der Wirt kennt die eigene
+        // Eingabe schon.
+        const text = `Neue Reservierung: ${r.personen} Personen am ${r.datum} um ${r.uhrzeit}, ${r.name}`;
+        const push = await benachrichtigeBetrieb(slug, { titel: "Neue Reservierung", text });
+        // Telegram ist der Fallback-Kanal: er greift nur, wenn kein Gerät für
+        // Web Push registriert ist (siehe pushNotify.js – "versucht": 0 heißt
+        // entweder kein VAPID-Schlüssel hinterlegt oder keine Subscription).
+        if (!push.versucht) {
+          await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
+        }
         json(res, 200, { ok: true, reservierung: { id: r.id, datum: r.datum, uhrzeit: r.uhrzeit } }, CORS);
         return;
       }
 
       if (pathname === "/oeffentlich/bestellung") {
         const b = legeBestellungAn(slug, daten);
-        await benachrichtigeBetrieb(slug, {
-          titel: "Neue Bestellung",
-          text: `${b.nummer} · Abholung gewünscht um ${b.abholzeit}, ${b.name}`,
-        });
+        const text = `Neue Bestellung ${b.nummer} · Abholung gewünscht um ${b.abholzeit}, ${b.name}`;
+        const push = await benachrichtigeBetrieb(slug, { titel: "Neue Bestellung", text });
+        if (!push.versucht) {
+          await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
+        }
         json(res, 200, { ok: true, bestellung: { id: b.id, nummer: b.nummer } }, CORS);
         return;
       }
@@ -262,6 +271,12 @@ export const handler = async (req, res) => {
       if (pathname === "/intern/push/subscribe") {
         const gespeichert = fuegePushSubscriptionHinzu(slug, eingabe);
         json(res, 200, { ok: true, ...gespeichert });
+        return;
+      }
+
+      if (pathname === "/intern/telegram/chat-id") {
+        const chatId = setzeTelegramChatId(slug, eingabe.chatId);
+        json(res, 200, { ok: true, telegramChatId: chatId });
         return;
       }
     } catch (fehler) {

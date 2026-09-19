@@ -28,6 +28,7 @@ function leererBetrieb() {
     bestellungen: [],
     zusaetzlicheWartezeitMinuten: 0,
     pushSubscriptions: [],
+    telegramChatId: "",
   };
 }
 
@@ -490,5 +491,22 @@ export function entfernePushSubscription(slug, endpoint) {
   return aendere(slug, (daten) => {
     daten.pushSubscriptions = (daten.pushSubscriptions ?? []).filter((s) => s.endpoint !== endpoint);
     return true;
+  });
+}
+
+/**
+ * Die eigene Telegram-Chat-ID des Wirts, als Rückkanal für Geräte ohne
+ * funktionierendes Web Push (siehe telegramNotify.js). Eine leere Zeichenkette
+ * schaltet den Kanal wieder ab.
+ */
+export function setzeTelegramChatId(slug, chatId) {
+  const sauber = String(chatId ?? "").trim();
+  if (sauber && !/^-?\d+$/.test(sauber)) {
+    throw new Error("Die Telegram-Chat-ID besteht nur aus Ziffern.");
+  }
+
+  return aendere(slug, (daten) => {
+    daten.telegramChatId = sauber;
+    return sauber;
   });
 }

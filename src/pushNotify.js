@@ -37,7 +37,7 @@ export const pushSendenHook = { aktuell: sendeEchtenPush };
  * ungültigen Subscriptions nur deren Eintrag auf.
  */
 export async function benachrichtigeBetrieb(slug, { titel, text, url = "/" }) {
-  if (!vapidKonfiguriert()) return;
+  if (!vapidKonfiguriert()) return { versucht: 0 };
 
   const subscriptions = ladeBetrieb(slug).pushSubscriptions ?? [];
 
@@ -56,4 +56,9 @@ export async function benachrichtigeBetrieb(slug, { titel, text, url = "/" }) {
       }
     }),
   );
+
+  // "versucht" (nicht "erfolgreich"): wirtServer.js nutzt das, um zu
+  // entscheiden, ob Telegram als Fallback greifen soll – 0 heißt, dass kein
+  // Gerät für Web Push registriert war, egal ob der Versand selbst klappte.
+  return { versucht: subscriptions.length };
 }
