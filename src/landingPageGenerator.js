@@ -3,21 +3,26 @@ import {
   menuForCuisine,
   highlightCandidates,
   detectCuisine,
-  gerichtId,
 } from "./menuCatalog.js";
 import { HERO_IMAGES, INTERIOR_IMAGES, TEAM_IMAGES, assetFileName } from "./imageLibrary.js";
 import { resolveStimmung, stimmungenFuer, ARCHETYP_LABEL } from "./stimmungen.js";
-import {
-  heroSignatur,
-  heroDishPhoto,
-  heroAmbiencePhoto,
-  heroReservationHero,
-  SIGNATUR_CSS,
-} from "./heroSignature.js";
-import { MOTION_CSS, MOTION_SCRIPT } from "./motion.js";
+import { SIGNATUR_CSS } from "./heroSignature.js";
+import { MOTION_CSS, MOTION_SCRIPT, MOTION_EXTRA_CSS, MOTION_EXTRA_SKRIPT } from "./motion.js";
+import { EDITORIAL_CSS, TYPOGRAFIE_CSS } from "./styles/editorial.css.js";
 import { resonanzSkript } from "./resonanzBeacon.js";
-import { stimmenFuer, PLATZHALTER_ERKLAERUNG } from "./testimonials.js";
+import { engineMarkerMeta } from "./engineVersion.js";
 import { getPresetVariant, withDesignDefaults, presetFuerArchetyp } from "./designPresets.js";
+import { escapeHtml, jsonForScript, optionList } from "./htmlHelpers.js";
+import { renderHeader } from "./sections/header.js";
+import { renderHero, renderUspStrip } from "./sections/hero.js";
+import { renderHighlights } from "./sections/highlights.js";
+import { renderMenu } from "./sections/menu.js";
+import { renderAmbiente, renderContact, renderKontaktZeilen, renderOeffnungszeiten, FOTO_SLOTS } from "./sections/contact.js";
+import { renderStimmen } from "./sections/testimonials.js";
+import { renderReservation, PICKUP_SLOTS } from "./sections/reservation.js";
+import { renderFooter } from "./sections/footer.js";
+
+export { escapeHtml, FOTO_SLOTS };
 
 // Standard-Öffnungszeiten für den Entwurf. Google liefert diese Felder in
 // unserer Suchabfrage nicht mit, deshalb sind es bewusst Platzhalter, die auf
@@ -26,13 +31,6 @@ export const DEFAULT_OPENING_HOURS = [
   { tage: "Montag – Donnerstag", zeiten: "11:30 – 14:00 & 17:00 – 22:00" },
   { tage: "Freitag – Samstag", zeiten: "11:30 – 14:00 & 17:00 – 23:00" },
   { tage: "Sonntag & Feiertage", zeiten: "11:30 – 21:00" },
-];
-
-// Die drei Bildplätze, die der Wirt später mit eigenen Handyfotos füllt.
-export const FOTO_SLOTS = [
-  { titel: "Unser Haus", hinweis: "Außenansicht – damit Gäste Sie von der Straße aus erkennen" },
-  { titel: "Ihr Team", hinweis: "Ein Gesicht hinter der Theke schafft mehr Vertrauen als jedes Stockfoto" },
-  { titel: "Unser Bestseller", hinweis: "Das meistbestellte Gericht, ehrlich fotografiert" },
 ];
 
 function hashText(text) {
@@ -103,33 +101,6 @@ function beschreibungUnveraendert(_gerichtId, beschreibung) {
 }
 
 /**
- * Wählt das Hero-Element passend zu preset.hero.type. "signature" (Standard)
- * und jeder unbekannte Wert fallen auf die bisherige, küchenspezifische
- * Animation zurück – ein Tippfehler im Preset darf den Hero nie leeren.
- */
-function renderHeroFeature(type, ctx) {
-  if (type === "dish_photo") return heroDishPhoto(ctx);
-  if (type === "ambience_photo") return heroAmbiencePhoto(ctx);
-  if (type === "reservation_hero") return heroReservationHero(ctx);
-  return heroSignatur(ctx.cuisine, ctx);
-}
-
-/**
- * Die beiden Hero-CTAs ("Zur Abholung bestellen" / "Tisch reservieren").
- * Bei primaryAction "order" (Standard) exakt die bisherige Reihenfolge und
- * Optik; bei "reservation" tauschen Reihenfolge und Betonung (nicht Ziel
- * oder Text).
- */
-function heroActionButtons(primaryAction) {
-  const bestellen = (cls) => `<a class="btn ${cls}" href="#karte">Zur Abholung bestellen</a>`;
-  const reservieren = (cls) => `<a class="btn ${cls}" href="#reservierung">Tisch reservieren</a>`;
-  if (primaryAction === "reservation") {
-    return `${reservieren("btn-light")}${bestellen("btn-outline-light")}`;
-  }
-  return `${bestellen("btn-light")}${reservieren("btn-outline-light")}`;
-}
-
-/**
  * Die beiden Knöpfe der mobilen Aktionsleiste. Die ID "bar-order" bleibt in
  * jedem Fall am Bestell-Knopf – daran hängt das Warenkorb-Skript.
  */
@@ -155,28 +126,6 @@ export function slugify(value) {
     .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "") || "restaurant";
-}
-
-export function escapeHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-// Verhindert, dass ein "</script>" in den Daten das Skript-Tag vorzeitig schließt.
-function jsonForScript(data) {
-  return JSON.stringify(data).replace(/</g, "\\u003c");
-}
-
-function formatPrice(value) {
-  return `${Number(value).toFixed(2).replace(".", ",")} €`;
-}
-
-function formatCount(value) {
-  return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
 /**
@@ -214,26 +163,6 @@ export function ortsbezug(adresse, ort) {
 
   return ort ? `mitten in ${ort}` : "";
 }
-
-function timeSlots(startMinutes, endMinutes, stepMinutes) {
-  const slots = [];
-  for (let m = startMinutes; m <= endMinutes; m += stepMinutes) {
-    const hh = String(Math.floor(m / 60)).padStart(2, "0");
-    const mm = String(m % 60).padStart(2, "0");
-    slots.push(`${hh}:${mm}`);
-  }
-  return slots;
-}
-
-const RESERVATION_SLOTS = [
-  ...timeSlots(11 * 60 + 30, 14 * 60, 30),
-  ...timeSlots(17 * 60, 21 * 60 + 30, 30),
-];
-
-const PICKUP_SLOTS = [
-  ...timeSlots(11 * 60 + 30, 14 * 60, 15),
-  ...timeSlots(17 * 60, 21 * 60 + 30, 15),
-];
 
 /**
  * Sammelt alle Bilder, die eine Seite braucht – die CLI lädt sie damit vorab
@@ -946,170 +875,6 @@ const PAGE_SCRIPT = `
 })();
 `;
 
-function renderHighlights(highlights, bildUrl, showBadges = true, beschreibungFuer = beschreibungUnveraendert) {
-  return highlights
-    .map((gericht) => {
-      const veg = showBadges && gericht.vegetarisch ? '<span class="veg">vegetarisch</span>' : "";
-      return `
-      <article class="hl-card">
-        <div class="hl-media">
-          <img src="${escapeHtml(bildUrl(gericht.bild, "gericht"))}" alt="${escapeHtml(gericht.name)}" loading="lazy">
-          <span class="hl-kat">${escapeHtml(gericht.kategorie)}</span>
-        </div>
-        <div class="hl-body">
-          <h3 class="hl-name">${escapeHtml(gericht.name)}</h3>
-          <p class="hl-desc">${escapeHtml(beschreibungFuer(gericht.id, gericht.beschreibung))}</p>
-          <div class="hl-foot">
-            <span class="hl-preis">${formatPrice(gericht.preis)}</span>
-            ${veg}
-            <button class="add-btn" type="button" data-add="${gericht.id}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}">
-              <span aria-hidden="true">+</span> Vorbestellen
-            </button>
-          </div>
-        </div>
-      </article>`;
-    })
-    .join("");
-}
-
-/**
- * Die vollständige Karte als aufklappbare Liste – direkt im HTML statt als
- * PDF, damit sie auf dem Handy lesbar ist und Google sie indexieren kann.
- */
-function renderMenuAccordion(menu, showBadges = true, beschreibungFuer = beschreibungUnveraendert) {
-  return menu.kategorien
-    .map((kategorie, katIndex) => {
-      const gerichte = kategorie.gerichte
-        .map((gericht, gerichtIndex) => {
-          const veg = showBadges && gericht.vegetarisch ? ' <span class="veg">vegetarisch</span>' : "";
-          const id = gerichtId(katIndex, gerichtIndex);
-          return `
-          <div class="gericht">
-            <div class="gericht-body">
-              <div class="gericht-name">${escapeHtml(gericht.name)}${veg}</div>
-              <div class="gericht-desc">${escapeHtml(beschreibungFuer(id, gericht.beschreibung))}</div>
-            </div>
-            <div class="gericht-seite">
-              <span class="gericht-preis">${formatPrice(gericht.preis)}</span>
-              <button class="mini-add" type="button" data-add="${id}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}" aria-label="${escapeHtml(gericht.name)} vorbestellen">+</button>
-            </div>
-          </div>`;
-        })
-        .join("");
-
-      return `
-      <details class="kat"${katIndex === 0 ? " open" : ""}>
-        <summary>${escapeHtml(kategorie.name)} <span class="kat-anzahl">${kategorie.gerichte.length} Gerichte</span></summary>
-        <div class="kat-body">${gerichte}</div>
-      </details>`;
-    })
-    .join("");
-}
-
-/**
- * Die drei Bildplätze: Haus, Team und Bestseller. Jeder zeigt ein Motiv, das
- * zur Beschriftung passt, damit der Wirt sofort sieht, welches eigene Foto
- * dort hingehört.
- */
-function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl, eigeneBilder = {}) {
-  const quellen = [
-    eigeneBilder.haus ?? bildUrl(hausBild, "ambiente"),
-    eigeneBilder.team ?? bildUrl(teamBild, "ambiente"),
-    eigeneBilder.bestseller ??
-      (bestsellerBild ? bildUrl(bestsellerBild, "gericht") : bildUrl(hausBild, "ambiente")),
-  ];
-
-  return FOTO_SLOTS.map(
-    ({ titel, hinweis }, index) => `
-      <figure class="foto-slot" style="margin:0">
-        <img src="${escapeHtml(quellen[index])}" alt="" loading="lazy">
-        <span class="foto-badge">Platzhalter</span>
-        <figcaption class="foto-text">
-          <strong>${escapeHtml(titel)}</strong>
-          <span>${escapeHtml(hinweis)}</span>
-        </figcaption>
-      </figure>`,
-  ).join("");
-}
-
-/**
- * Gästestimmen. Bei echten Häusern bewusst Platzhalter: Google-Rezensionen
- * dürfen nicht gespeichert werden, und fremde Bewertungen auf einer
- * unbeauftragten Seite wären ohnehin nicht in Ordnung.
- */
-function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3") {
-  const { stimmen, slots, platzhalter } = stimmenFuer(cuisine, { fiktiv });
-
-  // Leere Plätze statt erfundener Zitate: ohne Sterne und ohne Namen ist
-  // nichts behauptet, der Aufbau ist trotzdem zu sehen.
-  const karten = platzhalter
-    ? slots
-        .map(
-          (titel) => `
-      <div class="stimme ist-platzhalter">
-        <span class="sterne leer" aria-hidden="true">★★★★★</span>
-        <p class="slot-titel">${escapeHtml(titel)}</p>
-        <footer><span>wird aus Ihren Google-Bewertungen übernommen</span></footer>
-      </div>`,
-        )
-        .join("")
-    : stimmen
-        .map(
-          ({ text, autor, wann }) => `
-      <blockquote class="stimme">
-        <span class="sterne" aria-hidden="true">★★★★★</span>
-        <p>${escapeHtml(text)}</p>
-        <footer><strong>${escapeHtml(autor)}</strong><span>${escapeHtml(wann)}</span></footer>
-      </blockquote>`,
-        )
-        .join("");
-
-  const note = lead.rating
-    ? `<div class="stimmen-note">
-         <span class="note">${String(lead.rating).replace(".", ",")}</span>
-         <span class="sterne" aria-hidden="true">${"★".repeat(Math.round(Number(lead.rating)))}</span>
-         <span>von 5 auf Google${
-           lead.anzahlBewertungen ? `, aus ${formatCount(lead.anzahlBewertungen)} Bewertungen` : ""
-         }</span>
-       </div>`
-    : "";
-
-  // "grid-3" ist das bisherige Verhalten und bekommt keine Zusatzklasse –
-  // nur abweichende Layouts (bisher: "list") erhalten einen Modifier.
-  const gridClass = socialLayout && socialLayout !== "grid-3" ? ` stimmen-grid--${socialLayout}` : "";
-
-  return `
-  <section class="section stimmen-section" id="stimmen">
-    <div class="wrap">
-      <div class="section-head mitte">
-        <div class="eyebrow">Gästestimmen</div>
-        <h2>Was unsere Gäste sagen</h2>
-      </div>
-      ${note}
-      <div class="stimmen-grid${gridClass}">${karten}</div>
-      ${platzhalter ? `<p class="stimmen-erklaerung">${escapeHtml(PLATZHALTER_ERKLAERUNG)}</p>` : ""}
-    </div>
-  </section>`;
-}
-
-function renderRating(lead) {
-  if (!lead.rating) return "";
-  const rounded = Math.round(Number(lead.rating));
-  const stars = "★".repeat(rounded) + "☆".repeat(Math.max(0, 5 - rounded));
-  const count = lead.anzahlBewertungen
-    ? ` (${formatCount(lead.anzahlBewertungen)} Bewertungen)`
-    : "";
-  return `
-    <div class="rating">
-      <span class="stars" aria-hidden="true">${stars}</span>
-      <span><strong>${String(lead.rating).replace(".", ",")}/5</strong> auf Google${count}</span>
-    </div>`;
-}
-
-function optionList(values) {
-  return values.map((value) => `<option>${escapeHtml(value)}</option>`).join("");
-}
-
 /**
  * Baut eine eigenständige HTML-Landingpage für einen Lead. Aufbau folgt dem
  * Bestellweg: Hero mit Konzept, Ort und Bewertung ohne Scrollen, feste
@@ -1177,28 +942,21 @@ export function buildLandingPage(lead, options = {}) {
   // entsteht kein Skript und die Seite bleibt exakt wie vorher.
   const resonanzBeacon = resonanzSkript(options.resonanzUrl, options.slug);
 
-  const kontaktZeilen = [
-    adresse
-      ? `<li><span class="k">📍</span><span>${escapeHtml(adresse)}${
-          mapsUrl
-            ? `<br><a href="${escapeHtml(mapsUrl)}" target="_blank" rel="noopener">Route planen</a>`
-            : ""
-        }</span></li>`
-      : "",
-    telefon
-      ? `<li><span class="k">📞</span><span><a href="tel:${escapeHtml(telHref)}">${escapeHtml(telefon)}</a><br><span class="hint">Telefonisch erreichbar während der Öffnungszeiten</span></span></li>`
-      : "",
-    `<li><span class="k">🥡</span><span>Abholung vorbestellen – Ihr Essen steht pünktlich bereit</span></li>`,
-  ]
-    .filter(Boolean)
-    .join("");
+  const kontaktZeilen = renderKontaktZeilen({ adresse, mapsUrl, telefon, telHref });
+  const hoursRows = renderOeffnungszeiten(openingHours);
 
-  const hoursRows = openingHours
-    .map(
-      (row) =>
-        `<div class="hours-row"><span>${escapeHtml(row.tage)}</span><span>${escapeHtml(row.zeiten)}</span></div>`,
-    )
-    .join("");
+  // Das Magazin-Raster und der Video-Hero sind opt-in. Nur wenn ein Preset sie
+  // anfordert, kommen der Editorial-Stil, die größere Schriftskala und der
+  // zusätzliche Bewegungsblock in die Seite. Für die drei bestehenden
+  // Archetypen bleibt die Ausgabe damit Zeichen für Zeichen dieselbe wie zuvor.
+  const asymmetrisch = preset.layout.gridStyle === "asymmetric";
+  const heroVideoSrc = eigeneBilder.heroVideo ?? lead.heroVideo ?? "";
+  const hatVideoHero = preset.hero.type === "video_loop" && Boolean(heroVideoSrc);
+  const brauchtExtraBewegung = asymmetrisch || preset.hero.type === "editorial" || hatVideoHero;
+  const typografieCss = TYPOGRAFIE_CSS[preset.typography?.scale ?? "standard"] ?? "";
+  const bodyKlassen = [veroeffentlicht ? "veroeffentlicht" : "", asymmetrisch ? "gitter-asymmetrisch" : ""]
+    .filter(Boolean)
+    .join(" ");
 
   const uspBadges = (menu.usps ?? [])
     .map((usp) => `<span><span aria-hidden="true">✓</span> ${escapeHtml(usp)}</span>`)
@@ -1212,7 +970,8 @@ export function buildLandingPage(lead, options = {}) {
 <title>${escapeHtml(name)}${ort ? ` – ${escapeHtml(menu.konzept ?? "Restaurant")} in ${escapeHtml(ort)}` : ""}</title>
 <meta name="description" content="${escapeHtml(`${name}${ort ? ` in ${ort}` : ""}: ${menu.konzept ?? menu.label}. ${schlagzeile} Jetzt Tisch reservieren oder zur Abholung vorbestellen.`)}">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
-${veroeffentlicht ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<style>
+${veroeffentlicht ? '<meta name="robots" content="noindex, nofollow">\n' : ""}${engineMarkerMeta({ archetyp: gestaltung.archetyp })}
+<style>
 ${fontCss}
 :root {
   --bg: ${t.bg};
@@ -1232,13 +991,17 @@ ${fontCss}
   --display-transform: ${t.displayTransform};
   --display-tracking: ${t.displayTracking};
   --radius: ${t.radius};
-}
+}${asymmetrisch ? `
+/* Der kräftigere Akzent aus colorMath.boldAccent – mindestens 4.5:1 gegen den
+   eigenen Grund. Er steht nur dort, wo er gebraucht wird: Die drei bestehenden
+   Archetypen arbeiten unverändert mit --accent. */
+:root { --accent-bold: ${t.accentBold ?? t.accent}; }` : ""}
 ${PAGE_STYLES}
 ${SIGNATUR_CSS}
-${MOTION_CSS}
+${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}
 </style>
 </head>
-<body${veroeffentlicht ? ' class="veroeffentlicht"' : ""}>
+<body${bodyKlassen ? ` class="${bodyKlassen}"` : ""}>
 
 ${
   veroeffentlicht
@@ -1249,43 +1012,25 @@ ${
       }</span></div>`
     : ""
 }
-<header class="${preset.header.sticky === false ? "topbar topbar-static" : "topbar"}" id="topbar">
-  <div class="wrap topbar-inner">
-    <div class="brand">${escapeHtml(name)}</div>
-    <nav class="topnav">
-      <a href="#highlights">Highlights</a>
-      <a href="#karte">Speisekarte</a>
-      <a href="#reservierung">Reservierung</a>
-      <a href="#kontakt">Kontakt</a>
-    </nav>
-    <a class="btn btn-primary" href="#reservierung">Tisch reservieren</a>
-  </div>
-</header>
+${renderHeader({ name, sticky: preset.header.sticky })}
 
-<section class="hero">
-  <div class="hero-media">
-    <img src="${escapeHtml(eigeneBilder.hero ?? bildUrl(gestaltung.heroImage, "hero"))}" alt="${escapeHtml(name)}">
-  </div>
-  <div class="hero-overlay"></div>
-  ${renderHeroFeature(preset.hero.type, {
-    cuisine: gestaltung.cuisine,
-    highlights,
-    hausBild: gestaltung.hausBild,
-    bildUrl,
-    escape: escapeHtml,
-  })}
-  <div class="hero-inner">
-    <div class="hero-kicker">${escapeHtml(menu.konzept ?? menu.label)}${ort ? ` · in ${escapeHtml(ort)}` : ""}</div>
-    <h1>${escapeHtml(heroHeadline)}</h1>
-    ${renderRating(lead)}
-    <p class="hero-sub">${escapeHtml(heroSchlagzeile)}</p>
-    <div class="hero-actions">${heroActionButtons(preset.hero.primaryAction)}</div>
-  </div>
-</section>
+${renderHero({
+  lead,
+  preset,
+  name,
+  ort,
+  heroImageSrc: eigeneBilder.hero ?? bildUrl(gestaltung.heroImage, "hero"),
+  heroVideoSrc,
+  konzeptLabel: menu.konzept ?? menu.label,
+  heroHeadline,
+  heroSchlagzeile,
+  cuisine: gestaltung.cuisine,
+  highlights,
+  hausBild: gestaltung.hausBild,
+  bildUrl,
+})}
 
-<section class="usp-strip">
-  <div class="wrap"><div class="usp-list">${uspBadges}</div></div>
-</section>
+${renderUspStrip(menu.usps)}
 
 ${(() => {
   // Reihenfolge der Hauptsektionen kommt aus preset.layout.sectionOrder.
@@ -1293,147 +1038,26 @@ ${(() => {
   // alles, was in der Vorgabe fehlt, wird in der bisherigen Reihenfolge
   // angehängt (das bisherige, feste Verhalten als Fallback).
   const sectionsById = {
-    highlights: `
-<section class="section" id="highlights">
-  <div class="wrap">
-    <div class="section-head mitte">
-      <div class="eyebrow">Unsere Highlights</div>
-      <h2>Das bestellen unsere Gäste am liebsten</h2>
-      <p>Alles frisch zubereitet. Zum Abholen einfach vorbestellen und zur Wunschzeit mitnehmen.</p>
-    </div>
+    highlights: renderHighlights({ highlights, bildUrl, showBadges: preset.menu.showBadges, beschreibungFuer, spalten, gridStyle: preset.layout.gridStyle }),
 
-    <div class="hl-grid ${spalten}">${renderHighlights(highlights, bildUrl, preset.menu.showBadges, beschreibungFuer)}</div>
+    karte: renderMenu({ menu, menuLayout: preset.menu.layout, showBadges: preset.menu.showBadges, beschreibungFuer }),
 
-    <div class="steps">
-      <div class="step">
-        <div class="step-n">1</div>
-        <div><h3>Aussuchen</h3><p>Gerichte antippen und in den Warenkorb legen.</p></div>
-      </div>
-      <div class="step">
-        <div class="step-n">2</div>
-        <div><h3>Abholzeit wählen</h3><p>Sie bestimmen, wann Ihr Essen fertig sein soll.</p></div>
-      </div>
-      <div class="step">
-        <div class="step-n">3</div>
-        <div><h3>Abholen &amp; zahlen</h3><p>Kein Warten, keine Vorkasse – bezahlt wird bei uns.</p></div>
-      </div>
-    </div>
-  </div>
-</section>`,
-
-    karte: `
-<section class="section karte-section" id="karte" data-menu-layout="${escapeHtml(preset.menu.layout)}">
-  <div class="wrap">
-    <div class="section-head mitte">
-      <div class="eyebrow">Speisekarte</div>
-      <h2>Unsere ganze Karte</h2>
-      <p>Kategorie antippen zum Aufklappen. Jedes Gericht lässt sich direkt zur Abholung vorbestellen.</p>
-    </div>
-    ${renderMenuAccordion(menu, preset.menu.showBadges, beschreibungFuer)}
-  </div>
-</section>`,
-
-    ambiente: `
-<section class="section" id="ambiente">
-  <div class="wrap">
-    <div class="section-head mitte">
-      <div class="eyebrow">Bei uns</div>
-      <h2>${escapeHtml(menu.konzept ?? menu.label)}${ort ? ` in ${escapeHtml(ort)}` : ""}</h2>
-      <p>${escapeHtml(menu.geschichte)}</p>
-    </div>
-    <div class="foto-grid">${renderFotoSlots(
-      {
-        hausBild: gestaltung.hausBild,
-        teamBild: gestaltung.teamBild,
-        bestsellerBild: highlights[0]?.bild,
-      },
+    ambiente: renderAmbiente({
+      konzeptLabel: menu.konzept ?? menu.label,
+      ort,
+      geschichte: menu.geschichte,
+      hausBild: gestaltung.hausBild,
+      teamBild: gestaltung.teamBild,
+      bestsellerBild: highlights[0]?.bild,
       bildUrl,
       eigeneBilder,
-    )}</div>
-  </div>
-</section>`,
+    }),
 
     stimmen: renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social.layout),
 
-    reservierung: `
-<section class="section reserve-section" id="reservierung" data-reservation-variant="${escapeHtml(preset.reservation.widgetVariant)}">
-  <div class="wrap">
-    <div class="reserve-grid">
-      <div>
-        <div class="eyebrow">Reservierung</div>
-        <h2 style="font-size:clamp(28px,4.4vw,42px);margin-bottom:16px">Tisch reservieren</h2>
-        <p style="color:var(--ink-soft);font-size:18px">Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
-        <ul class="reserve-pluspunkte">
-          <li><span class="k">✓</span><span>Rund um die Uhr buchbar, auch außerhalb der Öffnungszeiten</span></li>
-          <li><span class="k">✓</span><span>Sofortige Bestätigung, ganz ohne Anruf</span></li>
-          <li><span class="k">✓</span><span>Sonderwünsche wie Kinderstuhl oder Allergien direkt mitteilen</span></li>
-        </ul>
-      </div>
+    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant }),
 
-      <form class="panel" id="reservation-form" novalidate>
-        <div class="field-grid">
-          <div class="field">
-            <label for="res-datum">Datum</label>
-            <input type="date" id="res-datum" name="datum" required>
-            <span class="error">Bitte wählen Sie ein Datum.</span>
-          </div>
-          <div class="field">
-            <label for="res-uhrzeit">Uhrzeit</label>
-            <select id="res-uhrzeit" name="uhrzeit" required>
-              <option value="">Bitte wählen</option>
-              ${optionList(RESERVATION_SLOTS)}
-            </select>
-            <span class="error">Bitte wählen Sie eine Uhrzeit.</span>
-          </div>
-          <div class="field">
-            <label for="res-personen">Personen</label>
-            <select id="res-personen" name="personen" required>
-              <option value="">Bitte wählen</option>
-              ${optionList(["1 Person", "2 Personen", "3 Personen", "4 Personen", "5 Personen", "6 Personen", "7 Personen", "8 Personen", "Mehr als 8 Personen"])}
-            </select>
-            <span class="error">Bitte wählen Sie die Personenzahl.</span>
-          </div>
-          <div class="field">
-            <label for="res-name">Name</label>
-            <input type="text" id="res-name" name="name" autocomplete="name" required>
-            <span class="error">Bitte geben Sie Ihren Namen an.</span>
-          </div>
-          <div class="field">
-            <label for="res-telefon">Telefon</label>
-            <input type="tel" id="res-telefon" name="telefon" autocomplete="tel" required>
-            <span class="error">Bitte geben Sie eine Telefonnummer an.</span>
-          </div>
-          <div class="field">
-            <label for="res-email">E-Mail <span class="hint">(optional)</span></label>
-            <input type="email" id="res-email" name="email" autocomplete="email">
-          </div>
-          <div class="field field-wide">
-            <label for="res-wunsch">Anmerkungen <span class="hint">(optional)</span></label>
-            <textarea id="res-wunsch" name="wunsch" placeholder="Kinderstuhl, Allergien, Tisch am Fenster ..."></textarea>
-          </div>
-        </div>
-        <button class="btn btn-primary btn-block" type="submit" style="margin-top:24px">Reservierung anfragen</button>
-      </form>
-    </div>
-  </div>
-</section>`,
-
-    kontakt: `
-<section class="section" id="kontakt">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow">Kontakt</div>
-      <h2>So finden Sie uns</h2>
-    </div>
-    <div class="contact-grid">
-      <ul class="contact-list">${kontaktZeilen}</ul>
-      <div>
-        <h3 style="font-size:20px;margin-bottom:12px">Öffnungszeiten<span class="placeholder-badge">Platzhalter</span></h3>
-        ${hoursRows}
-      </div>
-    </div>
-  </div>
-</section>`,
+    kontakt: renderContact({ kontaktZeilen, hoursRows }),
   };
 
   const konfigurierteReihenfolge = (preset.layout.sectionOrder ?? []).filter((id) => sectionsById[id]);
@@ -1511,20 +1135,12 @@ ${
   }
 </div>
 
-<footer>
-  <div class="wrap">
-    <strong>${escapeHtml(name)}</strong>${adresse ? ` · ${escapeHtml(adresse)}` : ""}${telefon ? ` · ${escapeHtml(telefon)}` : ""}
-    <div class="footer-note">
-      Unverbindlicher Gestaltungsentwurf. Gerichte, Preise und Öffnungszeiten sind Platzhalter,
-      die Fotos stammen aus einer Stockbild-Datenbank (Unsplash). Vor einer Veröffentlichung werden
-      beide durch die echten Angaben und Aufnahmen des Hauses ersetzt.
-    </div>
-  </div>
-</footer>
+${renderFooter({ name, adresse, telefon })}
 
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${PAGE_SCRIPT}</script>
-<script>${MOTION_SCRIPT}</script>
+<script>${MOTION_SCRIPT}</script>${brauchtExtraBewegung ? `
+<script>${MOTION_EXTRA_SKRIPT}</script>` : ""}
 ${resonanzBeacon ? `<script>${resonanzBeacon}</script>` : ""}
 </body>
 </html>

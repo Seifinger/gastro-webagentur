@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { readAllLeads } from "./csvImport.js";
 import {
@@ -12,7 +12,8 @@ import { ladeZuordnungen, kuecheFuerLead } from "./cuisineOverrides.js";
 import { ladeStimmungsWahl, stimmungFuerLead } from "./stimmungsWahl.js";
 import { ensureAssets } from "./imageLibrary.js";
 import { ensureFonts, fontFaceCss } from "./fontLibrary.js";
-import { landingPagesDir, resonanzUrl } from "./config.js";
+import { resonanzUrl } from "./config.js";
+import { ladeManifest, placeIdFuerSlug } from "./entwurfsManifest.js";
 
 // Gemeinsamer Unterbau für die lokale Fassung (npm run pages) und die
 // veröffentlichte Fassung (npm run publish-site). Beide sollen denselben
@@ -123,14 +124,7 @@ export function baueEintraege(leads, cuisineOverride) {
  * Namen und Hash ergeben, praktisch ausgeschlossen bei eindeutigen placeIds.
  */
 export function leadFuerSlug(slug) {
-  let manifest;
-  try {
-    manifest = JSON.parse(readFileSync(path.join(landingPagesDir, "entwuerfe.json"), "utf-8"));
-  } catch {
-    return null;
-  }
-
-  const placeId = Object.keys(manifest).find((id) => manifest[id] === slug);
+  const placeId = placeIdFuerSlug(ladeManifest(), slug);
   if (!placeId) return null;
   return readAllLeads().find((lead) => lead.placeId === placeId) ?? null;
 }

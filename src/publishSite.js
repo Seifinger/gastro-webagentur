@@ -8,6 +8,7 @@ import { menuForCuisine } from "./menuCatalog.js";
 import { themeForLead } from "./landingPageGenerator.js";
 import { DEMO_LEADS } from "./demoLeads.js";
 import { loadLeadEdits } from "./leadEdits.js";
+import { merkeVeroeffentlichung } from "./entwurfsManifest.js";
 import { uploadsDir } from "./bildUpload.js";
 import {
   parseArgs,
@@ -187,6 +188,18 @@ export async function baueUndSchreibeEinzelnenEntwurf(
     },
   );
 
+  // Nur ein echter Lauf nach docs/ ist eine Veröffentlichung. Ein Bau in ein
+  // anderes Verzeichnis (Vorschau, Tests) darf den festgehaltenen Stand des
+  // Kunden nicht verschieben – sonst sähe eine Seite "frisch" aus, die online
+  // unverändert alt ist.
+  if (zielordner === docsDir) {
+    merkeVeroeffentlichung({
+      placeId: lead.placeId,
+      slug: entry.slug,
+      archetyp: entry.gestaltung?.archetyp ?? "",
+    });
+  }
+
   return { slug: entry.slug, ordner: path.join(zielordner, entry.slug) };
 }
 
@@ -254,6 +267,20 @@ async function run() {
   // Echte Leads: veröffentlicht, aber von nirgendwo verlinkt. Nur wer den
   // QR-Code oder Link bekommen hat, findet den Entwurf.
   schreibeSeiten(entries, docsDir, gemeinsam);
+
+  // Jede Seite, die dieser Lauf wirklich nach docs/ geschrieben hat, bekommt
+  // den aktuellen Engine-Stand ins Manifest. Der Archetyp bleibt dabei der,
+  // der dem Lead schon zugeordnet war (stimmungsWahl.js bzw. der Seed über
+  // die drei Grund-Archetypen) – ein Sammel-Lauf stellt niemanden um.
+  const jetzt = new Date().toISOString();
+  for (const entry of entries) {
+    merkeVeroeffentlichung({
+      placeId: entry.lead.placeId,
+      slug: entry.slug,
+      archetyp: entry.gestaltung?.archetyp ?? "",
+      zeitpunkt: jetzt,
+    });
+  }
 
   // Erfundene Lokale: das, was auf der Startseite steht.
   const demoEntries = DEMO_LEADS.map((lead) => ({
