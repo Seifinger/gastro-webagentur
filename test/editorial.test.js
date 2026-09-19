@@ -163,8 +163,15 @@ test("die bestehenden Archetypen bekommen nichts vom Editorial-Stil zu sehen", (
   for (const stimmung of stimmungenFuer("italienisch")) {
     if (stimmung.archetyp === "editorial") continue;
     const html = seite(stimmung.id);
-    for (const teil of ["hl-grid--magazin", "gitter-asymmetrisch", "--accent-bold", "auftritt-zeile", "hero-video"]) {
+    for (const teil of ["hl-grid--magazin", "gitter-asymmetrisch", "auftritt-zeile", "hero-video"]) {
       assert.ok(!html.includes(teil), `${stimmung.id}: ${teil} steht fälschlich in der Seite`);
+    }
+    // --accent-bold ist kein Editorial-Merkmal mehr: Die Handschrift des
+    // traditionellen Archetyps nutzt ihn für Text, der sonst unter 4.5:1
+    // gegen den eigenen Grund läge (docs-intern/design-tokens/traditionell.md).
+    // Die Archetypen ohne Handschrift haben ihn weiterhin nicht.
+    if (stimmung.archetyp !== "traditionell") {
+      assert.ok(!html.includes("--accent-bold"), `${stimmung.id}: --accent-bold steht fälschlich in der Seite`);
     }
   }
 });

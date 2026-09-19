@@ -222,7 +222,9 @@ test("die veröffentlichte Fassung weist sich als Entwurf aus", () => {
   const html = buildLandingPage(lead, { veroeffentlicht: true });
 
   assert.ok(html.includes('<meta name="robots" content="noindex, nofollow">'));
-  assert.ok(html.includes('<body class="veroeffentlicht">'));
+  // Neben "veroeffentlicht" steht die Handschrift des Archetyps – ohne Lead-
+  // Angabe ist das "traditionell" (siehe ARCHETYP_PRESET in designPresets.js).
+  assert.ok(html.includes('<body class="veroeffentlicht hs-traditionell">'));
   assert.ok(html.includes('class="entwurf-hinweis"'));
   assert.ok(html.includes("nicht</strong> die offizielle Website von Gasthof Zur Post"));
 });
@@ -232,7 +234,8 @@ test("die lokale Fassung trägt keinen Entwurfs-Hinweis und kein noindex", () =>
 
   assert.ok(!html.includes("noindex"));
   assert.ok(!html.includes('class="entwurf-hinweis"'));
-  assert.ok(html.includes("<body>"));
+  assert.ok(!html.includes('<body class="veroeffentlicht'));
+  assert.ok(html.includes('<body class="hs-traditionell">'));
 });
 
 test("buildLandingPage bindet übergebene Schriften ein", () => {
@@ -397,11 +400,25 @@ test("buildLandingPage ohne Preset-Angabe entspricht exakt dem bisherigen Verhal
   assert.ok(!html.includes('class="stimmen-grid stimmen-grid--'));
 });
 
-test("ein leeres options.preset ändert nichts gegenüber gar keinem Preset", () => {
+test("ein eigenes Preset übernimmt die Gestaltung vollständig – auch ohne ein einziges Feld", () => {
   const ohnePreset = buildLandingPage(lead, { menu: MENUS.italienisch });
   const leeresPreset = buildLandingPage(lead, { menu: MENUS.italienisch, preset: {} });
 
-  assert.equal(ohnePreset, leeresPreset);
+  // Wer ein eigenes Preset übergibt, bekommt die Standardwerte aus
+  // designPresets.js und nicht das Preset seines Archetyps – dieselbe Regel,
+  // nach der schon das Magazin-Raster nur auf ausdrückliche Anforderung
+  // kommt. Die Handschrift (Schritt 3-5 des Design-Auftrags) gehört dem
+  // Archetyp, also entfällt sie hier.
+  assert.ok(ohnePreset.includes('<body class="hs-traditionell">'));
+  assert.ok(leeresPreset.includes("<body>"));
+  assert.ok(!leeresPreset.includes("hs-traditionell"));
+
+  // Alles außer der Handschrift ist gleich: derselbe Hero, dieselbe Karte,
+  // derselbe Bestellweg.
+  for (const teil of ['class="hero"', 'id="karte"', 'id="reservierung"', 'id="cart-fab"', "sig-pizza"]) {
+    assert.ok(leeresPreset.includes(teil), teil);
+    assert.ok(ohnePreset.includes(teil), teil);
+  }
 });
 
 test("hero.type 'dish_photo' zeigt ein einzelnes Gerichtsfoto statt der Küchen-Signatur", () => {
@@ -752,7 +769,8 @@ test("texte.headline und texte.schlagzeile ersetzen nur die Hero-Texte", () => {
   assert.ok(html.includes('<p class="hero-sub">Seit 1904 am Stadtplatz.</p>'));
   // Kopfzeile und Fußzeile tragen weiter den Namen aus Google.
   assert.ok(html.includes('<div class="brand">Gasthof Zur Post</div>'));
-  assert.ok(html.includes("<strong>Gasthof Zur Post</strong>"));
+  // In der Fußzeile steht vor dem Namen die gezeichnete Küchenmarke.
+  assert.ok(html.includes("Gasthof Zur Post</strong>"));
 });
 
 test("highlightBeschreibungen ersetzt gezielt eine einzelne Gericht-ID", () => {

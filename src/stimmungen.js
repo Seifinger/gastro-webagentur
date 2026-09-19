@@ -445,6 +445,17 @@ function mitBoldAccent(s) {
   return {
     ...s,
     accentBold: boldAccent(s.accent, { against: s.bg, saturationBoost: 18, targetContrast: 4.5 }),
+    // Derselbe Gedanke, nur streng genug für Text: Der Akzent trägt Schrift
+    // nicht nur auf bg, sondern auch auf surface (Karten, Formulare) und soft
+    // (Karten- und Stimmen-Sektion). accentBold erreicht 4.5:1 nur gegen bg
+    // und fällt auf den beiden anderen Gründen in 35 von 48 Stimmungen durch
+    // (nachzurechnen mit scripts/colorSwatchCheck.mjs). accentLesbar prüft
+    // gegen alle drei und nimmt den ungünstigsten.
+    accentLesbar: boldAccent(s.accent, {
+      against: [s.bg, s.surface, s.soft],
+      saturationBoost: 18,
+      targetContrast: 4.5,
+    }),
   };
 }
 

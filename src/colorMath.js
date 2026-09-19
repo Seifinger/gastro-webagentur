@@ -112,8 +112,12 @@ export function meetsWcagAA(hexA, hexB, { largeText = false } = {}) {
  * @param {object} [options]
  * @param {number} [options.saturationBoost=15] - Prozentpunkte, die die
  *   Sättigung mindestens angehoben wird (auf max. 100 gedeckelt).
- * @param {string} [options.against] - Hintergrundfarbe, gegen die der
- *   Zielkontrast erreicht werden soll (z. B. --bg oder --surface).
+ * @param {string|string[]} [options.against] - Hintergrundfarbe, gegen die der
+ *   Zielkontrast erreicht werden soll (z. B. --bg oder --surface). Mehrere
+ *   Gründe als Liste: Dann wird so lange verschoben, bis der **ungünstigste**
+ *   von ihnen den Zielkontrast erreicht. Eine Seite setzt denselben Akzent auf
+ *   bg, surface und soft ein; gegen nur einen davon zu prüfen, lässt genau die
+ *   Stellen durchfallen, die man nicht geprüft hat.
  * @param {number} [options.targetContrast=4.5] - Ziel-Kontrastverhältnis
  *   gegenüber `against`, per Helligkeitsverschiebung angenähert.
  * @returns {string} Neue Hex-Farbe.
@@ -125,13 +129,16 @@ export function boldAccent(hex, options = {}) {
 
   if (!against) return hslToHex(hsl);
 
+  const gruende = Array.isArray(against) ? against : [against];
+  const schlechtester = (farbe) => Math.min(...gruende.map((grund) => contrastRatio(farbe, grund)));
+
   // Kontrast durch schrittweises Verdunkeln/Aufhellen annähern, ohne Farbton
   // oder Sättigung zu verändern. Bricht ab, sobald das Ziel erreicht ist oder
   // die Helligkeit an ihre Grenzen stößt.
-  const darkerThanBg = relativeLuminance(against) > 0.5;
+  const darkerThanBg = relativeLuminance(gruende[0]) > 0.5;
   let candidate = hslToHex(hsl);
   let guard = 0;
-  while (contrastRatio(candidate, against) < targetContrast && guard < 100) {
+  while (schlechtester(candidate) < targetContrast && guard < 100) {
     hsl.l += darkerThanBg ? -1 : 1;
     hsl.l = Math.max(0, Math.min(100, hsl.l));
     candidate = hslToHex(hsl);

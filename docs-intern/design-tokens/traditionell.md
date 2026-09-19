@@ -92,6 +92,76 @@ diese Werte sind erlaubt; neue Zwischengrößen sind es nicht.
 | Formularfeld | `padding: 13px 15px`, `radius: calc(var(--radius) / 2)` | `:427` |
 | Ecken | `--radius` je Stimmung, siehe Tabelle oben | `:1036` |
 
+## Der eine starke Moment
+
+**Die Hero-Signatur der Küche.** Sie steht schon in `src/heroSignature.js` und
+gehört diesem Haus: die Tafel mit der Tagesempfehlung und der überlaufende
+Bierkrug (bayerisch), die gegenläufig drehende Pizza (italienisch), der
+schaukelnde Olivenzweig (griechisch), der eingegossene Minztee (syrisch).
+
+Damit sie ein Moment sein kann, ist alles andere ruhiggestellt
+(`src/styles/handschrift.css.js`):
+
+| Was | Vorher | Jetzt |
+|---|---|---|
+| Hero-Fahrt | 26 s Zoom auf 106 % | steht |
+| Hero-Parallaxe | zwei Scroll-Timeline-Animationen | steht |
+| Foto-Plätze | Zoom von 110 % auf 100 % beim Scrollen | steht |
+| Highlight-Karte | hebt sich beim Überfahren um 4px, Bild zoomt | steht |
+| Eyebrow-Linie | zieht sich über 0.7 s auf | steht fertig da |
+| Schrittkette | Faden zieht sich über 0.8 s | steht fertig da |
+| Auftritt beim Scrollen | 22–30px Versatz, Skalierung, 85–90 ms Staffelung | nur Aufblenden, ohne Versatz, ohne Staffelung |
+
+Die Regel dahinter, und sie gilt für jede künftige Ergänzung:
+
+> Bewegung gibt es an genau zwei Stellen – bei der einen Signatur (Atmosphäre)
+> und als Antwort auf eine Handlung des Gastes (Akkordeon, Knopfdruck). Nichts
+> bewegt sich, nur weil es erscheint.
+
+**Die Kurve:** `cubic-bezier(.2,.72,.3,1)`, 0.52 s, keine Verzögerung.
+Schneller Anfang, langes Auslaufen – wie ein Teller, der aufgesetzt wird. Sie
+gilt nur für diesen Archetyp. Eine zweite Kurve braucht eine Begründung an
+dieser Stelle.
+
+**Neue Animationen: keine.** Die Handschrift enthält kein einziges
+`@keyframes` (geprüft in `test/handschrift.test.js`). Sie nimmt zurück.
+
+## Die vier Asymmetrien
+
+Je eine Stelle pro Sektion, jeweils aus dem Inhalt begründet:
+
+| Sektion | Vorher | Jetzt | Grund |
+|---|---|---|---|
+| Highlights | 2–3 gleich große Karten, Kopf mittig | **Treppe**: eine große Karte über die volle Breite (Bild links, Text rechts), dann mittlere, dann kleine | Ein Haus hat ein Gericht, für das man kommt. Die Karte mit dem Siegel „Hausempfehlung" ist dieses Gericht. |
+| Karte | Kästen untereinander, Kopf mittig | **Menütafel**: Kategoriename in vier von zwölf Spalten links, Gerichte in acht rechts; der Name bleibt beim Lesen stehen (`position: sticky`) | Ein Kategoriename ist zwei Wörter lang, eine Kategorie zehn Zeilen. Gleich breite Spalten behaupten das Gegenteil. |
+| Stimmen | drei gleich große Karten, bei echten Häusern drei **leere** Kästen | **Blatt**: die Google-Note groß in vier von zwölf Spalten links, die Zitate rechts als Zeilen | Die Note ist die Tatsache, die Zitate sind ihre Belege. Und ein leerer Kasten verspricht Inhalt, eine Linie nicht. |
+| Kontakt | `1fr 1fr` | **7fr / 5fr**, die Adresse in 20px statt 17px | Adresse und Telefon sind die Handlung, die Öffnungszeiten sind Nachschlagewerk. |
+
+Die Mittelachse ist überall aufgehoben: `section-head.mitte` wirkt in diesem
+Archetyp nicht mehr (`handschrift.css.js`), weil kein Inhalt dieser Seite
+symmetrisch gewichtet ist.
+
+## Die gezeichneten Zeichen
+
+`src/signaturIcons.js`. Drei Kontaktsymbole (Wegweiser, Hörer, Papiertüte) und
+ein Haken ersetzen 📍 📞 🥡 ✓. Dazu eine **Küchenmarke** je Küche, aus
+derselben Motivfamilie wie die Hero-Signatur:
+
+| Küche | Marke | Küche | Marke |
+|---|---|---|---|
+| bayerisch | Hopfendolde | thailändisch | Orchideenblüte |
+| italienisch | Basilikumzweig | vietnamesisch | Sternanis |
+| griechisch | Olivenzweig mit Olive | japanisch | Ensō |
+| türkisch | Drehspieß | indisch | Mörser und Stößel |
+| syrisch | Minzzweig | asiatisch | dampfende Schale |
+| chinesisch | Laterne | café | Kaffeebohne |
+
+Sie steht an **drei** Stellen derselben Seite: am Kopf der Highlights, auf dem
+Siegel der Hausempfehlung und in der Fußzeile.
+
+Alle Zeichen sind Kontur in `currentColor`, ohne eigene Farbe – ihr Kontrast
+ist damit der ihres Textes und muss nicht getrennt geprüft werden.
+
 ## Verbotene Muster
 
 Zusätzlich zu den sieben gemeinsamen Regeln aus `README.md`:

@@ -1,4 +1,5 @@
 import { escapeHtml } from "../htmlHelpers.js";
+import { KONTAKT_IKONEN } from "../signaturIcons.js";
 
 // Die drei Bildplätze, die der Wirt später mit eigenen Handyfotos füllt.
 export const FOTO_SLOTS = [
@@ -46,11 +47,11 @@ function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl, eigene
  * @param {Function} ctx.bildUrl
  * @param {object} [ctx.eigeneBilder]
  */
-export function renderAmbiente({ konzeptLabel, ort, geschichte, hausBild, teamBild, bestsellerBild, bildUrl, eigeneBilder }) {
+export function renderAmbiente({ konzeptLabel, ort, geschichte, hausBild, teamBild, bestsellerBild, bildUrl, eigeneBilder, handschrift }) {
   return `
 <section class="section" id="ambiente">
   <div class="wrap">
-    <div class="section-head mitte">
+    <div class="section-head${handschrift === "traditionell" ? "" : " mitte"}">
       <div class="eyebrow">Bei uns</div>
       <h2>${escapeHtml(konzeptLabel)}${ort ? ` in ${escapeHtml(ort)}` : ""}</h2>
       <p>${escapeHtml(geschichte)}</p>
@@ -92,20 +93,33 @@ export function renderContact({ kontaktZeilen, hoursRows }) {
 
 /**
  * Baut das <li>-Markup der Kontaktliste (Adresse, Telefon, Abholhinweis).
+ *
+ * Mit Handschrift stehen dort die gezeichneten Zeichen aus signaturIcons.js
+ * statt der Emoji 📍 📞 🥡. Emoji sind Systemschriften: Sie sehen auf jedem
+ * Gerät anders aus und tragen fremde Farben in die Palette.
+ *
+ * @param {string|null} [ctx.handschrift] - preset.layout.handschrift.
  */
-export function renderKontaktZeilen({ adresse, mapsUrl, telefon, telHref }) {
+export function renderKontaktZeilen({ adresse, mapsUrl, telefon, telHref, handschrift }) {
+  const gezeichnet = handschrift === "traditionell";
+  const zeichen = {
+    ort: gezeichnet ? KONTAKT_IKONEN.ort : "📍",
+    telefon: gezeichnet ? KONTAKT_IKONEN.telefon : "📞",
+    abholung: gezeichnet ? KONTAKT_IKONEN.abholung : "🥡",
+  };
+
   return [
     adresse
-      ? `<li><span class="k">📍</span><span>${escapeHtml(adresse)}${
+      ? `<li><span class="k">${zeichen.ort}</span><span>${escapeHtml(adresse)}${
           mapsUrl
             ? `<br><a href="${escapeHtml(mapsUrl)}" target="_blank" rel="noopener">Route planen</a>`
             : ""
         }</span></li>`
       : "",
     telefon
-      ? `<li><span class="k">📞</span><span><a href="tel:${escapeHtml(telHref)}">${escapeHtml(telefon)}</a><br><span class="hint">Telefonisch erreichbar während der Öffnungszeiten</span></span></li>`
+      ? `<li><span class="k">${zeichen.telefon}</span><span><a href="tel:${escapeHtml(telHref)}">${escapeHtml(telefon)}</a><br><span class="hint">Telefonisch erreichbar während der Öffnungszeiten</span></span></li>`
       : "",
-    `<li><span class="k">🥡</span><span>Abholung vorbestellen – Ihr Essen steht pünktlich bereit</span></li>`,
+    `<li><span class="k">${zeichen.abholung}</span><span>Abholung vorbestellen – Ihr Essen steht pünktlich bereit</span></li>`,
   ]
     .filter(Boolean)
     .join("");

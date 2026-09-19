@@ -1,0 +1,230 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { handschriftCss, handschriftKlasse } from "../src/styles/handschrift.css.js";
+import { ARCHETYP_PRESET, withDesignDefaults } from "../src/designPresets.js";
+import { buildLandingPage, themeForLead } from "../src/landingPageGenerator.js";
+import { menuForCuisine } from "../src/menuCatalog.js";
+import { stimmungenFuer, STIMMUNGEN } from "../src/stimmungen.js";
+import { contrastRatio } from "../src/colorMath.js";
+import { kuechenMarke, hatKuechenMarke, KONTAKT_IKONEN } from "../src/signaturIcons.js";
+
+const lead = {
+  name: "Gasthof Beispiel",
+  ort: "Mühldorf am Inn",
+  adresse: "Marktplatz 1, 84453 Mühldorf am Inn",
+  telefon: "08631 123456",
+  placeId: "test-handschrift",
+  rating: 4.7,
+  anzahlBewertungen: 428,
+};
+
+function seite(cuisine, stimmungsId, extra = {}) {
+  const gestaltung = themeForLead(lead, cuisine, stimmungsId);
+  return buildLandingPage(lead, { menu: menuForCuisine(cuisine), gestaltung, ...extra });
+}
+
+function stimmungFuer(cuisine, archetyp) {
+  return stimmungenFuer(cuisine).find((s) => s.archetyp === archetyp).id;
+}
+
+/* ---------- Die Handschrift kann keinen anderen Archetyp erreichen ---------- */
+
+test("jeder Selektor der Handschrift hängt an ihrer Körperklasse", () => {
+  // Das ist der eigentliche Regressionsschutz: Solange jede Regel an
+  // .hs-<archetyp> hängt, kann der Block die übrigen Archetypen selbst dann
+  // nicht verändern, wenn ihn jemand versehentlich überall einhängt.
+  const css = handschriftCss("traditionell").replace(/\/\*[\s\S]*?\*\//g, "");
+  const gruppen = [...css.matchAll(/([^{}]+)\{/g)]
+    .map((treffer) => treffer[1].trim().replace(/\s+/g, " "))
+    .filter((sel) => sel && !sel.startsWith("@"));
+
+  assert.ok(gruppen.length > 20, "zu wenige Selektoren gefunden – der Test prüft nichts");
+  for (const sel of gruppen) {
+    assert.ok(sel.includes(".hs-traditionell"), `ungebundener Selektor: ${sel}`);
+  }
+});
+
+test("ohne Handschrift gibt es weder Klasse noch CSS", () => {
+  assert.equal(handschriftCss(null), "");
+  assert.equal(handschriftCss(undefined), "");
+  assert.equal(handschriftKlasse(null), "");
+  // Ein Archetyp, der noch keine Handschrift hat, bekommt auch keine.
+  assert.equal(handschriftCss("abend"), "");
+  assert.equal(handschriftKlasse("abend"), "");
+});
+
+test("nur der traditionelle Archetyp trägt die Handschrift", () => {
+  assert.equal(ARCHETYP_PRESET.traditionell.layout.handschrift, "traditionell");
+  for (const archetyp of ["abend", "hell", "editorial"]) {
+    assert.equal(ARCHETYP_PRESET[archetyp].layout.handschrift, null, archetyp);
+  }
+  // Die A/B-Varianten der Küchen bleiben ebenfalls unberührt.
+  assert.equal(withDesignDefaults().layout.handschrift, null);
+});
+
+test("die Seiten der übrigen Archetypen enthalten kein Zeichen der Handschrift", () => {
+  for (const archetyp of ["abend", "hell", "editorial"]) {
+    const html = seite("bayerisch", stimmungFuer("bayerisch", archetyp));
+    for (const teil of ["hs-traditionell", "hl-treppe", "stimmen-blatt", "hl-siegel", "class=\"marke\""]) {
+      assert.ok(!html.includes(teil), `${archetyp}: ${teil} steht fälschlich in der Seite`);
+    }
+    // Und sie behalten ihre bisherigen Emoji-Symbole.
+    assert.ok(html.includes("📍"), `${archetyp}: Kontaktsymbol fehlt`);
+  }
+});
+
+/* ---------- Was die Handschrift der traditionellen Seite gibt ---------- */
+
+test("die traditionelle Seite trägt Körperklasse und Stilblock", () => {
+  const html = seite("bayerisch", "wirtshaus");
+  assert.ok(html.includes('<body class="hs-traditionell">'));
+  assert.ok(html.includes(".hs-traditionell .hl-treppe"));
+  assert.ok(html.includes("--accent-bold:"));
+});
+
+test("die Highlights stufen sich nach Anzahl ab", () => {
+  // Bayerisch hat vier Highlights, Italienisch sechs – die Treppe muss beide
+  // Fälle benennen, sonst greift in CSS keine Regel.
+  const bayern = seite("bayerisch", "wirtshaus");
+  assert.ok(bayern.includes('class="hl-grid hl-treppe hl-treppe--4"'));
+
+  const italien = seite("italienisch", "trattoria");
+  assert.ok(italien.includes('class="hl-grid hl-treppe hl-treppe--6"'));
+
+  // Für jede vorkommende Anzahl gibt es auch eine Regel.
+  const css = handschriftCss("traditionell");
+  for (const n of [3, 4, 6]) {
+    assert.ok(css.includes(`.hl-treppe--${n} >`), `keine Regel für ${n} Karten`);
+  }
+});
+
+test("genau ein Gericht bekommt das Siegel der Hausempfehlung", () => {
+  const html = seite("bayerisch", "wirtshaus");
+  assert.equal(html.split('class="hl-siegel"').length - 1, 1);
+  // Das Siegel steht im Textteil, nicht als Abzeichen auf dem Foto.
+  assert.ok(html.indexOf('class="hl-siegel"') > html.indexOf('class="hl-body"'));
+});
+
+test("die Speisekarte steht ohne Kästen und ohne Mittelachse", () => {
+  const html = seite("bayerisch", "wirtshaus");
+  const karteStart = html.indexOf('id="karte"');
+  const kopf = html.slice(karteStart, karteStart + 200);
+  assert.ok(kopf.includes('<div class="section-head">'));
+  assert.ok(!kopf.includes("section-head mitte"));
+  assert.ok(handschriftCss("traditionell").includes(".hs-traditionell .kat { background: transparent; border: 0;"));
+});
+
+test("die Gästestimmen stehen als Blatt, nicht als drei leere Kästen", () => {
+  const html = seite("bayerisch", "wirtshaus");
+  assert.ok(html.includes('class="stimmen-blatt"'));
+  assert.ok(html.includes('class="stimmen-note-spalte"'));
+  // Ohne Google-Note gäbe es links nichts zu zeigen – dann kein Blatt.
+  const ohneNote = buildLandingPage(
+    { ...lead, rating: undefined, anzahlBewertungen: undefined },
+    { menu: menuForCuisine("bayerisch"), gestaltung: themeForLead(lead, "bayerisch", "wirtshaus") },
+  );
+  assert.ok(!ohneNote.includes('class="stimmen-blatt"'));
+  assert.ok(ohneNote.includes('class="stimmen-grid"'));
+});
+
+/* ---------- Gezeichnete Zeichen statt Symbolschrift ---------- */
+
+test("die traditionelle Seite kommt ohne Emoji-Symbole aus", () => {
+  const html = seite("bayerisch", "wirtshaus");
+  for (const emoji of ["📍", "📞", "🥡"]) {
+    assert.ok(!html.includes(emoji), `${emoji} steht noch in der Seite`);
+  }
+  // Der Haken der USP-Leiste und der Reservierungs-Pluspunkte ist gezeichnet.
+  assert.ok(!html.includes('<span aria-hidden="true">✓</span>'));
+  assert.ok(html.includes("ikon-haken"));
+  for (const svg of Object.values(KONTAKT_IKONEN)) {
+    assert.ok(html.includes(svg), "ein Kontaktsymbol fehlt");
+  }
+});
+
+test("jede der zwölf Küchen hat eine eigene Marke", () => {
+  for (const cuisine of Object.keys(STIMMUNGEN)) {
+    assert.ok(hatKuechenMarke(cuisine), `${cuisine} hat keine Marke`);
+    assert.match(kuechenMarke(cuisine), /^<svg class="marke"/);
+  }
+  // Eine unbekannte Küche bekommt lieber gar nichts als ein fremdes Zeichen.
+  assert.equal(kuechenMarke("erfundene-kueche"), "");
+});
+
+test("die Marke steht an drei Stellen derselben Seite", () => {
+  const html = seite("griechisch", stimmungFuer("griechisch", "traditionell"));
+  // Kopf der Highlights, Siegel der Hausempfehlung, Fußzeile.
+  assert.equal(html.split('<svg class="marke"').length - 1, 3);
+});
+
+test("jedes gezeichnete Zeichen ist dekorativ und erbt seine Farbe", () => {
+  const alle = [...Object.values(KONTAKT_IKONEN), kuechenMarke("bayerisch")];
+  for (const svg of alle) {
+    assert.ok(svg.includes('aria-hidden="true"'), svg.slice(0, 60));
+    assert.ok(svg.includes('stroke="currentColor"'), svg.slice(0, 60));
+    // Keine eigene Farbe: Der Kontrast des Zeichens ist damit der seines Textes.
+    assert.ok(!/(fill|stroke)="#/.test(svg), svg.slice(0, 60));
+  }
+});
+
+/* ---------- Ruhe statt Gleichverteilung ---------- */
+
+test("die Handschrift nimmt Bewegung zurück, statt neue hinzuzufügen", () => {
+  const css = handschriftCss("traditionell");
+  // Die Hero-Fahrt, die Parallaxe, der Foto-Zoom und die Karten-Hover sind aus.
+  for (const regel of [
+    ".hs-traditionell .hero-media img { animation: none; }",
+    ".hs-traditionell .foto-slot img { animation: none; }",
+    ".hs-traditionell .hl-card:hover { transform: none; }",
+  ]) {
+    assert.ok(css.includes(regel), `fehlt: ${regel}`);
+  }
+  // Neue @keyframes gibt es keine – der eine Moment ist die Signatur der
+  // Küche, und die stand schon vorher in heroSignature.js.
+  assert.ok(!css.includes("@keyframes"));
+});
+
+test("auch die Handschrift bewegt nur transform und opacity", () => {
+  const erlaubt = /^(transform|opacity|none)$/;
+  for (const treffer of handschriftCss("traditionell").matchAll(/transition:\s*([^;]+);/g)) {
+    const liste = treffer[1].replace(/\([^)]*\)/g, "");
+    for (const teil of liste.split(",")) {
+      assert.match(teil.trim().split(/\s+/)[0], erlaubt, `teure Eigenschaft: ${teil}`);
+    }
+  }
+});
+
+test("wer keine Bewegung will, bekommt auch von der Handschrift keine", () => {
+  const css = handschriftCss("traditionell");
+  assert.ok(css.includes("@media (prefers-reduced-motion: reduce)"));
+  assert.ok(css.includes(".bewegung-aus .hs-traditionell .auftritt"));
+});
+
+/* ---------- Farbe ---------- */
+
+test("der Akzent der Handschrift erreicht 4.5:1 auf allen drei Gründen", () => {
+  // accentBold ist nur gegen bg geprüft; Text steht aber auch auf surface
+  // (Formulare) und soft (Karten- und Stimmen-Sektion).
+  for (const [cuisine, liste] of Object.entries(STIMMUNGEN)) {
+    for (const s of liste) {
+      for (const grund of ["bg", "surface", "soft"]) {
+        const wert = contrastRatio(s.accentLesbar, s[grund]);
+        assert.ok(wert >= 4.5, `${cuisine}/${s.id}: accentLesbar auf ${grund} nur ${wert.toFixed(2)}:1`);
+      }
+    }
+  }
+});
+
+test("die traditionelle Seite setzt den lesbaren Akzent, nicht den Magazin-Akzent", () => {
+  const stimmung = STIMMUNGEN.japanisch.find((s) => s.archetyp === "traditionell");
+  const html = seite("japanisch", stimmung.id);
+  assert.ok(html.includes(`--accent-bold: ${stimmung.accentLesbar};`));
+  assert.notEqual(stimmung.accentLesbar, stimmung.accentBold, "Testfall ohne Unterschied gewählt");
+});
+
+test("Flächen behalten den geprüften Akzent", () => {
+  // onAccent ist gegen accent geprüft, nicht gegen accentLesbar – eine Fläche
+  // in accentLesbar würde die Knopfschrift ungeprüft lassen.
+  const css = handschriftCss("traditionell");
+  assert.ok(!/background:\s*var\(--accent-bold\)/.test(css));
+});

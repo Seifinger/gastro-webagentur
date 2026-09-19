@@ -6,6 +6,7 @@ import {
   heroAmbiencePhoto,
   heroReservationHero,
 } from "../heroSignature.js";
+import { haken } from "../signaturIcons.js";
 
 /**
  * Wählt das Hero-Element passend zu preset.hero.type. "signature" (Standard)
@@ -199,10 +200,19 @@ export function renderHero(ctx) {
 </section>`;
 }
 
-/** USP-Leiste direkt unter dem Hero. */
-export function renderUspStrip(usps) {
+/**
+ * USP-Leiste direkt unter dem Hero.
+ *
+ * Mit Handschrift trägt sie den gezeichneten Haken aus signaturIcons.js statt
+ * des gesetzten ✓ – dasselbe Zeichen wie die Pluspunkte der Reservierung.
+ *
+ * @param {Array} usps
+ * @param {string|null} [handschrift] - preset.layout.handschrift.
+ */
+export function renderUspStrip(usps, handschrift = null) {
+  const zeichen = handschrift === "traditionell" ? haken() : '<span aria-hidden="true">✓</span>';
   const uspBadges = (usps ?? [])
-    .map((usp) => `<span><span aria-hidden="true">✓</span> ${escapeHtml(usp)}</span>`)
+    .map((usp) => `<span>${zeichen} ${escapeHtml(usp)}</span>`)
     .join("");
   return `<section class="usp-strip">
   <div class="wrap"><div class="usp-list">${uspBadges}</div></div>

@@ -33,6 +33,13 @@ const BASE_DEFAULT = {
     // Magazin-Raster des Editorial-Archetyps (versetzte Spalten, Vollbild).
     // Additiv: Wer das Feld nicht kennt, bekommt weiter das bisherige Raster.
     gridStyle: "standard",
+    // Die "Handschrift" eines Archetyps: der eine starke Moment plus die Ruhe
+    // drumherum, die ihn sichtbar macht, dazu die begründeten Asymmetrien und
+    // die gezeichneten Zeichen (siehe styles/handschrift.css.js und
+    // docs-intern/design-tokens/). null heißt: nichts davon – exakt die
+    // bisherige Ausgabe. Nur ARCHETYP_PRESET setzt hier einen Wert; ein Preset
+    // aus DESIGN_PRESETS (A/B-Variante) bleibt davon unberührt.
+    handschrift: null,
   },
   // Die Schriftgrößen-Stufe. Sie hängt am Archetyp, nicht an der Küche: Wie
   // groß eine Überschrift auftritt, ist eine Frage der Haltung des Hauses,
@@ -157,8 +164,10 @@ export const DESIGN_PRESETS = {
  * nicht der Stimmung, und ist das einzige bewegte Element der Seite.
  */
 export const ARCHETYP_PRESET = {
-  // Unverändert das bisherige Verhalten – der Entwurf, den es immer gab.
-  traditionell: withDesignDefaults(),
+  // Das Haus, das es schon gab. Layout wie bisher; dazu die eigene
+  // Handschrift: eine einzige Bewegung (die Hero-Signatur), die Treppe in den
+  // Highlights, die Menütafel, das Stimmenblatt und die gezeichneten Zeichen.
+  traditionell: withDesignDefaults({ layout: { handschrift: "traditionell" } }),
 
   // Das Abendhaus lebt vom reservierten Tisch, nicht von der Abholung. Das
   // Ambiente rückt nach vorn: Wer abends auswählt, entscheidet über den Raum,

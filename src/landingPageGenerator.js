@@ -9,6 +9,7 @@ import { resolveStimmung, stimmungenFuer, ARCHETYP_LABEL } from "./stimmungen.js
 import { SIGNATUR_CSS } from "./heroSignature.js";
 import { MOTION_CSS, MOTION_SCRIPT, MOTION_EXTRA_CSS, MOTION_EXTRA_SKRIPT } from "./motion.js";
 import { EDITORIAL_CSS, TYPOGRAFIE_CSS } from "./styles/editorial.css.js";
+import { handschriftCss, handschriftKlasse } from "./styles/handschrift.css.js";
 import { resonanzSkript } from "./resonanzBeacon.js";
 import { engineMarkerMeta } from "./engineVersion.js";
 import { getPresetVariant, withDesignDefaults, presetFuerArchetyp } from "./designPresets.js";
@@ -929,6 +930,12 @@ export function buildLandingPage(lead, options = {}) {
   const gestaltung = options.gestaltung ?? themeForLead(lead);
   const t = gestaltung.theme;
   const preset = resolveDesignPreset(gestaltung, options);
+  // Die Handschrift des Archetyps (Schritte 3-5 des Design-Auftrags, siehe
+  // styles/handschrift.css.js). Ohne sie - also bei jedem Preset, das kein
+  // Archetyp ist - entsteht weder eine Körperklasse noch ein CSS-Block, und
+  // die Seite bleibt Zeichen für Zeichen die bisherige.
+  const handschrift = preset.layout.handschrift ?? null;
+  const handschriftStil = handschriftCss(handschrift);
   const openingHours = options.öffnungszeiten ?? DEFAULT_OPENING_HOURS;
   const kontaktEmail = options.kontaktEmail ?? "";
   const assets = options.assetsPath ?? "../assets";
@@ -985,7 +992,7 @@ export function buildLandingPage(lead, options = {}) {
   // entsteht kein Skript und die Seite bleibt exakt wie vorher.
   const resonanzBeacon = resonanzSkript(options.resonanzUrl, options.slug);
 
-  const kontaktZeilen = renderKontaktZeilen({ adresse, mapsUrl, telefon, telHref });
+  const kontaktZeilen = renderKontaktZeilen({ adresse, mapsUrl, telefon, telHref, handschrift });
   const hoursRows = renderOeffnungszeiten(openingHours);
 
   // Das Magazin-Raster und der Video-Hero sind opt-in. Nur wenn ein Preset sie
@@ -997,13 +1004,39 @@ export function buildLandingPage(lead, options = {}) {
   const hatVideoHero = preset.hero.type === "video_loop" && Boolean(heroVideoSrc);
   const brauchtExtraBewegung = asymmetrisch || preset.hero.type === "editorial" || hatVideoHero;
   const typografieCss = TYPOGRAFIE_CSS[preset.typography?.scale ?? "standard"] ?? "";
-  const bodyKlassen = [veroeffentlicht ? "veroeffentlicht" : "", asymmetrisch ? "gitter-asymmetrisch" : ""]
+  // Der kräftigere Akzent wird von zwei Gestaltungen gebraucht: vom Magazin
+  // (große Flächen und Schrift) und von jeder Handschrift, die accent als
+  // Textfarbe einsetzt. Der Wortlaut des Magazin-Zweigs bleibt bewusst Zeichen
+  // für Zeichen der bisherige: Sonst änderte sich mit dem nächsten Publish
+  // jede bereits veröffentlichte Magazin-Seite, obwohl an ihr nichts
+  // gestaltet wurde.
+  const accentBoldRegel = `:root { --accent-bold: ${t.accentBold ?? t.accent}; }`;
+  // Für die Handschrift der strengere Wert: accentBold erreicht 4.5:1 nur
+  // gegen bg, accentLesbar auch gegen surface und soft (siehe stimmungen.js).
+  const accentLesbarRegel = `:root { --accent-bold: ${t.accentLesbar ?? t.accentBold ?? t.accent}; }`;
+  const accentBoldBlock = asymmetrisch
+    ? `
+/* Der kräftigere Akzent aus colorMath.boldAccent – mindestens 4.5:1 gegen den
+   eigenen Grund. Er steht nur dort, wo er gebraucht wird: Die drei bestehenden
+   Archetypen arbeiten unverändert mit --accent. */
+${accentBoldRegel}`
+    : handschriftStil
+      ? `
+/* Der kräftigere Akzent aus colorMath.boldAccent – mindestens 4.5:1 gegen den
+   eigenen Grund. Die Handschrift dieses Archetyps setzt ihn überall dort ein,
+   wo accent Text trägt und gegen den eigenen Grund unter 4.5:1 läge. Geprüft
+   ist er gegen alle drei Gründe, auf denen Text steht: bg, surface und soft.
+   Flächen behalten accent – dagegen ist onAccent geprüft. */
+${accentLesbarRegel}`
+      : "";
+
+  const bodyKlassen = [
+    veroeffentlicht ? "veroeffentlicht" : "",
+    asymmetrisch ? "gitter-asymmetrisch" : "",
+    handschriftKlasse(handschrift),
+  ]
     .filter(Boolean)
     .join(" ");
-
-  const uspBadges = (menu.usps ?? [])
-    .map((usp) => `<span><span aria-hidden="true">✓</span> ${escapeHtml(usp)}</span>`)
-    .join("");
 
   return `<!DOCTYPE html>
 <html lang="de">
@@ -1034,14 +1067,10 @@ ${fontCss}
   --display-transform: ${t.displayTransform};
   --display-tracking: ${t.displayTracking};
   --radius: ${t.radius};
-}${asymmetrisch ? `
-/* Der kräftigere Akzent aus colorMath.boldAccent – mindestens 4.5:1 gegen den
-   eigenen Grund. Er steht nur dort, wo er gebraucht wird: Die drei bestehenden
-   Archetypen arbeiten unverändert mit --accent. */
-:root { --accent-bold: ${t.accentBold ?? t.accent}; }` : ""}
+}${accentBoldBlock}
 ${PAGE_STYLES}
 ${SIGNATUR_CSS}
-${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}
+${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}${handschriftStil}
 </style>
 </head>
 <body${bodyKlassen ? ` class="${bodyKlassen}"` : ""}>
@@ -1073,7 +1102,7 @@ ${renderHero({
   bildUrl,
 })}
 
-${renderUspStrip(menu.usps)}
+${renderUspStrip(menu.usps, handschrift)}
 
 ${(() => {
   // Reihenfolge der Hauptsektionen kommt aus preset.layout.sectionOrder.
@@ -1081,9 +1110,9 @@ ${(() => {
   // alles, was in der Vorgabe fehlt, wird in der bisherigen Reihenfolge
   // angehängt (das bisherige, feste Verhalten als Fallback).
   const sectionsById = {
-    highlights: renderHighlights({ highlights, bildUrl, showBadges: preset.menu.showBadges, beschreibungFuer, spalten, gridStyle: preset.layout.gridStyle }),
+    highlights: renderHighlights({ highlights, bildUrl, showBadges: preset.menu.showBadges, beschreibungFuer, spalten, gridStyle: preset.layout.gridStyle, handschrift, cuisine: gestaltung.cuisine }),
 
-    karte: renderMenu({ menu, menuLayout: preset.menu.layout, showBadges: preset.menu.showBadges, beschreibungFuer }),
+    karte: renderMenu({ menu, menuLayout: preset.menu.layout, showBadges: preset.menu.showBadges, beschreibungFuer, handschrift }),
 
     ambiente: renderAmbiente({
       konzeptLabel: menu.konzept ?? menu.label,
@@ -1094,11 +1123,12 @@ ${(() => {
       bestsellerBild: highlights[0]?.bild,
       bildUrl,
       eigeneBilder,
+      handschrift,
     }),
 
-    stimmen: renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social.layout),
+    stimmen: renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social.layout, handschrift),
 
-    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant }),
+    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant, handschrift }),
 
     kontakt: renderContact({ kontaktZeilen, hoursRows }),
   };
@@ -1185,7 +1215,7 @@ ${
   }
 </div>
 
-${renderFooter({ name, adresse, telefon })}
+${renderFooter({ name, adresse, telefon, cuisine: gestaltung.cuisine, handschrift })}
 
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${PAGE_SCRIPT}</script>

@@ -6,7 +6,7 @@ import { stimmenFuer, PLATZHALTER_ERKLAERUNG } from "../testimonials.js";
  * dürfen nicht gespeichert werden, und fremde Bewertungen auf einer
  * unbeauftragten Seite wären ohnehin nicht in Ordnung.
  */
-export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3") {
+export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3", handschrift = null) {
   const { stimmen, slots, platzhalter } = stimmenFuer(cuisine, { fiktiv });
 
   // Leere Plätze statt erfundener Zitate: ohne Sterne und ohne Namen ist
@@ -46,17 +46,44 @@ export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3") {
   // "grid-3" ist das bisherige Verhalten und bekommt keine Zusatzklasse –
   // nur abweichende Layouts (bisher: "list") erhalten einen Modifier.
   const gridClass = socialLayout && socialLayout !== "grid-3" ? ` stimmen-grid--${socialLayout}` : "";
+  const erklaerung = platzhalter
+    ? `<p class="stimmen-erklaerung">${escapeHtml(PLATZHALTER_ERKLAERUNG)}</p>`
+    : "";
+
+  // Das Stimmenblatt des traditionellen Archetyps: die Note groß in einer
+  // schmalen linken Spalte, die Zitate rechts untereinander. Ohne Note (ein
+  // Lokal ohne Google-Bewertung) gäbe es links nichts zu sehen – dann bleibt
+  // es beim einspaltigen Aufbau.
+  const blatt = handschrift === "traditionell" && note;
+  if (blatt) {
+    return `
+  <section class="section stimmen-section" id="stimmen">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Gästestimmen</div>
+        <h2>Was unsere Gäste sagen</h2>
+      </div>
+      <div class="stimmen-blatt">
+        <div class="stimmen-note-spalte">${note}</div>
+        <div class="stimmen-zitate">
+          <div class="stimmen-grid${gridClass}">${karten}</div>
+          ${erklaerung}
+        </div>
+      </div>
+    </div>
+  </section>`;
+  }
 
   return `
   <section class="section stimmen-section" id="stimmen">
     <div class="wrap">
-      <div class="section-head mitte">
+      <div class="section-head${handschrift === "traditionell" ? "" : " mitte"}">
         <div class="eyebrow">Gästestimmen</div>
         <h2>Was unsere Gäste sagen</h2>
       </div>
       ${note}
       <div class="stimmen-grid${gridClass}">${karten}</div>
-      ${platzhalter ? `<p class="stimmen-erklaerung">${escapeHtml(PLATZHALTER_ERKLAERUNG)}</p>` : ""}
+      ${erklaerung}
     </div>
   </section>`;
 }

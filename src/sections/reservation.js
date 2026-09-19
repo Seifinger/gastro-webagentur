@@ -1,4 +1,5 @@
 import { escapeHtml, optionList, timeSlots } from "../htmlHelpers.js";
+import { haken } from "../signaturIcons.js";
 
 export const RESERVATION_SLOTS = [
   ...timeSlots(11 * 60 + 30, 14 * 60, 30),
@@ -15,8 +16,11 @@ export const PICKUP_SLOTS = [
  *
  * @param {object} ctx
  * @param {string} ctx.widgetVariant - preset.reservation.widgetVariant (nur als data-Attribut).
+ * @param {string|null} [ctx.handschrift] - preset.layout.handschrift. Mit
+ *   Handschrift tragen die Pluspunkte den gezeichneten Haken statt des ✓.
  */
-export function renderReservation({ widgetVariant }) {
+export function renderReservation({ widgetVariant, handschrift }) {
+  const k = handschrift === "traditionell" ? haken() : "✓";
   return `
 <section class="section reserve-section" id="reservierung" data-reservation-variant="${escapeHtml(widgetVariant)}">
   <div class="wrap">
@@ -26,9 +30,9 @@ export function renderReservation({ widgetVariant }) {
         <h2 style="font-size:clamp(28px,4.4vw,42px);margin-bottom:16px">Tisch reservieren</h2>
         <p style="color:var(--ink-soft);font-size:18px">Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
         <ul class="reserve-pluspunkte">
-          <li><span class="k">✓</span><span>Rund um die Uhr buchbar, auch außerhalb der Öffnungszeiten</span></li>
-          <li><span class="k">✓</span><span>Sofortige Bestätigung, ganz ohne Anruf</span></li>
-          <li><span class="k">✓</span><span>Sonderwünsche wie Kinderstuhl oder Allergien direkt mitteilen</span></li>
+          <li><span class="k">${k}</span><span>Rund um die Uhr buchbar, auch außerhalb der Öffnungszeiten</span></li>
+          <li><span class="k">${k}</span><span>Sofortige Bestätigung, ganz ohne Anruf</span></li>
+          <li><span class="k">${k}</span><span>Sonderwünsche wie Kinderstuhl oder Allergien direkt mitteilen</span></li>
         </ul>
       </div>
 

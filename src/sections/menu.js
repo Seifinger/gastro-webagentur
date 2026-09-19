@@ -43,12 +43,17 @@ function renderMenuAccordion(menu, showBadges, beschreibungFuer) {
  * @param {string} ctx.menuLayout - preset.menu.layout (nur als data-Attribut).
  * @param {boolean} ctx.showBadges - preset.menu.showBadges.
  * @param {Function} ctx.beschreibungFuer
+ * @param {string|null} [ctx.handschrift] - preset.layout.handschrift. Die
+ *   Menütafel des traditionellen Archetyps steckt im CSS (Kategoriename in
+ *   einer schmalen linken Spalte); hier hängt nur der Sektionskopf daran, der
+ *   dann nicht mehr auf der Mittelachse sitzt.
  */
-export function renderMenu({ menu, menuLayout, showBadges, beschreibungFuer }) {
+export function renderMenu({ menu, menuLayout, showBadges, beschreibungFuer, handschrift }) {
+  const mitte = handschrift === "traditionell" ? "" : " mitte";
   return `
 <section class="section karte-section" id="karte" data-menu-layout="${escapeHtml(menuLayout)}">
   <div class="wrap">
-    <div class="section-head mitte">
+    <div class="section-head${mitte}">
       <div class="eyebrow">Speisekarte</div>
       <h2>Unsere ganze Karte</h2>
       <p>Kategorie antippen zum Aufklappen. Jedes Gericht lässt sich direkt zur Abholung vorbestellen.</p>
