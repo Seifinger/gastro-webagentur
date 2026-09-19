@@ -211,6 +211,7 @@
 </div>
 
 <div id="toast"></div>
+<div id="push-hinweis" class="fehler" style="display:none;position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:92vw;z-index:59"></div>
 
 <script>
 let stand = { tische: [], reservierungen: [], bestellungen: [], plaetzeGesamt: 0 };
@@ -566,7 +567,72 @@ document.getElementById("tisch-form").addEventListener("submit", async (e) => {
   }
 });
 
+/* ---------- Push-Benachrichtigungen ---------- */
+
+// Auf dem iPhone liefert Safari Push-Nachrichten nur an Seiten, die zuvor
+// über "Zum Home-Bildschirm hinzufügen" installiert wurden (dann läuft die
+// Seite "standalone") - ganz normal im Safari-Tab bleibt es aus, ohne dass
+// der Browser das meldet. window.navigator.standalone gibt es nur auf iOS.
+function istIosOhneInstallation() {
+  const istIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  return istIos && window.navigator.standalone !== true;
+}
+
+function urlBase64ZuUint8Array(base64) {
+  const polster = "=".repeat((4 - (base64.length % 4)) % 4);
+  const sicher = (base64 + polster).replace(/-/g, "+").replace(/_/g, "/");
+  const roh = atob(sicher);
+  return Uint8Array.from([...roh].map((zeichen) => zeichen.charCodeAt(0)));
+}
+
+const PUSH_GEFRAGT_KEY = "wirt-push-gefragt";
+
+async function richtePushEin() {
+  if (istIosOhneInstallation()) {
+    const hinweis = document.getElementById("push-hinweis");
+    hinweis.textContent =
+      'Für Benachrichtigungen auf dem iPhone diese Seite zuerst über "Zum Home-Bildschirm hinzufügen" installieren und von dort erneut öffnen.';
+    hinweis.style.display = "block";
+    return;
+  }
+
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+
+  let bereitsGefragt = false;
+  try {
+    bereitsGefragt = Boolean(localStorage.getItem(PUSH_GEFRAGT_KEY));
+  } catch {
+    // Privater Modus oder blockierter Storage - dann eben bei jedem Öffnen
+    // erneut fragen, statt die Funktion ganz auszulassen.
+  }
+  if (bereitsGefragt) return;
+
+  try {
+    const { publicKey } = await (await fetch("/api/push/public-key")).json();
+    if (!publicKey) return; // Server ohne VAPID-Schlüssel: Feature bleibt aus.
+
+    try {
+      localStorage.setItem(PUSH_GEFRAGT_KEY, "1");
+    } catch {
+      // s.o.
+    }
+
+    const registration = await navigator.serviceWorker.register("/sw.js");
+    const erlaubnis = await Notification.requestPermission();
+    if (erlaubnis !== "granted") return;
+
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ZuUint8Array(publicKey),
+    });
+    await ruf("/intern/push/subscribe", subscription.toJSON());
+  } catch (fehler) {
+    console.warn("Push-Registrierung fehlgeschlagen:", fehler.message);
+  }
+}
+
 lade();
+richtePushEin();
 // Im Betrieb liegt das Tablet offen herum - regelmäßig nachladen, damit neue
 // Bestellungen auftauchen, ohne dass jemand die Seite neu lädt.
 setInterval(lade, 20000);

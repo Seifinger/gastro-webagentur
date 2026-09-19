@@ -18,10 +18,13 @@ import {
   tischKonflikte,
   tischVerteilung,
   setzeWartezeit,
+  fuegePushSubscriptionHinzu,
 } from "./betriebStore.js";
+import { benachrichtigeBetrieb, oeffentlicherVapidSchluessel } from "./pushNotify.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const seite = path.join(__dirname, "..", "public", "wirt.html");
+const serviceWorker = path.join(__dirname, "..", "public", "sw.js");
 
 function parseFlag(argv, name, standard) {
   const i = argv.indexOf(name);
@@ -123,6 +126,14 @@ export const handler = async (req, res) => {
     return;
   }
 
+  // Ohne Auslieferung von der Wurzel aus reicht der Geltungsbereich des
+  // Service Workers nicht bis zu den Push-Registrierungen von wirt.html.
+  if (pathname === "/sw.js") {
+    res.writeHead(200, { "Content-Type": "application/javascript; charset=utf-8" });
+    res.end(readFileSync(serviceWorker, "utf-8"));
+    return;
+  }
+
   /* ----- Öffentlich: was von der Landingpage hereinkommt ----- */
 
   if (pathname.startsWith("/oeffentlich/") && req.method === "POST") {
@@ -137,12 +148,22 @@ export const handler = async (req, res) => {
 
       if (pathname === "/oeffentlich/reservierung") {
         const r = legeReservierungAn(slug, daten, "online");
+        // Von Hand eingetragene Reservierungen (quelle "manuell") lösen
+        // bewusst keinen Push aus – der Wirt kennt die eigene Eingabe schon.
+        await benachrichtigeBetrieb(slug, {
+          titel: "Neue Reservierung",
+          text: `${r.personen} Personen am ${r.datum} um ${r.uhrzeit}, ${r.name}`,
+        });
         json(res, 200, { ok: true, reservierung: { id: r.id, datum: r.datum, uhrzeit: r.uhrzeit } }, CORS);
         return;
       }
 
       if (pathname === "/oeffentlich/bestellung") {
         const b = legeBestellungAn(slug, daten);
+        await benachrichtigeBetrieb(slug, {
+          titel: "Neue Bestellung",
+          text: `${b.nummer} · Abholung gewünscht um ${b.abholzeit}, ${b.name}`,
+        });
         json(res, 200, { ok: true, bestellung: { id: b.id, nummer: b.nummer } }, CORS);
         return;
       }
@@ -178,6 +199,13 @@ export const handler = async (req, res) => {
 
   if (pathname === "/api/betrieb") {
     json(res, 200, uebersicht());
+    return;
+  }
+
+  // Der öffentliche VAPID-Schlüssel ist unkritisch (er identifiziert nur den
+  // Absender, nicht den Betrieb) – wirt.html braucht ihn vorm Registrieren.
+  if (pathname === "/api/push/public-key") {
+    json(res, 200, { publicKey: oeffentlicherVapidSchluessel() });
     return;
   }
 
@@ -228,6 +256,12 @@ export const handler = async (req, res) => {
       if (pathname === "/intern/wartezeit") {
         const wert = setzeWartezeit(slug, eingabe.minuten);
         json(res, 200, { ok: true, zusaetzlicheWartezeitMinuten: wert });
+        return;
+      }
+
+      if (pathname === "/intern/push/subscribe") {
+        const gespeichert = fuegePushSubscriptionHinzu(slug, eingabe);
+        json(res, 200, { ok: true, ...gespeichert });
         return;
       }
     } catch (fehler) {

@@ -22,7 +22,13 @@ function datei(slug) {
 }
 
 function leererBetrieb() {
-  return { tische: [], reservierungen: [], bestellungen: [], zusaetzlicheWartezeitMinuten: 0 };
+  return {
+    tische: [],
+    reservierungen: [],
+    bestellungen: [],
+    zusaetzlicheWartezeitMinuten: 0,
+    pushSubscriptions: [],
+  };
 }
 
 export function ladeBetrieb(slug) {
@@ -444,5 +450,45 @@ export function setzeBestellungStatus(slug, id, status) {
     if (!b) throw new Error("Bestellung nicht gefunden.");
     b.status = status;
     return b;
+  });
+}
+
+/* ---------- Push-Benachrichtigungen ---------- */
+
+/**
+ * Merkt sich, auf welchem Gerät des Wirts neue Bestellungen/Reservierungen
+ * ankommen sollen (siehe pushNotify.js für den eigentlichen Versand). Nur die
+ * Datenhaltung liegt hier – dieselbe Trennung wie überall in diesem Modul,
+ * das keine eigenen Netzwerkaufrufe macht.
+ */
+export function fuegePushSubscriptionHinzu(slug, subscription) {
+  const endpoint = String(subscription?.endpoint ?? "").trim();
+  const p256dh = subscription?.keys?.p256dh;
+  const auth = subscription?.keys?.auth;
+
+  if (!endpoint || !p256dh || !auth) {
+    throw new Error("Ungültige Push-Subscription.");
+  }
+
+  return aendere(slug, (daten) => {
+    daten.pushSubscriptions ??= [];
+    // Dasselbe Gerät kann sich mehrfach registrieren (Seite neu geladen,
+    // Berechtigung erneut erteilt) – der Endpoint bleibt dabei gleich und
+    // ersetzt den alten Eintrag statt ihn zu verdoppeln.
+    daten.pushSubscriptions = daten.pushSubscriptions.filter((s) => s.endpoint !== endpoint);
+    daten.pushSubscriptions.push({ endpoint, keys: { p256dh, auth } });
+    return { endpoint };
+  });
+}
+
+/**
+ * Entfernt eine Subscription, die der Push-Dienst als ungültig gemeldet hat
+ * (Gerät lange offline, Berechtigung entzogen, Browser-Daten gelöscht) –
+ * sonst würde jeder weitere Versand an diesen Eintrag wieder fehlschlagen.
+ */
+export function entfernePushSubscription(slug, endpoint) {
+  return aendere(slug, (daten) => {
+    daten.pushSubscriptions = (daten.pushSubscriptions ?? []).filter((s) => s.endpoint !== endpoint);
+    return true;
   });
 }

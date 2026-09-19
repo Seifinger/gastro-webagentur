@@ -1,4 +1,4 @@
-import { test, before, after } from "node:test";
+import { test, beforeEach, after } from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { rmSync } from "node:fs";
@@ -11,12 +11,17 @@ import { fileURLToPath } from "node:url";
 const SLUG = "__test-wirt-server";
 process.env.BETRIEB = SLUG;
 const { handler } = await import("../src/wirtServer.js");
-const { ladeBetrieb, legeTischAn } = await import("../src/betriebStore.js");
+const { ladeBetrieb, speichereBetrieb, legeTischAn } = await import("../src/betriebStore.js");
+const { pushSendenHook } = await import("../src/pushNotify.js");
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dateiPfad = path.join(__dirname, "..", "data", "betrieb", `${SLUG}.json`);
 
-before(() => {
+// Voller Reset vor jedem Testfall: Push-Subscriptions und Bestellungen aus
+// einem Test dürfen die Zähl-Assertions eines späteren Tests nicht
+// verfälschen (z. B. "genau ein Push-Aufruf").
+beforeEach(() => {
+  speichereBetrieb(SLUG, { tische: [], reservierungen: [], bestellungen: [], pushSubscriptions: [] });
   legeTischAn(SLUG, { name: "Tisch 1", plaetze: 4 });
 });
 
@@ -32,6 +37,29 @@ async function mitServer(fn) {
   } finally {
     await new Promise((fertig) => server.close(fertig));
   }
+}
+
+// VAPID_PUBLIC_KEY/PRIVATE_KEY werden von pushNotify.js bei jedem Aufruf
+// frisch aus process.env gelesen – siehe pushNotify.test.js für dasselbe
+// Muster. mitVapid muss selbst eine Funktion zurückgeben (statt sofort zu
+// laufen): ein "async function mitVapid", das direkt in test(name, mitVapid(fn))
+// aufgerufen wird, würde schon beim Aufbau der test()-Aufrufe starten und
+// eine Promise statt einer Funktion übergeben.
+function mitVapid(fn) {
+  return async (...args) => {
+    const alterPublic = process.env.VAPID_PUBLIC_KEY;
+    const alterPrivate = process.env.VAPID_PRIVATE_KEY;
+    process.env.VAPID_PUBLIC_KEY = "oeffentlicher-test-schluessel";
+    process.env.VAPID_PRIVATE_KEY = "privater-test-schluessel";
+    try {
+      return await fn(...args);
+    } finally {
+      if (alterPublic === undefined) delete process.env.VAPID_PUBLIC_KEY;
+      else process.env.VAPID_PUBLIC_KEY = alterPublic;
+      if (alterPrivate === undefined) delete process.env.VAPID_PRIVATE_KEY;
+      else process.env.VAPID_PRIVATE_KEY = alterPrivate;
+    }
+  };
 }
 
 test("POST /intern/wartezeit setzt und liefert den neuen Wert", async () => {
@@ -79,3 +107,127 @@ test("GET /api/betrieb liefert die aktuelle Zusatz-Wartezeit mit", async () => {
     assert.equal(ergebnis.zusaetzlicheWartezeitMinuten, 10);
   });
 });
+
+test("GET /sw.js liefert den Service Worker als JavaScript aus", async () => {
+  await mitServer(async (basis) => {
+    const antwort = await fetch(`${basis}/sw.js`);
+    assert.equal(antwort.status, 200);
+    assert.match(antwort.headers.get("content-type"), /javascript/);
+    assert.match(await antwort.text(), /addEventListener\("push"/);
+  });
+});
+
+test("GET /api/push/public-key liefert leer, solange kein VAPID-Schlüssel gesetzt ist", async () => {
+  await mitServer(async (basis) => {
+    const antwort = await fetch(`${basis}/api/push/public-key`);
+    assert.deepEqual(await antwort.json(), { publicKey: "" });
+  });
+});
+
+test(
+  "GET /api/push/public-key liefert den gesetzten Schlüssel",
+  mitVapid(async () => {
+    await mitServer(async (basis) => {
+      const antwort = await fetch(`${basis}/api/push/public-key`);
+      assert.deepEqual(await antwort.json(), { publicKey: "oeffentlicher-test-schluessel" });
+    });
+  }),
+);
+
+test("POST /intern/push/subscribe speichert eine gültige Subscription", async () => {
+  await mitServer(async (basis) => {
+    const antwort = await fetch(`${basis}/intern/push/subscribe`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ endpoint: "https://push.beispiel.de/geraet-1", keys: { p256dh: "p", auth: "a" } }),
+    });
+    const ergebnis = await antwort.json();
+
+    assert.equal(antwort.status, 200);
+    assert.equal(ergebnis.ok, true);
+    assert.equal(ladeBetrieb(SLUG).pushSubscriptions.some((s) => s.endpoint === "https://push.beispiel.de/geraet-1"), true);
+  });
+});
+
+test("POST /intern/push/subscribe weist eine unvollständige Subscription ab", async () => {
+  await mitServer(async (basis) => {
+    const antwort = await fetch(`${basis}/intern/push/subscribe`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ endpoint: "https://push.beispiel.de/kaputt" }),
+    });
+    const ergebnis = await antwort.json();
+
+    assert.equal(antwort.status, 400);
+    assert.match(ergebnis.fehler, /Ungültige Push-Subscription/);
+  });
+});
+
+test(
+  "eine neue Bestellung über /oeffentlich/bestellung löst einen (gemockten) Push aus",
+  mitVapid(async () => {
+    await mitServer(async (basis) => {
+      await fetch(`${basis}/intern/push/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: "https://push.beispiel.de/best-test", keys: { p256dh: "p", auth: "a" } }),
+      });
+
+      const aufrufe = [];
+      const alt = pushSendenHook.aktuell;
+      pushSendenHook.aktuell = async (subscription, nutzlast) => {
+        aufrufe.push({ subscription, nutzlast });
+      };
+
+      try {
+        const antwort = await fetch(`${basis}/oeffentlich/bestellung`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
+            abholzeit: "18:30",
+            name: "Testgast",
+          }),
+        });
+        assert.equal(antwort.status, 200);
+      } finally {
+        pushSendenHook.aktuell = alt;
+      }
+
+      assert.equal(aufrufe.length, 1);
+      assert.equal(aufrufe[0].subscription.endpoint, "https://push.beispiel.de/best-test");
+      assert.equal(aufrufe[0].nutzlast.titel, "Neue Bestellung");
+    });
+  }),
+);
+
+test(
+  "eine manuell (vom Wirt) eingetragene Reservierung löst keinen Push aus",
+  mitVapid(async () => {
+    await mitServer(async (basis) => {
+      await fetch(`${basis}/intern/push/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: "https://push.beispiel.de/manuell-test", keys: { p256dh: "p", auth: "a" } }),
+      });
+
+      const aufrufe = [];
+      const alt = pushSendenHook.aktuell;
+      pushSendenHook.aktuell = async (subscription, nutzlast) => {
+        aufrufe.push({ subscription, nutzlast });
+      };
+
+      try {
+        await fetch(`${basis}/api/reservierung`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ datum: "2026-09-20", uhrzeit: "19:00", personen: 2, name: "Theke" }),
+        });
+      } finally {
+        pushSendenHook.aktuell = alt;
+      }
+
+      assert.equal(aufrufe.length, 0);
+    });
+  }),
+);

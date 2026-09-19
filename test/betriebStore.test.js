@@ -23,6 +23,8 @@ import {
   ABHOL_VORLAUF_MINUTEN,
   ABHOL_FENSTER_MINUTEN,
   ABHOL_SCHRITT_MINUTEN,
+  fuegePushSubscriptionHinzu,
+  entfernePushSubscription,
 } from "../src/betriebStore.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -274,6 +276,58 @@ test("die Zusatz-Wartezeit verschiebt neu berechnete Abholzeiten, bestehende Bes
   const nachher = ladeBetrieb(SLUG).bestellungen.find((x) => x.id === b.id);
   assert.equal(nachher.abholzeit, "12:30", "der ursprüngliche Wunsch bleibt stehen");
   assert.equal(nachher.bestaetigteAbholzeit, "12:30", "eine bereits bestätigte Zeit läuft nicht mit");
+});
+
+test("eine Push-Subscription wird gespeichert", () => {
+  const subscription = {
+    endpoint: "https://push.beispiel.de/abc",
+    keys: { p256dh: "schluessel", auth: "geheim" },
+  };
+
+  fuegePushSubscriptionHinzu(SLUG, subscription);
+  assert.deepEqual(ladeBetrieb(SLUG).pushSubscriptions, [subscription]);
+});
+
+test("eine Subscription mit demselben Endpoint ersetzt die alte statt zu verdoppeln", () => {
+  fuegePushSubscriptionHinzu(SLUG, {
+    endpoint: "https://push.beispiel.de/abc",
+    keys: { p256dh: "alt", auth: "alt" },
+  });
+  fuegePushSubscriptionHinzu(SLUG, {
+    endpoint: "https://push.beispiel.de/abc",
+    keys: { p256dh: "neu", auth: "neu" },
+  });
+
+  const subscriptions = ladeBetrieb(SLUG).pushSubscriptions;
+  assert.equal(subscriptions.length, 1);
+  assert.equal(subscriptions[0].keys.p256dh, "neu");
+});
+
+test("eine unvollständige Push-Subscription wird abgewiesen", () => {
+  assert.throws(() => fuegePushSubscriptionHinzu(SLUG, {}), /Ungültige Push-Subscription/);
+  assert.throws(
+    () => fuegePushSubscriptionHinzu(SLUG, { endpoint: "https://push.beispiel.de/x" }),
+    /Ungültige Push-Subscription/,
+  );
+  assert.throws(
+    () =>
+      fuegePushSubscriptionHinzu(SLUG, {
+        endpoint: "https://push.beispiel.de/x",
+        keys: { p256dh: "nur-das" },
+      }),
+    /Ungültige Push-Subscription/,
+  );
+});
+
+test("entfernePushSubscription löscht gezielt einen Endpoint", () => {
+  fuegePushSubscriptionHinzu(SLUG, { endpoint: "a", keys: { p256dh: "1", auth: "1" } });
+  fuegePushSubscriptionHinzu(SLUG, { endpoint: "b", keys: { p256dh: "2", auth: "2" } });
+
+  entfernePushSubscription(SLUG, "a");
+
+  const subscriptions = ladeBetrieb(SLUG).pushSubscriptions;
+  assert.equal(subscriptions.length, 1);
+  assert.equal(subscriptions[0].endpoint, "b");
 });
 
 test("unbekannte Status werden nicht gesetzt", () => {
