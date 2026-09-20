@@ -935,7 +935,7 @@ export function buildLandingPage(lead, options = {}) {
   // Archetyp ist - entsteht weder eine Körperklasse noch ein CSS-Block, und
   // die Seite bleibt Zeichen für Zeichen die bisherige.
   const handschrift = preset.layout.handschrift ?? null;
-  const handschriftStil = handschriftCss(handschrift);
+  const handschriftStil = handschriftCss(handschrift, gestaltung.cuisine);
   // Ohne Handschrift trägt jede Seite die Signaturregeln aller zwölf Küchen
   // mit sich – rund 17 kB, von denen sie eine braucht. Das bleibt so, weil
   // jede bereits veröffentlichte Seite sonst mit dem nächsten Publish andere

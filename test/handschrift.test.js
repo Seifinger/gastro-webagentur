@@ -34,7 +34,9 @@ test("jeder Selektor der Handschrift hängt an ihrer Körperklasse", () => {
   // Das ist der eigentliche Regressionsschutz: Solange jede Regel an
   // .hs-<archetyp> hängt, kann der Block die übrigen Archetypen selbst dann
   // nicht verändern, wenn ihn jemand versehentlich überall einhängt.
-  const css = handschriftCss("traditionell").replace(/\/\*[\s\S]*?\*\//g, "");
+  // Beide Fassungen: die gemeinsame und die, die eine Küche zusätzlich
+  // mitbringt (hier der gezeichnete Maßkrug bei bayerisch).
+  const css = handschriftCss("traditionell", "bayerisch").replace(/\/\*[\s\S]*?\*\//g, "");
   const gruppen = [...css.matchAll(/([^{}]+)\{/g)]
     .map((treffer) => treffer[1].trim().replace(/\s+/g, " "))
     .filter((sel) => sel && !sel.startsWith("@"));
@@ -43,6 +45,17 @@ test("jeder Selektor der Handschrift hängt an ihrer Körperklasse", () => {
   for (const sel of gruppen) {
     assert.ok(sel.includes(".hs-traditionell"), `ungebundener Selektor: ${sel}`);
   }
+});
+
+test("nur die Küche, die ihn im Markup hat, bekommt das CSS des Maßkrugs", () => {
+  const bayern = handschriftCss("traditionell", "bayerisch");
+  const italien = handschriftCss("traditionell", "italienisch");
+  assert.ok(bayern.includes(".hs-traditionell .sig-krug"));
+  assert.ok(!italien.includes(".sig-krug"));
+  // Und in der Seite läuft er wirklich: Regel und Keyframes kommen zusammen an.
+  const html = seite("bayerisch", "wirtshaus");
+  assert.ok(html.includes("animation: sig-beer-schaum"));
+  assert.ok(html.includes("@keyframes sig-beer-schaum"));
 });
 
 test("ohne Handschrift gibt es weder Klasse noch CSS", () => {
@@ -171,6 +184,28 @@ test("mit Handschrift bleiben die Regeln der elf anderen Küchen draußen", () =
     assert.ok(!gestaltung.includes(fremd), `${fremd} reist mit`);
   }
   assert.ok(nurBayern.length * 3 < SIGNATUR_CSS.length, "kaum etwas gespart");
+});
+
+test("jede Animation, die eine Seite anfordert, bekommt auch ihre Keyframes", () => {
+  // Der Fallstrick beim Filtern, an dem der Maßkrug eine Weile stillstand:
+  // Die Regel mit "animation: sig-beer-schaum" wurde ausgeliefert, die
+  // dazugehörigen @keyframes lagen im aussortierten Block. Im Browser
+  // passiert dann nichts, und im Quelltext sieht alles richtig aus.
+  for (const cuisine of Object.keys(STIMMUNGEN)) {
+    const html = seite(cuisine, stimmungFuer(cuisine, "traditionell"));
+    const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
+
+    const vorhanden = new Set([...css.matchAll(/@keyframes\s+([\w-]+)/g)].map((t) => t[1]));
+    const gefordert = new Set();
+    for (const treffer of css.matchAll(/animation:\s*([\w-]+)/g)) gefordert.add(treffer[1]);
+    for (const treffer of css.matchAll(/animation-name:\s*([\w-]+)/g)) gefordert.add(treffer[1]);
+    gefordert.delete("none");
+
+    assert.ok(gefordert.size > 0, `${cuisine}: keine Animation gefunden, der Test prüft nichts`);
+    for (const name of gefordert) {
+      assert.ok(vorhanden.has(name), `${cuisine}: "animation: ${name}" ohne @keyframes`);
+    }
+  }
 });
 
 test("jede Küche behält die Regeln, die ihr Markup wirklich braucht", () => {

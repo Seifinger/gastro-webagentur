@@ -60,14 +60,6 @@ const TRADITIONELL = `
   transition-delay: 0s;
 }
 
-/* Ist der Hero durch, steht auch die Signatur still. motion.js setzt die
-   Klasse .ruht ohnehin schon (dafür gibt es den IntersectionObserver); bisher
-   hing daran nur die Hero-Fahrt. Eine Animation, die niemand sieht, hält den
-   Compositor trotzdem wach. */
-.hs-traditionell .hero.ruht .sig-tafel .karte,
-.hs-traditionell .hero.ruht .sig-krug .schaum,
-.hs-traditionell .hero.ruht .sig-krug .tropfen { animation-play-state: paused; }
-
 /* --- Farbe: Text trägt accentBold, Flächen behalten accent -------------- */
 /* Begründung und Messwerte: docs-intern/design-tokens/traditionell.md. */
 .hs-traditionell .eyebrow,
@@ -226,6 +218,46 @@ const TRADITIONELL = `
 .hs-traditionell .contact-list .k .ikon { width: 1.5em; height: 1.5em; }
 .hs-traditionell .hours-row { font-variant-numeric: tabular-nums; }
 
+/* --- Gezeichnete Zeichen (signaturIcons.js) ----------------------------- */
+/* Auch die USP-Leiste verlässt die Mittelachse: Mit der Note sind es vier
+   Punkte, die auf zwei Zeilen umbrechen – zentriert sieht die zweite Zeile
+   aus wie ein Rest. */
+.hs-traditionell .usp-list { justify-content: flex-start; }
+.hs-traditionell .usp-list span { gap: 10px; }
+.hs-traditionell .reserve-pluspunkte .k { display: inline-flex; padding-top: .2em; }
+.hs-traditionell footer strong { display: inline-flex; align-items: center; gap: 10px; }
+${ikonenCss("hs-traditionell")}
+/* Die Küchenmarke steht an drei Stellen: Kopf der Highlights, Siegel der
+   Hausempfehlung, Fußzeile. */
+.hs-traditionell .kopf-marke { display: inline-flex; align-items: center; gap: 9px; }
+
+/* --- Wer keine Bewegung will, bekommt keine ----------------------------- */
+/* Auch der Auftritt beim Scrollen – zusätzlich zu motion.js, damit die Regel
+   nicht davon abhängt, welcher Block zuletzt gewinnt. */
+@media (prefers-reduced-motion: reduce) {
+  .bewegt .hs-traditionell .auftritt,
+  .bewegt .hs-traditionell .auftritt-karte,
+  .bewegt .hs-traditionell .usp-list span { opacity: 1; transition: none; }
+}
+.bewegung-aus .hs-traditionell .auftritt,
+.bewegung-aus .hs-traditionell .auftritt-karte,
+.bewegung-aus .hs-traditionell .usp-list span { opacity: 1; transition: none; }
+`;
+
+/* Was eine bayerische Seite zusätzlich braucht: die gezeichnete Tafel und der
+   Maßkrug stehen nur dort im Markup. Würden ihre Regeln in jeder
+   traditionellen Seite mitfahren, forderte eine italienische Seite eine
+   Animation an, deren Keyframes sie gar nicht bekommt – genau dieser Fall
+   stand eine Weile still im Hero, ohne dass es auffiel. */
+const TRADITIONELL_BAYERISCH = `
+/* Ist der Hero durch, stehen Tafel und Krug still. motion.js setzt die Klasse
+   .ruht ohnehin schon (dafür gibt es den IntersectionObserver); bisher hing
+   daran nur die Hero-Fahrt. Eine Animation, die niemand sieht, hält den
+   Compositor trotzdem wach. */
+.hs-traditionell .hero.ruht .sig-tafel .karte,
+.hs-traditionell .hero.ruht .sig-krug .schaum,
+.hs-traditionell .hero.ruht .sig-krug .tropfen { animation-play-state: paused; }
+
 /* --- Der Maßkrug (heroSignature.js: heroBierkrug) ------------------------ */
 /* Die Glaskontur liegt im viewBox 0 0 64 86 bei x 14…50 und beginnt bei
    y = 16. Schaum und Tropfen sitzen deshalb bei 23 % / 23 % und am Rand –
@@ -283,44 +315,30 @@ const TRADITIONELL = `
   .hs-traditionell .foto-slot img { flex: 1; min-height: 0; height: auto;
                                     aspect-ratio: auto; object-fit: cover; }
 }
-
-/* --- Gezeichnete Zeichen (signaturIcons.js) ----------------------------- */
-/* Auch die USP-Leiste verlässt die Mittelachse: Mit der Note sind es vier
-   Punkte, die auf zwei Zeilen umbrechen – zentriert sieht die zweite Zeile
-   aus wie ein Rest. */
-.hs-traditionell .usp-list { justify-content: flex-start; }
-.hs-traditionell .usp-list span { gap: 10px; }
-.hs-traditionell .reserve-pluspunkte .k { display: inline-flex; padding-top: .2em; }
-.hs-traditionell footer strong { display: inline-flex; align-items: center; gap: 10px; }
-${ikonenCss("hs-traditionell")}
-/* Die Küchenmarke steht an drei Stellen: Kopf der Highlights, Siegel der
-   Hausempfehlung, Fußzeile. */
-.hs-traditionell .kopf-marke { display: inline-flex; align-items: center; gap: 9px; }
-
-/* --- Wer keine Bewegung will, bekommt keine ----------------------------- */
-/* Auch der Auftritt beim Scrollen – zusätzlich zu motion.js, damit die Regel
-   nicht davon abhängt, welcher Block zuletzt gewinnt. */
-@media (prefers-reduced-motion: reduce) {
-  .bewegt .hs-traditionell .auftritt,
-  .bewegt .hs-traditionell .auftritt-karte,
-  .bewegt .hs-traditionell .usp-list span { opacity: 1; transition: none; }
-}
-.bewegung-aus .hs-traditionell .auftritt,
-.bewegung-aus .hs-traditionell .auftritt-karte,
-.bewegung-aus .hs-traditionell .usp-list span { opacity: 1; transition: none; }
 `;
 
 const HANDSCHRIFTEN = {
   traditionell: TRADITIONELL,
 };
 
+// Was eine Handschrift zusätzlich braucht, wenn eine bestimmte Küche sie
+// trägt. Der Schlüssel ist "<archetyp>/<kueche>".
+const HANDSCHRIFT_JE_KUECHE = {
+  "traditionell/bayerisch": TRADITIONELL_BAYERISCH,
+};
+
 /**
  * Das CSS der Handschrift. Ohne Handschrift (preset.layout.handschrift null,
  * also jedes Preset außer den Archetypen) kommt ein leerer String zurück –
  * die Seite ist dann Zeichen für Zeichen die bisherige.
+ *
+ * @param {string|null} handschrift
+ * @param {string} [cuisine] - für die Teile, die nur eine Küche braucht.
  */
-export function handschriftCss(handschrift) {
-  return HANDSCHRIFTEN[handschrift] ?? "";
+export function handschriftCss(handschrift, cuisine) {
+  const basis = HANDSCHRIFTEN[handschrift];
+  if (!basis) return "";
+  return basis + (HANDSCHRIFT_JE_KUECHE[`${handschrift}/${cuisine}`] ?? "");
 }
 
 /** Die Körperklasse, an der jeder Selektor des Blocks hängt. */

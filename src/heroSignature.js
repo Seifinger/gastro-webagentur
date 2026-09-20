@@ -341,7 +341,11 @@ const SIGNATUR_TEILE = {
 .sig-beer .tropfen { position: absolute; left: 50%; top: 18%; width: 5px; height: 5px;
                       border-radius: 50%; background: #fdf3d6; opacity: 0;
                       animation: sig-beer-tropfen 8s ease-in infinite; }
-.sig-beer .tropfen-2 { left: 64%; animation-delay: .25s; }
+.sig-beer .tropfen-2 { left: 64%; animation-delay: .25s; }`,
+  // Eigener Teil, weil der gezeichnete Maßkrug der Handschrift (.sig-krug)
+  // dieselben beiden Keyframes nutzt. Er braucht sie – die Regeln von
+  // .sig-beer daneben nicht.
+  krugBewegung: `
 /* Der eigentliche Überlauf-Moment (82–100 %) ist bewusst breiter als der
    Rest des Zyklus, damit er als Ereignis lesbar ist statt nur als Zucken. */
 @keyframes sig-beer-schaum {
@@ -353,7 +357,8 @@ const SIGNATUR_TEILE = {
   0%, 82% { opacity: 0; transform: translateY(0); }
   87% { opacity: .9; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(20px); }
-}
+}`,
+  bayerischKrugEnde: `
 @media (max-width: 899px) {
   .sig-beer { right: 6%; bottom: 5%; width: 32px; }
 }
@@ -416,7 +421,8 @@ const SIGNATUR_TEILE = {
 const SIGNATUR_REIHENFOLGE = [
   "basis", "italienisch", "japanisch", "tuerkisch", "syrisch", "bayerischTafel",
   "totDiashow", "griechisch", "cafe", "chinesisch", "vietnamesisch", "thailaendisch",
-  "indisch", "asiatisch", "bayerischKrug", "generisch", "reduziert",
+  "indisch", "asiatisch", "bayerischKrug", "krugBewegung", "bayerischKrugEnde",
+  "generisch", "reduziert",
 ];
 
 const SIGNATUR_CSS = `${SIGNATUR_REIHENFOLGE.map((teil) => SIGNATUR_TEILE[teil]).join("")}\n`;
@@ -440,7 +446,10 @@ const SIGNATUR_JE_KUECHE = {
   japanisch: ["japanisch"],
   tuerkisch: ["tuerkisch"],
   syrisch: ["syrisch"],
-  bayerisch: ["bayerischTafel"],
+  // krugBewegung sind die beiden Keyframes, die der gezeichnete Maßkrug der
+  // Handschrift nutzt. Ohne sie stand er still – und genau das tat er, bis
+  // es jemand nachgemessen hat.
+  bayerisch: ["bayerischTafel", "krugBewegung"],
   griechisch: ["griechisch"],
   cafe: ["cafe"],
   chinesisch: ["chinesisch"],
