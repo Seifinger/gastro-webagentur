@@ -1,5 +1,5 @@
 import { escapeHtml, optionList, timeSlots } from "../htmlHelpers.js";
-import { haken } from "../signaturIcons.js";
+import { haken, gedeck } from "../signaturIcons.js";
 
 export const RESERVATION_SLOTS = [
   ...timeSlots(11 * 60 + 30, 14 * 60, 30),
@@ -20,14 +20,30 @@ export const PICKUP_SLOTS = [
  *   Handschrift tragen die Pluspunkte den gezeichneten Haken statt des ✓.
  */
 export function renderReservation({ widgetVariant, handschrift }) {
-  const k = handschrift === "traditionell" ? haken() : "✓";
+  const k = handschrift ? haken() : "✓";
+
+  // Im Abendhaus ist die Reservierung der eine starke Moment der Seite (siehe
+  // docs-intern/design-tokens/abend.md). Sie bekommt deshalb als einzige
+  // Sektion ein eigenes gezeichnetes Zeichen – das Gedeck.
+  const eyebrow =
+    handschrift === "abend"
+      ? `<div class="eyebrow"><span class="kopf-marke">${gedeck()} Reservierung</span></div>`
+      : '<div class="eyebrow">Reservierung</div>';
+
+  // Ohne Handschrift bleibt die Größe als style-Attribut am Element stehen –
+  // so stand sie immer dort. Mit Handschrift entscheidet das CSS des
+  // Archetyps, wie groß diese Überschrift im Verhältnis zu den anderen ist.
+  const ueberschrift = handschrift
+    ? "<h2>Tisch reservieren</h2>"
+    : '<h2 style="font-size:clamp(28px,4.4vw,42px);margin-bottom:16px">Tisch reservieren</h2>';
+
   return `
 <section class="section reserve-section" id="reservierung" data-reservation-variant="${escapeHtml(widgetVariant)}">
   <div class="wrap">
     <div class="reserve-grid">
       <div>
-        <div class="eyebrow">Reservierung</div>
-        <h2 style="font-size:clamp(28px,4.4vw,42px);margin-bottom:16px">Tisch reservieren</h2>
+        ${eyebrow}
+        ${ueberschrift}
         <p style="color:var(--ink-soft);font-size:18px">Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
         <ul class="reserve-pluspunkte">
           <li><span class="k">${k}</span><span>Rund um die Uhr buchbar, auch außerhalb der Öffnungszeiten</span></li>

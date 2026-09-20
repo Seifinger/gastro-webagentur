@@ -22,6 +22,32 @@
 //    derselben Media Query wie alles andere.
 
 import { ikonenCss } from "../signaturIcons.js";
+import { SIGNATUR_REDUZIERT_REGELN } from "../heroSignature.js";
+
+/**
+ * Die Bildunterschrift steht unter dem Bild, nicht darauf.
+ *
+ * Sie stand bisher IM Foto, auf einem schwarzen Verlauf von transparent nach
+ * 82 %. Der beginnt oben bei null – und genau dort sitzt die Zeile: gemessen
+ * über den echten Pixeln kam "Unser Haus" auf 1.99:1 über den hellsten
+ * Bildstellen. Ein Schleier, der weiße Schrift auf einem Foto lesbar halten
+ * soll, ist ohnehin das Muster, das jede Vorlage hat.
+ *
+ * Gilt für jede Handschrift; wie die Bilder darüber angeordnet sind,
+ * entscheidet der Archetyp.
+ *
+ * @param {string} klasse - die Körperklasse des Archetyps.
+ */
+function bildunterschriftCss(klasse) {
+  return `
+/* --- Ambiente: die Bildunterschrift steht unter dem Bild ---------------- */
+.${klasse} .foto-slot { border-radius: 0; background: none; overflow: visible;
+                        display: flex; flex-direction: column; }
+.${klasse} .foto-slot img { border-radius: var(--radius); }
+.${klasse} .foto-text { position: static; padding: 14px 0 0; background: none; color: var(--ink); }
+.${klasse} .foto-text strong { font-size: 20px; }
+.${klasse} .foto-text span { color: var(--ink-soft); font-size: 14px; margin-top: 3px; }`;
+}
 
 /* ========================================================================= *
  * traditionell
@@ -136,24 +162,24 @@ const TRADITIONELL = `
                               text-transform: uppercase; color: var(--accent-bold); }
 .hs-traditionell .hl-foot { margin-top: 14px; }
 @media (min-width: 680px) {
-  .hs-traditionell .hl-treppe { grid-template-columns: repeat(6, 1fr); gap: 48px 30px; }
-  .hs-traditionell .hl-treppe > .hl-card:first-child {
+  .hs-traditionell .hl-anordnung { grid-template-columns: repeat(6, 1fr); gap: 48px 30px; }
+  .hs-traditionell .hl-anordnung > .hl-card:first-child {
     grid-column: 1 / -1; display: grid; grid-template-columns: 7fr 5fr;
     gap: 36px; align-items: center;
   }
-  .hs-traditionell .hl-treppe > .hl-card:first-child .hl-media { aspect-ratio: 4 / 3; }
-  .hs-traditionell .hl-treppe > .hl-card:first-child .hl-body { padding: 0; gap: 10px; }
-  .hs-traditionell .hl-treppe > .hl-card:first-child .hl-name { font-size: clamp(25px, 2.7vw, 34px); }
-  .hs-traditionell .hl-treppe > .hl-card:first-child .hl-desc { font-size: 17px; }
-  .hs-traditionell .hl-treppe > .hl-card:first-child .hl-preis { font-size: 25px; }
+  .hs-traditionell .hl-anordnung > .hl-card:first-child .hl-media { aspect-ratio: 4 / 3; }
+  .hs-traditionell .hl-anordnung > .hl-card:first-child .hl-body { padding: 0; gap: 10px; }
+  .hs-traditionell .hl-anordnung > .hl-card:first-child .hl-name { font-size: clamp(25px, 2.7vw, 34px); }
+  .hs-traditionell .hl-anordnung > .hl-card:first-child .hl-desc { font-size: 17px; }
+  .hs-traditionell .hl-anordnung > .hl-card:first-child .hl-preis { font-size: 25px; }
   /* Drei Karten: eine große, zwei halbe. */
-  .hs-traditionell .hl-treppe--3 > .hl-card:nth-child(n+2) { grid-column: span 3; }
+  .hs-traditionell .hl-anordnung--3 > .hl-card:nth-child(n+2) { grid-column: span 3; }
   /* Vier Karten: eine große, drei Drittel. */
-  .hs-traditionell .hl-treppe--4 > .hl-card:nth-child(n+2) { grid-column: span 2; }
+  .hs-traditionell .hl-anordnung--4 > .hl-card:nth-child(n+2) { grid-column: span 2; }
   /* Sechs Karten: eine große, zwei halbe, drei Drittel. */
-  .hs-traditionell .hl-treppe--6 > .hl-card:nth-child(n+2):nth-child(-n+3) { grid-column: span 3; }
-  .hs-traditionell .hl-treppe--6 > .hl-card:nth-child(n+4) { grid-column: span 2; }
-  .hs-traditionell .hl-treppe > .hl-card:not(:first-child) .hl-media { aspect-ratio: 3 / 2; }
+  .hs-traditionell .hl-anordnung--6 > .hl-card:nth-child(n+2):nth-child(-n+3) { grid-column: span 3; }
+  .hs-traditionell .hl-anordnung--6 > .hl-card:nth-child(n+4) { grid-column: span 2; }
+  .hs-traditionell .hl-anordnung > .hl-card:not(:first-child) .hl-media { aspect-ratio: 3 / 2; }
 }
 
 /* --- Karte: Menütafel statt Kästen -------------------------------------- */
@@ -218,6 +244,18 @@ const TRADITIONELL = `
 .hs-traditionell .contact-list .k .ikon { width: 1.5em; height: 1.5em; }
 .hs-traditionell .hours-row { font-variant-numeric: tabular-nums; }
 
+${bildunterschriftCss("hs-traditionell")}
+/* Das Haus ist wichtiger als Team und Bestseller – es ist das, woran der Gast
+   die Tür erkennt. Auf dem Handy bleibt es beim Stapel: Ein verschobenes
+   Raster auf 390px ist nur eng. */
+@media (min-width: 760px) {
+  .hs-traditionell .foto-grid { grid-template-columns: 1.4fr 1fr 1fr; gap: 22px;
+                                height: clamp(360px, 34vw, 480px); }
+  .hs-traditionell .foto-slot { height: 100%; }
+  .hs-traditionell .foto-slot img { flex: 1; min-height: 0; height: auto;
+                                    aspect-ratio: auto; object-fit: cover; }
+}
+
 /* --- Gezeichnete Zeichen (signaturIcons.js) ----------------------------- */
 /* Auch die USP-Leiste verlässt die Mittelachse: Mit der Note sind es vier
    Punkte, die auf zwei Zeilen umbrechen – zentriert sieht die zweite Zeile
@@ -249,15 +287,235 @@ ${ikonenCss("hs-traditionell")}
    traditionellen Seite mitfahren, forderte eine italienische Seite eine
    Animation an, deren Keyframes sie gar nicht bekommt – genau dieser Fall
    stand eine Weile still im Hero, ohne dass es auffiel. */
-const TRADITIONELL_BAYERISCH = `
-/* Ist der Hero durch, stehen Tafel und Krug still. motion.js setzt die Klasse
-   .ruht ohnehin schon (dafür gibt es den IntersectionObserver); bisher hing
-   daran nur die Hero-Fahrt. Eine Animation, die niemand sieht, hält den
-   Compositor trotzdem wach. */
-.hs-traditionell .hero.ruht .sig-tafel .karte,
-.hs-traditionell .hero.ruht .sig-krug .schaum,
-.hs-traditionell .hero.ruht .sig-krug .tropfen { animation-play-state: paused; }
+/* ========================================================================= *
+ * abend
+ * ------------------------------------------------------------------------- *
+ * Der eine starke Moment: die Reservierung. Nicht der Hero – das Abendhaus
+ * verspricht keinen Betrieb, sondern einen Abend, und der beginnt mit einem
+ * Tisch. Die Reservierung ist deshalb die einzige gefüllte Akzentfläche
+ * unterhalb des Heros, die einzige Sektion mit zusätzlicher Luft und die
+ * einzige Stelle, an der überhaupt etwas in Bewegung kommt.
+ *
+ * Damit das trägt, steht alles andere still – auch die Signatur der Küche.
+ * Ein Sushi-Band, das endlos durchs Bild fährt, ist Betrieb; ein Abendhaus
+ * wartet. Die Signatur bleibt als Zeichnung stehen, sie läuft nur nicht mehr.
+ *
+ * Das Raster des Archetyps: Der Sektionskopf steht in einer schmalen linken
+ * Randspalte, der Inhalt daneben. Beim traditionellen Archetyp hält die
+ * Randspalte die Kategorie und die Note – hier ist es der Kopf selbst.
+ *
+ * Die Kurve: cubic-bezier(.5,0,.1,1). Langsam an, langsam aus – ein Abend
+ * hat es nicht eilig. 0.9s für den einen Moment, 0.5s für den Rest.
+ * ========================================================================= */
+const ABEND = `
+/* --- Stille: auch die Signatur der Küche wartet ------------------------- */
+.hs-abend .hero-media img { animation: none; }
+.hs-abend .hero-media, .hs-abend .hero-inner { animation: none; }
+.hs-abend .foto-slot img { animation: none; }
+.hs-abend .hl-card, .hs-abend .hl-media img { transition: none; }
+.hs-abend .hl-card:hover { transform: none; }
+.hs-abend .hl-card:hover .hl-media img { transform: none; }
+.hs-abend .section-head .eyebrow::after,
+.hs-abend .step:not(:last-child)::after { transform: scaleX(1); transition: none; }
+.bewegt .hs-abend .section-head.auftritt .eyebrow::after { transform: scaleX(1); }
+.bewegt .hs-abend .auftritt,
+.bewegt .hs-abend .auftritt-karte,
+.bewegt .hs-abend .usp-list span {
+  transform: none;
+  transition: opacity .5s cubic-bezier(.5,0,.1,1);
+  transition-delay: 0s;
+}
+/* Dieselben Regeln, die prefers-reduced-motion setzt – hier dauerhaft.
+   Einmal geschrieben in heroSignature.js, nicht ein zweites Mal abgetippt. */
+.hs-abend {
+  ${SIGNATUR_REDUZIERT_REGELN}
+}
+/* Das Sushi-Band ist als einzige Signatur kein Gegenstand, sondern ein
+   Mechanismus: Steht es still, liegt ein Filmstreifen quer über dem Hero.
+   Im Abendhaus wird daraus ein gesetztes Viererfeld am rechten Rand – vier
+   Teller, ruhig nebeneinander, statt eines angehaltenen Laufbands. */
+.hs-abend .sig-band { left: auto; right: 4%; top: 14%; height: auto;
+                      width: clamp(230px, 26vw, 360px); mask-image: none; opacity: .92; }
+.hs-abend .sig-band .band { flex-wrap: wrap; width: 100%; gap: 10px; }
+.hs-abend .sig-band img { width: calc(50% - 5px); height: auto; aspect-ratio: 4 / 3; border-radius: 2px; }
+.hs-abend .sig-band img:nth-child(n + 5) { display: none; }
+@media (max-width: 899px) {
+  .hs-abend .sig-band { right: -6%; top: 9%; width: 46vw; opacity: .5; }
+}
 
+/* Orchidee und Gewürzwölkchen hängen nicht an einer Animation, sondern an
+   einem Übergang, den .bewegt auslöst. Auch der bleibt hier aus. */
+.bewegt .hs-abend .sig-orchid .bluete, .bewegt .hs-abend .sig-orchid.da .bluete {
+  opacity: 1; transform: none; transition: none;
+}
+.bewegt .hs-abend .sig-spice .puff, .bewegt .hs-abend .sig-spice.da .puff,
+.bewegt .hs-abend .sig-spice .fleck, .bewegt .hs-abend .sig-spice.da .fleck {
+  opacity: 1; transform: none; animation: none;
+}
+
+/* --- Der eine Moment: die Reservierung ---------------------------------- */
+/* Die einzige gefüllte Akzentfläche unterhalb des Heros ist der Knopf in
+   diesem Formular. Die USP-Leiste gibt ihre Akzentfläche dafür ab, die
+   Ziffern des Abholwegs werden zu Kontur. */
+.hs-abend .usp-strip { background: var(--soft); color: var(--ink-soft);
+                       border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.hs-abend .usp-list { justify-content: flex-start; font-weight: 500; }
+.hs-abend .usp-platzhalter { color: var(--gold-dunkel); }
+.hs-abend .step-n { background: transparent; color: var(--accent-bold); border: 1px solid var(--line); }
+
+.hs-abend #reservierung { padding: 124px 0; }
+.hs-abend .reserve-section { background: var(--bg); }
+.hs-abend #reservierung .section-head h2,
+.hs-abend #reservierung h2 { font-size: clamp(30px, 4.6vw, 48px); margin-bottom: 18px; }
+.hs-abend .reserve-grid > div:first-child p { color: var(--ink-soft); font-size: 19px; }
+/* Die eine helle Fläche der Seite: Hier wird der Tisch gesichert. */
+.hs-abend .panel { background: var(--surface); padding: 38px; border-color: var(--line); }
+.hs-abend .panel .btn-primary { padding: 16px 26px; font-size: 16px; }
+.bewegt .hs-abend .reserve-grid > .auftritt {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .9s cubic-bezier(.5,0,.1,1), transform .9s cubic-bezier(.5,0,.1,1);
+}
+.bewegt .hs-abend .reserve-grid > .auftritt.da { opacity: 1; transform: none; }
+
+/* --- Farbe: Text trägt accentBold, Flächen behalten accent -------------- */
+.hs-abend .eyebrow,
+.hs-abend .veg,
+.hs-abend .error,
+.hs-abend .contact-list a,
+.hs-abend .contact-list .k,
+.hs-abend .reserve-pluspunkte .k,
+.hs-abend .stimmen-note .note,
+.hs-abend .kat > summary::after,
+.hs-abend .add-btn,
+.hs-abend .mini-add { color: var(--accent-bold); }
+.hs-abend .add-btn, .hs-abend .mini-add { border-color: var(--accent-bold); }
+.hs-abend .kat > summary:hover { color: var(--accent-bold); }
+.hs-abend .stimmen-note .sterne,
+.hs-abend .stimme .sterne { color: var(--gold-dunkel); }
+
+/* --- Keine Mittelachse -------------------------------------------------- */
+.hs-abend .section-head.mitte { margin-left: 0; margin-right: 0; text-align: left; }
+.hs-abend .stimmen-erklaerung { margin-left: 0; margin-right: 0; text-align: left; }
+
+/* --- Rhythmus ----------------------------------------------------------- */
+.hs-abend .section { padding: 88px 0; }
+.hs-abend #ambiente { padding: 104px 0 88px; }
+.hs-abend #highlights .section-head h2 { font-size: clamp(26px, 3.6vw, 36px); }
+.hs-abend .section-head p { font-size: 19px; }
+.hs-abend .hint, .hs-abend .error, .hs-abend .footer-note,
+.hs-abend .foto-text span, .hs-abend .demo-note { font-size: 14px; }
+.hs-abend .hl-kat, .hs-abend .veg, .hs-abend .placeholder-badge { font-size: 12px; }
+
+/* --- Highlights: die Leseliste ------------------------------------------ */
+/* Im Abendhaus liest man eine Karte, man blättert keine Kacheln. Ein Gericht
+   steht mit Bild, die übrigen als Zeilen daneben – Name, Beschreibung, Preis. */
+.hs-abend .hl-card { background: transparent; border: 0; border-radius: 0; overflow: visible; }
+.hs-abend .hl-media { border-radius: var(--radius); }
+.hs-abend .hl-body { padding: 16px 0 0; gap: 6px; }
+.hs-abend .hl-kat { position: static; background: none; border-radius: 0; padding: 0;
+                    color: var(--accent-bold); letter-spacing: .16em; align-self: start; }
+.hs-abend .hl-siegel { display: inline-flex; align-items: center; gap: 8px;
+                       font-size: 12px; font-weight: 700; letter-spacing: .14em;
+                       text-transform: uppercase; color: var(--accent-bold); }
+@media (min-width: 860px) {
+  .hs-abend .hl-anordnung { grid-template-columns: 6fr 6fr; gap: 0 54px; align-items: start; }
+  .hs-abend .hl-anordnung > .hl-card:first-child { grid-column: 1; }
+  .hs-abend .hl-anordnung--3 > .hl-card:first-child { grid-row: span 2; }
+  .hs-abend .hl-anordnung--4 > .hl-card:first-child { grid-row: span 3; }
+  .hs-abend .hl-anordnung--6 > .hl-card:first-child { grid-row: span 5; }
+  .hs-abend .hl-anordnung > .hl-card:first-child .hl-media { aspect-ratio: 4 / 5; }
+  .hs-abend .hl-anordnung > .hl-card:first-child .hl-name { font-size: clamp(22px, 2.3vw, 28px); }
+  .hs-abend .hl-anordnung > .hl-card:not(:first-child) {
+    grid-column: 2; border-top: 1px solid var(--line); padding-top: 18px;
+  }
+  .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-media { display: none; }
+  .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-body { padding: 0; }
+  .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-name { font-size: 19px; }
+  .hs-abend .hl-anordnung > .hl-card:last-child { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+}
+
+/* --- Karte und Stimmen: der Kopf steht in der Randspalte ---------------- */
+/* Das ist das Raster dieses Archetyps: links der Kopf, rechts der Inhalt.
+   Eine Speisekarte und eine Sammlung von Stimmen brauchen keinen Titel über
+   sich – sie brauchen einen neben sich. */
+.hs-abend .karte-section { background: var(--bg); }
+.hs-abend .kat { background: transparent; border: 0; border-top: 1px solid var(--line);
+                 border-radius: 0; margin-bottom: 0; overflow: visible; }
+.hs-abend .kat:last-of-type { border-bottom: 1px solid var(--line); }
+.hs-abend .kat > summary { padding: 22px 0; }
+.hs-abend .kat-body { padding: 0 0 14px; }
+.hs-abend .gericht-preis { font-variant-numeric: tabular-nums; }
+.hs-abend .stimme { background: transparent; border: 0; border-top: 1px solid var(--line);
+                    border-radius: 0; padding: 22px 0; gap: 10px; }
+.hs-abend .stimme.ist-platzhalter { border-style: solid; min-height: 0; justify-content: flex-start; }
+.hs-abend .stimmen-grid { grid-template-columns: 1fr; gap: 0; }
+.hs-abend .stimmen-grid--list { max-width: none; margin-left: 0; margin-right: 0; }
+.hs-abend .stimmen-note { justify-content: flex-start; margin-bottom: 20px; }
+.hs-abend .stimmen-note .note { font-size: 36px; }
+.hs-abend .stimmen-blatt { display: block; }
+@media (min-width: 960px) {
+  .hs-abend #karte .wrap,
+  .hs-abend #stimmen .wrap { display: grid; grid-template-columns: 4fr 8fr;
+                             column-gap: 54px; align-items: start; }
+  .hs-abend #karte .section-head,
+  .hs-abend #stimmen .section-head { grid-column: 1; margin-bottom: 0; max-width: none; }
+  .hs-abend #karte .kat,
+  .hs-abend #stimmen .stimmen-blatt,
+  .hs-abend #stimmen .stimmen-note,
+  .hs-abend #stimmen .stimmen-grid,
+  .hs-abend #stimmen .stimmen-erklaerung { grid-column: 2; }
+}
+
+${bildunterschriftCss("hs-abend")}
+/* Der Raum führt diesen Archetyp an – er steht über die ganze Breite, Team
+   und Bestseller teilen sich die Zeile darunter. */
+@media (min-width: 760px) {
+  .hs-abend .foto-grid { grid-template-columns: 1fr 1fr; gap: 26px; }
+  .hs-abend .foto-slot:first-child { grid-column: 1 / -1; }
+  .hs-abend .foto-slot:first-child img { aspect-ratio: 21 / 9; }
+}
+
+/* --- Kontakt: die Öffnungszeiten tragen --------------------------------- */
+/* Umgekehrt zum traditionellen Archetyp: Wer einen Abend plant, will zuerst
+   wissen, ob offen ist – die Adresse findet er danach. */
+@media (min-width: 860px) {
+  .hs-abend .contact-grid { grid-template-columns: 5fr 7fr; gap: 60px; }
+}
+.hs-abend .hours-row { font-size: 17px; padding: 15px 0; font-variant-numeric: tabular-nums; }
+.hs-abend .contact-list li { gap: 16px; padding: 14px 0; align-items: flex-start; }
+.hs-abend .contact-list .k { font-size: inherit; display: inline-flex; padding-top: .1em; }
+
+/* --- Gezeichnete Zeichen ------------------------------------------------ */
+.hs-abend .usp-list span { gap: 10px; }
+.hs-abend .reserve-pluspunkte .k { display: inline-flex; padding-top: .2em; }
+.hs-abend footer strong { display: inline-flex; align-items: center; gap: 10px; }
+.hs-abend .kopf-marke { display: inline-flex; align-items: center; gap: 10px; }
+${ikonenCss("hs-abend")}
+
+/* --- Wer keine Bewegung will, bekommt keine ----------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .bewegt .hs-abend .auftritt,
+  .bewegt .hs-abend .auftritt-karte,
+  .bewegt .hs-abend .reserve-grid > .auftritt,
+  .bewegt .hs-abend .usp-list span { opacity: 1; transform: none; transition: none; }
+}
+.bewegung-aus .hs-abend .auftritt,
+.bewegung-aus .hs-abend .auftritt-karte,
+.bewegung-aus .hs-abend .reserve-grid > .auftritt,
+.bewegung-aus .hs-abend .usp-list span { opacity: 1; transform: none; transition: none; }
+`;
+
+/**
+ * Was eine bayerische Seite zusätzlich braucht: Der gezeichnete Maßkrug
+ * (heroSignature.js: heroBierkrug) steht nur dort im Markup. Würden seine
+ * Regeln in jeder Seite mitfahren, forderte eine italienische Seite eine
+ * Animation an, deren Keyframes sie gar nicht bekommt – genau dieser Fall
+ * stand eine Weile still im Hero, ohne dass es auffiel.
+ *
+ * @param {string} klasse - die Körperklasse des Archetyps.
+ */
+function krugCss(klasse) {
+  return `
 /* --- Der Maßkrug (heroSignature.js: heroBierkrug) ------------------------ */
 /* Die Glaskontur liegt im viewBox 0 0 64 86 bei x 14…50 und beginnt bei
    y = 16. Schaum und Tropfen sitzen deshalb bei 23 % / 23 % und am Rand –
@@ -267,64 +525,63 @@ const TRADITIONELL_BAYERISCH = `
    (sig-beer-schaum, sig-beer-tropfen aus SIGNATUR_CSS). */
 /* Der Krug steht unter der Tafel, nicht vor ihr: Die Tafel sitzt mittig
    (top 50 %, translateY(-50 %)) und endet bei 1440x900 auf y = 599. */
-.hs-traditionell .sig-krug { position: absolute; right: 6.5%; bottom: 2.5%;
+.${klasse} .sig-krug { position: absolute; right: 6.5%; bottom: 2.5%;
                              width: clamp(86px, 8.6vw, 118px); aspect-ratio: 64 / 86;
                              color: var(--gold-hell);
                              filter: drop-shadow(0 14px 20px rgba(0,0,0,.45)); }
-.hs-traditionell .sig-krug-form { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.hs-traditionell .sig-krug .noppe { opacity: .55; }
-.hs-traditionell .sig-krug .schaum { position: absolute; left: 23%; right: 23%; top: 3%; height: 14%;
+.${klasse} .sig-krug-form { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.${klasse} .sig-krug .noppe { opacity: .55; }
+.${klasse} .sig-krug .schaum { position: absolute; left: 23%; right: 23%; top: 3%; height: 14%;
                                      border-radius: 999px 999px 5px 5px; background: #fdf3d6;
                                      transform-origin: 50% 100%;
                                      animation: sig-beer-schaum 8s ease-in-out infinite; }
-.hs-traditionell .sig-krug .tropfen { position: absolute; top: 16%; width: 5px; height: 5px;
+.${klasse} .sig-krug .tropfen { position: absolute; top: 16%; width: 5px; height: 5px;
                                       border-radius: 50%; background: #fdf3d6; opacity: 0;
                                       animation: sig-beer-tropfen 8s ease-in infinite; }
-.hs-traditionell .sig-krug .tropfen-1 { left: 25%; }
-.hs-traditionell .sig-krug .tropfen-2 { left: 68%; animation-delay: .25s; }
+.${klasse} .sig-krug .tropfen-1 { left: 25%; }
+.${klasse} .sig-krug .tropfen-2 { left: 68%; animation-delay: .25s; }
 @media (max-width: 899px) {
-  .hs-traditionell .sig-krug { right: 6%; bottom: 4%; width: 46px; }
+  .${klasse} .sig-krug { right: 6%; bottom: 4%; width: 46px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hs-traditionell .sig-krug .schaum,
-  .hs-traditionell .sig-krug .tropfen { animation: none; }
+  .${klasse} .sig-krug .schaum,
+  .${klasse} .sig-krug .tropfen { animation: none; }
 }
-.bewegung-aus .hs-traditionell .sig-krug .schaum,
-.bewegung-aus .hs-traditionell .sig-krug .tropfen { animation: none; }
+.bewegung-aus .${klasse} .sig-krug .schaum,
+.bewegung-aus .${klasse} .sig-krug .tropfen { animation: none; }
 
-/* --- Ambiente: ein Bildband, die Bildunterschrift unter dem Bild -------- */
-/* Das Haus ist wichtiger als Team und Bestseller – es ist das, woran der Gast
-   die Tür erkennt. Auf dem Handy bleibt es beim Stapel: Ein verschobenes
-   Raster auf 390px ist nur eng.
-   Die Unterschrift stand bisher IM Bild, auf einem schwarzen Verlauf von
-   transparent nach 82 %. Gemessen über den echten Pixeln kam "Unser Haus"
-   damit auf 1.99:1 über den hellsten Bildstellen – der Verlauf beginnt oben
-   bei null, und genau dort sitzt die Zeile. Ein Schleier, der Text lesbar
-   macht, ist ohnehin das Muster, das jede Vorlage hat: Hier steht die
-   Unterschrift jetzt unter dem Bild, auf dem Grund der Seite. */
-.hs-traditionell .foto-slot { border-radius: 0; background: none; overflow: visible;
-                              display: flex; flex-direction: column; }
-.hs-traditionell .foto-slot img { border-radius: var(--radius); }
-.hs-traditionell .foto-text { position: static; padding: 14px 0 0; background: none; color: var(--ink); }
-.hs-traditionell .foto-text strong { font-size: 20px; }
-.hs-traditionell .foto-text span { color: var(--ink-soft); font-size: 14px; margin-top: 3px; }
-@media (min-width: 760px) {
-  .hs-traditionell .foto-grid { grid-template-columns: 1.4fr 1fr 1fr; gap: 22px;
-                                height: clamp(360px, 34vw, 480px); }
-  .hs-traditionell .foto-slot { height: 100%; }
-  .hs-traditionell .foto-slot img { flex: 1; min-height: 0; height: auto;
-                                    aspect-ratio: auto; object-fit: cover; }
+`;
 }
+
+/* Der traditionelle Archetyp lässt den Krug überlaufen und hält ihn an,
+   sobald der Hero durch ist. motion.js setzt die Klasse .ruht ohnehin schon
+   (dafür gibt es den IntersectionObserver); bisher hing daran nur die
+   Hero-Fahrt. Eine Animation, die niemand sieht, hält den Compositor
+   trotzdem wach. */
+const TRADITIONELL_BAYERISCH = `${krugCss("hs-traditionell")}
+.hs-traditionell .hero.ruht .sig-tafel .karte,
+.hs-traditionell .hero.ruht .sig-krug .schaum,
+.hs-traditionell .hero.ruht .sig-krug .tropfen { animation-play-state: paused; }
+`;
+
+/* Im Abendhaus steht der Krug einfach da. Er läuft nicht über: Das ist die
+   Regel dieses Archetyps, und sie gilt auch für das eine Element, das eine
+   andere Küche in Bewegung hielte. */
+const ABEND_BAYERISCH = `${krugCss("hs-abend")}
+.hs-abend .sig-krug .schaum,
+.hs-abend .sig-krug .tropfen { animation: none; }
 `;
 
 const HANDSCHRIFTEN = {
   traditionell: TRADITIONELL,
+  abend: ABEND,
 };
 
 // Was eine Handschrift zusätzlich braucht, wenn eine bestimmte Küche sie
 // trägt. Der Schlüssel ist "<archetyp>/<kueche>".
 const HANDSCHRIFT_JE_KUECHE = {
   "traditionell/bayerisch": TRADITIONELL_BAYERISCH,
+  "abend/bayerisch": ABEND_BAYERISCH,
 };
 
 /**

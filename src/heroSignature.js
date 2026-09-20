@@ -12,7 +12,10 @@ import { assetFileName } from "./imageLibrary.js";
 // Regeln braucht es deshalb unter beiden Auslösern (siehe Ende von
 // SIGNATUR_CSS) – der echten Media Query für Besucher mit Systemeinstellung
 // und der Klasse .bewegung-aus, die motion.js bei ?bewegung=aus setzt.
-const SIGNATUR_REDUZIERT_REGELN = `
+// Auch von außen gebraucht: Der Abend-Archetyp stellt die Signatur seiner
+// Küche dauerhaft still (siehe styles/handschrift.css.js) und nutzt dafür
+// genau dieselben Regeln wie prefers-reduced-motion.
+export const SIGNATUR_REDUZIERT_REGELN = `
   .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
   .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i,
   .sig-drehteller .teller, .sig-drehteller img,

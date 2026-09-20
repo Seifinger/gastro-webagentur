@@ -166,11 +166,11 @@ test("die bestehenden Archetypen bekommen nichts vom Editorial-Stil zu sehen", (
     for (const teil of ["hl-grid--magazin", "gitter-asymmetrisch", "auftritt-zeile", "hero-video"]) {
       assert.ok(!html.includes(teil), `${stimmung.id}: ${teil} steht fälschlich in der Seite`);
     }
-    // --accent-bold ist kein Editorial-Merkmal mehr: Die Handschrift des
-    // traditionellen Archetyps nutzt ihn für Text, der sonst unter 4.5:1
-    // gegen den eigenen Grund läge (docs-intern/design-tokens/traditionell.md).
-    // Die Archetypen ohne Handschrift haben ihn weiterhin nicht.
-    if (stimmung.archetyp !== "traditionell") {
+    // --accent-bold ist kein Editorial-Merkmal mehr: Jede Handschrift nutzt
+    // ihn für Text, der sonst unter 4.5:1 gegen den eigenen Grund läge
+    // (siehe docs-intern/design-tokens/). Die Archetypen ohne Handschrift
+    // haben ihn weiterhin nicht.
+    if (!presetFuerArchetyp(stimmung.archetyp).layout.handschrift) {
       assert.ok(!html.includes("--accent-bold"), `${stimmung.id}: --accent-bold steht fälschlich in der Seite`);
     }
   }

@@ -28,22 +28,57 @@ function stimmungFuer(cuisine, archetyp) {
   return stimmungenFuer(cuisine).find((s) => s.archetyp === archetyp).id;
 }
 
+// Welche Archetypen ihre Handschrift schon haben und welche noch nicht. Beim
+// nächsten Archetyp wandert einer von rechts nach links.
+const MIT_HANDSCHRIFT = ["traditionell", "abend"];
+const OHNE_HANDSCHRIFT = ["hell", "editorial"];
+
 /* ---------- Die Handschrift kann keinen anderen Archetyp erreichen ---------- */
+
+/**
+ * Sammelt alle Selektoren eines CSS-Blocks, die nicht bereits in einem
+ * Elternselektor mit der Körperklasse stecken. CSS-Verschachtelung zählt als
+ * Bindung (`.hs-abend { ... }`), eine @media-Regel nicht – die bindet nichts.
+ */
+function ungebundeneSelektoren(css, klasse) {
+  const ohneKommentare = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const lose = [];
+  const stapel = [];
+  let gelesen = 0;
+  let gesamt = 0;
+
+  for (let i = 0; i < ohneKommentare.length; i += 1) {
+    const zeichen = ohneKommentare[i];
+    if (zeichen === "{") {
+      const sel = ohneKommentare.slice(gelesen, i).trim().replace(/\s+/g, " ");
+      const gebundenDurchEltern = stapel.some((eltern) => eltern.includes(klasse));
+      if (sel && !sel.startsWith("@")) {
+        gesamt += 1;
+        if (!sel.includes(klasse) && !gebundenDurchEltern) lose.push(sel);
+      }
+      stapel.push(sel);
+      gelesen = i + 1;
+    } else if (zeichen === "}") {
+      stapel.pop();
+      gelesen = i + 1;
+    }
+  }
+  return { lose, gesamt };
+}
 
 test("jeder Selektor der Handschrift hängt an ihrer Körperklasse", () => {
   // Das ist der eigentliche Regressionsschutz: Solange jede Regel an
   // .hs-<archetyp> hängt, kann der Block die übrigen Archetypen selbst dann
   // nicht verändern, wenn ihn jemand versehentlich überall einhängt.
-  // Beide Fassungen: die gemeinsame und die, die eine Küche zusätzlich
-  // mitbringt (hier der gezeichnete Maßkrug bei bayerisch).
-  const css = handschriftCss("traditionell", "bayerisch").replace(/\/\*[\s\S]*?\*\//g, "");
-  const gruppen = [...css.matchAll(/([^{}]+)\{/g)]
-    .map((treffer) => treffer[1].trim().replace(/\s+/g, " "))
-    .filter((sel) => sel && !sel.startsWith("@"));
-
-  assert.ok(gruppen.length > 20, "zu wenige Selektoren gefunden – der Test prüft nichts");
-  for (const sel of gruppen) {
-    assert.ok(sel.includes(".hs-traditionell"), `ungebundener Selektor: ${sel}`);
+  // Geprüft wird auch die Fassung, die eine Küche zusätzlich mitbringt (der
+  // gezeichnete Maßkrug bei bayerisch).
+  for (const [archetyp, cuisine] of [["traditionell", "bayerisch"], ["abend", "bayerisch"]]) {
+    const { lose, gesamt } = ungebundeneSelektoren(
+      handschriftCss(archetyp, cuisine),
+      `.hs-${archetyp}`,
+    );
+    assert.ok(gesamt > 20, `${archetyp}: zu wenige Selektoren – der Test prüft nichts`);
+    assert.deepEqual(lose, [], `${archetyp}: ungebundene Selektoren`);
   }
 });
 
@@ -63,23 +98,27 @@ test("ohne Handschrift gibt es weder Klasse noch CSS", () => {
   assert.equal(handschriftCss(undefined), "");
   assert.equal(handschriftKlasse(null), "");
   // Ein Archetyp, der noch keine Handschrift hat, bekommt auch keine.
-  assert.equal(handschriftCss("abend"), "");
-  assert.equal(handschriftKlasse("abend"), "");
+  assert.equal(handschriftCss("hell"), "");
+  assert.equal(handschriftKlasse("hell"), "");
 });
 
-test("nur der traditionelle Archetyp trägt die Handschrift", () => {
-  assert.equal(ARCHETYP_PRESET.traditionell.layout.handschrift, "traditionell");
-  for (const archetyp of ["abend", "hell", "editorial"]) {
+test("jeder Archetyp mit Handschrift nennt seine eigene", () => {
+  for (const archetyp of MIT_HANDSCHRIFT) {
+    assert.equal(ARCHETYP_PRESET[archetyp].layout.handschrift, archetyp);
+    assert.ok(handschriftCss(archetyp).length > 1000, `${archetyp}: kein CSS`);
+  }
+  for (const archetyp of OHNE_HANDSCHRIFT) {
     assert.equal(ARCHETYP_PRESET[archetyp].layout.handschrift, null, archetyp);
+    assert.equal(handschriftCss(archetyp), "", archetyp);
   }
   // Die A/B-Varianten der Küchen bleiben ebenfalls unberührt.
   assert.equal(withDesignDefaults().layout.handschrift, null);
 });
 
 test("die Seiten der übrigen Archetypen enthalten kein Zeichen der Handschrift", () => {
-  for (const archetyp of ["abend", "hell", "editorial"]) {
+  for (const archetyp of OHNE_HANDSCHRIFT) {
     const html = seite("bayerisch", stimmungFuer("bayerisch", archetyp));
-    for (const teil of ["hs-traditionell", "hl-treppe", "stimmen-blatt", "hl-siegel", "class=\"marke\""]) {
+    for (const teil of ["hs-traditionell", "hl-anordnung", "stimmen-blatt", "hl-siegel", "class=\"marke\""]) {
       assert.ok(!html.includes(teil), `${archetyp}: ${teil} steht fälschlich in der Seite`);
     }
     // Und sie behalten ihre bisherigen Emoji-Symbole.
@@ -92,7 +131,7 @@ test("die Seiten der übrigen Archetypen enthalten kein Zeichen der Handschrift"
 test("die traditionelle Seite trägt Körperklasse und Stilblock", () => {
   const html = seite("bayerisch", "wirtshaus");
   assert.ok(html.includes('<body class="hs-traditionell">'));
-  assert.ok(html.includes(".hs-traditionell .hl-treppe"));
+  assert.ok(html.includes(".hs-traditionell .hl-anordnung"));
   assert.ok(html.includes("--accent-bold:"));
 });
 
@@ -100,15 +139,15 @@ test("die Highlights stufen sich nach Anzahl ab", () => {
   // Bayerisch hat vier Highlights, Italienisch sechs – die Treppe muss beide
   // Fälle benennen, sonst greift in CSS keine Regel.
   const bayern = seite("bayerisch", "wirtshaus");
-  assert.ok(bayern.includes('class="hl-grid hl-treppe hl-treppe--4"'));
+  assert.ok(bayern.includes('class="hl-grid hl-anordnung hl-anordnung--4"'));
 
   const italien = seite("italienisch", "trattoria");
-  assert.ok(italien.includes('class="hl-grid hl-treppe hl-treppe--6"'));
+  assert.ok(italien.includes('class="hl-grid hl-anordnung hl-anordnung--6"'));
 
   // Für jede vorkommende Anzahl gibt es auch eine Regel.
   const css = handschriftCss("traditionell");
   for (const n of [3, 4, 6]) {
-    assert.ok(css.includes(`.hl-treppe--${n} >`), `keine Regel für ${n} Karten`);
+    assert.ok(css.includes(`.hl-anordnung--${n} >`), `keine Regel für ${n} Karten`);
   }
 });
 

@@ -49,7 +49,7 @@ function renderMenuAccordion(menu, showBadges, beschreibungFuer) {
  *   dann nicht mehr auf der Mittelachse sitzt.
  */
 export function renderMenu({ menu, menuLayout, showBadges, beschreibungFuer, handschrift }) {
-  const mitte = handschrift === "traditionell" ? "" : " mitte";
+  const mitte = handschrift ? "" : " mitte";
   return `
 <section class="section karte-section" id="karte" data-menu-layout="${escapeHtml(menuLayout)}">
   <div class="wrap">

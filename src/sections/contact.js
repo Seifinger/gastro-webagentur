@@ -24,7 +24,7 @@ function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl, eigene
   // Das Abzeichen auf dem Foto ist eine Pille über einem Bild – dasselbe
   // Muster wie in jeder Vorlage. Mit Handschrift steht dasselbe Wort in der
   // Bildunterschrift, wo es ohnehin hingehört.
-  const gezeichnet = handschrift === "traditionell";
+  const gezeichnet = Boolean(handschrift);
 
   return FOTO_SLOTS.map(
     ({ titel, hinweis }, index) => `
@@ -60,7 +60,7 @@ export function renderAmbiente({ konzeptLabel, ort, geschichte, hausBild, teamBi
   return `
 <section class="section" id="ambiente">
   <div class="wrap">
-    <div class="section-head${handschrift === "traditionell" ? "" : " mitte"}">
+    <div class="section-head${handschrift ? "" : " mitte"}">
       <div class="eyebrow">Bei uns</div>
       <h2>${escapeHtml(konzeptLabel)}${ort ? ` in ${escapeHtml(ort)}` : ""}</h2>
       <p>${escapeHtml(geschichte)}${hinweis}</p>
@@ -127,7 +127,9 @@ export function renderContact({ kontaktZeilen, hoursRows, strasse, ort, handschr
  * @param {string|null} [ctx.handschrift] - preset.layout.handschrift.
  */
 export function renderKontaktZeilen({ adresse, mapsUrl, telefon, telHref, handschrift }) {
-  const gezeichnet = handschrift === "traditionell";
+  // Gezeichnete Zeichen gehören zu jeder Handschrift, nicht zu einer
+  // bestimmten: Sie sind der Satz der Agentur, nicht der eines Archetyps.
+  const gezeichnet = Boolean(handschrift);
   const zeichen = {
     ort: gezeichnet ? KONTAKT_IKONEN.ort : "📍",
     telefon: gezeichnet ? KONTAKT_IKONEN.telefon : "📞",

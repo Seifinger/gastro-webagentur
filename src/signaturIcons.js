@@ -72,6 +72,21 @@ export function stern() {
   );
 }
 
+/**
+ * Das Gedeck von oben – Teller, Gabel, Messer. Das Zeichen der Reservierung
+ * im Abendhaus: Dort ist der gedeckte Tisch die Sache, um die es geht, und
+ * die Reservierung ist der eine starke Moment der Seite.
+ */
+export function gedeck() {
+  return strich(
+    "0 0 24 24",
+    '<circle cx="12" cy="12.4" r="4.9"/><circle cx="12" cy="12.4" r="2"/>' +
+      '<path d="M2.6 3.4v4.1c0 1.1.6 1.8 1.6 2v11.1"/><path d="M5.8 3.4v4.1c0 1.1-.6 1.8-1.6 2"/>' +
+      '<path d="M20 3.4c1.4 1.6 2 3.6 1.7 5.9-.1 1.2-.7 1.8-1.7 2v9.3"/>',
+    "ikon ikon-gedeck",
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Die Küchenmarke
 // ---------------------------------------------------------------------------
@@ -150,6 +165,7 @@ export function ikonenCss(klasse) {
 .${klasse} .ikon { width: 1.35em; height: 1.35em; flex: none; vertical-align: -.26em; }
 .${klasse} .ikon-haken { width: 1.05em; height: 1.05em; opacity: .9; }
 .${klasse} .ikon-stern { width: 1.15em; height: 1.15em; }
+.${klasse} .ikon-gedeck { width: 2.1em; height: 2.1em; vertical-align: -.62em; }
 .${klasse} .marke { width: 1.9em; height: 1.9em; flex: none; vertical-align: -.48em; }
 `;
 }

@@ -228,7 +228,7 @@ export function renderHero(ctx) {
  * @param {boolean} [fiktiv] - erfundenes Beispiel-Lokal.
  */
 export function renderUspStrip(usps, handschrift = null, lead = null, fiktiv = false) {
-  const gezeichnet = handschrift === "traditionell";
+  const gezeichnet = Boolean(handschrift);
   const zeichen = gezeichnet ? haken() : '<span aria-hidden="true">✓</span>';
   const note =
     gezeichnet && lead?.rating

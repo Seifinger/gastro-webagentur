@@ -175,7 +175,10 @@ export const ARCHETYP_PRESET = {
   // Raster – ruhiger, passend zur dunklen Welt.
   abend: withDesignDefaults({
     hero: { primaryAction: "reservation" },
-    layout: { sectionOrder: ["ambiente", "karte", "highlights", "stimmen", "reservierung", "kontakt"] },
+    layout: {
+      sectionOrder: ["ambiente", "karte", "highlights", "stimmen", "reservierung", "kontakt"],
+      handschrift: "abend",
+    },
     social: { layout: "list" },
   }),
 

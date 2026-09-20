@@ -16,7 +16,7 @@ import { kuechenMarke } from "../signaturIcons.js";
  * @param {string|null} [ctx.handschrift] - preset.layout.handschrift.
  */
 export function renderFooter({ name, adresse, telefon, cuisine, handschrift }) {
-  const marke = handschrift === "traditionell" ? kuechenMarke(cuisine) : "";
+  const marke = handschrift ? kuechenMarke(cuisine) : "";
   return `<footer>
   <div class="wrap">
     <strong>${marke}${escapeHtml(name)}</strong>${adresse ? ` · ${escapeHtml(adresse)}` : ""}${telefon ? ` · ${escapeHtml(telefon)}` : ""}

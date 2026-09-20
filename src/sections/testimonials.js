@@ -18,7 +18,7 @@ export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3", ha
   // Die fünf grauen Sterne des Platzhalters stehen mit 1.14:1 auf ihrem Grund
   // und behaupten nichts, was der Titel nicht schon sagt. Mit Handschrift
   // fallen sie weg; ohne sie bleibt alles wie bisher.
-  const leereSterne = handschrift === "traditionell"
+  const leereSterne = handschrift
     ? ""
     : '<span class="sterne leer" aria-hidden="true">★★★★★</span>\n        ';
 
@@ -64,7 +64,7 @@ export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3", ha
   // schmalen linken Spalte, die Zitate rechts untereinander. Ohne Note (ein
   // Lokal ohne Google-Bewertung) gäbe es links nichts zu sehen – dann bleibt
   // es beim einspaltigen Aufbau.
-  const blatt = handschrift === "traditionell" && note;
+  const blatt = Boolean(handschrift) && note;
   if (blatt) {
     // Bei echten Häusern gibt es keine Zitate, nur die Zusage. Dann stehen
     // rechts nicht drei leere Plätze, sondern der Satz, der erklärt, was
@@ -93,7 +93,7 @@ export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3", ha
   return `
   <section class="section stimmen-section" id="stimmen">
     <div class="wrap">
-      <div class="section-head${handschrift === "traditionell" ? "" : " mitte"}">
+      <div class="section-head${handschrift ? "" : " mitte"}">
         <div class="eyebrow">Gästestimmen</div>
         <h2>Was unsere Gäste sagen</h2>
       </div>
