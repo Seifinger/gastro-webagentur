@@ -51,14 +51,19 @@ function renderFotoSlots({ hausBild, teamBild, bestsellerBild }, bildUrl, eigene
  * @param {Function} ctx.bildUrl
  * @param {object} [ctx.eigeneBilder]
  */
-export function renderAmbiente({ konzeptLabel, ort, geschichte, hausBild, teamBild, bestsellerBild, bildUrl, eigeneBilder, handschrift }) {
+export function renderAmbiente({ konzeptLabel, ort, geschichte, hausBild, teamBild, bestsellerBild, bildUrl, eigeneBilder, handschrift, fiktiv }) {
+  // Die Hausgeschichte kommt aus dem Küchenkatalog und behauptet etwas über
+  // dieses Haus („Seit Generationen kochen wir, was hier wächst ..."). Bei
+  // einem echten Lokal, das den Entwurf nicht beauftragt hat, wird sie
+  // gekennzeichnet – genau wie Fotos und Öffnungszeiten.
+  const hinweis = fiktiv ? "" : '<span class="placeholder-badge">Platzhalter</span>';
   return `
 <section class="section" id="ambiente">
   <div class="wrap">
     <div class="section-head${handschrift === "traditionell" ? "" : " mitte"}">
       <div class="eyebrow">Bei uns</div>
       <h2>${escapeHtml(konzeptLabel)}${ort ? ` in ${escapeHtml(ort)}` : ""}</h2>
-      <p>${escapeHtml(geschichte)}</p>
+      <p>${escapeHtml(geschichte)}${hinweis}</p>
     </div>
     <div class="foto-grid">${renderFotoSlots(
       { hausBild, teamBild, bestsellerBild },

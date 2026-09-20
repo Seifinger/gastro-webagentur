@@ -58,8 +58,22 @@ hier sind sie gesammelt:
 6. **Eine neue Easing-Kurve braucht einen Satz Begründung** im Abschnitt
    „Der eine starke Moment" der jeweiligen Datei. Ohne Begründung gilt die
    Kurve des Archetyps.
-7. **Byte-Diff:** Wer an einem Archetyp arbeitet, ändert die übrigen drei um
+7. **Kennzeichnungspflicht.** Jede Aussage über das Haus, die nicht aus den
+   Lead-Daten stammt, trägt den Hinweis „Platzhalter" – genauso wie Fotos und
+   Öffnungszeiten. Das betrifft die USP-Leiste und die Hausgeschichte (beide
+   aus `menuCatalog.js`): Sätze wie „Fleisch vom Metzger im Ort" oder „Seit
+   Generationen kochen wir …" sind Behauptungen über Lieferkette und
+   Firmengeschichte eines Lokals, das den Entwurf nicht beauftragt hat.
+   Erfundene Beispiel-Lokale (`fiktiv`) brauchen den Hinweis nicht – bei
+   ihnen steht schon oben, dass das Haus frei erfunden ist.
+8. **Byte-Diff:** Wer an einem Archetyp arbeitet, ändert die übrigen drei um
    kein Byte. Prüfung:
    `node scripts/archetypSnapshot.mjs /tmp/vorher` vor und
    `node scripts/archetypSnapshot.mjs /tmp/nachher` nach der Änderung, dann
    `diff -rq /tmp/vorher /tmp/nachher`.
+
+   **Einmal bewusst gebrochen:** die Kennzeichnung aus Punkt 7. Sie betrifft
+   alle 48 Seiten und wurde als eigener Commit gemacht, nach ausdrücklicher
+   Entscheidung – nicht nebenbei im Zuge einer Archetyp-Arbeit. Wer den
+   Byte-Diff das nächste Mal brechen will, macht es genauso: eigener Commit,
+   eigene Begründung, vorher gefragt.

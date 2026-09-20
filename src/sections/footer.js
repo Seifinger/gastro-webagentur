@@ -21,9 +21,11 @@ export function renderFooter({ name, adresse, telefon, cuisine, handschrift }) {
   <div class="wrap">
     <strong>${marke}${escapeHtml(name)}</strong>${adresse ? ` · ${escapeHtml(adresse)}` : ""}${telefon ? ` · ${escapeHtml(telefon)}` : ""}
     <div class="footer-note">
-      Unverbindlicher Gestaltungsentwurf. Gerichte, Preise und Öffnungszeiten sind Platzhalter,
-      die Fotos stammen aus einer Stockbild-Datenbank (Unsplash). Vor einer Veröffentlichung werden
-      beide durch die echten Angaben und Aufnahmen des Hauses ersetzt.
+      Unverbindlicher Gestaltungsentwurf. Alles, was auf dieser Seite als Platzhalter gekennzeichnet
+      ist – Gerichte, Preise, Öffnungszeiten und die Angaben zu Zubereitung, Herkunft und Geschichte
+      des Hauses –, ist ein Vorschlag und noch nicht vom Haus bestätigt. Die Fotos stammen aus einer
+      Stockbild-Datenbank (Unsplash). Vor einer Veröffentlichung werden Angaben und Aufnahmen durch
+      die echten des Hauses ersetzt.
     </div>
   </div>
 </footer>`;

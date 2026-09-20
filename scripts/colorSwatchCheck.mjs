@@ -56,7 +56,8 @@ const ANWENDUNGEN = [
   { rang: "muss", was: "Akzenttext (Handschrift)", vorn: "accentLesbar", hinten: "bg" },
   { rang: "muss", was: "Akzenttext auf Fläche (Handschrift)", vorn: "accentLesbar", hinten: "surface" },
   { rang: "muss", was: "Akzenttext auf Sektionsfläche (Handschrift)", vorn: "accentLesbar", hinten: "soft" },
-  // Gold trägt das "Platzhalter"-Abzeichen, die Sterne und die Kicker-Zeile.
+  // Gold trägt das "Platzhalter"-Abzeichen (in jeder Seite), die Sterne und
+  // die Kicker-Zeile (nur mit Handschrift).
   { rang: "muss", was: "Goldtext auf hellem Grund", vorn: "goldDunkel", hinten: "bg" },
   { rang: "muss", was: "Goldtext auf Fläche", vorn: "goldDunkel", hinten: "surface" },
   { rang: "muss", was: "Goldtext auf Sektionsfläche", vorn: "goldDunkel", hinten: "soft" },

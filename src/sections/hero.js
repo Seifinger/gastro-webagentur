@@ -213,11 +213,21 @@ export function renderHero(ctx) {
  * dieses eine Haus stimmt – und sie steht damit an der Stelle, die direkt
  * unter dem Hero als Erstes gelesen wird.
  *
+ * Und sie trägt bei Entwürfen echter Häuser den Hinweis „Platzhalter". Die
+ * Punkte stammen aus dem Küchenkatalog (menuCatalog.js) und behaupten etwas
+ * über Zubereitung, Herkunft und Wartezeit eines Hauses, das diesen Entwurf
+ * nicht beauftragt hat – „Fleisch vom Metzger im Ort", „Abholung in 20
+ * Minuten". Fotos und Öffnungszeiten sind längst gekennzeichnet; diese Sätze
+ * stehen sogar prominenter, direkt unter dem Hero. Erfundene Beispiel-Lokale
+ * brauchen den Hinweis nicht: Bei ihnen steht schon oben auf der Seite, dass
+ * das Haus frei erfunden ist.
+ *
  * @param {Array} usps
  * @param {string|null} [handschrift] - preset.layout.handschrift.
  * @param {object} [lead] - für die Google-Note.
+ * @param {boolean} [fiktiv] - erfundenes Beispiel-Lokal.
  */
-export function renderUspStrip(usps, handschrift = null, lead = null) {
+export function renderUspStrip(usps, handschrift = null, lead = null, fiktiv = false) {
   const gezeichnet = handschrift === "traditionell";
   const zeichen = gezeichnet ? haken() : '<span aria-hidden="true">✓</span>';
   const note =
@@ -228,8 +238,13 @@ export function renderUspStrip(usps, handschrift = null, lead = null) {
           lead.anzahlBewertungen ? `, aus ${formatCount(lead.anzahlBewertungen)} Bewertungen` : ""
         }</span>`
       : "";
+  // Der Hinweis steht VOR den Punkten aus dem Küchenkatalog und hinter der
+  // Google-Note: Er gehört zu dem, was folgt, und die Note ist keiner –
+  // sie ist belegt und nennt ihre Quelle.
+  const hinweis = fiktiv ? "" : '<span class="usp-platzhalter">Platzhalter</span>';
   const uspBadges =
     note +
+    hinweis +
     (usps ?? [])
       .map((usp) => `<span>${zeichen} ${escapeHtml(usp)}</span>`)
       .join("");

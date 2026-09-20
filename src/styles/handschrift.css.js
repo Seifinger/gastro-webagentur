@@ -74,9 +74,9 @@ const TRADITIONELL = `
 .hs-traditionell .mini-add { color: var(--accent-bold); }
 .hs-traditionell .add-btn, .hs-traditionell .mini-add { border-color: var(--accent-bold); }
 .hs-traditionell .kat > summary:hover { color: var(--accent-bold); }
-/* Gold trug Text mit 2.0-3.1:1 auf hellem Grund. Auf heller Fläche der
-   dunklere Ton, im Hero (Gold auf Foto unter Schleier) der hellere. */
-.hs-traditionell .placeholder-badge,
+/* Gold trug Text mit 2.0-3.1:1 auf hellem Grund. Das Abzeichen nutzt den
+   dunkleren Ton inzwischen in jeder Seite (PAGE_STYLES); hier kommen die
+   Sterne dazu, im Hero der hellere Ton. */
 .hs-traditionell .stimmen-note .sterne,
 .hs-traditionell .stimme .sterne { color: var(--gold-dunkel); }
 .hs-traditionell .hero-kicker,

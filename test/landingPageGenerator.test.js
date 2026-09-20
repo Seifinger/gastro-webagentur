@@ -187,6 +187,26 @@ test("buildLandingPage nutzt eine übergebene Bildquelle statt lokaler Dateien",
   assert.ok(!html.includes("../assets/photo-"));
 });
 
+test("Angaben aus dem Küchenkatalog sind bei echten Lokalen gekennzeichnet", () => {
+  // Die USP-Leiste und die Hausgeschichte behaupten etwas über Zubereitung,
+  // Herkunft und Wartezeit - über ein Haus, das diesen Entwurf nicht
+  // beauftragt hat. Fotos und Öffnungszeiten tragen den Hinweis längst; diese
+  // Sätze stehen sogar prominenter.
+  const html = buildLandingPage(lead);
+  assert.ok(html.includes('<span class="usp-platzhalter">Platzhalter</span>'));
+  const ambienteStart = html.indexOf('id="ambiente"');
+  const ambiente = html.slice(ambienteStart, html.indexOf("</section>", ambienteStart));
+  assert.ok(ambiente.includes('<span class="placeholder-badge">Platzhalter</span>'));
+  // Die Fußzeile sagt, was der Hinweis bedeutet.
+  assert.ok(html.includes("noch nicht vom Haus bestätigt"));
+
+  // Ein erfundenes Beispiel-Lokal braucht ihn nicht: Dass es frei erfunden
+  // ist, steht dort bereits ganz oben auf der Seite.
+  const erfunden = buildLandingPage(lead, { fiktiv: true, veroeffentlicht: true });
+  assert.ok(!erfunden.includes("usp-platzhalter\">Platzhalter"));
+  assert.ok(erfunden.includes("frei erfunden"));
+});
+
 test("Entwürfe echter Lokale bekommen niemals erfundene Bewertungen", () => {
   // Google untersagt das Speichern von Rezensionstexten, und ein erfundenes
   // Zitat unter dem echten Namen eines Hauses wäre als Bewertung lesbar.

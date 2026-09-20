@@ -504,7 +504,10 @@ textarea { resize: vertical; min-height: 90px; }
 .contact-list a { color: var(--accent); }
 .hours-row { display: flex; justify-content: space-between; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
 .hours-row span:first-child { color: var(--ink-soft); }
-.placeholder-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; margin-left: 10px; vertical-align: middle; }
+.placeholder-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold-dunkel); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; margin-left: 10px; vertical-align: middle; }
+/* Derselbe Hinweis auf der Akzentfläche der USP-Leiste. Dort trägt er
+   --on-accent: Das ist der Ton, der gegen --accent geprüft ist. */
+.usp-platzhalter { display: inline-block; font-size: 11px; font-weight: 700; color: var(--on-accent); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; }
 
 footer { background: var(--tint); color: rgba(255,255,255,.72); padding: 48px 0; font-size: 14px; }
 footer strong { color: #fff; font-family: var(--display); text-transform: var(--display-transform); font-size: 17px; }
@@ -1029,12 +1032,12 @@ ${accentBoldRegel}`
       ? `
 /* Die beiden abgeleiteten Töne der Handschrift (siehe stimmungen.js):
    --accent-bold trägt jeden Text, der sonst in accent stünde und gegen bg,
-   surface oder soft unter 4.5:1 läge. --gold-dunkel und --gold-hell sind
-   dasselbe für Gold: einer für helle Flächen, einer für den Hero, wo Gold auf
-   einem Foto unter einem Schleier liegt. Flächen behalten accent und gold –
-   dagegen ist onAccent geprüft. */
+   surface oder soft unter 4.5:1 läge. --gold-hell ist dasselbe für Gold im
+   Hero, wo es auf einem Foto unter einem Schleier liegt (--gold-dunkel für
+   helle Flächen steht ohnehin in jeder Seite). Flächen behalten accent und
+   gold – dagegen ist onAccent geprüft. */
 ${accentLesbarRegel}
-:root { --gold-dunkel: ${t.goldDunkel ?? t.gold}; --gold-hell: ${t.goldAufTint ?? t.gold}; }`
+:root { --gold-hell: ${t.goldAufTint ?? t.gold}; }`
       : "";
 
   const bodyKlassen = [
@@ -1067,6 +1070,11 @@ ${fontCss}
   --accent-dark: ${t.accentDark};
   --on-accent: ${t.onAccent};
   --gold: ${t.gold};
+  /* Gold trägt Text (Platzhalter-Abzeichen, Sterne, Kicker) und erreicht
+     dort auf hellem Grund 2.0-3.1:1. Der abgeleitete Ton steht jeder Seite
+     zur Verfügung, damit ein gekennzeichneter Platzhalter überall lesbar
+     ist - siehe stimmungen.js und scripts/colorSwatchCheck.mjs. */
+  --gold-dunkel: ${t.goldDunkel ?? t.gold};
   --tint: ${t.tint};
   --tint-rgb: ${t.tintRgb};
   --display: ${t.display};
@@ -1110,7 +1118,7 @@ ${renderHero({
   handschrift,
 })}
 
-${renderUspStrip(menu.usps, handschrift, lead)}
+${renderUspStrip(menu.usps, handschrift, lead, fiktiv)}
 
 ${(() => {
   // Reihenfolge der Hauptsektionen kommt aus preset.layout.sectionOrder.
@@ -1132,6 +1140,7 @@ ${(() => {
       bildUrl,
       eigeneBilder,
       handschrift,
+      fiktiv,
     }),
 
     stimmen: renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social.layout, handschrift),
