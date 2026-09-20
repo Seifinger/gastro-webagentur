@@ -12,7 +12,10 @@ import { assetFileName } from "./imageLibrary.js";
 // Regeln braucht es deshalb unter beiden Auslösern (siehe Ende von
 // SIGNATUR_CSS) – der echten Media Query für Besucher mit Systemeinstellung
 // und der Klasse .bewegung-aus, die motion.js bei ?bewegung=aus setzt.
-const SIGNATUR_REDUZIERT_REGELN = `
+// Auch von außen gebraucht: Der Abend-Archetyp stellt die Signatur seiner
+// Küche dauerhaft still (siehe styles/handschrift.css.js) und nutzt dafür
+// genau dieselben Regeln wie prefers-reduced-motion.
+export const SIGNATUR_REDUZIERT_REGELN = `
   .sig-pizza img, .sig-band .band, .sig-spiess .fleisch,
   .sig-tafel .karte, .sig-diashow img, .sig-tasse .dampf i,
   .sig-drehteller .teller, .sig-drehteller img,
@@ -25,9 +28,26 @@ const SIGNATUR_REDUZIERT_REGELN = `
   .sig-olive-form { animation: none; }
 `;
 
-const SIGNATUR_CSS = `
+// Die Signaturen liegen als einzelne Blöcke vor, einer je Küche.
+//
+// Warum nicht als ein Stück: Eine bayerische Seite trug bisher die Regeln für
+// drehende Pizzahälften, Dönerspieß, Drehteller, Teetasse und acht weitere
+// Küchen mit – rund 17 kB CSS, die in ihrem Markup nie vorkommen.
+//
+// SIGNATUR_CSS setzt alle Blöcke in der bisherigen Reihenfolge wieder
+// zusammen und ist damit Zeichen für Zeichen dasselbe wie vorher (geprüft in
+// test/handschrift.test.js). Wer nur die Regeln einer Küche braucht, nimmt
+// signaturCssFuer() – eingesetzt wird das dort, wo ein Archetyp seine
+// Handschrift mitbringt.
+//
+// Jeder Teil beginnt mit einem Zeilenumbruch und endet ohne einen; erst das
+// Zusammensetzen hängt den letzten an. Nur so ergibt das Aneinanderreihen
+// wieder genau die alte Vorlage.
+const SIGNATUR_TEILE = {
+  basis: `
 .sig { position: absolute; z-index: 1; pointer-events: none; }
-
+`,
+  italienisch: `
 /* Italienisch: zwei Pizzahälften, die gegeneinander drehen */
 .sig-pizza { right: -14%; top: 50%; transform: translateY(-50%);
              width: clamp(240px, 42vw, 460px); aspect-ratio: 1; border-radius: 50%;
@@ -42,7 +62,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-pizza { right: -26%; top: 16%; transform: none; width: 62vw; opacity: .5; }
 }
-
+`,
+  japanisch: `
 /* Asiatisch: Gerichte laufen wie auf dem Sushi-Band durchs Bild */
 .sig-band { left: 0; right: 0; top: 70px; height: clamp(74px, 11vw, 108px); overflow: hidden;
             opacity: .9; mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); }
@@ -51,7 +72,8 @@ const SIGNATUR_CSS = `
                 object-fit: cover; border-radius: 4px; }
 @keyframes sig-band { to { transform: translateX(-50%); } }
 @media (max-width: 899px) { .sig-band { top: 62px; opacity: .55; } }
-
+`,
+  tuerkisch: `
 /* Türkisch: der Drehspieß dreht sich weiter */
 .sig-spiess { right: 6%; top: 50%; transform: translateY(-50%);
               width: clamp(120px, 17vw, 190px); height: clamp(260px, 38vw, 400px);
@@ -64,7 +86,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-spiess { right: -4%; top: 12%; transform: none; width: 34vw; height: 46vw; opacity: .5; }
 }
-
+`,
+  syrisch: `
 /* Syrisch: Minztee wird eingegossen, während das Glas selbst leicht "atmet"
    und Dampf aufsteigt – eine eigene Signatur statt des mit Türkisch
    geteilten Spießes. Läuft dauerhaft wie der Bierkrug-Überlauf bei
@@ -95,7 +118,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-tea-form { right: -2%; top: 12%; transform: none; width: 26vw; opacity: .55; }
 }
-
+`,
+  bayerischTafel: `
 /* Bayerisch: die Tagesempfehlung wechselt durch */
 .sig-tafel { right: 5%; top: 50%; transform: translateY(-50%);
              width: clamp(210px, 27vw, 310px); aspect-ratio: 3 / 4; }
@@ -114,7 +138,8 @@ const SIGNATUR_CSS = `
   .sig-tafel { right: 4%; top: 11%; transform: none; width: 34vw; opacity: .6; }
   .sig-tafel .schild { display: none; }
 }
-
+`,
+  totDiashow: `
 /* Griechisch: ruhiger Bildwechsel mit langsamer Annäherung */
 .sig-diashow { right: 4%; top: 50%; transform: translateY(-50%);
                width: clamp(230px, 34vw, 400px); aspect-ratio: 4 / 5; border-radius: 200px 200px 14px 14px;
@@ -132,7 +157,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-diashow { right: -8%; top: 12%; transform: none; width: 46vw; opacity: .5; }
 }
-
+`,
+  griechisch: `
 /* Griechisch: ein Olivenzweig schaukelt sanft – ein eigenes, kulturell
    eindeutiges Motiv statt der bisherigen, kulturell neutralen Fotodiashow.
    Dieselbe Schaukel-Mechanik wie bei den Laternen (sig-laterne-schaukel),
@@ -146,7 +172,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-olive-form { right: -4%; top: 12%; width: 40vw; opacity: .55; }
 }
-
+`,
+  cafe: `
 /* Café: aufsteigender Dampf über der Tasse */
 .sig-tasse { right: 6%; top: 50%; transform: translateY(-50%);
              width: clamp(210px, 30vw, 340px); aspect-ratio: 1; }
@@ -169,7 +196,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-tasse { right: -4%; top: 13%; transform: none; width: 44vw; opacity: .55; }
 }
-
+`,
+  chinesisch: `
 /* Chinesisch: der Drehteller in der Tischmitte, wie beim Essen in der Runde */
 .sig-drehteller { right: 2%; top: 50%; transform: translateY(-50%);
                   width: clamp(250px, 40vw, 440px); aspect-ratio: 1; }
@@ -197,7 +225,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-drehteller { right: -14%; top: 11%; transform: none; width: 60vw; opacity: .5; }
 }
-
+`,
+  vietnamesisch: `
 /* Vietnamesisch: die Schale Phở, über der der Dampf steht */
 .sig-schale { right: 5%; top: 50%; transform: translateY(-50%);
               width: clamp(220px, 32vw, 380px); aspect-ratio: 1; }
@@ -222,7 +251,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-schale { right: -6%; top: 12%; transform: none; width: 48vw; opacity: .55; }
 }
-
+`,
+  thailaendisch: `
 /* Thailändisch: eine Orchidee blüht auf, sobald der Hero ins Bild scrollt.
    Die Blütenblätter nutzen dieselbe Intersection-Observer-Kopplung wie der
    Rest der Seite (.bewegt/.da aus motion.js) statt einer eigenen Schleife –
@@ -247,7 +277,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-orchid { right: -6%; top: 12%; transform: none; width: 40vw; opacity: .6; }
 }
-
+`,
+  indisch: `
 /* Indisch: ein Puder-Wölkchen platzt auf, sobald der Hero ins Bild scrollt –
    dieselbe .bewegt/.da-Kopplung wie bei der Orchidee, aber als einmalige
    @keyframes-Animation statt Übergang, weil Start- und Zielwert hier auf
@@ -274,7 +305,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-spice { right: -2%; top: 15%; transform: none; width: 40vw; }
 }
-
+`,
+  asiatisch: `
 /* Asiatisch (gemischt): ein bis zwei Laternen pulsieren dezent am Rand –
    nicht mittig über dem Essen wie das Sushi-Band, das Japanisch behält.
    Statt box-shadow direkt zu animieren (teuer, löst Repaints aus), pulsiert
@@ -293,7 +325,8 @@ const SIGNATUR_CSS = `
 @media (max-width: 899px) {
   .sig-lanterns { left: 2%; top: 8%; gap: 16px; }
 }
-
+`,
+  bayerischKrug: `
 /* Bayerisch: zusätzlich zur Tagestafel ein kleines Detail – der Bierkrug
    läuft alle 8s kurz über. Ergänzt die bestehende Signatur, ersetzt sie
    nicht. Das Glas selbst (sig-beer-glas) ist ein statisches SVG-Icon,
@@ -311,7 +344,11 @@ const SIGNATUR_CSS = `
 .sig-beer .tropfen { position: absolute; left: 50%; top: 18%; width: 5px; height: 5px;
                       border-radius: 50%; background: #fdf3d6; opacity: 0;
                       animation: sig-beer-tropfen 8s ease-in infinite; }
-.sig-beer .tropfen-2 { left: 64%; animation-delay: .25s; }
+.sig-beer .tropfen-2 { left: 64%; animation-delay: .25s; }`,
+  // Eigener Teil, weil der gezeichnete Maßkrug der Handschrift (.sig-krug)
+  // dieselben beiden Keyframes nutzt. Er braucht sie – die Regeln von
+  // .sig-beer daneben nicht.
+  krugBewegung: `
 /* Der eigentliche Überlauf-Moment (82–100 %) ist bewusst breiter als der
    Rest des Zyklus, damit er als Ereignis lesbar ist statt nur als Zucken. */
 @keyframes sig-beer-schaum {
@@ -323,11 +360,13 @@ const SIGNATUR_CSS = `
   0%, 82% { opacity: 0; transform: translateY(0); }
   87% { opacity: .9; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(20px); }
-}
+}`,
+  bayerischKrugEnde: `
 @media (max-width: 899px) {
   .sig-beer { right: 6%; bottom: 5%; width: 32px; }
 }
-
+`,
+  generisch: `
 /* Generische, küchenunabhängige Hero-Varianten – wählbar über das
    Design-Preset-Modell (designPresets.js) für A/B-Tests, ohne die
    küchenspezifischen Signaturen oben zu verändern. */
@@ -355,7 +394,8 @@ const SIGNATUR_CSS = `
                            letter-spacing: .14em; opacity: .75; margin-bottom: 4px; }
 .sig-reservation-text { display: block; font-size: 15px; font-weight: 600; }
 @media (max-width: 899px) { .sig-reservation { display: none; } }
-
+`,
+  reduziert: `
 /* Wer Bewegung im System abgestellt hat, bekommt das Standbild. */
 @media (prefers-reduced-motion: reduce) {
   ${SIGNATUR_REDUZIERT_REGELN}
@@ -377,8 +417,65 @@ const SIGNATUR_CSS = `
    setzt – statt die Selektoren ein zweites Mal auszuschreiben. */
 .bewegung-aus {
   ${SIGNATUR_REDUZIERT_REGELN}
+}`,
+};
+
+// Die bisherige Reihenfolge – sie ist Teil der Byte-Identität.
+const SIGNATUR_REIHENFOLGE = [
+  "basis", "italienisch", "japanisch", "tuerkisch", "syrisch", "bayerischTafel",
+  "totDiashow", "griechisch", "cafe", "chinesisch", "vietnamesisch", "thailaendisch",
+  "indisch", "asiatisch", "bayerischKrug", "krugBewegung", "bayerischKrugEnde",
+  "generisch", "reduziert",
+];
+
+const SIGNATUR_CSS = `${SIGNATUR_REIHENFOLGE.map((teil) => SIGNATUR_TEILE[teil]).join("")}\n`;
+
+/**
+ * Welche Blöcke eine Küche wirklich braucht. Zwei Blöcke stehen bewusst in
+ * keiner Liste:
+ *
+ * - "totDiashow": die Regeln von .sig-diashow. Griechisch hat den
+ *   Bildwechsel gegen den gezeichneten Olivenzweig getauscht, seitdem
+ *   erzeugt kein einziger Pfad dieses Markup – 879 Bytes tote Regeln.
+ * - "bayerischKrug": die Regeln von .sig-beer. Wo eine Handschrift im Spiel
+ *   ist, steht dort der gezeichnete Maßkrug (.sig-krug), und der bringt sein
+ *   CSS selbst mit.
+ *
+ * In SIGNATUR_CSS bleiben beide enthalten: Eine Seite ohne Handschrift muss
+ * Zeichen für Zeichen die bisherige bleiben.
+ */
+const SIGNATUR_JE_KUECHE = {
+  italienisch: ["italienisch"],
+  japanisch: ["japanisch"],
+  tuerkisch: ["tuerkisch"],
+  syrisch: ["syrisch"],
+  // krugBewegung sind die beiden Keyframes, die der gezeichnete Maßkrug der
+  // Handschrift nutzt. Ohne sie stand er still – und genau das tat er, bis
+  // es jemand nachgemessen hat.
+  bayerisch: ["bayerischTafel", "krugBewegung"],
+  griechisch: ["griechisch"],
+  cafe: ["cafe"],
+  chinesisch: ["chinesisch"],
+  vietnamesisch: ["vietnamesisch"],
+  thailaendisch: ["thailaendisch"],
+  indisch: ["indisch"],
+  asiatisch: ["asiatisch"],
+};
+
+/**
+ * Das Signatur-CSS einer einzelnen Küche: das Gemeinsame, ihre eigenen
+ * Regeln, die küchenunabhängigen Hero-Varianten (die hängen am Preset, nicht
+ * an der Küche) und der Block für abgestellte Bewegung.
+ *
+ * Eine unbekannte Küche bekommt alles – lieber ein paar Kilobyte zu viel als
+ * ein Hero ohne Gestaltung.
+ */
+export function signaturCssFuer(cuisine) {
+  const eigene = SIGNATUR_JE_KUECHE[cuisine];
+  if (!eigene) return SIGNATUR_CSS;
+  const teile = ["basis", ...eigene, "generisch", "reduziert"];
+  return `${teile.map((teil) => SIGNATUR_TEILE[teil]).join("")}\n`;
 }
-`;
 
 function bild(id, rolle, bildUrl) {
   return bildUrl ? bildUrl(id, rolle) : `../assets/${assetFileName(id, rolle)}`;
@@ -504,6 +601,43 @@ function heroOliveBranch() {
     </div>`;
 }
 
+/**
+ * Der Maßkrug mit Henkel und Noppen – gezeichnet, nicht aus einer
+ * Icon-Bibliothek genommen. Er ersetzt heroBeerFoamOverflow() überall dort,
+ * wo ein Archetyp seine Handschrift mitbringt.
+ *
+ * Warum überhaupt ein zweiter: Die bisherige Form ist ein gefüllter Pfad aus
+ * einer Icon-Sammlung – ein henkelloses, tailliertes Glas, also ein Pint und
+ * kein Maßkrug. An der prominentesten Stelle einer bayerischen Wirtshausseite
+ * ist das das falsche Gefäß.
+ *
+ * Schaum und Tropfen bleiben eigene Elemente (kein SVG), weil sie sich
+ * bewegen: Sie nutzen dieselben Keyframes wie bisher (sig-beer-schaum,
+ * sig-beer-tropfen, siehe SIGNATUR_CSS) – es kommt also keine Animation dazu,
+ * es wird nur eine andere Zeichnung bewegt. Die Maße stehen in der
+ * Handschrift des jeweiligen Archetyps, damit Schaum und Tropfen an der
+ * Glaskontur sitzen statt daneben.
+ */
+function heroBierkrug() {
+  return `
+    <div class="sig sig-krug" aria-hidden="true">
+      <svg class="sig-krug-form" viewBox="0 0 64 86" fill="none" stroke="currentColor"
+           stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+        <path class="henkel" d="M49,30 C60,29 62.5,34 62.5,42 C62.5,52 57,58.5 47.2,58.5"></path>
+        <path class="glas" d="M14,16 L50,16 L46,76 Q45.6,79.4 42,79.4 L22,79.4 Q18.4,79.4 18,76 Z"></path>
+        <path class="rand" d="M12,16 H52"></path>
+        <circle class="noppe" cx="25.5" cy="37" r="3.1"></circle>
+        <circle class="noppe" cx="38.5" cy="37" r="3.1"></circle>
+        <circle class="noppe" cx="32" cy="50" r="3.1"></circle>
+        <circle class="noppe" cx="26" cy="63" r="3.1"></circle>
+        <circle class="noppe" cx="38" cy="63" r="3.1"></circle>
+      </svg>
+      <div class="schaum"></div>
+      <span class="tropfen tropfen-1"></span>
+      <span class="tropfen tropfen-2"></span>
+    </div>`;
+}
+
 function heroBeerFoamOverflow() {
   return `
     <div class="sig sig-beer" aria-hidden="true">
@@ -520,7 +654,7 @@ function heroBeerFoamOverflow() {
  * Liefert das bewegte Hero-Element zur Küche. Ohne passende Bilder bleibt es
  * weg – lieber kein Effekt als ein leerer Rahmen.
  */
-export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {}) {
+export function heroSignatur(cuisine, { highlights = [], bildUrl, escape, handschrift = null } = {}) {
   const esc = escape ?? ((v) => String(v));
   const gerichte = highlights.filter((g) => g.bild);
 
@@ -607,7 +741,10 @@ export function heroSignatur(cuisine, { highlights = [], bildUrl, escape } = {})
         </div>`,
       )
       .join("");
-    return `<div class="sig sig-tafel" aria-hidden="true">${karten}</div>${heroBeerFoamOverflow()}`;
+    // Mit Handschrift der gezeichnete Maßkrug, ohne sie das bisherige Glas –
+    // die Archetypen ohne Handschrift bleiben Zeichen für Zeichen gleich.
+    const krug = handschrift ? heroBierkrug() : heroBeerFoamOverflow();
+    return `<div class="sig sig-tafel" aria-hidden="true">${karten}</div>${krug}`;
   }
 
   // Ein Wölkchen aus Gewürzpuder platzt auf, sobald der Hero ins Bild

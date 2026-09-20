@@ -6,6 +6,7 @@ import {
   heroAmbiencePhoto,
   heroReservationHero,
 } from "../heroSignature.js";
+import { haken, stern } from "../signaturIcons.js";
 
 /**
  * Wählt das Hero-Element passend zu preset.hero.type. "signature" (Standard)
@@ -168,7 +169,7 @@ export function renderHeroEditorial(ctx) {
  * @param {Function} ctx.bildUrl
  */
 export function renderHero(ctx) {
-  const { lead, preset, name, ort, heroImageSrc, heroVideoSrc, konzeptLabel, heroHeadline, heroSchlagzeile, cuisine, highlights, hausBild, bildUrl } = ctx;
+  const { lead, preset, name, ort, heroImageSrc, heroVideoSrc, konzeptLabel, heroHeadline, heroSchlagzeile, cuisine, highlights, hausBild, bildUrl, handschrift } = ctx;
 
   // Der Editorial-Archetyp bringt einen eigenen Hero mit – große Typografie,
   // asymmetrisches Raster. Alles andere läuft weiter durch den bisherigen.
@@ -188,6 +189,7 @@ export function renderHero(ctx) {
     hausBild,
     bildUrl,
     escape: escapeHtml,
+    handschrift,
   })}
   <div class="hero-inner">
     <div class="hero-kicker">${escapeHtml(konzeptLabel)}${ort ? ` · in ${escapeHtml(ort)}` : ""}</div>
@@ -199,11 +201,53 @@ export function renderHero(ctx) {
 </section>`;
 }
 
-/** USP-Leiste direkt unter dem Hero. */
-export function renderUspStrip(usps) {
-  const uspBadges = (usps ?? [])
-    .map((usp) => `<span><span aria-hidden="true">✓</span> ${escapeHtml(usp)}</span>`)
-    .join("");
+/**
+ * USP-Leiste direkt unter dem Hero.
+ *
+ * Mit Handschrift trägt sie den gezeichneten Haken aus signaturIcons.js statt
+ * des gesetzten ✓ – dasselbe Zeichen wie die Pluspunkte der Reservierung.
+ *
+ * Und sie beginnt dann mit der Google-Note dieses Hauses. Die drei übrigen
+ * Punkte gelten für jedes Lokal derselben Küche (sie stammen aus
+ * menuCatalog.js); die Note ist das Einzige an dieser Leiste, das nur für
+ * dieses eine Haus stimmt – und sie steht damit an der Stelle, die direkt
+ * unter dem Hero als Erstes gelesen wird.
+ *
+ * Und sie trägt bei Entwürfen echter Häuser den Hinweis „Platzhalter". Die
+ * Punkte stammen aus dem Küchenkatalog (menuCatalog.js) und behaupten etwas
+ * über Zubereitung, Herkunft und Wartezeit eines Hauses, das diesen Entwurf
+ * nicht beauftragt hat – „Fleisch vom Metzger im Ort", „Abholung in 20
+ * Minuten". Fotos und Öffnungszeiten sind längst gekennzeichnet; diese Sätze
+ * stehen sogar prominenter, direkt unter dem Hero. Erfundene Beispiel-Lokale
+ * brauchen den Hinweis nicht: Bei ihnen steht schon oben auf der Seite, dass
+ * das Haus frei erfunden ist.
+ *
+ * @param {Array} usps
+ * @param {string|null} [handschrift] - preset.layout.handschrift.
+ * @param {object} [lead] - für die Google-Note.
+ * @param {boolean} [fiktiv] - erfundenes Beispiel-Lokal.
+ */
+export function renderUspStrip(usps, handschrift = null, lead = null, fiktiv = false) {
+  const gezeichnet = Boolean(handschrift);
+  const zeichen = gezeichnet ? haken() : '<span aria-hidden="true">✓</span>';
+  const note =
+    gezeichnet && lead?.rating
+      ? `<span class="usp-note">${stern()} <strong>${escapeHtml(
+          String(lead.rating).replace(".", ","),
+        )}</strong> von 5 auf Google${
+          lead.anzahlBewertungen ? `, aus ${formatCount(lead.anzahlBewertungen)} Bewertungen` : ""
+        }</span>`
+      : "";
+  // Der Hinweis steht VOR den Punkten aus dem Küchenkatalog und hinter der
+  // Google-Note: Er gehört zu dem, was folgt, und die Note ist keiner –
+  // sie ist belegt und nennt ihre Quelle.
+  const hinweis = fiktiv ? "" : '<span class="usp-platzhalter">Platzhalter</span>';
+  const uspBadges =
+    note +
+    hinweis +
+    (usps ?? [])
+      .map((usp) => `<span>${zeichen} ${escapeHtml(usp)}</span>`)
+      .join("");
   return `<section class="usp-strip">
   <div class="wrap"><div class="usp-list">${uspBadges}</div></div>
 </section>`;

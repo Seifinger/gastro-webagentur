@@ -159,7 +159,14 @@ test("buildLandingPage bietet drei beschriftete Bildplätze für eigene Fotos", 
   assert.ok(html.includes("Unser Haus"));
   assert.ok(html.includes("Ihr Team"));
   assert.ok(html.includes("Unser Bestseller"));
-  assert.equal((html.match(/class="foto-badge">Platzhalter</g) ?? []).length, 3);
+  // Jeder Platz ist als Platzhalter gekennzeichnet. Mit der Handschrift des
+  // traditionellen Archetyps steht das Wort in der Bildunterschrift statt als
+  // Pille auf dem Foto; ohne Handschrift bleibt es die Pille.
+  assert.equal((html.match(/Platzhalter · /g) ?? []).length, 3);
+  assert.ok(!html.includes('class="foto-badge"'));
+
+  const ohneHandschrift = buildLandingPage(lead, { preset: {} });
+  assert.equal((ohneHandschrift.match(/class="foto-badge">Platzhalter</g) ?? []).length, 3);
 });
 
 test("buildLandingPage bindet Bilder aus dem Asset-Ordner ein", () => {
@@ -180,6 +187,26 @@ test("buildLandingPage nutzt eine übergebene Bildquelle statt lokaler Dateien",
   assert.ok(!html.includes("../assets/photo-"));
 });
 
+test("Angaben aus dem Küchenkatalog sind bei echten Lokalen gekennzeichnet", () => {
+  // Die USP-Leiste und die Hausgeschichte behaupten etwas über Zubereitung,
+  // Herkunft und Wartezeit - über ein Haus, das diesen Entwurf nicht
+  // beauftragt hat. Fotos und Öffnungszeiten tragen den Hinweis längst; diese
+  // Sätze stehen sogar prominenter.
+  const html = buildLandingPage(lead);
+  assert.ok(html.includes('<span class="usp-platzhalter">Platzhalter</span>'));
+  const ambienteStart = html.indexOf('id="ambiente"');
+  const ambiente = html.slice(ambienteStart, html.indexOf("</section>", ambienteStart));
+  assert.ok(ambiente.includes('<span class="placeholder-badge">Platzhalter</span>'));
+  // Die Fußzeile sagt, was der Hinweis bedeutet.
+  assert.ok(html.includes("noch nicht vom Haus bestätigt"));
+
+  // Ein erfundenes Beispiel-Lokal braucht ihn nicht: Dass es frei erfunden
+  // ist, steht dort bereits ganz oben auf der Seite.
+  const erfunden = buildLandingPage(lead, { fiktiv: true, veroeffentlicht: true });
+  assert.ok(!erfunden.includes("usp-platzhalter\">Platzhalter"));
+  assert.ok(erfunden.includes("frei erfunden"));
+});
+
 test("Entwürfe echter Lokale bekommen niemals erfundene Bewertungen", () => {
   // Google untersagt das Speichern von Rezensionstexten, und ein erfundenes
   // Zitat unter dem echten Namen eines Hauses wäre als Bewertung lesbar.
@@ -192,8 +219,15 @@ test("Entwürfe echter Lokale bekommen niemals erfundene Bewertungen", () => {
     }
   }
 
-  assert.ok(html.includes('class="stimme ist-platzhalter"'), "keine Platzhalter-Plätze");
-  assert.ok(html.includes("Ihre erste Bewertung"));
+  // Was an die Stelle der Zitate tritt, hängt vom Archetyp ab: mit
+  // Handschrift die Zusage im Klartext, ohne sie die drei leeren Plätze.
+  // Beides behauptet nichts.
+  assert.ok(html.includes("direkt aus Google"), "keine Zusage, woher die Stimmen kommen");
+  assert.ok(!html.includes('class="stimme ist-platzhalter"'));
+
+  const ohneHandschrift = buildLandingPage(lead, { preset: {} });
+  assert.ok(ohneHandschrift.includes('class="stimme ist-platzhalter"'), "keine Platzhalter-Plätze");
+  assert.ok(ohneHandschrift.includes("Ihre erste Bewertung"));
 });
 
 test("erfundene Beispiel-Lokale bekommen erfundene Stimmen", () => {
@@ -222,7 +256,9 @@ test("die veröffentlichte Fassung weist sich als Entwurf aus", () => {
   const html = buildLandingPage(lead, { veroeffentlicht: true });
 
   assert.ok(html.includes('<meta name="robots" content="noindex, nofollow">'));
-  assert.ok(html.includes('<body class="veroeffentlicht">'));
+  // Neben "veroeffentlicht" steht die Handschrift des Archetyps – ohne Lead-
+  // Angabe ist das "traditionell" (siehe ARCHETYP_PRESET in designPresets.js).
+  assert.ok(html.includes('<body class="veroeffentlicht hs-traditionell">'));
   assert.ok(html.includes('class="entwurf-hinweis"'));
   assert.ok(html.includes("nicht</strong> die offizielle Website von Gasthof Zur Post"));
 });
@@ -232,7 +268,8 @@ test("die lokale Fassung trägt keinen Entwurfs-Hinweis und kein noindex", () =>
 
   assert.ok(!html.includes("noindex"));
   assert.ok(!html.includes('class="entwurf-hinweis"'));
-  assert.ok(html.includes("<body>"));
+  assert.ok(!html.includes('<body class="veroeffentlicht'));
+  assert.ok(html.includes('<body class="hs-traditionell">'));
 });
 
 test("buildLandingPage bindet übergebene Schriften ein", () => {
@@ -397,11 +434,25 @@ test("buildLandingPage ohne Preset-Angabe entspricht exakt dem bisherigen Verhal
   assert.ok(!html.includes('class="stimmen-grid stimmen-grid--'));
 });
 
-test("ein leeres options.preset ändert nichts gegenüber gar keinem Preset", () => {
+test("ein eigenes Preset übernimmt die Gestaltung vollständig – auch ohne ein einziges Feld", () => {
   const ohnePreset = buildLandingPage(lead, { menu: MENUS.italienisch });
   const leeresPreset = buildLandingPage(lead, { menu: MENUS.italienisch, preset: {} });
 
-  assert.equal(ohnePreset, leeresPreset);
+  // Wer ein eigenes Preset übergibt, bekommt die Standardwerte aus
+  // designPresets.js und nicht das Preset seines Archetyps – dieselbe Regel,
+  // nach der schon das Magazin-Raster nur auf ausdrückliche Anforderung
+  // kommt. Die Handschrift (Schritt 3-5 des Design-Auftrags) gehört dem
+  // Archetyp, also entfällt sie hier.
+  assert.ok(ohnePreset.includes('<body class="hs-traditionell">'));
+  assert.ok(leeresPreset.includes("<body>"));
+  assert.ok(!leeresPreset.includes("hs-traditionell"));
+
+  // Alles außer der Handschrift ist gleich: derselbe Hero, dieselbe Karte,
+  // derselbe Bestellweg.
+  for (const teil of ['class="hero"', 'id="karte"', 'id="reservierung"', 'id="cart-fab"', "sig-pizza"]) {
+    assert.ok(leeresPreset.includes(teil), teil);
+    assert.ok(ohnePreset.includes(teil), teil);
+  }
 });
 
 test("hero.type 'dish_photo' zeigt ein einzelnes Gerichtsfoto statt der Küchen-Signatur", () => {
@@ -520,7 +571,18 @@ test("Bayerisch bekommt den überlaufenden Bierkrug zusätzlich zur Tagestafel",
   });
 
   assert.ok(html.includes('class="sig sig-tafel"'), "Tagestafel muss weiter existieren");
-  assert.ok(html.includes('class="sig sig-beer"'), "Bierkrug-Detail fehlt");
+  // Mit Handschrift der gezeichnete Maßkrug (Henkel, Noppen), ohne sie das
+  // bisherige Glas aus der Icon-Sammlung.
+  assert.ok(html.includes('class="sig sig-krug"'), "Maßkrug fehlt");
+  assert.ok(html.includes('class="henkel"'), "der Krug hat keinen Henkel");
+
+  const ohneHandschrift = buildLandingPage(lead, {
+    menu: MENUS.bayerisch,
+    gestaltung: themeForLead(lead, "bayerisch"),
+    preset: {},
+  });
+  assert.ok(ohneHandschrift.includes('class="sig sig-beer"'), "Bierkrug-Detail fehlt");
+  assert.ok(!ohneHandschrift.includes("sig-krug"));
 });
 
 test("?bewegung=aus schaltet dieselben Signatur-Animationen ab wie prefers-reduced-motion", () => {
@@ -752,7 +814,8 @@ test("texte.headline und texte.schlagzeile ersetzen nur die Hero-Texte", () => {
   assert.ok(html.includes('<p class="hero-sub">Seit 1904 am Stadtplatz.</p>'));
   // Kopfzeile und Fußzeile tragen weiter den Namen aus Google.
   assert.ok(html.includes('<div class="brand">Gasthof Zur Post</div>'));
-  assert.ok(html.includes("<strong>Gasthof Zur Post</strong>"));
+  // In der Fußzeile steht vor dem Namen die gezeichnete Küchenmarke.
+  assert.ok(html.includes("Gasthof Zur Post</strong>"));
 });
 
 test("highlightBeschreibungen ersetzt gezielt eine einzelne Gericht-ID", () => {

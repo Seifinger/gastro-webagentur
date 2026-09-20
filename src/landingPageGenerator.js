@@ -6,9 +6,10 @@ import {
 } from "./menuCatalog.js";
 import { HERO_IMAGES, INTERIOR_IMAGES, TEAM_IMAGES, assetFileName } from "./imageLibrary.js";
 import { resolveStimmung, stimmungenFuer, ARCHETYP_LABEL } from "./stimmungen.js";
-import { SIGNATUR_CSS } from "./heroSignature.js";
+import { SIGNATUR_CSS, signaturCssFuer } from "./heroSignature.js";
 import { MOTION_CSS, MOTION_SCRIPT, MOTION_EXTRA_CSS, MOTION_EXTRA_SKRIPT } from "./motion.js";
 import { EDITORIAL_CSS, TYPOGRAFIE_CSS } from "./styles/editorial.css.js";
+import { handschriftCss, handschriftKlasse } from "./styles/handschrift.css.js";
 import { resonanzSkript } from "./resonanzBeacon.js";
 import { engineMarkerMeta } from "./engineVersion.js";
 import { getPresetVariant, withDesignDefaults, presetFuerArchetyp } from "./designPresets.js";
@@ -503,7 +504,10 @@ textarea { resize: vertical; min-height: 90px; }
 .contact-list a { color: var(--accent); }
 .hours-row { display: flex; justify-content: space-between; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
 .hours-row span:first-child { color: var(--ink-soft); }
-.placeholder-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; margin-left: 10px; vertical-align: middle; }
+.placeholder-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold-dunkel); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; margin-left: 10px; vertical-align: middle; }
+/* Derselbe Hinweis auf der Akzentfläche der USP-Leiste. Dort trägt er
+   --on-accent: Das ist der Ton, der gegen --accent geprüft ist. */
+.usp-platzhalter { display: inline-block; font-size: 11px; font-weight: 700; color: var(--on-accent); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; }
 
 footer { background: var(--tint); color: rgba(255,255,255,.72); padding: 48px 0; font-size: 14px; }
 footer strong { color: #fff; font-family: var(--display); text-transform: var(--display-transform); font-size: 17px; }
@@ -929,6 +933,17 @@ export function buildLandingPage(lead, options = {}) {
   const gestaltung = options.gestaltung ?? themeForLead(lead);
   const t = gestaltung.theme;
   const preset = resolveDesignPreset(gestaltung, options);
+  // Die Handschrift des Archetyps (Schritte 3-5 des Design-Auftrags, siehe
+  // styles/handschrift.css.js). Ohne sie - also bei jedem Preset, das kein
+  // Archetyp ist - entsteht weder eine Körperklasse noch ein CSS-Block, und
+  // die Seite bleibt Zeichen für Zeichen die bisherige.
+  const handschrift = preset.layout.handschrift ?? null;
+  const handschriftStil = handschriftCss(handschrift, gestaltung.cuisine);
+  // Ohne Handschrift trägt jede Seite die Signaturregeln aller zwölf Küchen
+  // mit sich – rund 17 kB, von denen sie eine braucht. Das bleibt so, weil
+  // jede bereits veröffentlichte Seite sonst mit dem nächsten Publish andere
+  // Bytes bekäme; wo eine Handschrift im Spiel ist, wird gefiltert.
+  const signaturStil = handschrift ? signaturCssFuer(gestaltung.cuisine) : SIGNATUR_CSS;
   const openingHours = options.öffnungszeiten ?? DEFAULT_OPENING_HOURS;
   const kontaktEmail = options.kontaktEmail ?? "";
   const assets = options.assetsPath ?? "../assets";
@@ -985,7 +1000,7 @@ export function buildLandingPage(lead, options = {}) {
   // entsteht kein Skript und die Seite bleibt exakt wie vorher.
   const resonanzBeacon = resonanzSkript(options.resonanzUrl, options.slug);
 
-  const kontaktZeilen = renderKontaktZeilen({ adresse, mapsUrl, telefon, telHref });
+  const kontaktZeilen = renderKontaktZeilen({ adresse, mapsUrl, telefon, telHref, handschrift });
   const hoursRows = renderOeffnungszeiten(openingHours);
 
   // Das Magazin-Raster und der Video-Hero sind opt-in. Nur wenn ein Preset sie
@@ -997,13 +1012,41 @@ export function buildLandingPage(lead, options = {}) {
   const hatVideoHero = preset.hero.type === "video_loop" && Boolean(heroVideoSrc);
   const brauchtExtraBewegung = asymmetrisch || preset.hero.type === "editorial" || hatVideoHero;
   const typografieCss = TYPOGRAFIE_CSS[preset.typography?.scale ?? "standard"] ?? "";
-  const bodyKlassen = [veroeffentlicht ? "veroeffentlicht" : "", asymmetrisch ? "gitter-asymmetrisch" : ""]
+  // Der kräftigere Akzent wird von zwei Gestaltungen gebraucht: vom Magazin
+  // (große Flächen und Schrift) und von jeder Handschrift, die accent als
+  // Textfarbe einsetzt. Der Wortlaut des Magazin-Zweigs bleibt bewusst Zeichen
+  // für Zeichen der bisherige: Sonst änderte sich mit dem nächsten Publish
+  // jede bereits veröffentlichte Magazin-Seite, obwohl an ihr nichts
+  // gestaltet wurde.
+  const accentBoldRegel = `:root { --accent-bold: ${t.accentBold ?? t.accent}; }`;
+  // Für die Handschrift der strengere Wert: accentBold erreicht 4.5:1 nur
+  // gegen bg, accentLesbar auch gegen surface und soft (siehe stimmungen.js).
+  const accentLesbarRegel = `:root { --accent-bold: ${t.accentLesbar ?? t.accentBold ?? t.accent}; }`;
+  const accentBoldBlock = asymmetrisch
+    ? `
+/* Der kräftigere Akzent aus colorMath.boldAccent – mindestens 4.5:1 gegen den
+   eigenen Grund. Er steht nur dort, wo er gebraucht wird: Die drei bestehenden
+   Archetypen arbeiten unverändert mit --accent. */
+${accentBoldRegel}`
+    : handschriftStil
+      ? `
+/* Die beiden abgeleiteten Töne der Handschrift (siehe stimmungen.js):
+   --accent-bold trägt jeden Text, der sonst in accent stünde und gegen bg,
+   surface oder soft unter 4.5:1 läge. --gold-hell ist dasselbe für Gold im
+   Hero, wo es auf einem Foto unter einem Schleier liegt (--gold-dunkel für
+   helle Flächen steht ohnehin in jeder Seite). Flächen behalten accent und
+   gold – dagegen ist onAccent geprüft. */
+${accentLesbarRegel}
+:root { --gold-hell: ${t.goldAufTint ?? t.gold}; }`
+      : "";
+
+  const bodyKlassen = [
+    veroeffentlicht ? "veroeffentlicht" : "",
+    asymmetrisch ? "gitter-asymmetrisch" : "",
+    handschriftKlasse(handschrift),
+  ]
     .filter(Boolean)
     .join(" ");
-
-  const uspBadges = (menu.usps ?? [])
-    .map((usp) => `<span><span aria-hidden="true">✓</span> ${escapeHtml(usp)}</span>`)
-    .join("");
 
   return `<!DOCTYPE html>
 <html lang="de">
@@ -1027,6 +1070,11 @@ ${fontCss}
   --accent-dark: ${t.accentDark};
   --on-accent: ${t.onAccent};
   --gold: ${t.gold};
+  /* Gold trägt Text (Platzhalter-Abzeichen, Sterne, Kicker) und erreicht
+     dort auf hellem Grund 2.0-3.1:1. Der abgeleitete Ton steht jeder Seite
+     zur Verfügung, damit ein gekennzeichneter Platzhalter überall lesbar
+     ist - siehe stimmungen.js und scripts/colorSwatchCheck.mjs. */
+  --gold-dunkel: ${t.goldDunkel ?? t.gold};
   --tint: ${t.tint};
   --tint-rgb: ${t.tintRgb};
   --display: ${t.display};
@@ -1034,14 +1082,10 @@ ${fontCss}
   --display-transform: ${t.displayTransform};
   --display-tracking: ${t.displayTracking};
   --radius: ${t.radius};
-}${asymmetrisch ? `
-/* Der kräftigere Akzent aus colorMath.boldAccent – mindestens 4.5:1 gegen den
-   eigenen Grund. Er steht nur dort, wo er gebraucht wird: Die drei bestehenden
-   Archetypen arbeiten unverändert mit --accent. */
-:root { --accent-bold: ${t.accentBold ?? t.accent}; }` : ""}
+}${accentBoldBlock}
 ${PAGE_STYLES}
-${SIGNATUR_CSS}
-${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}
+${signaturStil}
+${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}${handschriftStil}
 </style>
 </head>
 <body${bodyKlassen ? ` class="${bodyKlassen}"` : ""}>
@@ -1071,9 +1115,10 @@ ${renderHero({
   highlights,
   hausBild: gestaltung.hausBild,
   bildUrl,
+  handschrift,
 })}
 
-${renderUspStrip(menu.usps)}
+${renderUspStrip(menu.usps, handschrift, lead, fiktiv)}
 
 ${(() => {
   // Reihenfolge der Hauptsektionen kommt aus preset.layout.sectionOrder.
@@ -1081,9 +1126,9 @@ ${(() => {
   // alles, was in der Vorgabe fehlt, wird in der bisherigen Reihenfolge
   // angehängt (das bisherige, feste Verhalten als Fallback).
   const sectionsById = {
-    highlights: renderHighlights({ highlights, bildUrl, showBadges: preset.menu.showBadges, beschreibungFuer, spalten, gridStyle: preset.layout.gridStyle }),
+    highlights: renderHighlights({ highlights, bildUrl, showBadges: preset.menu.showBadges, beschreibungFuer, spalten, gridStyle: preset.layout.gridStyle, handschrift, cuisine: gestaltung.cuisine }),
 
-    karte: renderMenu({ menu, menuLayout: preset.menu.layout, showBadges: preset.menu.showBadges, beschreibungFuer }),
+    karte: renderMenu({ menu, menuLayout: preset.menu.layout, showBadges: preset.menu.showBadges, beschreibungFuer, handschrift }),
 
     ambiente: renderAmbiente({
       konzeptLabel: menu.konzept ?? menu.label,
@@ -1094,13 +1139,15 @@ ${(() => {
       bestsellerBild: highlights[0]?.bild,
       bildUrl,
       eigeneBilder,
+      handschrift,
+      fiktiv,
     }),
 
-    stimmen: renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social.layout),
+    stimmen: renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social.layout, handschrift),
 
-    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant }),
+    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant, handschrift }),
 
-    kontakt: renderContact({ kontaktZeilen, hoursRows }),
+    kontakt: renderContact({ kontaktZeilen, hoursRows, strasse: strasseAusAdresse(adresse), ort, handschrift }),
   };
 
   const konfigurierteReihenfolge = (preset.layout.sectionOrder ?? []).filter((id) => sectionsById[id]);
@@ -1185,7 +1232,7 @@ ${
   }
 </div>
 
-${renderFooter({ name, adresse, telefon })}
+${renderFooter({ name, adresse, telefon, cuisine: gestaltung.cuisine, handschrift })}
 
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${PAGE_SCRIPT}</script>
