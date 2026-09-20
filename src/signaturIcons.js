@@ -60,6 +60,18 @@ export function haken() {
   return strich("0 0 24 24", '<path d="M4 12.4c2.1 1 3.8 2.5 5.1 4.4C12 11.6 15.8 7.4 21 4.6"/>', "ikon ikon-haken");
 }
 
+/**
+ * Der Stern für die Google-Note in der USP-Leiste. Bewusst ungleiche Zacken –
+ * ein konstruierter Fünfstern wäre wieder ein Icon-Font-Zeichen.
+ */
+export function stern() {
+  return strich(
+    "0 0 24 24",
+    '<path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/>',
+    "ikon ikon-stern",
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Die Küchenmarke
 // ---------------------------------------------------------------------------
@@ -137,6 +149,7 @@ export function ikonenCss(klasse) {
   return `
 .${klasse} .ikon { width: 1.35em; height: 1.35em; flex: none; vertical-align: -.26em; }
 .${klasse} .ikon-haken { width: 1.05em; height: 1.05em; opacity: .9; }
+.${klasse} .ikon-stern { width: 1.15em; height: 1.15em; }
 .${klasse} .marke { width: 1.9em; height: 1.9em; flex: none; vertical-align: -.48em; }
 `;
 }

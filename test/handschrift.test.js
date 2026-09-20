@@ -7,6 +7,7 @@ import { menuForCuisine } from "../src/menuCatalog.js";
 import { stimmungenFuer, STIMMUNGEN } from "../src/stimmungen.js";
 import { contrastRatio } from "../src/colorMath.js";
 import { kuechenMarke, hatKuechenMarke, KONTAKT_IKONEN } from "../src/signaturIcons.js";
+import { SIGNATUR_CSS, signaturCssFuer } from "../src/heroSignature.js";
 
 const lead = {
   name: "Gasthof Beispiel",
@@ -116,8 +117,24 @@ test("die Speisekarte steht ohne Kästen und ohne Mittelachse", () => {
 
 test("die Gästestimmen stehen als Blatt, nicht als drei leere Kästen", () => {
   const html = seite("bayerisch", "wirtshaus");
-  assert.ok(html.includes('class="stimmen-blatt"'));
+  assert.ok(html.includes('class="stimmen-blatt'));
   assert.ok(html.includes('class="stimmen-note-spalte"'));
+  // Bei einem echten Haus gibt es keine Zitate. Dann stehen dort auch keine
+  // leeren Plätze, sondern die Zusage – die Note trägt die Sektion allein.
+  assert.ok(html.includes('class="stimmen-blatt stimmen-blatt--zusage"'));
+  assert.ok(!html.includes('class="stimme ist-platzhalter"'));
+  assert.ok(!html.includes("Ihre erste Bewertung"));
+  assert.ok(html.includes("Was Ihre Gäste sagen"));
+
+  // Ein erfundenes Beispiel-Lokal hat Zitate – dort bleibt das Raster.
+  const fiktiv = buildLandingPage(lead, {
+    menu: menuForCuisine("bayerisch"),
+    gestaltung: themeForLead(lead, "bayerisch", "wirtshaus"),
+    fiktiv: true,
+  });
+  assert.ok(fiktiv.includes('class="stimmen-grid'));
+  assert.ok(!fiktiv.includes('class="stimmen-blatt stimmen-blatt--zusage"'));
+  assert.ok(fiktiv.includes("Was unsere Gäste sagen"));
   // Ohne Google-Note gäbe es links nichts zu zeigen – dann kein Blatt.
   const ohneNote = buildLandingPage(
     { ...lead, rating: undefined, anzahlBewertungen: undefined },
@@ -125,6 +142,50 @@ test("die Gästestimmen stehen als Blatt, nicht als drei leere Kästen", () => {
   );
   assert.ok(!ohneNote.includes('class="stimmen-blatt"'));
   assert.ok(ohneNote.includes('class="stimmen-grid"'));
+});
+
+/* ---------- Signatur-CSS: nur noch die eigene Küche ---------- */
+
+test("ohne Handschrift trägt die Seite weiter alle Signaturregeln", () => {
+  // Die Blöcke sind nur anders abgelegt, nicht anders geschrieben. Eine Seite
+  // ohne Handschrift muss Zeichen für Zeichen dieselbe bleiben.
+  const html = buildLandingPage(lead, { menu: menuForCuisine("bayerisch"), preset: {} });
+  assert.ok(html.includes(SIGNATUR_CSS), "die vollständige Vorlage fehlt");
+  assert.equal(signaturCssFuer("erfundene-kueche"), SIGNATUR_CSS);
+});
+
+test("mit Handschrift bleiben die Regeln der elf anderen Küchen draußen", () => {
+  const nurBayern = signaturCssFuer("bayerisch");
+  assert.ok(nurBayern.includes(".sig-tafel {"));
+
+  // Geprüft wird der Teil vor dem Block für abgestellte Bewegung. Dessen
+  // Selektorliste nennt weiterhin alle Küchen: Sie ist eine einzige Liste von
+  // 947 Bytes, und sie zu zerlegen kostete mehr Klarheit, als sie spart.
+  const gestaltung = nurBayern.slice(0, nurBayern.indexOf("/* Wer Bewegung im System"));
+  assert.ok(gestaltung.length > 1000, "Schnitt an der falschen Stelle");
+  for (const fremd of [".sig-pizza", ".sig-band", ".sig-spiess", ".sig-tea-form",
+                       ".sig-drehteller", ".sig-tasse", ".sig-orchid", ".sig-spice",
+                       ".sig-lanterns", ".sig-schale", ".sig-olive-form",
+                       // seit dem gezeichneten Olivenzweig erzeugt niemand mehr .sig-diashow
+                       ".sig-diashow"]) {
+    assert.ok(!gestaltung.includes(fremd), `${fremd} reist mit`);
+  }
+  assert.ok(nurBayern.length * 3 < SIGNATUR_CSS.length, "kaum etwas gespart");
+});
+
+test("jede Küche behält die Regeln, die ihr Markup wirklich braucht", () => {
+  // Der eigentliche Fallstrick beim Filtern: eine Küche, deren Signatur im
+  // Markup steht, deren Regeln aber herausgefallen sind.
+  for (const cuisine of Object.keys(STIMMUNGEN)) {
+    const html = seite(cuisine, stimmungFuer(cuisine, "traditionell"));
+    const koerper = html.slice(html.indexOf("</head>"));
+    const klassen = new Set();
+    for (const treffer of koerper.matchAll(/class="sig ([a-z-]+)"/g)) klassen.add(treffer[1]);
+    for (const klasse of klassen) {
+      assert.ok(html.includes(`.${klasse} `) || html.includes(`.${klasse}{`),
+        `${cuisine}: keine Regel für .${klasse}`);
+    }
+  }
 });
 
 /* ---------- Gezeichnete Zeichen statt Symbolschrift ---------- */

@@ -89,6 +89,15 @@ export const PLATZHALTER_ERKLAERUNG =
   "Diese drei Plätze füllen wir mit echten Bewertungen Ihrer Gäste – auf Wunsch " +
   "direkt aus Google, dann halten sie sich von selbst aktuell.";
 
+// Dieselbe Zusage ohne den Verweis auf drei sichtbare Plätze. Wo ein Archetyp
+// seine Handschrift mitbringt, stehen die leeren Plätze nicht mehr in der
+// Seite: Drei Zeilen, die nichts sagen, neben einer echten Note aus 428
+// Bewertungen lassen die Sektion aussehen, als fehle etwas. Die Zusage bleibt,
+// die Leere geht.
+export const PLATZHALTER_ERKLAERUNG_OHNE_PLAETZE =
+  "Die Stimmen Ihrer Gäste holen wir auf Wunsch direkt aus Google – dann steht " +
+  "hier immer das Aktuelle, ohne dass jemand etwas nachpflegen muss.";
+
 export function stimmenFuer(cuisine, { fiktiv }) {
   if (!fiktiv) return { stimmen: [], slots: PLATZHALTER_SLOTS, platzhalter: true };
   return { stimmen: STIMMEN[cuisine] ?? STIMMEN.bayerisch, slots: [], platzhalter: false };

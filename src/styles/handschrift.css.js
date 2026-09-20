@@ -60,6 +60,14 @@ const TRADITIONELL = `
   transition-delay: 0s;
 }
 
+/* Ist der Hero durch, steht auch die Signatur still. motion.js setzt die
+   Klasse .ruht ohnehin schon (dafür gibt es den IntersectionObserver); bisher
+   hing daran nur die Hero-Fahrt. Eine Animation, die niemand sieht, hält den
+   Compositor trotzdem wach. */
+.hs-traditionell .hero.ruht .sig-tafel .karte,
+.hs-traditionell .hero.ruht .sig-krug .schaum,
+.hs-traditionell .hero.ruht .sig-krug .tropfen { animation-play-state: paused; }
+
 /* --- Farbe: Text trägt accentBold, Flächen behalten accent -------------- */
 /* Begründung und Messwerte: docs-intern/design-tokens/traditionell.md. */
 .hs-traditionell .eyebrow,
@@ -187,12 +195,18 @@ const TRADITIONELL = `
 .hs-traditionell .stimme.ist-platzhalter { border-style: solid; min-height: 0; justify-content: flex-start; }
 .hs-traditionell .stimme .slot-titel { font-size: 17px; }
 .hs-traditionell .stimmen-erklaerung { margin-top: 22px; }
+.hs-traditionell .stimmen-blatt--zusage .stimmen-erklaerung { margin-top: 0; font-size: 17px; max-width: 46ch; }
+.hs-traditionell .usp-note { display: inline-flex; align-items: center; gap: 10px; }
+.hs-traditionell .usp-note strong { font-family: var(--display); font-size: 19px; font-weight: 700; }
 @media (min-width: 880px) {
   .hs-traditionell .stimmen-blatt { grid-template-columns: 4fr 8fr; column-gap: 60px; align-items: start; }
   /* Die Note ist 111px hoch, die Zitate daneben rund 490px – ohne das hier
      bleiben drei Viertel der linken Spalte leer. Klebend wird aus der Leere
-     Führung: Die Zahl steht neben jedem Zitat, das man gerade liest. */
+     Führung: Die Zahl steht neben jedem Zitat, das man gerade liest.
+     Steht rechts nur die Zusage (echtes Haus, noch keine Zitate), ist beides
+     gleich hoch und das Kleben hätte nichts zu führen. */
   .hs-traditionell .stimmen-note-spalte { position: sticky; top: 104px; }
+  .hs-traditionell .stimmen-blatt--zusage .stimmen-note-spalte { position: static; }
 }
 
 /* --- Kontakt: Adresse und Telefon sind die Handlung, die Zeiten sind ----- */
@@ -246,18 +260,35 @@ const TRADITIONELL = `
 .bewegung-aus .hs-traditionell .sig-krug .schaum,
 .bewegung-aus .hs-traditionell .sig-krug .tropfen { animation: none; }
 
-/* --- Ambiente: ein Bildband statt dreier gleicher Kacheln --------------- */
+/* --- Ambiente: ein Bildband, die Bildunterschrift unter dem Bild -------- */
 /* Das Haus ist wichtiger als Team und Bestseller – es ist das, woran der Gast
    die Tür erkennt. Auf dem Handy bleibt es beim Stapel: Ein verschobenes
-   Raster auf 390px ist nur eng. */
+   Raster auf 390px ist nur eng.
+   Die Unterschrift stand bisher IM Bild, auf einem schwarzen Verlauf von
+   transparent nach 82 %. Gemessen über den echten Pixeln kam "Unser Haus"
+   damit auf 1.99:1 über den hellsten Bildstellen – der Verlauf beginnt oben
+   bei null, und genau dort sitzt die Zeile. Ein Schleier, der Text lesbar
+   macht, ist ohnehin das Muster, das jede Vorlage hat: Hier steht die
+   Unterschrift jetzt unter dem Bild, auf dem Grund der Seite. */
+.hs-traditionell .foto-slot { border-radius: 0; background: none; overflow: visible;
+                              display: flex; flex-direction: column; }
+.hs-traditionell .foto-slot img { border-radius: var(--radius); }
+.hs-traditionell .foto-text { position: static; padding: 14px 0 0; background: none; color: var(--ink); }
+.hs-traditionell .foto-text strong { font-size: 20px; }
+.hs-traditionell .foto-text span { color: var(--ink-soft); font-size: 14px; margin-top: 3px; }
 @media (min-width: 760px) {
   .hs-traditionell .foto-grid { grid-template-columns: 1.4fr 1fr 1fr; gap: 22px;
-                                height: clamp(320px, 32vw, 440px); }
+                                height: clamp(360px, 34vw, 480px); }
   .hs-traditionell .foto-slot { height: 100%; }
-  .hs-traditionell .foto-slot img { height: 100%; aspect-ratio: auto; object-fit: cover; }
+  .hs-traditionell .foto-slot img { flex: 1; min-height: 0; height: auto;
+                                    aspect-ratio: auto; object-fit: cover; }
 }
 
 /* --- Gezeichnete Zeichen (signaturIcons.js) ----------------------------- */
+/* Auch die USP-Leiste verlässt die Mittelachse: Mit der Note sind es vier
+   Punkte, die auf zwei Zeilen umbrechen – zentriert sieht die zweite Zeile
+   aus wie ein Rest. */
+.hs-traditionell .usp-list { justify-content: flex-start; }
 .hs-traditionell .usp-list span { gap: 10px; }
 .hs-traditionell .reserve-pluspunkte .k { display: inline-flex; padding-top: .2em; }
 .hs-traditionell footer strong { display: inline-flex; align-items: center; gap: 10px; }

@@ -6,7 +6,7 @@ import {
   heroAmbiencePhoto,
   heroReservationHero,
 } from "../heroSignature.js";
-import { haken } from "../signaturIcons.js";
+import { haken, stern } from "../signaturIcons.js";
 
 /**
  * Wählt das Hero-Element passend zu preset.hero.type. "signature" (Standard)
@@ -207,14 +207,32 @@ export function renderHero(ctx) {
  * Mit Handschrift trägt sie den gezeichneten Haken aus signaturIcons.js statt
  * des gesetzten ✓ – dasselbe Zeichen wie die Pluspunkte der Reservierung.
  *
+ * Und sie beginnt dann mit der Google-Note dieses Hauses. Die drei übrigen
+ * Punkte gelten für jedes Lokal derselben Küche (sie stammen aus
+ * menuCatalog.js); die Note ist das Einzige an dieser Leiste, das nur für
+ * dieses eine Haus stimmt – und sie steht damit an der Stelle, die direkt
+ * unter dem Hero als Erstes gelesen wird.
+ *
  * @param {Array} usps
  * @param {string|null} [handschrift] - preset.layout.handschrift.
+ * @param {object} [lead] - für die Google-Note.
  */
-export function renderUspStrip(usps, handschrift = null) {
-  const zeichen = handschrift === "traditionell" ? haken() : '<span aria-hidden="true">✓</span>';
-  const uspBadges = (usps ?? [])
-    .map((usp) => `<span>${zeichen} ${escapeHtml(usp)}</span>`)
-    .join("");
+export function renderUspStrip(usps, handschrift = null, lead = null) {
+  const gezeichnet = handschrift === "traditionell";
+  const zeichen = gezeichnet ? haken() : '<span aria-hidden="true">✓</span>';
+  const note =
+    gezeichnet && lead?.rating
+      ? `<span class="usp-note">${stern()} <strong>${escapeHtml(
+          String(lead.rating).replace(".", ","),
+        )}</strong> von 5 auf Google${
+          lead.anzahlBewertungen ? `, aus ${formatCount(lead.anzahlBewertungen)} Bewertungen` : ""
+        }</span>`
+      : "";
+  const uspBadges =
+    note +
+    (usps ?? [])
+      .map((usp) => `<span>${zeichen} ${escapeHtml(usp)}</span>`)
+      .join("");
   return `<section class="usp-strip">
   <div class="wrap"><div class="usp-list">${uspBadges}</div></div>
 </section>`;

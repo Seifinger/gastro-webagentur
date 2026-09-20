@@ -199,8 +199,15 @@ test("Entwürfe echter Lokale bekommen niemals erfundene Bewertungen", () => {
     }
   }
 
-  assert.ok(html.includes('class="stimme ist-platzhalter"'), "keine Platzhalter-Plätze");
-  assert.ok(html.includes("Ihre erste Bewertung"));
+  // Was an die Stelle der Zitate tritt, hängt vom Archetyp ab: mit
+  // Handschrift die Zusage im Klartext, ohne sie die drei leeren Plätze.
+  // Beides behauptet nichts.
+  assert.ok(html.includes("direkt aus Google"), "keine Zusage, woher die Stimmen kommen");
+  assert.ok(!html.includes('class="stimme ist-platzhalter"'));
+
+  const ohneHandschrift = buildLandingPage(lead, { preset: {} });
+  assert.ok(ohneHandschrift.includes('class="stimme ist-platzhalter"'), "keine Platzhalter-Plätze");
+  assert.ok(ohneHandschrift.includes("Ihre erste Bewertung"));
 });
 
 test("erfundene Beispiel-Lokale bekommen erfundene Stimmen", () => {

@@ -126,6 +126,18 @@ dieser Stelle.
 **Neue Animationen: keine.** Die Handschrift enthält kein einziges
 `@keyframes` (geprüft in `test/handschrift.test.js`). Sie nimmt zurück.
 
+**Und sie hält an.** Ist der Hero aus dem Bild gescrollt, stehen auch Tafel
+und Maßkrug still – `motion.js` setzt die Klasse `.ruht` ohnehin schon, bisher
+hing daran nur die Hero-Fahrt. Eine Animation, die niemand sieht, hält den
+Compositor trotzdem wach.
+
+**Gewicht.** Die Handschrift kostet rund 9 kB CSS. Dafür trägt die Seite die
+Signaturregeln der elf anderen Küchen nicht mehr mit: `signaturCssFuer()`
+liefert nur die eigene (`src/heroSignature.js`), das sind 5,2 statt 22 kB.
+Unterm Strich ist eine bayerische Seite mit allem, was hier steht, **2,3 %
+größer** als vor dem Umbau (23.349 → 23.877 Bytes gzip) – bei halb so vielen
+laufenden Animationen.
+
 ## Die vier Asymmetrien
 
 Je eine Stelle pro Sektion, jeweils aus dem Inhalt begründet:
@@ -139,7 +151,42 @@ Je eine Stelle pro Sektion, jeweils aus dem Inhalt begründet:
 
 Die Mittelachse ist überall aufgehoben: `section-head.mitte` wirkt in diesem
 Archetyp nicht mehr (`handschrift.css.js`), weil kein Inhalt dieser Seite
-symmetrisch gewichtet ist.
+symmetrisch gewichtet ist. Dasselbe gilt für die USP-Leiste.
+
+Dazu zwei Stellen, die keine Asymmetrie brauchten, sondern eine Entscheidung:
+
+- **Ambiente**: drei gleiche Kacheln wurden ein Band mit einem breiteren
+  ersten Bild (das Haus ist das, woran der Gast die Tür erkennt). Die
+  Bildunterschrift steht **unter** dem Bild statt darauf – der schwarze
+  Schleier, der weiße Schrift auf einem Foto lesbar hält, ist das Muster, das
+  jede Vorlage hat, und er trug an dieser Stelle nachweislich nicht: gemessen
+  1,99:1 über den hellsten Bildstellen.
+- **Gästestimmen**: Bei einem echten Haus gibt es keine Zitate. Dann stehen
+  dort auch keine drei leeren Plätze mehr, sondern die Note dieses Hauses und
+  die Zusage im Klartext. Drei Zeilen, die nichts sagen, neben einer echten
+  4,7 aus 428 Bewertungen lassen die Sektion aussehen, als fehle etwas.
+
+## Was von diesem Haus kommt
+
+Der Archetyp ist die Form, nicht der Inhalt. Diese sichtbaren Elemente
+stammen aus den Daten genau dieses Lokals und sind bei keinem zweiten
+gleich:
+
+| Stelle | Woher |
+|---|---|
+| Titel und Kopfzeile | `lead.name` |
+| Schlagzeile im Hero | `ortsbezug()` aus Straße und Ort |
+| Bewertung im Hero **und als erster Punkt der USP-Leiste** | `lead.rating`, `lead.anzahlBewertungen` |
+| Überschrift der Kontaktsektion | `strasseAusAdresse(lead.adresse)` |
+| Note in den Gästestimmen | `lead.rating` |
+| Titelbild | über den Hash der `placeId` aus dem Bildpaar der Stimmung |
+| Auswahl und Reihenfolge der Highlights, damit auch die Hausempfehlung | über den Hash der `placeId` |
+
+Was **nicht** von diesem Haus kommt und es aus rechtlichen Gründen auch nicht
+kann: die Gästezitate. Google untersagt das Speichern von Rezensionstexten,
+und ein erfundenes Zitat unter dem echten Namen eines Lokals wäre als
+Bewertung lesbar – auch auf einem Entwurf. Deshalb steht dort die Zusage
+statt eines Zitats (`src/testimonials.js`).
 
 ## Die gezeichneten Zeichen
 
@@ -159,8 +206,30 @@ derselben Motivfamilie wie die Hero-Signatur:
 Sie steht an **drei** Stellen derselben Seite: am Kopf der Highlights, auf dem
 Siegel der Hausempfehlung und in der Fußzeile.
 
+Dazu der **Maßkrug** im bayerischen Hero (`heroBierkrug`): Henkel, Noppen,
+Schaum, der alle acht Sekunden überläuft. Er ersetzt dort, wo eine
+Handschrift im Spiel ist, ein gefülltes Pfad-Icon aus einer Sammlung – ein
+henkelloses, tailliertes Pint-Glas, also das falsche Gefäß an der
+prominentesten Stelle. Neue Animation kommt keine dazu: Es laufen dieselben
+Keyframes wie vorher.
+
 Alle Zeichen sind Kontur in `currentColor`, ohne eigene Farbe – ihr Kontrast
 ist damit der ihres Textes und muss nicht getrennt geprüft werden.
+
+## Die beiden Goldtöne
+
+`gold` trägt Text an vier Stellen und erreicht dort auf hellem Grund 2,0 bis
+3,1:1 – in keiner einzigen Stimmung AA. Deshalb zwei abgeleitete Töne
+(`src/stimmungen.js`):
+
+| Token | Geprüft gegen | Steht auf |
+|---|---|---|
+| `--gold-dunkel` | `bg`, `surface`, `soft` | „Platzhalter"-Abzeichen, Sterne der Note |
+| `--gold-hell` | `tint` **und** `tint` mit 80 % Deckkraft über Weiß | Kicker-Zeile und Sterne im Hero |
+
+Der zweite Grund ist kein Token, sondern das, was der Besucher wirklich
+sieht: Der Wirt darf das Hero-Foto austauschen, und ein helles Bild hätte den
+Wert sonst gekippt.
 
 ## Verbotene Muster
 

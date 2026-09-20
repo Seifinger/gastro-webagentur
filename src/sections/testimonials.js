@@ -1,5 +1,9 @@
 import { escapeHtml, formatCount } from "../htmlHelpers.js";
-import { stimmenFuer, PLATZHALTER_ERKLAERUNG } from "../testimonials.js";
+import {
+  stimmenFuer,
+  PLATZHALTER_ERKLAERUNG,
+  PLATZHALTER_ERKLAERUNG_OHNE_PLAETZE,
+} from "../testimonials.js";
 
 /**
  * Gästestimmen. Bei echten Häusern bewusst Platzhalter: Google-Rezensionen
@@ -62,18 +66,24 @@ export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3", ha
   // es beim einspaltigen Aufbau.
   const blatt = handschrift === "traditionell" && note;
   if (blatt) {
+    // Bei echten Häusern gibt es keine Zitate, nur die Zusage. Dann stehen
+    // rechts nicht drei leere Plätze, sondern der Satz, der erklärt, was
+    // dorthin kommt – und die Note trägt die Sektion allein.
+    const rechts = platzhalter
+      ? `<p class="stimmen-erklaerung">${escapeHtml(PLATZHALTER_ERKLAERUNG_OHNE_PLAETZE)}</p>`
+      : `<div class="stimmen-grid${gridClass}">${karten}</div>`;
+
     return `
   <section class="section stimmen-section" id="stimmen">
     <div class="wrap">
       <div class="section-head">
         <div class="eyebrow">Gästestimmen</div>
-        <h2>Was unsere Gäste sagen</h2>
+        <h2>${platzhalter ? "Was Ihre Gäste sagen" : "Was unsere Gäste sagen"}</h2>
       </div>
-      <div class="stimmen-blatt">
+      <div class="stimmen-blatt${platzhalter ? " stimmen-blatt--zusage" : ""}">
         <div class="stimmen-note-spalte">${note}</div>
         <div class="stimmen-zitate">
-          <div class="stimmen-grid${gridClass}">${karten}</div>
-          ${erklaerung}
+          ${rechts}
         </div>
       </div>
     </div>

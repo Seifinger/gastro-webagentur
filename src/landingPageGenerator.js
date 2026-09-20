@@ -6,7 +6,7 @@ import {
 } from "./menuCatalog.js";
 import { HERO_IMAGES, INTERIOR_IMAGES, TEAM_IMAGES, assetFileName } from "./imageLibrary.js";
 import { resolveStimmung, stimmungenFuer, ARCHETYP_LABEL } from "./stimmungen.js";
-import { SIGNATUR_CSS } from "./heroSignature.js";
+import { SIGNATUR_CSS, signaturCssFuer } from "./heroSignature.js";
 import { MOTION_CSS, MOTION_SCRIPT, MOTION_EXTRA_CSS, MOTION_EXTRA_SKRIPT } from "./motion.js";
 import { EDITORIAL_CSS, TYPOGRAFIE_CSS } from "./styles/editorial.css.js";
 import { handschriftCss, handschriftKlasse } from "./styles/handschrift.css.js";
@@ -936,6 +936,11 @@ export function buildLandingPage(lead, options = {}) {
   // die Seite bleibt Zeichen für Zeichen die bisherige.
   const handschrift = preset.layout.handschrift ?? null;
   const handschriftStil = handschriftCss(handschrift);
+  // Ohne Handschrift trägt jede Seite die Signaturregeln aller zwölf Küchen
+  // mit sich – rund 17 kB, von denen sie eine braucht. Das bleibt so, weil
+  // jede bereits veröffentlichte Seite sonst mit dem nächsten Publish andere
+  // Bytes bekäme; wo eine Handschrift im Spiel ist, wird gefiltert.
+  const signaturStil = handschrift ? signaturCssFuer(gestaltung.cuisine) : SIGNATUR_CSS;
   const openingHours = options.öffnungszeiten ?? DEFAULT_OPENING_HOURS;
   const kontaktEmail = options.kontaktEmail ?? "";
   const assets = options.assetsPath ?? "../assets";
@@ -1071,7 +1076,7 @@ ${fontCss}
   --radius: ${t.radius};
 }${accentBoldBlock}
 ${PAGE_STYLES}
-${SIGNATUR_CSS}
+${signaturStil}
 ${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}${handschriftStil}
 </style>
 </head>
@@ -1105,7 +1110,7 @@ ${renderHero({
   handschrift,
 })}
 
-${renderUspStrip(menu.usps, handschrift)}
+${renderUspStrip(menu.usps, handschrift, lead)}
 
 ${(() => {
   // Reihenfolge der Hauptsektionen kommt aus preset.layout.sectionOrder.
