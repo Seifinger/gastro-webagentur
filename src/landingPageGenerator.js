@@ -265,7 +265,7 @@ body.veroeffentlicht .topbar { top: 38px; }
 /* Kopfzeile: liegt transparent über dem Hero und wird beim Scrollen fest */
 .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 40; transition: background .28s ease, box-shadow .28s ease; }
 .topbar::before { content: ""; position: absolute; inset: 0; pointer-events: none; transition: opacity .28s ease;
-                  background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.14) 70%, transparent 100%); }
+                  background: linear-gradient(180deg, rgba(var(--tint-rgb), .55) 0%, rgba(var(--tint-rgb), .14) 70%, transparent 100%); }
 .topbar.scrolled::before { opacity: 0; }
 .topbar-inner { position: relative; display: flex; align-items: center; gap: 18px; height: 70px; }
 .brand { font-family: var(--display); text-transform: var(--display-transform); font-size: 19px; font-weight: 700; margin-right: auto;
@@ -387,7 +387,7 @@ body.veroeffentlicht .topbar { top: 38px; }
 .foto-slot { position: relative; border-radius: var(--radius); overflow: hidden; background: var(--soft); }
 .foto-slot img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
 .foto-text { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 18px 18px; color: #fff;
-             background: linear-gradient(180deg, transparent, rgba(0,0,0,.82)); }
+             background: linear-gradient(180deg, transparent, rgba(var(--tint-rgb), .82)); }
 .foto-text strong { font-family: var(--display); text-transform: var(--display-transform); font-size: 19px; display: block; }
 .foto-text span { font-size: 13px; color: rgba(255,255,255,.82); display: block; margin-top: 4px; }
 .foto-badge { position: absolute; right: 12px; top: 12px; font-size: 11px; font-weight: 700; color: #fff;
