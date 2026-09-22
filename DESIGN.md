@@ -50,12 +50,22 @@ Dieses Designsystem wird verfeinert und an externe Best Practices angeglichen.
 - Keine generischen AI-Standardpaletten (z. B. beliebige Lila/Rosa-Gradients ohne Bezug).
 - Fokus auf kulinarische Atmosphären: Erdtöne, Holz, metallische Highlights, Nachtlicht – validiert gegen Refero-Referenzen und echte Restaurant-Websites.
 
-### Spacing, Radius, Shadow, Transition – globales Token-Set (Stage 2)
+### Spacing, Radius, Shadow, Transition – globales Token-Set (Stage 2, umgesetzt in Stage 3/4/5)
 
-Verbindlich für alle Landing-Pages **und** beide Dashboards (Stage 3/4/5).
-Wird als `:root`-Ergänzung in `PAGE_STYLES` (`landingPageGenerator.js`) und in
-den Dashboard-Stylesheets gesetzt – siehe Stage 3a/4a. Bis dahin sind das
-Zielwerte, noch kein Code.
+Verbindlich für alle Landing-Pages **und** beide Dashboards. Die Namen sind
+überall identisch (`--space-*`, `--radius-*`, `--shadow-*`, `--transition-*`),
+die **Werte** aber pro Oberfläche eigenständig, weil jede einen anderen
+Grundton trägt:
+
+- **Landing-Pages** (`PAGE_STYLES` in `landingPageGenerator.js`): Werte exakt
+  wie unten – diese Tabelle ist die kanonische Quelle.
+- **Wirt-Dashboard** (`public/wirt.html`): dieselben Namen, dunkle Schatten
+  (`rgba(0,0,0,.25)`/`.35` statt `.07`/`.10`) passend zum dunklen Grund.
+- **Nutzer-Dashboard** (`public/dashboard.html`, `public/bearbeiten.html`):
+  dieselben Namen, hellere Radien (6/10/16px statt 6/12/20px) und Schatten
+  passend zum bestehenden hellen Schema dieses internen Werkzeugs.
+
+Kanonische Werte (Landing-Pages):
 
 ```css
 --space-xs: 6px;
@@ -353,5 +363,9 @@ Format je Küche:
 5. Stage 6: die drei benannten Piloten (Italienisch/Trattoria, Japanisch/Izakaya, Bayerisch/Wirtshaus) gebaut und per Headless-Browser (Desktop + Mobil, Hero/Highlights/Speisekarte/Kontakt/Fußzeile) gegengeprüft – erledigt, keine Code-Änderung nötig.
    - **Hinweis zur Vorgabe:** Laut den Stimmung-Daten (`stimmungenFuer()`) sind alle drei benannten Piloten tatsächlich Archetyp `traditionell` (Izakaya nicht `abend`, wie der ursprüngliche Auftrag annahm). Um die anderen beiden Archetypen nicht ungeprüft zu lassen, wurden zusätzlich Omakase (`abend`) und Washitsu (`hell`) – beide Japanisch, derselben Küche wie Izakaya – mitgebaut und geprüft.
    - **Ergebnis:** Keine Regressionen. Der kräftige linke Kicker-Strich, die SVG-Sterne, der Glas-Effekt auf dem zweiten Hero-Button, die schattenbasierten Highlight-Karten, der rotierende Speisekarten-Pfeil mit Akzentstreifen, die gezeichneten Kontakt-Icons und die dreispaltige Fußzeile tragen über sehr unterschiedliche Paletten hinweg (dunkles Izakaya-Rot/Montserrat-Großschrift, warmes Trattoria-Terrakotta, helles Bayerisch-Grün, fast-schwarzes Omakase, cremefarbenes Washitsu) und über alle drei Archetypen. Die gezeichneten Hero-Signaturen (Pizzahälften, Bierkrug) sind unabhängig von Stockfotos und blieben auch ohne Netzwerkzugriff im Prüf-Sandbox intakt; das Sushi-Band (echte Fotos) ließ sich mangels Netzwerk nicht abschließend beurteilen, seine Layout-Logik (Positionierung unabhängig vom Content-Fluss) ist aber dieselbe wie bei den anderen Signaturen und unauffällig.
-6. Stage 7: Rollout auf alle 12×3, README-Abschnitt "Designsystem" – noch offen.
+6. Stage 7: Rollout-Bestätigung + Dokumentation – erledigt.
+   - Alle 12 Küchen × 4 Stimmungen (traditionell/abend/hell/editorial, 48 insgesamt) direkt über `buildLandingPage` gebaut und geprüft: `</html>` vorhanden, `engine-version 3` im Marker, keine unaufgelösten Template-Platzhalter, Speisekarte/Reservierung/Kontakt/Fußzeile vorhanden – 0 Probleme. Das ist die inhaltliche Rollout-Prüfung: Da Stage 3/4/5 die Tokens und Komponenten global (nicht pro Preset) verdrahten, gibt es keine "Übertragung auf die übrigen Küchen" mehr nachzuholen – sie tragen den neuen Stand bereits.
+   - `npm run publish-site` lässt sich in dieser Umgebung ohne echte Google-Places-Leads nicht bis zum tatsächlichen Schreiben nach `docs/` durchlaufen (`waehleLeads` liefert dann leer, das Skript bricht kontrolliert mit "Keine passenden Leads gefunden" ab, ohne `docs/` anzufassen) – lief aber fehlerfrei durch. Dieselbe Schreiblogik (`schreibeSeiten`, `baueUndSchreibeEinzelnenEntwurf`) ist über `test/publishSite.test.js` und `test/veroeffentlichung.test.js` gegen ein Scratch-Verzeichnis abgedeckt und lief grün.
+   - `npm test`: alle 403 Tests grün.
+   - README bekam den Abschnitt "Designsystem: Token-Set und eine neue Küche ergänzen" (zwischen den bestehenden Abschnitten zur Handschrift und zu Bildern/Schriften): nennt DESIGN.md als einzige verbindliche Quelle für Designentscheidungen, verweist auf die Token-Dateien je Oberfläche und beschreibt in Reihenfolge, was eine neue Küche braucht (menuCatalog.js → stimmungen.js → imageLibrary.js → optional heroSignature.js/signaturIcons.js).
 7. Jede Preset-/Stimmungs-Änderung weiterhin hier dokumentieren, bevor sie in Code übersetzt wird.
