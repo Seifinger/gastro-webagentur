@@ -1,5 +1,5 @@
 import { escapeHtml } from "../htmlHelpers.js";
-import { KONTAKT_IKONEN } from "../signaturIcons.js";
+import { KONTAKT_IKONEN, uhr } from "../signaturIcons.js";
 
 // Die drei Bildplätze, die der Wirt später mit eigenen Handyfotos füllt.
 export const FOTO_SLOTS = [
@@ -92,6 +92,14 @@ export function renderAmbiente({ konzeptLabel, ort, geschichte, hausBild, teamBi
  * @param {string|null} [ctx.handschrift]
  */
 export function renderContact({ kontaktZeilen, hoursRows, strasse, ort, handschrift }) {
+  // Der helle Archetyp wird unterwegs gelesen: Die Frage ist "habt ihr
+  // jetzt offen?", nicht "wo seid ihr?". Deshalb stehen die Zeiten hier
+  // vorn und tragen als einzige Überschrift der Sektion ein Zeichen.
+  const eigeneKlasse = handschrift === "abend" || handschrift === "hell";
+  const kopfKlasse = eigeneKlasse
+    ? ' class="hours-head"'
+    : ' style="font-size:20px;margin-bottom:12px"';
+  const zeitZeichen = handschrift === "hell" ? `${uhr()} ` : "";
   const ueberschrift =
     handschrift === "traditionell" && strasse
       ? `<h2 class="kontakt-adresse"><span class="kontakt-strasse">${escapeHtml(strasse)}</span>${
@@ -109,7 +117,7 @@ export function renderContact({ kontaktZeilen, hoursRows, strasse, ort, handschr
     <div class="contact-grid">
       <ul class="contact-list">${kontaktZeilen}</ul>
       <div>
-        <h3${handschrift === "abend" ? ' class="hours-head"' : ' style="font-size:20px;margin-bottom:12px"'}>Öffnungszeiten<span class="placeholder-badge">Platzhalter</span></h3>
+        <h3${kopfKlasse}>${zeitZeichen}Öffnungszeiten<span class="placeholder-badge">Platzhalter</span></h3>
         ${hoursRows}
       </div>
     </div>
