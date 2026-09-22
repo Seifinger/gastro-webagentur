@@ -69,7 +69,7 @@ Herleitung: Neutrale warm getönt (#fdfaf5 → #fdfaf5), weil die Referenzen meh
 
 - **Anzeige:** EB Garamond 600 – Garamond wie im Kochbuch – Trattoria ohne Karo
 - **Text:** Karla 400/600 – eigenwillige Grotesk mit engen Kurven
-- **Rubriken:** kursive Anzeigeschrift in Textgröße – wie ein handgeschriebenes Etikett
+- **Rubriken:** Anzeigeschrift aufrecht in Einleitungsgröße – wie ein Etikett (keine künstliche Kursive)
 - **Skala:** Quarte (×1.333), Basis 18px
 
 | Stufe | Desktop | Mobil | Einsatz |

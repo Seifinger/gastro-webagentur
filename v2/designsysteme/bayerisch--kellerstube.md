@@ -69,7 +69,7 @@ Herleitung: Neutrale warm getönt (#141013 → #15130f), weil die Referenzen meh
 
 - **Anzeige:** Young Serif 400 – schwere Antiqua mit weichen Kehlen – Bräustüberl-Schild, Kellerlicht
 - **Text:** Alegreya Sans 400/500 – humanistische Textgrotesk mit Schreibduktus
-- **Rubriken:** kursive Anzeigeschrift in Textgröße – wie ein handgeschriebenes Etikett
+- **Rubriken:** Anzeigeschrift aufrecht in Einleitungsgröße – wie ein Etikett (keine künstliche Kursive)
 - **Skala:** Quarte (×1.333), Basis 18px
 
 | Stufe | Desktop | Mobil | Einsatz |

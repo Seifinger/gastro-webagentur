@@ -99,3 +99,34 @@ Neueste Einträge unten.
   (Stage 4 nutzt ihn für Prompts) und Sprachkanon (Stage 6 für den Copy-Refiner) mit.
 - **E2.9 · Designsysteme sind generiert, nicht handgepflegt.** Ein Test prüft, dass die
   eingecheckten JSON-Dateien exakt der Generatorausgabe entsprechen.
+
+## Stage 3 – Build-Engine
+
+- **E3.1 · Funktionen 1:1 aus v1 per Auslesen statt Kopie.** `PAGE_SCRIPT` ist in v1 nicht
+  exportiert, v1 soll unverändert bleiben. `v1Funktionen.js` liest das Template-Literal
+  zur Build-Zeit aus `src/landingPageGenerator.js` und wertet es aus wie v1. Ein Test
+  sichert, dass v1 und v2 byte-identisch dasselbe Skript einbetten. Dazu ein
+  „Funktionsvertrag“ (alle IDs und Feldnamen, an denen das Skript hängt) als Gate.
+- **E3.2 · Einzige Designquelle ist das Designsystem-Dokument.** `tokens.js` übersetzt es in
+  CSS-Variablen; `stil.js` (Komponenten) enthält keinen Farbwert und keinen freien
+  Abstand. Der Lint prüft das als eigene Regel „hartkodierte-farbe“.
+- **E3.3 · Vier harte Gates.** WCAG-AA (alle 23 Paare), ≥ 3 strukturell verschiedene
+  Hero-Aufbauten (über `struktur`-Signatur), Funktionsvertrag, Anti-Slop-Lint. Jeder
+  Verstoß wirft `BuildAbbruch` mit Gate-Namen.
+- **E3.4 · Lint-Definition „Karte“.** Kartenartig = echtes Bild (img/picture/video) oder
+  freistehendes Icon plus Überschrift. Icons in Knöpfen zählen nicht – sonst wären die
+  Kategorien jeder Speisekarte „Karten“ (so im ersten Lauf passiert).
+- **E3.5 · Highlights-Anzahl je Anordnung.** Treppe 3 (1 groß + 2), Leseliste 4, Reihe 4 mit
+  ungleichen Spaltenbreiten – keine Anordnung erzeugt drei gleiche Karten.
+- **E3.6 · Bildkennzeichnung auf der Seite.** Platzhalter-Badge nur an den drei
+  „Das Haus“-Fotos (sie sind die Foto-Aufgabenliste, wie in v1), KI-Badge an jedem
+  KI-Bild, eigenes Foto ohne Badge. Die vollständige Kennzeichnung steht immer in
+  `data-herkunft` und im Build-Bericht (für das Dashboard).
+- **E3.7 · Keine künstliche Kursive.** Die Rubrik-Variante „kursiv“ wurde zu „etikett“
+  (aufrechte Anzeigeschrift), weil nur ein Schnitt je Anzeigeschrift geladen wird und
+  der Browser sonst eine schräggestellte Normale erzeugt.
+- **E3.8 · Sichtprüfung vor dem Commit.** Screenshots aller Aufbauten zeigten zwei echte
+  Fehler, die kein Gate fand: horizontaler Überlauf mobil (Speisekarten-Zeilen,
+  lange Wörter in großer Anzeigeschrift) und verdeckte Fotos durch Bildunterschriften.
+  Behoben mit `min-width: 0`, deutscher Silbentrennung in Überschriften und
+  Unterschriften unter statt auf dem Bild. Der Überlauf-Check wandert in den Judge.

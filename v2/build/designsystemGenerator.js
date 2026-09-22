@@ -47,12 +47,12 @@ export const WCAG_UI = 3;
 export const SCHRIFTPAARE = {
   bayerisch: {
     wirtshaus: { display: "Vollkorn", gewicht: 700, text: "Alegreya Sans", rubrik: "versal" },
-    kellerstube: { display: "Young Serif", gewicht: 400, text: "Alegreya Sans", rubrik: "kursiv" },
+    kellerstube: { display: "Young Serif", gewicht: 400, text: "Alegreya Sans", rubrik: "etikett" },
     biergarten: { display: "Fraunces", gewicht: 600, text: "Figtree", rubrik: "versal" },
   },
   italienisch: {
-    trattoria: { display: "EB Garamond", gewicht: 600, text: "Karla", rubrik: "kursiv" },
-    "osteria-notte": { display: "Bodoni Moda", gewicht: 600, text: "Instrument Sans", rubrik: "kursiv" },
+    trattoria: { display: "EB Garamond", gewicht: 600, text: "Karla", rubrik: "etikett" },
+    "osteria-notte": { display: "Bodoni Moda", gewicht: 600, text: "Instrument Sans", rubrik: "etikett" },
     costiera: { display: "Italiana", gewicht: 400, text: "Figtree", rubrik: "mono" },
   },
   griechisch: {
@@ -62,13 +62,13 @@ export const SCHRIFTPAARE = {
   },
   tuerkisch: {
     basar: { display: "Barlow Condensed", gewicht: 700, text: "Work Sans", rubrik: "versal", versal: true },
-    "bosporus-nacht": { display: "Gloock", gewicht: 400, text: "Instrument Sans", rubrik: "kursiv" },
+    "bosporus-nacht": { display: "Gloock", gewicht: 400, text: "Instrument Sans", rubrik: "etikett" },
     "anatolische-erde": { display: "Alegreya", gewicht: 700, text: "Alegreya Sans", rubrik: "versal" },
   },
   syrisch: {
     "damaszener-hof": { display: "Amiri", gewicht: 700, text: "Karla", rubrik: "versal" },
     gewuerzbasar: { display: "Reem Kufi", gewicht: 600, text: "Instrument Sans", rubrik: "versal", versal: true },
-    "levante-modern": { display: "Libre Caslon Display", gewicht: 400, text: "Figtree", rubrik: "kursiv" },
+    "levante-modern": { display: "Libre Caslon Display", gewicht: 400, text: "Figtree", rubrik: "etikett" },
   },
   chinesisch: {
     "rote-laterne": { display: "Noto Serif Display", gewicht: 700, text: "Libre Franklin", rubrik: "versal" },
@@ -76,13 +76,13 @@ export const SCHRIFTPAARE = {
     teehaus: { display: "Gilda Display", gewicht: 400, text: "Zen Kaku Gothic New", rubrik: "versal" },
   },
   thailaendisch: {
-    orchidee: { display: "Yeseva One", gewicht: 400, text: "Karla", rubrik: "kursiv" },
+    orchidee: { display: "Yeseva One", gewicht: 400, text: "Karla", rubrik: "etikett" },
     "streetfood-nacht": { display: "Big Shoulders Display", gewicht: 800, text: "Libre Franklin", rubrik: "versal", versal: true },
     andamanen: { display: "Newsreader", gewicht: 500, text: "Figtree", rubrik: "mono" },
   },
   vietnamesisch: {
-    indochine: { display: "Cormorant Garamond", gewicht: 700, text: "Source Serif 4", rubrik: "kursiv" },
-    "hanoi-nacht": { display: "DM Serif Display", gewicht: 400, text: "Instrument Sans", rubrik: "kursiv" },
+    indochine: { display: "Cormorant Garamond", gewicht: 700, text: "Source Serif 4", rubrik: "etikett" },
+    "hanoi-nacht": { display: "DM Serif Display", gewicht: 400, text: "Instrument Sans", rubrik: "etikett" },
     strassenkueche: { display: "Chivo", gewicht: 800, text: "Karla", rubrik: "mono" },
   },
   japanisch: {
@@ -92,7 +92,7 @@ export const SCHRIFTPAARE = {
   },
   indisch: {
     gewuerzmarkt: { display: "Fjalla One", gewicht: 400, text: "Libre Franklin", rubrik: "versal", versal: true },
-    maharadscha: { display: "Rozha One", gewicht: 400, text: "Instrument Sans", rubrik: "kursiv" },
+    maharadscha: { display: "Rozha One", gewicht: 400, text: "Instrument Sans", rubrik: "etikett" },
     "suedindisch-hell": { display: "Literata", gewicht: 600, text: "Figtree", rubrik: "versal" },
   },
   asiatisch: {
@@ -102,7 +102,7 @@ export const SCHRIFTPAARE = {
   },
   cafe: {
     "wiener-kaffeehaus": { display: "Old Standard TT", gewicht: 700, text: "Libre Franklin", rubrik: "versal" },
-    konditorei: { display: "Rufina", gewicht: 700, text: "Karla", rubrik: "kursiv" },
+    konditorei: { display: "Rufina", gewicht: 700, text: "Karla", rubrik: "etikett" },
     "third-wave": { display: "Schibsted Grotesk", gewicht: 800, text: "Karla", rubrik: "mono" },
   },
 };
@@ -403,7 +403,7 @@ export function leiteTypografieAb(kueche, stimmung, signal) {
       stil: paar.rubrik,
       beschreibung: {
         versal: "Versalien, weit gesperrt (0.14em), klein",
-        kursiv: "kursive Anzeigeschrift in Textgröße – wie ein handgeschriebenes Etikett",
+        etikett: "Anzeigeschrift aufrecht in Einleitungsgröße – wie ein Etikett (keine künstliche Kursive)",
         mono: "Schreibmaschine – Etikett, Zeit, Preis",
       }[paar.rubrik],
     },

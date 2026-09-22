@@ -69,7 +69,7 @@ Herleitung: Akzent gedämpft (#b13a7a → #a54679, Sättigung ×0.8), Referenzen
 
 - **Anzeige:** Yeseva One 400 – festliche Anzeigeantiqua – Orchidee, Seide
 - **Text:** Karla 400/600 – eigenwillige Grotesk mit engen Kurven
-- **Rubriken:** kursive Anzeigeschrift in Textgröße – wie ein handgeschriebenes Etikett
+- **Rubriken:** Anzeigeschrift aufrecht in Einleitungsgröße – wie ein Etikett (keine künstliche Kursive)
 - **Skala:** große Terz (×1.25), Basis 18px
 
 | Stufe | Desktop | Mobil | Einsatz |

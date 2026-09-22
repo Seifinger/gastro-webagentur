@@ -69,7 +69,7 @@ Herleitung: Neutrale warm getönt (#fdfbf7 → #fdfbf7), weil die Referenzen meh
 
 - **Anzeige:** Libre Caslon Display 400 – Caslon in Anzeigegröße – helle Levante, Kochbuch
 - **Text:** Figtree 400/600 – freundliche, offene Textgrotesk
-- **Rubriken:** kursive Anzeigeschrift in Textgröße – wie ein handgeschriebenes Etikett
+- **Rubriken:** Anzeigeschrift aufrecht in Einleitungsgröße – wie ein Etikett (keine künstliche Kursive)
 - **Skala:** kleine Terz (×1.2), Basis 17px
 
 | Stufe | Desktop | Mobil | Einsatz |

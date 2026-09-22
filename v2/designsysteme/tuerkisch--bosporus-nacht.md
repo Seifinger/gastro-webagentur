@@ -69,7 +69,7 @@ Herleitung: Akzent gedämpft (#2b8181 → #347878, Sättigung ×0.8), Referenzen
 
 - **Anzeige:** Gloock 400 – Kontrast-Serife mit scharfen Tropfen – Bosporus bei Nacht
 - **Text:** Instrument Sans 400/600 – präzise, schmal laufende Grotesk
-- **Rubriken:** kursive Anzeigeschrift in Textgröße – wie ein handgeschriebenes Etikett
+- **Rubriken:** Anzeigeschrift aufrecht in Einleitungsgröße – wie ein Etikett (keine künstliche Kursive)
 - **Skala:** Quarte (×1.333), Basis 17px
 
 | Stufe | Desktop | Mobil | Einsatz |

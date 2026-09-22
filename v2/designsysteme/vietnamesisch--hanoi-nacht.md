@@ -68,7 +68,7 @@ Herleitung: Akzent gedämpft (#d08a1f → #be8631, Sättigung ×0.8), Referenzen
 
 - **Anzeige:** DM Serif Display 400 – hoher Kontrast, abendlich – Laternenlicht (aus v1 übernommen)
 - **Text:** Instrument Sans 400/600 – präzise, schmal laufende Grotesk
-- **Rubriken:** kursive Anzeigeschrift in Textgröße – wie ein handgeschriebenes Etikett
+- **Rubriken:** Anzeigeschrift aufrecht in Einleitungsgröße – wie ein Etikett (keine künstliche Kursive)
 - **Skala:** Quarte (×1.333), Basis 17px
 
 | Stufe | Desktop | Mobil | Einsatz |

@@ -69,7 +69,7 @@ Herleitung: Neutrale warm getönt (#fdfbf7 → #fdfbf7), weil die Referenzen meh
 
 - **Anzeige:** Cormorant Garamond 700 – feine, luftige Garamond – Olivenhain, Kolonialhaus
 - **Text:** Source Serif 4 400/600 – lesestarke Textantiqua
-- **Rubriken:** kursive Anzeigeschrift in Textgröße – wie ein handgeschriebenes Etikett
+- **Rubriken:** Anzeigeschrift aufrecht in Einleitungsgröße – wie ein Etikett (keine künstliche Kursive)
 - **Skala:** Quarte (×1.333), Basis 18px
 
 | Stufe | Desktop | Mobil | Einsatz |

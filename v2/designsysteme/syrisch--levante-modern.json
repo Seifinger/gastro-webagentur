@@ -403,8 +403,8 @@
     },
     "label": null,
     "rubrik": {
-      "stil": "kursiv",
-      "beschreibung": "kursive Anzeigeschrift in Textgröße – wie ein handgeschriebenes Etikett"
+      "stil": "etikett",
+      "beschreibung": "Anzeigeschrift aufrecht in Einleitungsgröße – wie ein Etikett (keine künstliche Kursive)"
     },
     "skala": {
       "verhaeltnis": 1.2,
