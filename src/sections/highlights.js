@@ -1,5 +1,5 @@
 import { escapeHtml, formatPrice, joinClasses } from "../htmlHelpers.js";
-import { kuechenMarke, plus } from "../signaturIcons.js";
+import { kuechenMarke, plus, ziffer } from "../signaturIcons.js";
 
 /**
  * Eine Highlight-Karte. `gestaltet` ist die Variante für Archetypen mit
@@ -8,12 +8,13 @@ import { kuechenMarke, plus } from "../signaturIcons.js";
  * braucht einen Schleier, damit es lesbar bleibt, und genau solche Schleier
  * stehen in jeder Vorlage.
  */
-function karte(gericht, { bildUrl, showBadges, beschreibungFuer, medienKlasse, gestaltet, siegel }) {
+function karte(gericht, { bildUrl, showBadges, beschreibungFuer, medienKlasse, gestaltet, siegel, rang }) {
   const veg = showBadges && gericht.vegetarisch ? '<span class="veg">vegetarisch</span>' : "";
   const kat = `<span class="hl-kat">${escapeHtml(gericht.kategorie)}</span>`;
   return `
       <article class="hl-card">
-        <div class="${medienKlasse}">
+        ${rang ? `<div class="hl-rang">${rang}</div>
+        ` : ""}<div class="${medienKlasse}">
           <img src="${escapeHtml(bildUrl(gericht.bild, "gericht"))}" alt="${escapeHtml(gericht.name)}" loading="lazy">
           ${gestaltet ? "" : kat}
         </div>
@@ -31,7 +32,7 @@ function karte(gericht, { bildUrl, showBadges, beschreibungFuer, medienKlasse, g
       </article>`;
 }
 
-function renderHighlightCards(highlights, bildUrl, showBadges, beschreibungFuer, magazin, gestaltet, cuisine) {
+function renderHighlightCards(highlights, bildUrl, showBadges, beschreibungFuer, magazin, gestaltet, cuisine, rangfolge, remotionSignature) {
   // Im Magazin-Raster bekommt das Bild zusätzlich das Hover-Primitiv aus
   // motion.js (.bild-zoom): ruhiger Zoom nur auf Geräten mit echtem Zeiger,
   // abgeschaltet bei prefers-reduced-motion.
@@ -41,7 +42,18 @@ function renderHighlightCards(highlights, bildUrl, showBadges, beschreibungFuer,
   // Hausempfehlung und bekommt als einzige das Siegel mit der Küchenmarke.
   // Welche Form die Anordnung annimmt, entscheidet das CSS des Archetyps –
   // das Markup ist für alle dasselbe.
-  const marke = gestaltet ? kuechenMarke(cuisine) : "";
+  const markeRoh = gestaltet ? kuechenMarke(cuisine) : "";
+  // Opt-in (siehe landingPageGenerator.js, remotionSignature): Dieselbe
+  // Marke, nur in eine Bühne für den Remotion-Player gehüllt – kein eigener
+  // Platz auf der Seite, sondern genau der, den die Marke ohnehin schon hat.
+  // Größe und vertikale Ausrichtung kopieren exakt die .marke-Regel aus
+  // signaturIcons.js (1.9em × 1.9em, vertical-align -.48em), damit das
+  // Siegel sich um kein Pixel verschiebt, ob die Marke steht oder gezeichnet
+  // wird.
+  const marke =
+    markeRoh && remotionSignature
+      ? `<span class="remotion-mount" style="display:inline-block;position:relative;width:1.9em;height:1.9em;vertical-align:-.48em" aria-hidden="true">${markeRoh}</span>`
+      : markeRoh;
   const siegelMarkup = marke
     ? `<span class="hl-siegel">${marke} Hausempfehlung</span>`
     : gestaltet
@@ -57,6 +69,10 @@ function renderHighlightCards(highlights, bildUrl, showBadges, beschreibungFuer,
         medienKlasse,
         gestaltet,
         siegel: gestaltet && i === 0 ? siegelMarkup : "",
+        // Die Rangfolge ist keine Verzierung, sondern die Aussage der
+        // Sektion: "Das bestellen unsere Gäste am liebsten" ist eine Liste
+        // mit einer Reihenfolge. Der helle Archetyp schreibt sie hin.
+        rang: rangfolge ? ziffer(i + 1) : "",
       }),
     )
     .join("");
@@ -80,8 +96,11 @@ function renderHighlightCards(highlights, bildUrl, showBadges, beschreibungFuer,
  *   Kategorie wandert vom Foto in den Textteil; die Anordnung selbst (Treppe
  *   beim traditionellen, Leseliste beim Abend-Archetyp) steckt im CSS.
  * @param {string} [ctx.cuisine] - für die gezeichnete Küchenmarke im Siegel.
+ * @param {boolean} [ctx.remotionSignature] - Opt-in, kein Preset-Feld (siehe
+ *   landingPageGenerator.js): Die Küchenmarke im Siegel der Hausempfehlung
+ *   wird dann strichweise gezeichnet statt fertig zu stehen.
  */
-export function renderHighlights({ highlights, bildUrl, showBadges, beschreibungFuer, spalten, gridStyle, handschrift, cuisine }) {
+export function renderHighlights({ highlights, bildUrl, showBadges, beschreibungFuer, spalten, gridStyle, handschrift, cuisine, remotionSignature }) {
   const magazin = gridStyle === "asymmetric";
   if (magazin) {
     return `
@@ -117,6 +136,7 @@ export function renderHighlights({ highlights, bildUrl, showBadges, beschreibung
   // Die Anzahl steht im Markup, weil die Anordnung von ihr abhängt: Beim
   // traditionellen Archetyp wird aus 3 Karten 1 große und 2 halbe, aus 4 eine
   // große und 3 Drittel. In CSS allein ließe sich das nicht sauber trennen.
+  const rangfolge = handschrift === "hell";
   const rasterKlasse = gestaltet
     ? `hl-grid hl-anordnung hl-anordnung--${highlights.length}`
     : `hl-grid ${spalten}`;
@@ -134,7 +154,7 @@ export function renderHighlights({ highlights, bildUrl, showBadges, beschreibung
       <p>Alles frisch zubereitet. Zum Abholen einfach vorbestellen und zur Wunschzeit mitnehmen.</p>
     </div>
 
-    <div class="${rasterKlasse}">${renderHighlightCards(highlights, bildUrl, showBadges, beschreibungFuer, false, gestaltet, cuisine)}</div>
+    <div class="${rasterKlasse}">${renderHighlightCards(highlights, bildUrl, showBadges, beschreibungFuer, false, gestaltet, cuisine, rangfolge, remotionSignature)}</div>
 
     <div class="steps">
       <div class="step">

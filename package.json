@@ -13,13 +13,21 @@
     "resonanz": "node src/resonanzServer.js",
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "preview": "node src/previewServer.js",
-    "engine-status": "node scripts/engineStatus.mjs"
+    "engine-status": "node scripts/engineStatus.mjs",
+    "build:motion": "node scripts/buildRemotionPlayer.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",
+    "@remotion/player": "4.0.527",
     "dotenv": "^16.4.5",
     "pdfkit": "^0.20.2",
     "qrcode": "^1.5.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remotion": "4.0.527",
     "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
   }
 }

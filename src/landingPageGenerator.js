@@ -10,7 +10,7 @@ import { SIGNATUR_CSS, signaturCssFuer } from "./heroSignature.js";
 import { MOTION_CSS, MOTION_SCRIPT, MOTION_EXTRA_CSS, MOTION_EXTRA_SKRIPT } from "./motion.js";
 import { EDITORIAL_CSS, TYPOGRAFIE_CSS } from "./styles/editorial.css.js";
 import { handschriftCss, handschriftKlasse } from "./styles/handschrift.css.js";
-import { checkCircle, warnung } from "./signaturIcons.js";
+import { checkCircle, warnung, hatKuechenMarke } from "./signaturIcons.js";
 import { resonanzSkript } from "./resonanzBeacon.js";
 import { engineMarkerMeta } from "./engineVersion.js";
 import { getPresetVariant, withDesignDefaults, presetFuerArchetyp } from "./designPresets.js";
@@ -995,6 +995,43 @@ const PAGE_SCRIPT = `
 })();
 `;
 
+// Der Bootstrap für den Remotion-Player: absichtlich als winziges Inline-
+// Skript, nicht als weiterer <script src>. Das Bündel selbst
+// (docs/assets/motion/signature-player.js, gebaut über
+// scripts/buildRemotionPlayer.mjs) wiegt ~168 kB gzip – React, react-dom und
+// Remotion für eine einzige gezeichnete Marke. Damit Seiten, bei denen
+// niemand bis dorthin scrollt oder liest, dafür nie bezahlen, lädt dieses
+// Skript das Bündel erst per IntersectionObserver, kurz bevor die Marke ins
+// Bild kommt – dieselbe Zurückhaltung wie bei loading="lazy" auf den Fotos.
+function remotionBootstrapScript(assets) {
+  return `
+<script>
+(function () {
+  function einrichten() {
+    // .remotion-mount steckt im Siegel der Hausempfehlung, weit unten in
+    // der Highlights-Sektion – dieses Skript steht aber gleich nach <body>,
+    // damit es so früh wie möglich lädt. Ohne DOMContentLoaded fände
+    // querySelector hier noch nichts.
+    var el = document.querySelector(".remotion-mount");
+    if (!el) return;
+    var geladen = false;
+    function laden() {
+      if (geladen) return;
+      geladen = true;
+      import("${assets}/motion/signature-player.js");
+    }
+    if (!("IntersectionObserver" in window)) { laden(); return; }
+    var beobachter = new IntersectionObserver(function (eintraege) {
+      if (eintraege.some(function (e) { return e.isIntersecting; })) { laden(); beobachter.disconnect(); }
+    }, { rootMargin: "200px" });
+    beobachter.observe(el);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", einrichten);
+  else einrichten();
+})();
+</script>`;
+}
+
 /**
  * Baut eine eigenständige HTML-Landingpage für einen Lead. Aufbau folgt dem
  * Bestellweg: Hero mit Konzept, Ort und Bewertung ohne Scrollen, feste
@@ -1017,6 +1054,11 @@ export function buildLandingPage(lead, options = {}) {
   // jede bereits veröffentlichte Seite sonst mit dem nächsten Publish andere
   // Bytes bekäme; wo eine Handschrift im Spiel ist, wird gefiltert.
   const signaturStil = handschrift ? signaturCssFuer(gestaltung.cuisine) : SIGNATUR_CSS;
+  // Opt-in, kein Preset-Feld: gilt nur, wenn der Aufruf es ausdrücklich
+  // verlangt (options.remotionSignature === true), und nur dort, wo die
+  // Küche überhaupt eine gezeichnete Marke hat. Jede bisherige Seite bleibt
+  // ohne diese Zeile Zeichen für Zeichen dieselbe.
+  const remotionSignature = Boolean(options.remotionSignature) && Boolean(handschrift) && hatKuechenMarke(gestaltung.cuisine);
   const openingHours = options.öffnungszeiten ?? DEFAULT_OPENING_HOURS;
   const kontaktEmail = options.kontaktEmail ?? "";
   const assets = options.assetsPath ?? "../assets";
@@ -1189,7 +1231,7 @@ ${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraB
 </style>
 </head>
 <body${bodyKlassen ? ` class="${bodyKlassen}"` : ""}>
-
+${remotionSignature ? `${remotionBootstrapScript(assets)}\n` : ""}
 ${
   veroeffentlicht
     ? `<div class="entwurf-hinweis"><span>${
@@ -1226,7 +1268,7 @@ ${(() => {
   // alles, was in der Vorgabe fehlt, wird in der bisherigen Reihenfolge
   // angehängt (das bisherige, feste Verhalten als Fallback).
   const sectionsById = {
-    highlights: renderHighlights({ highlights, bildUrl, showBadges: preset.menu.showBadges, beschreibungFuer, spalten, gridStyle: preset.layout.gridStyle, handschrift, cuisine: gestaltung.cuisine }),
+    highlights: renderHighlights({ highlights, bildUrl, showBadges: preset.menu.showBadges, beschreibungFuer, spalten, gridStyle: preset.layout.gridStyle, handschrift, cuisine: gestaltung.cuisine, remotionSignature }),
 
     karte: renderMenu({ menu, menuLayout: preset.menu.layout, showBadges: preset.menu.showBadges, beschreibungFuer, handschrift }),
 

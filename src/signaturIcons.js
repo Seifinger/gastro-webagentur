@@ -53,6 +53,45 @@ export const KONTAKT_IKONEN = {
 };
 
 /**
+ * Die Ziffern eins bis sechs, mit der Hand gezogen. Sie stehen dort, wo eine
+ * Seite zaehlt: in der Rangfolge der Highlights und an den drei Schritten des
+ * Abholwegs. Eine gesetzte Ziffer in einem Kreis ist die Vorlagenform dafuer;
+ * diese hier sind krumm, und genau darum erkennt man sie wieder.
+ */
+const ZIFFERN = {
+  1: '<path d="M9.4 7.9 13.1 5v14"/><path d="M9.2 19.2h7"/>',
+  2: '<path d="M7.4 8.6c.4-2.5 3-3.8 5.2-3.1 2.4.8 3.1 3.4 1.5 5.4-1.7 2.1-4.8 4-6.8 8.3h8.9"/>',
+  3: '<path d="M7.6 6.3c2.5-1.6 6.4-1 6.9 1.8.3 2-1.5 3.3-3.5 3.4 2.5-.1 4.4 1.3 4.2 3.6-.3 3-4.7 3.9-7.5 2.1"/>',
+  4: '<path d="M14.8 19.1V5.1L6.5 15.2h10.9"/>',
+  5: '<path d="M15.4 5.2H9.1l-.8 5.3c2.4-1.1 5.5-.6 6.6 1.6 1.2 2.4-.4 5.4-3.4 5.9-1.8.3-3.4-.2-4.4-1.2"/>',
+  6: '<path d="M15.1 5.1c-3.6.6-6.5 3.7-6.9 7.8-.3 3.1 1.6 5.5 4.2 5.6 2.3.1 4.1-1.6 4.1-3.8 0-2.1-1.7-3.6-3.8-3.5-1.9.1-3.4 1.3-4.2 3"/>',
+};
+
+/**
+ * Eine gezeichnete Ziffer. Unbekannte Zahlen kommen als gesetzter Text
+ * zurueck – lieber eine schlichte Ziffer als gar keine.
+ *
+ * @param {number|string} n
+ */
+export function ziffer(n) {
+  const d = ZIFFERN[Number(n)];
+  return d ? strich("0 0 24 24", d, "ikon ikon-ziffer") : String(n);
+}
+
+/**
+ * Die Uhr der Oeffnungszeiten. Ihr Rund ist bewusst nicht geschlossen: Ein
+ * exakter Kreis waere ein Symbol aus der Bibliothek, dieser hier ist
+ * gezogen.
+ */
+export function uhr() {
+  return strich(
+    "0 0 24 24",
+    '<path d="M13.2 4.3a7.8 7.8 0 1 1-6.4 3.1"/><path d="M12 7.9v4.4l3.3 2"/>',
+    "ikon ikon-uhr",
+  );
+}
+
+/**
  * Der Haken der USP-Leiste und der Reservierungs-Pluspunkte. Ein Strich mit
  * ungleichen Schenkeln statt des gesetzten ✓.
  */
@@ -184,14 +223,26 @@ export function hatKuechenMarke(cuisine) {
  * gar nicht erst zu sehen, und keine Regel daraus kann einen anderen
  * Archetyp erreichen.
  *
+ * Ein Archetyp bekommt nur die Regeln der Zeichen, die er auch zeichnet:
+ * Eine Regel fuer eine gezeichnete Ziffer auf einer Seite ohne Ziffern ist
+ * Gewicht ohne Wirkung. Was alle brauchen, steht in der Grundmenge.
+ *
  * @param {string} klasse - z. B. "hs-traditionell".
+ * @param {object} [zusatz] - welche zusaetzlichen Zeichen der Archetyp nutzt.
+ * @param {boolean} [zusatz.ziffer]
+ * @param {boolean} [zusatz.uhr]
  */
-export function ikonenCss(klasse) {
-  return `
-.${klasse} .ikon { width: 1.35em; height: 1.35em; flex: none; vertical-align: -.26em; }
-.${klasse} .ikon-haken { width: 1.05em; height: 1.05em; opacity: .9; }
-.${klasse} .ikon-stern { width: 1.15em; height: 1.15em; }
-.${klasse} .ikon-gedeck { width: 2.1em; height: 2.1em; vertical-align: -.62em; }
-.${klasse} .marke { width: 1.9em; height: 1.9em; flex: none; vertical-align: -.48em; }
-`;
+export function ikonenCss(klasse, zusatz = {}) {
+  const zeilen = [
+    `.${klasse} .ikon { width: 1.35em; height: 1.35em; flex: none; vertical-align: -.26em; }`,
+    `.${klasse} .ikon-haken { width: 1.05em; height: 1.05em; opacity: .9; }`,
+    `.${klasse} .ikon-stern { width: 1.15em; height: 1.15em; }`,
+  ];
+  if (zusatz.ziffer) zeilen.push(`.${klasse} .ikon-ziffer { width: 1em; height: 1em; vertical-align: -.14em; }`);
+  if (zusatz.uhr) zeilen.push(`.${klasse} .ikon-uhr { width: 1.2em; height: 1.2em; }`);
+  zeilen.push(
+    `.${klasse} .ikon-gedeck { width: 2.1em; height: 2.1em; vertical-align: -.62em; }`,
+    `.${klasse} .marke { width: 1.9em; height: 1.9em; flex: none; vertical-align: -.48em; }`,
+  );
+  return `\n${zeilen.join("\n")}\n`;
 }

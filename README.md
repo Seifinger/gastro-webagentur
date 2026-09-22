@@ -294,6 +294,16 @@ Eine neue Küche braucht in dieser Reihenfolge: einen Eintrag in `menuCatalog.js
 
 Stockfotos (Unsplash) und Schriften (Google Fonts, alle unter der SIL Open Font License) werden beim ersten Lauf **einmalig heruntergeladen** und unter `data/landingpages/assets/` abgelegt. Danach funktionieren die Entwürfe komplett offline – praktisch, wenn du sie beim Termin im Lokal auf dem Laptop zeigst und dort kein Empfang ist. Ein erneuter Lauf lädt nur noch Fehlendes nach. Schlägt der Schriften-Download fehl, greifen die Seiten auf Systemschriften zurück.
 
+### Live-Animation mit Remotion (opt-in, standardmäßig aus)
+
+Eine Sonderoption, keine Voreinstellung: `buildLandingPage(lead, { ..., remotionSignature: true })` zeichnet die gezeichnete Küchenmarke im Siegel der Hausempfehlung (erste Karte der Highlights) strichweise nach, statt sie fertig zu zeigen – über [Remotion](https://www.remotion.dev/docs) (`@remotion/player`) und React, live im Browser, nicht als vorgerendertes Video. Details, Kosten und Grenzen stehen in [`docs-intern/remotion-signature.md`](docs-intern/remotion-signature.md); kurz zusammengefasst:
+
+- **Baue das Bündel einmal**, bevor du die Option nutzt: `npm run build:motion` schreibt `docs/assets/motion/signature-player.js` (self-hosted, wie Schriften und Bilder – kein CDN).
+- **Kostet spürbar Gewicht**: React + Remotion für eine einzige Marke sind ~168 kB gzip, geladen erst per `IntersectionObserver`, kurz bevor die Marke ins Bild kommt – aber eben doch geladen, für alle, die so weit scrollen.
+- **Respektiert `prefers-reduced-motion`** vollständig: Ohne Bewegung bleibt die serverseitig schon fertig gezeichnete Marke stehen, der Player mountet gar nicht erst.
+- **Kein Preset-Feld**, sondern eine Generator-Option: Jede der 48 veröffentlichten Seiten bleibt ohne die Option Zeichen für Zeichen dieselbe (siehe `test/remotionSignature.test.js`).
+- **Lizenz beachten**: Remotion ist für Einzelpersonen und kleine Unternehmen (bis 3 Beschäftigte) kostenlos nutzbar, größere brauchen eine Company License – siehe [remotion.dev/license](https://remotion.dev/license).
+
 ### Gästestimmen
 
 Vor der Reservierung steht eine Referenzen-Sektion. Auf den Entwürfen echter Häuser bleiben die drei Plätze **bewusst leer** und zeigen nur den Aufbau – die einzige echte Sozialbestätigung dort ist die Google-Gesamtnote.

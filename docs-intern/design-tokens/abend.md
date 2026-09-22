@@ -71,10 +71,80 @@ gilt `accentBold` (alle sieben Werte dort ≥ 4.5:1).
 
 ## Spacing-Raster
 
-Identisch zum Archetyp `traditionell` (dieselbe `PAGE_STYLES`-Basis, siehe
-`traditionell.md`). Abweichend ist allein die Sektionsreihenfolge und die
-gestapelte Stimmen-Spalte (`.stimmen-grid--list`, `max-width: 640px`,
-`landingPageGenerator.js:404`).
+Gemessen liefen auf der Seite **17 verschiedene `gap`-Werte** nebeneinander –
+6, 7, 8, 9, 10, 12, 14, 15, 16, 18, 20, 22, 24, 26, 30, 54, 60 px. Jeder
+einzeln entschieden statt abgeleitet; 7 px und 9 px passen zu keinem
+Vielfachen von irgendetwas. Es gelten jetzt **fünf Stufen aus derselben Acht**,
+deklariert auf `.hs-abend`:
+
+| Token | Wert | Wofür |
+| --- | --- | --- |
+| `--r-1` | `8px` | Innerhalb eines Elements: Icon zu Wort, Zeile zu Zeile im Kartenkörper |
+| `--r-2` | `16px` | Zwischen Geschwistern einer Gruppe: Formularfeld, Kontaktzeile, Öffnungszeit |
+| `--r-3` | `24px` | Zwischen Gruppen: Navigation, Abholschritte, Fotopaar |
+| `--r-4` | `32px` | Die Spaltenrinne der USP-Leiste |
+| `--r-5` | `56px` | Die Rinne zwischen den beiden Hauptspalten einer Sektion |
+
+Die Sektionspolster sind Vielfache derselben Acht: `88px` (11×8) für jede
+Sektion, `104px` (13×8) oben am Ambiente, `128px` (16×8) für die
+Reservierung – die einzige Sektion mit zusätzlicher Luft, weil sie der eine
+Moment ist. Vorher standen dort `124px`, der einzige Wert außerhalb des
+Rasters.
+
+Im Übrigen weiterhin dieselbe `PAGE_STYLES`-Basis wie `traditionell`.
+Abweichend ist die Sektionsreihenfolge und die gestapelte Stimmen-Spalte
+(`.stimmen-grid--list`, `max-width: 640px`, `landingPageGenerator.js:404`).
+
+## Die Schriftskala
+
+Gemessen stand im Fließbereich **jeder Ganzzahlwert von 11 bis 20 px** auf der
+Seite: 11, 12, 13, 14, 15, 16, 17, 18, 19, 20. Zehn Stufen, von denen keine
+zwei nebeneinander unterscheidbar waren – das ist keine Skala, sondern eine
+Liste von Zufällen. Es gelten jetzt **vier Fließstufen und drei
+Anzeigestufen**, jede mit einer Aufgabe:
+
+| Token | Wert | Rolle |
+| --- | --- | --- |
+| `--t-xs` | `12px` | Text, der etikettiert: Küchenmarke, Kategorie, Abzeichen, Platzhalter-Pille |
+| `--t-s` | `14px` | Beiwerk: Gerichtbeschreibung, Hinweis, Öffnungszeit, Fußnote |
+| `--t-m` | `17px` | Lesegröße: Fließtext, Gerichtzeile, jeder Knopf |
+| `--t-l` | `21px` | Die Stimme des Hauses: Preis, Kategorietitel, Wortmarke, Hero-Vorspann |
+| `--d-3` | `clamp(26px, 3.2vw, 34px)` | Sektionsüberschrift, Name der Hausempfehlung, die Bewertungszahl |
+| `--d-2` | `clamp(32px, 4.4vw, 46px)` | Allein die Reservierung – der eine Moment darf größer auftreten |
+| `--d-1` | `clamp(40px, 6.4vw, 70px)` | Der Name des Hauses im Hero |
+
+Die Regel dahinter: **keine zwei Stufen liegen an irgendeiner Breite näher
+als ein Fünftel beieinander.** Vorher klemmten bei 390 px zwei gleichrangige
+Sektionsköpfe auf 28 px und 26 px – 2 px auseinander in derselben
+Anzeigeschrift liest sich nicht als Rang, sondern als Versehen. Geprüft wird
+das bei 390, 768 und 1440 px.
+
+## Die Bewegungssprache
+
+Zwei Kurven, sonst keine. Der Browser-Standard `ease` ist in jeder
+generierten Seite derselbe und hat hier deshalb nichts zu suchen.
+
+| Token | Wert | Wofür |
+| --- | --- | --- |
+| `--ease-ruhig` | `cubic-bezier(.22,.61,.36,1)` | Oberfläche und Rückmeldung auf einen Griff: Kopfzeile, Knöpfe, Warenkorb |
+| `--ease-moment` | `cubic-bezier(.5,0,.1,1)` | Allein der Auftritt der Reservierung, 0,9 s |
+
+Auf der gerenderten Seite laufen damit sieben Übergänge, alle über eines
+dieser beiden Token, und keine Endlosschleife.
+
+## Die Farbrolle der Hauptaktion
+
+Die **gefüllte Goldfläche gehört der Reservierung und sonst nichts**. Sie
+steht im Hero, in der mobilen Aktionsleiste und im Formular. Solange der Hero
+im Bild ist, bleibt der Knopf in der Kopfzeile Kontur – zwei gefüllte Flächen
+für dieselbe Handlung wären eine zu viel. Sobald der Hero heraus ist, ist der
+Kopfzeilen-Knopf der einzige mitlaufende Weg zur Reservierung (die bei rund
+85 % Scrolltiefe liegt) und übernimmt die Goldfläche.
+
+Umgesetzt als Zustandswechsel auf einer Scroll-Zeitachse
+(`view-timeline: --abend-hero`, `steps(1, jump-end)`), nicht als Bewegung –
+er läuft deshalb auch bei `prefers-reduced-motion`. Wo die Scroll-Zeitachse
+fehlt, steht der Knopf durchgehend gefüllt: lieber zu stark als übersehen.
 
 ## Der eine starke Moment
 
@@ -155,6 +225,31 @@ der auf den Gründen der Seite Text tragen kann. Auf hellen Gründen wird er
 dunkler, auf den dunklen Gründen dieses Archetyps heller. Geprüft wird
 gegen `bg`, `surface` und `soft` – siehe `scripts/colorSwatchCheck.mjs`.
 
+## Farbe über dem Herofoto
+
+Auf dem Foto spricht das Haus in **Weiß**; das Gold fängt an, wo die Seite
+anfängt. Hero-Kicker und Sternzeile standen zunächst in der Akzentfarbe
+direkt auf dem Bild. Pixelgenau gegen den gerenderten Hintergrund gemessen
+(alle zwölf Küchen, 390 px und 1440 px) lagen davon bis zu **100 % der
+Textfläche unter 4.5:1**, im schlimmsten Fall bei **1.60:1** (café, 390 px).
+
+Eine andere Akzentfarbe löst das nicht: Cafés `accentBold` `#cd3b72` erreicht
+gegen *jeden* dunkleren Grund rechnerisch nie 4.5:1 – es bräuchte einen
+nahezu weißen Grund. Ein dichterer Schleier löst es auch nicht, ohne das Foto
+zu ruinieren. Farbiger Kleintext auf einem Foto ist über zwölf Paletten
+hinweg nicht absicherbar, also steht dort keiner mehr.
+
+Gemessen nach der Änderung: alle zwölf Küchen, beide Breiten, **kein
+einziges Pixel unter 4.5:1**, schlechtester Einzelwert 5.01:1.
+
+## Kanten
+
+`--radius` gilt hier für **jede** Fläche, auch für Knöpfe und Abzeichen. Die
+999-px-Pille ist die generischste Knopfform überhaupt; neben einer
+2-px-Bildkante ist sie kein Kontrast, sondern eine vergessene Stelle. Rund
+bleibt allein, was rund gemeint ist: die Ziffer des Abholwegs, der Zähler am
+Warenkorb und das Haken-Rund der Bestätigung.
+
 ## Verbotene Muster
 
 Zusätzlich zu den sieben gemeinsamen Regeln aus `README.md`:
@@ -172,3 +267,19 @@ Zusätzlich zu den sieben gemeinsamen Regeln aus `README.md`:
   Ein Sushi-Band, das endlos durchs Bild fährt, ist Betrieb, nicht Abend.
 - **Kein mittig gesetzter Sektionskopf.**
 - **Keine generischen Symbolschriften** (siehe `traditionell.md`).
+- **Kein `ease`.** Jeder Übergang referenziert `--ease-ruhig` oder
+  `--ease-moment`.
+- **Kein Schriftgrad und kein Abstand außerhalb der Skala.** Neue Größen
+  kommen aus `--t-*`/`--d-*`, neue Abstände aus `--r-*`. Wer eine neue Stufe
+  braucht, ändert die Skala hier und begründet sie – er setzt keinen
+  Einzelwert.
+- **Die gefüllte Goldfläche steht in einer Ansicht genau einmal.** Zwei
+  Gestalten für dieselbe Handlung zwingen den Gast, die Gleichheit aus dem
+  Text zu erschließen statt aus der Form.
+- **Keine Akzentfarbe als Text auf einem Foto.** Über dem Hero trägt Text
+  Weiß. Wer dort eine Farbe setzen will, muss sie pixelgenau für alle zwölf
+  Küchen messen – nicht gegen `--bg`, sondern gegen das Bild.
+- **Keine Pillenform.** Auch Knöpfe und Abzeichen tragen `--radius`.
+- **Keine Sektion, in der eine Spalte offensichtlich leer ausläuft.** Wo zwei
+  Spalten verschieden hoch sein wollen, wird die Höhe geteilt (siehe die
+  Leseliste der Highlights), nicht das Loch stehen gelassen.
