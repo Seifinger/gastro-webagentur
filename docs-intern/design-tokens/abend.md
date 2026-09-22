@@ -225,6 +225,31 @@ der auf den Gründen der Seite Text tragen kann. Auf hellen Gründen wird er
 dunkler, auf den dunklen Gründen dieses Archetyps heller. Geprüft wird
 gegen `bg`, `surface` und `soft` – siehe `scripts/colorSwatchCheck.mjs`.
 
+## Farbe über dem Herofoto
+
+Auf dem Foto spricht das Haus in **Weiß**; das Gold fängt an, wo die Seite
+anfängt. Hero-Kicker und Sternzeile standen zunächst in der Akzentfarbe
+direkt auf dem Bild. Pixelgenau gegen den gerenderten Hintergrund gemessen
+(alle zwölf Küchen, 390 px und 1440 px) lagen davon bis zu **100 % der
+Textfläche unter 4.5:1**, im schlimmsten Fall bei **1.60:1** (café, 390 px).
+
+Eine andere Akzentfarbe löst das nicht: Cafés `accentBold` `#cd3b72` erreicht
+gegen *jeden* dunkleren Grund rechnerisch nie 4.5:1 – es bräuchte einen
+nahezu weißen Grund. Ein dichterer Schleier löst es auch nicht, ohne das Foto
+zu ruinieren. Farbiger Kleintext auf einem Foto ist über zwölf Paletten
+hinweg nicht absicherbar, also steht dort keiner mehr.
+
+Gemessen nach der Änderung: alle zwölf Küchen, beide Breiten, **kein
+einziges Pixel unter 4.5:1**, schlechtester Einzelwert 5.01:1.
+
+## Kanten
+
+`--radius` gilt hier für **jede** Fläche, auch für Knöpfe und Abzeichen. Die
+999-px-Pille ist die generischste Knopfform überhaupt; neben einer
+2-px-Bildkante ist sie kein Kontrast, sondern eine vergessene Stelle. Rund
+bleibt allein, was rund gemeint ist: die Ziffer des Abholwegs, der Zähler am
+Warenkorb und das Haken-Rund der Bestätigung.
+
 ## Verbotene Muster
 
 Zusätzlich zu den sieben gemeinsamen Regeln aus `README.md`:
@@ -251,6 +276,10 @@ Zusätzlich zu den sieben gemeinsamen Regeln aus `README.md`:
 - **Die gefüllte Goldfläche steht in einer Ansicht genau einmal.** Zwei
   Gestalten für dieselbe Handlung zwingen den Gast, die Gleichheit aus dem
   Text zu erschließen statt aus der Form.
+- **Keine Akzentfarbe als Text auf einem Foto.** Über dem Hero trägt Text
+  Weiß. Wer dort eine Farbe setzen will, muss sie pixelgenau für alle zwölf
+  Küchen messen – nicht gegen `--bg`, sondern gegen das Bild.
+- **Keine Pillenform.** Auch Knöpfe und Abzeichen tragen `--radius`.
 - **Keine Sektion, in der eine Spalte offensichtlich leer ausläuft.** Wo zwei
   Spalten verschieden hoch sein wollen, wird die Höhe geteilt (siehe die
   Leseliste der Highlights), nicht das Loch stehen gelassen.

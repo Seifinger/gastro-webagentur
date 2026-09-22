@@ -425,6 +425,17 @@ const ABEND = `
 .hs-abend .mini-add { color: var(--accent-bold); }
 .hs-abend .add-btn, .hs-abend .mini-add { border-color: var(--accent-bold); }
 
+/* Gerade Kanten auch an den Knoepfen: --radius gilt hier fuer jede Flaeche.
+   Rund bleibt allein, was rund gemeint ist – die Ziffer des Abholwegs, der
+   Zaehler am Warenkorb, das Haken-Rund der Bestaetigung. */
+.hs-abend .btn,
+.hs-abend .add-btn,
+.hs-abend .mini-add,
+.hs-abend .veg,
+.hs-abend .placeholder-badge,
+.hs-abend .usp-platzhalter,
+.hs-abend .cart-fab { border-radius: var(--radius); }
+
 /* Die gefuellte Goldflaeche gehoert der Reservierung und sonst nichts. */
 .hs-abend .hero-actions .btn-light { background: var(--accent); color: var(--on-accent); }
 .hs-abend .hero-actions .btn-light:hover { background: var(--accent-dark); }
@@ -454,6 +465,20 @@ const ABEND = `
 .hs-abend .kat > summary:hover { color: var(--accent-bold); }
 .hs-abend .stimmen-note .sterne,
 .hs-abend .stimme .sterne { color: var(--gold-dunkel); }
+/* Auf dem Foto spricht das Haus in Weiss, das Gold faengt an, wo die Seite
+   anfaengt: Farbiger Kleintext auf einem Foto laesst sich ueber zwoelf
+   Paletten nicht auf 4.5:1 absichern. Messung und Begruendung in
+   docs-intern/design-tokens/abend.md. */
+.hs-abend .hero-kicker, .hs-abend .hero .stars { color: #fff; }
+
+/* Das Formular fuehrt sonst als einziger Bereich eine fremde Groesse. */
+.hs-abend input, .hs-abend select, .hs-abend textarea {
+  font-size: var(--t-m); padding: 12px var(--r-2); line-height: 1.5;
+}
+/* Native Felder rechnen ihre Hoehe jeweils anders aus; in einer Zeile
+   laufen die Unterkanten sonst auseinander. 48 = 6x8. */
+.hs-abend input:not([type="checkbox"]):not([type="radio"]),
+.hs-abend select { height: 48px; padding-block: 0; box-sizing: border-box; }
 
 /* --- Keine Mittelachse -------------------------------------------------- */
 .hs-abend .section-head.mitte { margin-left: 0; margin-right: 0; text-align: left; }
@@ -536,8 +561,9 @@ const ABEND = `
   .hs-abend .hl-anordnung--3 { grid-template-rows: repeat(2, 1fr); }
   .hs-abend .hl-anordnung--4 { grid-template-rows: repeat(3, 1fr); }
   .hs-abend .hl-anordnung--6 { grid-template-rows: repeat(5, 1fr); }
-  /* Quadratisch statt hochkant, sonst faellt die Liste daneben auseinander. */
-  .hs-abend .hl-anordnung > .hl-card:first-child .hl-media { aspect-ratio: 1 / 1; }
+  /* Breiter Anschnitt statt Hochformat: Ein hohes Bild zwingt die zwei
+     Zeilen daneben auseinander (gemessen 62 % Leerraum je Zeile). */
+  .hs-abend .hl-anordnung > .hl-card:first-child .hl-media { aspect-ratio: 2 / 1; }
   .hs-abend .hl-anordnung > .hl-card:first-child .hl-name { font-size: var(--d-3); }
   .hs-abend .hl-anordnung > .hl-card:not(:first-child) {
     grid-column: 2; border-top: 1px solid var(--line);
