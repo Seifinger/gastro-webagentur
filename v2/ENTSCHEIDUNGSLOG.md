@@ -56,3 +56,46 @@ Neueste Einträge unten.
   `--ignore-certificate-errors-spki-list` genau dem Proxy-CA (SPKI-Pin), die
   Zertifikatsprüfung bleibt für alles andere aktiv. Außerhalb der Sandbox greift das
   nur, wenn `V2_PROXY_CA` gesetzt ist.
+
+## Stage 2 – Designsystem-Generator
+
+- **E2.1 · Eigenes Schriftpaar je Stimmung, keine Inter mehr als Textschrift.** v1 setzt
+  Inter unter alle 36 Welten – genau das macht die Seiten verwechselbar. v2 wählt je
+  Stimmung Anzeige- *und* Textschrift (45 Familien, alle OFL, lokal gehostet). Leitlinie
+  der Auswahl: die Schrift erzählt vom Ort, nicht vom Trend – Vollkorn (Wirtshaus,
+  „Werkserife“), Bodoni Moda (Osteria Notte, Parma), Old Standard TT (Kaffeehaus-Zeitung),
+  Amiri (Damaszener Hof, Naskh-Buchantiqua), Shippori/Zen Old Mincho (Omakase/Washitsu),
+  Big Shoulders/Barlow Condensed für Markt- und Grillschilder. Die Referenzanalyse
+  bestätigt oder widerspricht der Schriftart; das steht je Dokument unter „Herleitung“.
+- **E2.2 · Verbotene Schriften über Inter/Roboto/system-ui hinaus.** Ebenfalls
+  ausgeschlossen: Montserrat, Poppins, DM Sans, Manrope, Plus Jakarta Sans, Space
+  Grotesk, Syne, Satoshi, Outfit, Clash/General Sans, Open Sans, Lato, Raleway. Grund:
+  Sie sind die Standardausgabe generierter Landing-Pages. Damit entfallen auch die vier
+  Montserrat-Stimmungen aus DESIGN.md (⚠) – dort stehen jetzt Tenor Sans (Athener
+  Moderne), Poiret One (Shanghai Nacht), Antonio (Izakaya), Saira Extra Condensed (Neon).
+- **E2.3 · Farben: v1-Palette als Basis, Referenzen als Korrektiv.** Die v1-Paletten sind
+  bereits gegen 288 Farbpaare geprüft und tragen die Küchenidentität. v2 verschiebt sie
+  nur: Temperatur der Referenzen tönt die Neutralen, gedeckte Referenzen dämpfen den
+  Akzent (×0,8/0,9 Sättigung), ein Referenz-Akzent derselben Farbfamilie (≤ 35° Farbton-
+  abstand) zieht den eigenen um 20 %. Danach werden alle 23 Kontrastpaare gesichert,
+  inklusive 3:1 Knopf-gegen-Grund (WCAG 1.4.11) – das fing den Gewürzmarkt-Orange ab.
+- **E2.4 · Jede Farbe hat genau eine Aufgabe.** 18 Rollen (grund, flaeche, flaecheTief,
+  text, textLeise, linie, linieStark, akzent, akzentTief, aufAkzent, akzentText, signal,
+  signalText, tint, aufTint, aufTintLeise, signalAufTint, fehler). Der Akzent ist
+  ausschließlich Handlung (Knöpfe, aktive Zustände, max. 8 % Fläche). Gold („signal“)
+  ist nie Fläche.
+- **E2.5 · 8px-Raster mit genau einem Halbschritt (4px).** Kleine Marken (Badges,
+  Mengenknöpfe) brauchen 4px; alles andere liegt auf 8. Sektionsabstand aus der Dichte
+  der Referenzen (luftig 128 / ausgewogen 96 / dicht 80px).
+- **E2.6 · Sechs Hero-Aufbauten, je Archetyp vier erlaubt.** spalte-bild, tafel, karte,
+  typo, passepartout, streifen – strukturell verschieden (eigene `struktur`-Signatur).
+  Kein Aufbau setzt Text auf ein Foto mit Verlaufsschleier; die Tafel ist deckend.
+  Symmetrische Referenzen schieben die versetzten Aufbauten nach hinten.
+- **E2.7 · Schatten nur im traditionellen Haus.** Dunkle Häuser (Schatten unsichtbar) und
+  helle Häuser (flach) arbeiten mit Kanten. „Weicher Schatten auf jeder Karte“ gilt als
+  Template-Merkmal.
+- **E2.8 · Bild- und Sprachkanon gleich mit im Dokument.** Damit jedes Designsystem ein
+  vollständiges Dokument ist, schreibt der Generator schon in Stage 2 Bildkanon
+  (Stage 4 nutzt ihn für Prompts) und Sprachkanon (Stage 6 für den Copy-Refiner) mit.
+- **E2.9 · Designsysteme sind generiert, nicht handgepflegt.** Ein Test prüft, dass die
+  eingecheckten JSON-Dateien exakt der Generatorausgabe entsprechen.
