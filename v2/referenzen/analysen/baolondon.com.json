@@ -1,0 +1,80 @@
+{
+  "url": "https://www.baolondon.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:31:00.150Z",
+  "titel": "BAO - Award Winning Taiwanese Restaurants & Karaoke Rooms",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#f9f9f5",
+        "anzahl": 3091275
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 1296000
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 251940
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 2
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 137
+      },
+      {
+        "hex": "#4b4b4a",
+        "anzahl": 29
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 18
+      },
+      {
+        "hex": "#f20000",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#f20000"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Brown",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 36,
+    "bodyPx": 14,
+    "kontrastVerhaeltnis": 2.57,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 12,
+    "treffer": 1,
+    "median": 36,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "wert": 0.67,
+    "reihen": 6,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 2,
+    "medianDauerMs": 150,
+    "charakter": "lebendig"
+  }
+}

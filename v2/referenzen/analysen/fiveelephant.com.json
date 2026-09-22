@@ -1,0 +1,113 @@
+{
+  "url": "https://www.fiveelephant.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:31:53.975Z",
+  "titel": "Five Elephant.",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 13324401
+      },
+      {
+        "hex": "#f7f9fa",
+        "anzahl": 4196263
+      },
+      {
+        "hex": "#f7f7f5",
+        "anzahl": 3969428
+      },
+      {
+        "hex": "#111111",
+        "anzahl": 1296000
+      },
+      {
+        "hex": "#2a2a28",
+        "anzahl": 972000
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 900203
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#0c0c0c",
+        "anzahl": 10
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 4
+      },
+      {
+        "hex": "#212121",
+        "anzahl": 1
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 77
+      },
+      {
+        "hex": "#0c0c0c",
+        "anzahl": 74
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 52
+      },
+      {
+        "hex": "#212121",
+        "anzahl": 46
+      },
+      {
+        "hex": "#3a3a3a",
+        "anzahl": 28
+      },
+      {
+        "hex": "#111111",
+        "anzahl": 16
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "AkkuratLLWeb-Bold",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "AkkuratLLWeb-Regular",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 40.5,
+    "bodyPx": 14,
+    "kontrastVerhaeltnis": 2.89,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 8,
+    "treffer": 0.69,
+    "median": 56,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.71,
+    "reihen": 14,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 24,
+    "medianDauerMs": 250,
+    "charakter": "lebendig"
+  }
+}

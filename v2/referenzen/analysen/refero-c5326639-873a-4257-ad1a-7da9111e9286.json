@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/c5326639-873a-4257-ad1a-7da9111e9286",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:28:56.970Z",
+  "name": "Wise Design",
+  "originalUrl": "https://wise.design",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#083400",
+        "name": "Forest Ink",
+        "anzahl": 7
+      },
+      {
+        "hex": "#ffbd89",
+        "name": "Papaya",
+        "anzahl": 5
+      },
+      {
+        "hex": "#ffd5f0",
+        "name": "Cotton Candy",
+        "anzahl": 4
+      },
+      {
+        "hex": "#2a0831",
+        "name": "Aubergine Night",
+        "anzahl": 3
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#87ea5c",
+        "name": "Lime Volt",
+        "anzahl": 8
+      },
+      {
+        "hex": "#ffea4b",
+        "name": "Volt Yellow",
+        "anzahl": 6
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#ffea4b",
+    "schema": "both"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Inter",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Wise Sans",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "Zen Kaku Gothic New",
+        "anzahl": 3,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "lebendig"
+  },
+  "leitsatz": "Neon market stall on a global street — electric lime signage that shouts across a crowded marketplace, then polished product UI slips in behind it."
+}

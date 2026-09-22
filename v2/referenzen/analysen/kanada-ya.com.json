@@ -1,0 +1,88 @@
+{
+  "url": "https://www.kanada-ya.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:30:06.097Z",
+  "titel": "Award-Winning Japanese Ramen Restaurant | Kanada-Ya",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 25281855
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ed1c24",
+        "anzahl": 15
+      },
+      {
+        "hex": "#941919",
+        "anzahl": 6
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 5
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 74
+      },
+      {
+        "hex": "#f1f1f1",
+        "anzahl": 39
+      },
+      {
+        "hex": "#666666",
+        "anzahl": 10
+      },
+      {
+        "hex": "#ed1c23",
+        "anzahl": 4
+      },
+      {
+        "hex": "#dd3333",
+        "anzahl": 2
+      },
+      {
+        "hex": "#d83131",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "dunkel",
+    "saettigung": "fast unbunt",
+    "akzent": "#ed1c24"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Oswald",
+        "rolle": "h2",
+        "art": "schmal"
+      }
+    ],
+    "charakter": "schmale Grotesk führt",
+    "displayArt": "schmal",
+    "h1Px": 46.4,
+    "bodyPx": 20.8,
+    "kontrastVerhaeltnis": 2.23,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 1,
+    "median": 30,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "wert": 0.2,
+    "reihen": 5,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 11,
+    "medianDauerMs": 300,
+    "charakter": "lebendig"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "url": "https://styles.refero.design/style/f240ed7d-d466-478e-bbce-6c93420dfd1c",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:30:42.387Z",
+  "name": "Slab",
+  "originalUrl": "https://slab.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#42022e",
+        "name": "Midnight Wine",
+        "anzahl": 8
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Paper White",
+        "anzahl": 4
+      },
+      {
+        "hex": "#e0e0e0",
+        "name": "Mist",
+        "anzahl": 3
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ff4143",
+        "name": "Coral Ember",
+        "anzahl": 7
+      },
+      {
+        "hex": "#455360",
+        "name": "Slate Ink",
+        "anzahl": 6
+      },
+      {
+        "hex": "#939598",
+        "name": "Fog Gray",
+        "anzahl": 5
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#ff4143",
+    "schema": "both"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Sentinel",
+        "anzahl": 5,
+        "art": "serif"
+      },
+      {
+        "name": "Whitney",
+        "anzahl": 4,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Serife führt, Grotesk als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "midnight-wine reading room"
+}

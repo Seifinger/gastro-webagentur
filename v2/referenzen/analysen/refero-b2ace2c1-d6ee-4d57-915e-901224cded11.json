@@ -1,0 +1,75 @@
+{
+  "url": "https://styles.refero.design/style/b2ace2c1-d6ee-4d57-915e-901224cded11",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:25:38.730Z",
+  "name": "Alison Roman",
+  "originalUrl": "https://www.alisoneroman.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#290a08",
+        "name": "Aubergine Ink",
+        "anzahl": 8
+      },
+      {
+        "hex": "#fff3cc",
+        "name": "Buttery Highlight",
+        "anzahl": 6
+      },
+      {
+        "hex": "#f6f0e1",
+        "name": "Parchment Canvas",
+        "anzahl": 5
+      },
+      {
+        "hex": "#fffaec",
+        "name": "Linen Card",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#810c00",
+        "name": "Vintage Burgundy",
+        "anzahl": 7
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#810c00",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Jannon Neo",
+        "anzahl": 5,
+        "art": "serif"
+      },
+      {
+        "name": "Modale Antique",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "-apple-system",
+        "anzahl": 3,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Serife führt, Grotesk als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "cookbook pages on warm cream paper — a printed spread from an artisan food memoir, translated to screen with zero loss of tactility"
+}

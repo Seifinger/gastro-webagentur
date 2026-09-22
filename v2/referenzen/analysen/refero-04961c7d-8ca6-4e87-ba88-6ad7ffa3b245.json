@@ -1,0 +1,70 @@
+{
+  "url": "https://styles.refero.design/style/04961c7d-8ca6-4e87-ba88-6ad7ffa3b245",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:30:06.097Z",
+  "name": "Home page | Impossible Foods",
+  "originalUrl": "https://impossiblefoods.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#260212",
+        "name": "Velvet Wine",
+        "anzahl": 8
+      },
+      {
+        "hex": "#ffc7c6",
+        "name": "Blush Highlight",
+        "anzahl": 5
+      },
+      {
+        "hex": "#000000",
+        "name": "Butcher Black",
+        "anzahl": 4
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Bone White",
+        "anzahl": 3
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#4f0423",
+        "name": "Burgundy Stage",
+        "anzahl": 7
+      },
+      {
+        "hex": "#e10600",
+        "name": "Impossible Red",
+        "anzahl": 6
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#e10600",
+    "schema": "dark"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "sans-meat",
+        "anzahl": 5,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "lebendig"
+  },
+  "leitsatz": "Blood-red punk poster in velvet darkness. A custom condensed display face bleeds across a wine-dark canvas while single-color red CTAs punch through like a price tag on a butcher's chalkboard."
+}

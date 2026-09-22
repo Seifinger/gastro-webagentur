@@ -1,0 +1,85 @@
+{
+  "url": "https://www.963berlin.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:27:37.901Z",
+  "titel": "963 Berlin",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 14395694
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 5205105
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 1
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 28
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 5
+      },
+      {
+        "hex": "#ababa8",
+        "anzahl": 3
+      },
+      {
+        "hex": "#8d8d8d",
+        "anzahl": 2
+      },
+      {
+        "hex": "#444444",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "dunkel",
+    "saettigung": "fast unbunt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Inter Tight",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "Inter",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 19.456,
+    "bodyPx": 12.0256,
+    "kontrastVerhaeltnis": 1.62,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": 14,
+    "dichte": "dicht"
+  },
+  "layout": {
+    "wert": 0.25,
+    "reihen": 12,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 18,
+    "medianDauerMs": 400,
+    "charakter": "lebendig"
+  }
+}

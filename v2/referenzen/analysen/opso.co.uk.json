@@ -1,0 +1,92 @@
+{
+  "url": "https://www.opso.co.uk",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:26:47.906Z",
+  "titel": "OPSO Restaurant, London - Our restaurant",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 3163995
+      },
+      {
+        "hex": "#f0f0f0",
+        "anzahl": 631575
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 589230
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 1
+      },
+      {
+        "hex": "#2d6f83",
+        "anzahl": 1
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 19
+      },
+      {
+        "hex": "#333333",
+        "anzahl": 14
+      },
+      {
+        "hex": "#266071",
+        "anzahl": 6
+      },
+      {
+        "hex": "#001f45",
+        "anzahl": 5
+      },
+      {
+        "hex": "#1a1a1a",
+        "anzahl": 4
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#2d6f83"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Open Sans Condensed",
+        "rolle": "h1",
+        "art": "schmal"
+      }
+    ],
+    "charakter": "schmale Grotesk führt, viel Versalsatz",
+    "displayArt": "schmal",
+    "h1Px": 16,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 1,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 5,
+    "treffer": 1,
+    "median": 10,
+    "dichte": "dicht"
+  },
+  "layout": {
+    "wert": 1,
+    "reihen": 8,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 3,
+    "medianDauerMs": 300,
+    "charakter": "ruhig"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/d91841cf-c717-43ef-97a2-400778fa6e1a",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:25:27.092Z",
+  "name": "sweetgreen",
+  "originalUrl": "https://www.sweetgreen.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#00473c",
+        "name": "Deep Forest",
+        "anzahl": 8
+      },
+      {
+        "hex": "#d8e5d6",
+        "name": "Sage Mist",
+        "anzahl": 6
+      },
+      {
+        "hex": "#e8dcc6",
+        "name": "Warm Sand",
+        "anzahl": 5
+      },
+      {
+        "hex": "#f4f3e7",
+        "name": "Cream Canvas",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#e6ff55",
+        "name": "Lime Glow",
+        "anzahl": 7
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#e6ff55",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "SweetSans",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Grenette",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "SweetSansText",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "SweetSansText-Regular",
+        "anzahl": 2,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "farm-stand chalkboard at golden hour"
+}

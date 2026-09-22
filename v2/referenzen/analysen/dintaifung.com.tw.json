@@ -1,0 +1,80 @@
+{
+  "url": "https://www.dintaifung.com.tw",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:28:15.136Z",
+  "titel": "鼎泰豐・Din Tai Fung・ディンタイフォン・딘타이펑",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 9918203
+      },
+      {
+        "hex": "#f3f3f3",
+        "anzahl": 4320000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#a18231",
+        "anzahl": 5
+      },
+      {
+        "hex": "#2c2c2c",
+        "anzahl": 3
+      },
+      {
+        "hex": "#252525",
+        "anzahl": 3
+      },
+      {
+        "hex": "#8b7231",
+        "anzahl": 3
+      },
+      {
+        "hex": "#c7000a",
+        "anzahl": 2
+      },
+      {
+        "hex": "#b09753",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#c7000a"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Myriad Pro",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": null,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": null,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 5,
+    "treffer": 1,
+    "median": 45,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 2,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 3,
+    "medianDauerMs": 700,
+    "charakter": "ruhig"
+  }
+}

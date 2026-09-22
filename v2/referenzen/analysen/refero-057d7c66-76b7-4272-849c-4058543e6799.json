@@ -1,0 +1,90 @@
+{
+  "url": "https://styles.refero.design/style/057d7c66-76b7-4272-849c-4058543e6799",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:30:56.001Z",
+  "name": "Lamanna",
+  "originalUrl": "https://lamannabakery.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "name": "Obsidian",
+        "anzahl": 4
+      },
+      {
+        "hex": "#fdbeba",
+        "name": "Blush Peach",
+        "anzahl": 3
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ff4100",
+        "name": "Anger Orange",
+        "anzahl": 8
+      },
+      {
+        "hex": "#ffc700",
+        "name": "Sun Yellow",
+        "anzahl": 7
+      },
+      {
+        "hex": "#1573dd",
+        "name": "Royal Blue",
+        "anzahl": 6
+      },
+      {
+        "hex": "#292a2c",
+        "name": "Charcoal",
+        "anzahl": 5
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#ff4100",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "rightgrotesk-spatialblack-webfont",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "nimbus-sans-extended-bold",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "nimbus-sans-extended-regular",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "Open Sans",
+        "anzahl": 2,
+        "art": "grotesk"
+      },
+      {
+        "name": "obviously-condensed-semibold",
+        "anzahl": 1,
+        "art": "schmal"
+      }
+    ],
+    "charakter": "Grotesk führt, schmale Grotesk als Gegenstimme",
+    "displayArt": "schmal"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "lebendig"
+  },
+  "leitsatz": "Neon circus tent on a Naples sidewalk"
+}

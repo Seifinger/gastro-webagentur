@@ -1,0 +1,100 @@
+{
+  "url": "https://www.caytre.co.uk",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:29:56.097Z",
+  "titel": "Find Local Hookup Near Me - Meet a Local Sex Buddy Looking For Quick Sex!",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#f7f8f9",
+        "anzahl": 4320000
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 2630305
+      },
+      {
+        "hex": "#ff0000",
+        "anzahl": 408785
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 296000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#28a745",
+        "anzahl": 1
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 1
+      },
+      {
+        "hex": "#ff4d4d",
+        "anzahl": 1
+      },
+      {
+        "hex": "#55555e",
+        "anzahl": 1
+      },
+      {
+        "hex": "#222222",
+        "anzahl": 894
+      },
+      {
+        "hex": "#1e73be",
+        "anzahl": 86
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 21
+      },
+      {
+        "hex": "#333333",
+        "anzahl": 5
+      },
+      {
+        "hex": "#28a745",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#28a745"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "-apple-system",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 42,
+    "bodyPx": 25,
+    "kontrastVerhaeltnis": 1.68,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0.67,
+    "reihen": 3,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 100,
+    "charakter": "lebendig"
+  }
+}

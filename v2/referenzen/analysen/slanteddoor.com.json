@@ -1,0 +1,64 @@
+{
+  "url": "https://www.slanteddoor.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:29:42.721Z",
+  "titel": "The Slanted Door",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 3645900
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 2751368
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 17
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "gemischt",
+    "saettigung": "fast unbunt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Dosis",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": null,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": null,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0.25,
+    "reihen": 4,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 250,
+    "charakter": "ruhig"
+  }
+}

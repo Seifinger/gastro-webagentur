@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/887f0c74-c696-4589-82ae-85705ecda919",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:26:04.482Z",
+  "name": "Miti Navi",
+  "originalUrl": "https://miti-navi.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#e6dece",
+        "name": "Linen",
+        "anzahl": 8
+      },
+      {
+        "hex": "#000e13",
+        "name": "Deep Ink",
+        "anzahl": 7
+      },
+      {
+        "hex": "#232323",
+        "name": "Carbon",
+        "anzahl": 6
+      },
+      {
+        "hex": "#ffdead",
+        "name": "Warm Apricot",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#999999",
+        "name": "Soft Ash",
+        "anzahl": 5
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "gedeckt",
+    "akzent": null,
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "GT Pressura Mono",
+        "anzahl": 5,
+        "art": "mono"
+      },
+      {
+        "name": "Voyage",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "GTSectraDisplay",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "Times",
+        "anzahl": 2,
+        "art": "serif"
+      }
+    ],
+    "charakter": "Monospace führt, Grotesk als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Tuscan sea-view chapbook on raw linen"
+}

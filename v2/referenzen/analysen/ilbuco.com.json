@@ -1,0 +1,108 @@
+{
+  "url": "https://www.ilbuco.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:25:54.759Z",
+  "titel": "il Buco Restaurants",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#f4f3ed",
+        "anzahl": 4320000
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 2808000
+      },
+      {
+        "hex": "#e8e6db",
+        "anzahl": 1410188
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 354227
+      },
+      {
+        "hex": "#f5f4f0",
+        "anzahl": 151808
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#a8794d",
+        "anzahl": 2
+      },
+      {
+        "hex": "#a7784d",
+        "anzahl": 2
+      },
+      {
+        "hex": "#d5d0b5",
+        "anzahl": 2
+      },
+      {
+        "hex": "#8b8055",
+        "anzahl": 1
+      },
+      {
+        "hex": "#333333",
+        "anzahl": 45
+      },
+      {
+        "hex": "#414141",
+        "anzahl": 16
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 14
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 11
+      },
+      {
+        "hex": "#797676",
+        "anzahl": 4
+      },
+      {
+        "hex": "#555555",
+        "anzahl": 4
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#a8794d"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Crimson Text",
+        "rolle": "h2",
+        "art": "serif"
+      }
+    ],
+    "charakter": "Serife führt",
+    "displayArt": "serif",
+    "h1Px": 16.8,
+    "bodyPx": 15,
+    "kontrastVerhaeltnis": 1.12,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 8,
+    "treffer": 1,
+    "median": 40,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "wert": 0.2,
+    "reihen": 15,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 8,
+    "medianDauerMs": 300,
+    "charakter": "lebendig"
+  }
+}

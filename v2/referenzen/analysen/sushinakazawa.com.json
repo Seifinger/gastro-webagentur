@@ -1,0 +1,64 @@
+{
+  "url": "https://www.sushinakazawa.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:30:10.017Z",
+  "titel": "Sushi Nakazawa",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 3888000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 4
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 4
+      },
+      {
+        "hex": "#0000ee",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "dunkel",
+    "saettigung": "fast unbunt",
+    "akzent": "#0000ee"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "sans-serif",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": null,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": null,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 0,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 4,
+    "medianDauerMs": 200,
+    "charakter": "ruhig"
+  }
+}

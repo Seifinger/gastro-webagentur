@@ -1,0 +1,97 @@
+{
+  "url": "https://www.hirschgarten.de/en/",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:25:21.456Z",
+  "titel": "Königlicher Hirschgarten – Restaurant and Biergarten in Munich",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 5176485
+      },
+      {
+        "hex": "#591c29",
+        "anzahl": 2890080
+      },
+      {
+        "hex": "#d2cabf",
+        "anzahl": 1631790
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#af0d0d",
+        "anzahl": 2
+      },
+      {
+        "hex": "#efefef",
+        "anzahl": 1
+      },
+      {
+        "hex": "#eaeaeb",
+        "anzahl": 57
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 56
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 28
+      },
+      {
+        "hex": "#121212",
+        "anzahl": 16
+      },
+      {
+        "hex": "#bdb1a1",
+        "anzahl": 8
+      },
+      {
+        "hex": "#8d897f",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": "#af0d0d"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "ModernLoveRough",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "Playfair Display",
+        "rolle": "body",
+        "art": "serif"
+      }
+    ],
+    "charakter": "Grotesk führt, Serife als Gegenstimme",
+    "displayArt": "grotesk",
+    "h1Px": 48,
+    "bodyPx": 18,
+    "kontrastVerhaeltnis": 2.67,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 1,
+    "median": 70,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.29,
+    "reihen": 7,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 100,
+    "charakter": "lebendig"
+  }
+}

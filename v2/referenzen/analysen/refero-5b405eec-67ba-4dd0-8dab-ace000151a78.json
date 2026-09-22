@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/5b405eec-67ba-4dd0-8dab-ace000151a78",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:26:23.911Z",
+  "name": "Michael Wandelmaier",
+  "originalUrl": "https://wandelmaier.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "name": "Inkwell",
+        "anzahl": 8
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Bone",
+        "anzahl": 7
+      },
+      {
+        "hex": "#fbcbcb",
+        "name": "Coral Blush",
+        "anzahl": 3
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#a9a9a9",
+        "name": "Ash",
+        "anzahl": 6
+      },
+      {
+        "hex": "#302f2d",
+        "name": "Ember",
+        "anzahl": 5
+      },
+      {
+        "hex": "#34a847",
+        "name": "Meadow",
+        "anzahl": 4
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "fast unbunt",
+    "akzent": "#34a847",
+    "schema": "dark"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Canela Web",
+        "anzahl": 5,
+        "art": "serif"
+      },
+      {
+        "name": "PolySans",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "sans-serif (system)",
+        "anzahl": 3,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Serife führt, Grotesk als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "museum placard on black velvet — three candy pills, one whisper-weight serif, and almost nothing else."
+}

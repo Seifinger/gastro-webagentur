@@ -1,0 +1,105 @@
+{
+  "url": "https://www.carbonenewyork.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:33:13.922Z",
+  "titel": "Carbone New York",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#0a1a29",
+        "anzahl": 25916805
+      },
+      {
+        "hex": "#fff9f0",
+        "anzahl": 7001460
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 453600
+      },
+      {
+        "hex": "#04111e",
+        "anzahl": 368640
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#0a1a29",
+        "anzahl": 3
+      },
+      {
+        "hex": "#fff9f0",
+        "anzahl": 3
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 2
+      },
+      {
+        "hex": "#091a29",
+        "anzahl": 1
+      },
+      {
+        "hex": "#fff9f0",
+        "anzahl": 82
+      },
+      {
+        "hex": "#231f20",
+        "anzahl": 14
+      },
+      {
+        "hex": "#091a29",
+        "anzahl": 4
+      },
+      {
+        "hex": "#0a1a29",
+        "anzahl": 3
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "dunkel",
+    "saettigung": "kräftig",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "__headingFont_5c2578",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "sans-serif",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 38,
+    "bodyPx": 15,
+    "kontrastVerhaeltnis": 2.53,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0.21,
+    "reihen": 14,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 500,
+    "charakter": "ruhig"
+  }
+}

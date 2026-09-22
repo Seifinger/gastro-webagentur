@@ -1,0 +1,77 @@
+{
+  "url": "https://www.kuffler.de/de/seehaus",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:25:27.091Z",
+  "titel": "Seehaus im Englischen Garten, München",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#edece7",
+        "anzahl": 4320000
+      },
+      {
+        "hex": "#878787",
+        "anzahl": 405000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 1
+      },
+      {
+        "hex": "#262f34",
+        "anzahl": 86
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 16
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "OpenSansCondensedBold",
+        "rolle": "h2",
+        "art": "schmal"
+      },
+      {
+        "name": "OpenSansCondensedLight",
+        "rolle": "body",
+        "art": "schmal"
+      }
+    ],
+    "charakter": "schmale Grotesk führt",
+    "displayArt": "schmal",
+    "h1Px": 40,
+    "bodyPx": 20,
+    "kontrastVerhaeltnis": 2,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 12,
+    "treffer": 1,
+    "median": 120,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.33,
+    "reihen": 6,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 300,
+    "charakter": "ruhig"
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "url": "https://styles.refero.design/style/a6284fcd-fa69-4469-ac40-4239e5b84a39",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:28:33.974Z",
+  "name": "Freshman",
+  "originalUrl": "https://freshman.tv",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "name": "Pure White",
+        "anzahl": 8
+      },
+      {
+        "hex": "#000000",
+        "name": "Carbon Black",
+        "anzahl": 7
+      },
+      {
+        "hex": "#101010",
+        "name": "Charcoal Shale",
+        "anzahl": 6
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ff2936",
+        "name": "Signal Red",
+        "anzahl": 5
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "gedeckt",
+    "akzent": "#ff2936",
+    "schema": "dark"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Editorial New",
+        "anzahl": 5,
+        "art": "serif"
+      },
+      {
+        "name": "TT Firs Neue",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "Altform",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "Wasted Year",
+        "anzahl": 2,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Serife führt, Grotesk als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "cinema title card on black velvet"
+}

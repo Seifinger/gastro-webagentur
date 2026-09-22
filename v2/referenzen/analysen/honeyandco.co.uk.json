@@ -1,0 +1,59 @@
+{
+  "url": "https://www.honeyandco.co.uk",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:27:59.712Z",
+  "titel": "Home - Honey & Co",
+  "farben": {
+    "hintergrund": [],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 74
+      },
+      {
+        "hex": "#1e1e1e",
+        "anzahl": 25
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 23
+      }
+    ],
+    "temperatur": "unbekannt",
+    "helligkeit": "unbekannt",
+    "saettigung": "unbekannt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Merriweather",
+        "rolle": "h1",
+        "art": "serif"
+      }
+    ],
+    "charakter": "Serife führt",
+    "displayArt": "serif",
+    "h1Px": 60,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 3.75,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 1,
+    "median": 50,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.85,
+    "reihen": 20,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 49,
+    "medianDauerMs": 200,
+    "charakter": "lebendig"
+  }
+}

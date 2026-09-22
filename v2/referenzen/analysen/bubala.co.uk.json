@@ -1,0 +1,101 @@
+{
+  "url": "https://www.bubala.co.uk",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:27:44.373Z",
+  "titel": "Home - Bubala",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#394a23",
+        "anzahl": 7401600
+      },
+      {
+        "hex": "#e6d8bc",
+        "anzahl": 5316840
+      },
+      {
+        "hex": "#262626",
+        "anzahl": 2851200
+      },
+      {
+        "hex": "#3b6873",
+        "anzahl": 1327680
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#394a23",
+        "anzahl": 1
+      },
+      {
+        "hex": "#e6d8bc",
+        "anzahl": 1
+      },
+      {
+        "hex": "#efefef",
+        "anzahl": 1
+      },
+      {
+        "hex": "#262626",
+        "anzahl": 44
+      },
+      {
+        "hex": "#e6d8bc",
+        "anzahl": 41
+      },
+      {
+        "hex": "#394a23",
+        "anzahl": 13
+      },
+      {
+        "hex": "#737956",
+        "anzahl": 7
+      },
+      {
+        "hex": "#6e695f",
+        "anzahl": 6
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "gedeckt",
+    "akzent": "#394a23"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "sifonn",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "raleway",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 100,
+    "bodyPx": 12,
+    "kontrastVerhaeltnis": 8.33,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0.15,
+    "reihen": 13,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 35,
+    "medianDauerMs": 600,
+    "charakter": "lebendig"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "url": "https://www.nightmarketsong.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:28:56.970Z",
+  "titel": "NIGHT MARKET THAI RESTAURANTS",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ff006a",
+        "anzahl": 4320000
+      },
+      {
+        "hex": "#ddff00",
+        "anzahl": 2520000
+      },
+      {
+        "hex": "#4f4f4f",
+        "anzahl": 982080
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 368955
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#0066ff",
+        "anzahl": 53
+      },
+      {
+        "hex": "#ff0000",
+        "anzahl": 21
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 11
+      },
+      {
+        "hex": "#111111",
+        "anzahl": 6
+      },
+      {
+        "hex": "#222222",
+        "anzahl": 3
+      },
+      {
+        "hex": "#ffff0a",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#0066ff"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Open Sans",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "proxima-nova",
+        "rolle": "h2",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 72,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 4.5,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 1,
+    "median": 10,
+    "dichte": "dicht"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 0,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 500,
+    "charakter": "ruhig"
+  }
+}

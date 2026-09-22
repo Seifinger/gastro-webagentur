@@ -1,0 +1,72 @@
+{
+  "url": "https://www.yauatcha.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:28:39.563Z",
+  "titel": "Official Site of Yauatcha an All-Day Dim Sum Tea House",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 5839290
+      },
+      {
+        "hex": "#2b53d7",
+        "anzahl": 3438000
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 2368485
+      },
+      {
+        "hex": "#1e1d1c",
+        "anzahl": 717950
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 172
+      },
+      {
+        "hex": "#d8679c",
+        "anzahl": 48
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": "#d8679c"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Futura PT Book",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 50.4,
+    "bodyPx": 15,
+    "kontrastVerhaeltnis": 3.36,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 8,
+    "treffer": 1,
+    "median": 112,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.2,
+    "reihen": 10,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 10,
+    "medianDauerMs": 150,
+    "charakter": "lebendig"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "url": "https://styles.refero.design/style/e6b53c1e-644b-4300-b42f-0e64905d1443",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:26:14.842Z",
+  "name": "Relief",
+  "originalUrl": "https://www.relief.app",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#f9f7f0",
+        "name": "Warm Cream",
+        "anzahl": 8
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Snow",
+        "anzahl": 7
+      },
+      {
+        "hex": "#212121",
+        "name": "Charcoal",
+        "anzahl": 5
+      },
+      {
+        "hex": "#d0d5dd",
+        "name": "Fog",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#333333",
+        "name": "Ink",
+        "anzahl": 6
+      },
+      {
+        "hex": "#616c8a",
+        "name": "Slate",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": null,
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Gilroy",
+        "anzahl": 5,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Cream-paper harbor under flat sky-blue"
+}

@@ -1,0 +1,88 @@
+{
+  "url": "https://www.ilsanpietro.it",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:33:35.453Z",
+  "titel": "Home - Welcome to Il San Pietro di Positano",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 5616000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#213d59",
+        "anzahl": 1
+      },
+      {
+        "hex": "#dedfe0",
+        "anzahl": 1
+      },
+      {
+        "hex": "#3c7587",
+        "anzahl": 1
+      },
+      {
+        "hex": "#213d59",
+        "anzahl": 71
+      },
+      {
+        "hex": "#3b6166",
+        "anzahl": 21
+      },
+      {
+        "hex": "#191919",
+        "anzahl": 5
+      },
+      {
+        "hex": "#444444",
+        "anzahl": 4
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 3
+      },
+      {
+        "hex": "#1e293b",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#213d59"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Jost",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 54,
+    "bodyPx": 15,
+    "kontrastVerhaeltnis": 3.6,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 0.86,
+    "median": 100,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 5,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 40,
+    "medianDauerMs": 300,
+    "charakter": "lebendig"
+  }
+}

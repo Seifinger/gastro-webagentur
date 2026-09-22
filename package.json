@@ -14,7 +14,10 @@
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "preview": "node src/previewServer.js",
     "engine-status": "node scripts/engineStatus.mjs",
-    "build:motion": "node scripts/buildRemotionPlayer.mjs"
+    "build:motion": "node scripts/buildRemotionPlayer.mjs",
+    "v2:referenzen": "node v2/build/referenzAnalyse.js",
+    "v2:refero": "node v2/build/referoSuche.js",
+    "v2:designsysteme": "node v2/build/designsystemGenerator.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",
@@ -28,6 +31,7 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
-    "esbuild": "0.28.2"
+    "esbuild": "0.28.2",
+    "playwright-core": "^1.56.1"
   }
 }

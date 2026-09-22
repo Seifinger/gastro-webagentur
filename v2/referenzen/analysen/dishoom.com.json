@@ -1,0 +1,96 @@
+{
+  "url": "https://www.dishoom.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:30:29.511Z",
+  "titel": "Dishoom | Indian Restaurants | From Bombay with Love",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#f0ece0",
+        "anzahl": 6071657
+      },
+      {
+        "hex": "#151515",
+        "anzahl": 2592000
+      },
+      {
+        "hex": "#36393a",
+        "anzahl": 93473
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#f0ece0",
+        "anzahl": 8
+      },
+      {
+        "hex": "#666666",
+        "anzahl": 1
+      },
+      {
+        "hex": "#353839",
+        "anzahl": 1
+      },
+      {
+        "hex": "#353839",
+        "anzahl": 272
+      },
+      {
+        "hex": "#fffdf9",
+        "anzahl": 52
+      },
+      {
+        "hex": "#c4bfaf",
+        "anzahl": 28
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 6
+      },
+      {
+        "hex": "#f0ece0",
+        "anzahl": 3
+      },
+      {
+        "hex": "#3c3f40",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "cheltenhamBT",
+        "rolle": "h1",
+        "art": "serif"
+      }
+    ],
+    "charakter": "Serife führt, viel Versalsatz",
+    "displayArt": "serif",
+    "h1Px": 32,
+    "bodyPx": 18,
+    "kontrastVerhaeltnis": 1.78,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 8,
+    "treffer": 0.89,
+    "median": 72,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.38,
+    "reihen": 16,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 59,
+    "medianDauerMs": 150,
+    "charakter": "lebendig"
+  }
+}

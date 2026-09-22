@@ -1,0 +1,1802 @@
+{
+  "quelle": "https://styles.refero.design/api/styles (öffentliche JSON-API, abgerufen 2026-09-22)",
+  "hinweis": "Auszug der für Gastronomie-Stimmungen relevanten Styles aus dem Gesamtkatalog (1322 Styles). Volltextsuche: node v2/build/referoSuche.js <begriff>",
+  "styles": [
+    {
+      "id": "d91841cf-c717-43ef-97a2-400778fa6e1a",
+      "siteName": "sweetgreen",
+      "url": "https://www.sweetgreen.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Deep Forest",
+          "hex": "#00473c"
+        },
+        {
+          "name": "Lime Glow",
+          "hex": "#e6ff55"
+        },
+        {
+          "name": "Sage Mist",
+          "hex": "#d8e5d6"
+        },
+        {
+          "name": "Warm Sand",
+          "hex": "#e8dcc6"
+        },
+        {
+          "name": "Cream Canvas",
+          "hex": "#f4f3e7"
+        },
+        {
+          "name": "Forest Shadow",
+          "hex": "#0e150e"
+        }
+      ],
+      "fonts": [
+        "SweetSans",
+        "Grenette",
+        "SweetSansText",
+        "SweetSansText-Regular"
+      ],
+      "northStar": "farm-stand chalkboard at golden hour"
+    },
+    {
+      "id": "b753dfda-cbe1-41e4-b341-b98d69c8422f",
+      "siteName": "Amrit Palace",
+      "url": "https://amritpalace.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Parchment",
+          "hex": "#d8cbb8"
+        },
+        {
+          "name": "Linen",
+          "hex": "#bfb4a3"
+        },
+        {
+          "name": "Warm Stone",
+          "hex": "#b6ab9c"
+        },
+        {
+          "name": "Walnut",
+          "hex": "#978e81"
+        },
+        {
+          "name": "Espresso",
+          "hex": "#615b53"
+        },
+        {
+          "name": "Onyx Warm",
+          "hex": "#2c2c2c"
+        }
+      ],
+      "fonts": [
+        "TT Ramillas Variable",
+        "Satoshi"
+      ],
+      "northStar": "spiced parchment gallery — a candlelit beige wall holding sparse saffron punctuation beneath breath-soft serif headlines."
+    },
+    {
+      "id": "47f15da7-8905-45b3-bcab-06a4277c6168",
+      "siteName": "Hungry Tiger",
+      "url": "https://www.eathungrytiger.com",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Tiger Gold",
+          "hex": "#faae33"
+        },
+        {
+          "name": "Ember Rust",
+          "hex": "#823513"
+        },
+        {
+          "name": "Saffron Glow",
+          "hex": "#9f531b"
+        },
+        {
+          "name": "Dark Spice",
+          "hex": "#402011"
+        },
+        {
+          "name": "Charred Clove",
+          "hex": "#281006"
+        },
+        {
+          "name": "Cardamom Brown",
+          "hex": "#6b2e12"
+        }
+      ],
+      "fonts": [
+        "Salmond",
+        "Graphikx"
+      ],
+      "northStar": "Turmeric-bright graffiti on a tandoor wall. A single gold-on-rust palette with display type so large it reads as a spice market sign, not a webpage."
+    },
+    {
+      "id": "f1b6a7d6-1ecb-4f1c-95b0-e03323363999",
+      "siteName": "Limón",
+      "url": "https://limonoslo.no",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Black Olive",
+          "hex": "#1d0b0d"
+        },
+        {
+          "name": "Forest Ink",
+          "hex": "#103b15"
+        },
+        {
+          "name": "Lemon Zest",
+          "hex": "#f7ea48"
+        },
+        {
+          "name": "Warm Cream",
+          "hex": "#fcf9f0"
+        },
+        {
+          "name": "Sage Mist",
+          "hex": "#dbe2dc"
+        },
+        {
+          "name": "Pure White",
+          "hex": "#ffffff"
+        }
+      ],
+      "fonts": [
+        "VenusCom",
+        "Font Awesome 6 Free",
+        "Font Awesome 6 Brands",
+        "Times",
+        "Helvetica",
+        "FreeSans"
+      ],
+      "northStar": "moody brasserie under candlelight"
+    },
+    {
+      "id": "f2a84e0f-cf77-41fa-ade0-b062a3a42495",
+      "siteName": "GRAZA",
+      "url": "https://graza.co",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Olive Ink",
+          "hex": "#3c422e"
+        },
+        {
+          "name": "Linen Cream",
+          "hex": "#fff4ec"
+        },
+        {
+          "name": "Buttery Peach",
+          "hex": "#f6e6d9"
+        },
+        {
+          "name": "Squeeze Bottle Green",
+          "hex": "#9eef80"
+        },
+        {
+          "name": "EVOO Yellow-Green",
+          "hex": "#d1e030"
+        },
+        {
+          "name": "Mustard Sun",
+          "hex": "#fbd535"
+        }
+      ],
+      "fonts": [
+        "GT Alpina Typewriter",
+        "ITC Garamond Condensed",
+        "Apercu"
+      ],
+      "northStar": "Mediterranean deli counter, sunlit and hand-set"
+    },
+    {
+      "id": "3e497155-bd96-4134-a4a5-855bd885a25c",
+      "siteName": "Roberta's Pizza",
+      "url": "https://www.robertaspizza.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Roberta Red",
+          "hex": "#ed2023"
+        },
+        {
+          "name": "Charcoal",
+          "hex": "#2b2f36"
+        },
+        {
+          "name": "Pure White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Pure Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Shadow Gray",
+          "hex": "#bfbfbf"
+        }
+      ],
+      "fonts": [
+        "Offset TM",
+        "Borensa"
+      ],
+      "northStar": "Brooklyn pizza punk parlor — a checkered tablecloth lit by neon red signage, where every screen is a poster."
+    },
+    {
+      "id": "057d7c66-76b7-4272-849c-4058543e6799",
+      "siteName": "Lamanna",
+      "url": "https://lamannabakery.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Anger Orange",
+          "hex": "#ff4100"
+        },
+        {
+          "name": "Sun Yellow",
+          "hex": "#ffc700"
+        },
+        {
+          "name": "Royal Blue",
+          "hex": "#1573dd"
+        },
+        {
+          "name": "Charcoal",
+          "hex": "#292a2c"
+        },
+        {
+          "name": "Obsidian",
+          "hex": "#000000"
+        },
+        {
+          "name": "Blush Peach",
+          "hex": "#fdbeba"
+        }
+      ],
+      "fonts": [
+        "rightgrotesk-spatialblack-webfont",
+        "nimbus-sans-extended-bold",
+        "nimbus-sans-extended-regular",
+        "Open Sans",
+        "obviously-condensed-semibold"
+      ],
+      "northStar": "Neon circus tent on a Naples sidewalk"
+    },
+    {
+      "id": "9307193e-7ce3-48c1-b650-8ab77aa83c3f",
+      "siteName": "Redbrick Coffee",
+      "url": "https://redbrick.coffee",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Brick Red",
+          "hex": "#e82c2a"
+        },
+        {
+          "name": "Press Black",
+          "hex": "#212529"
+        },
+        {
+          "name": "Cream White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Soft Grey",
+          "hex": "#f2f2f2"
+        },
+        {
+          "name": "Carbon",
+          "hex": "#121212"
+        }
+      ],
+      "fonts": [
+        "Surt",
+        "Editorial Old",
+        "GTStandard-M",
+        "system-ui"
+      ],
+      "northStar": "Scarlet ink editorial on butcher paper"
+    },
+    {
+      "id": "8288950a-2731-44fd-85ef-211aecd8091d",
+      "siteName": "Assembly Coffee London",
+      "url": "https://assemblycoffee.co.uk",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Obsidian",
+          "hex": "#0e1311"
+        },
+        {
+          "name": "Pure Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Ash Charcoal",
+          "hex": "#1a1a1a"
+        },
+        {
+          "name": "Graphite",
+          "hex": "#333333"
+        },
+        {
+          "name": "Stone Gray",
+          "hex": "#808080"
+        },
+        {
+          "name": "Silver",
+          "hex": "#b3b3b3"
+        }
+      ],
+      "fonts": [
+        "GT America Standard",
+        "ID00 Serif",
+        "Helvetica",
+        "reviewsio-font"
+      ],
+      "northStar": "Embers in a dark roastery. A near-black canvas with warm, low-lit product photography and italic serif labels — the feeling of a specialty coffee menu printed in a midnight zine."
+    },
+    {
+      "id": "b5532c58-620a-4d69-8861-35b2b6443956",
+      "siteName": "Escape Coffee Company",
+      "url": "https://escape.cafe",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Bone",
+          "hex": "#f5f4f2"
+        },
+        {
+          "name": "Ink",
+          "hex": "#151515"
+        },
+        {
+          "name": "Ash",
+          "hex": "#ebe9e6"
+        },
+        {
+          "name": "Paper",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Pure Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Smoke",
+          "hex": "#8a8a8a"
+        }
+      ],
+      "fonts": [
+        "TWK Lausanne",
+        "Molitor",
+        "Garaje",
+        "Arial",
+        "GTStandard-M"
+      ],
+      "northStar": "Frost-bleached editorial broadsheet — large display type cut into warm off-white, all atmosphere carried by raw photography."
+    },
+    {
+      "id": "ca522706-03ed-48cb-acb3-1bb2a22f2eda",
+      "siteName": "Little Amps",
+      "url": "https://littleampscoffee.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Espresso",
+          "hex": "#522c25"
+        },
+        {
+          "name": "Burnt Orange",
+          "hex": "#c03001"
+        },
+        {
+          "name": "Amber Ink",
+          "hex": "#c46500"
+        },
+        {
+          "name": "Marigold Wash",
+          "hex": "#febf6f"
+        },
+        {
+          "name": "Dusty Blue",
+          "hex": "#89b4ca"
+        },
+        {
+          "name": "Cream Paper",
+          "hex": "#fff9f2"
+        }
+      ],
+      "fonts": [
+        "Little Amps",
+        "Inclusive Sans",
+        "Necto Mono",
+        "Roboto Mono",
+        "GTStandard-M"
+      ],
+      "northStar": "vinyl record sleeve in afternoon sun. Cream paper, burnt-orange ink, a single dusty blue stamp, every label set in monospace — the interface behaves like a printed coffee zine: tactile, editorial, never sterile."
+    },
+    {
+      "id": "17ce9ad2-f22d-4e48-92de-e28fb8551cc5",
+      "siteName": "Fallen Grape",
+      "url": "https://www.fallengrape.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Vintage Cream",
+          "hex": "#ece0d2"
+        },
+        {
+          "name": "Bone White",
+          "hex": "#f3f3f3"
+        },
+        {
+          "name": "Walnut Ink",
+          "hex": "#573d21"
+        },
+        {
+          "name": "Saddle Brown",
+          "hex": "#7c664d"
+        },
+        {
+          "name": "Peach Sand",
+          "hex": "#e1c6ab"
+        },
+        {
+          "name": "Terracotta Glow",
+          "hex": "#e3a36e"
+        }
+      ],
+      "fonts": [
+        "Romie",
+        "Arial Narrow",
+        "GTStandard-M"
+      ],
+      "northStar": "Sun-drenched vineyard at golden hour. Warm cream paper, walnut ink, terracotta warmth — a wine label breathed into a full interface."
+    },
+    {
+      "id": "07f5281d-2a18-4e12-a8ff-d54d3e03d198",
+      "siteName": "Essie Wine",
+      "url": "https://www.essiewine.com",
+      "colorScheme": "both",
+      "colors": [
+        {
+          "name": "Ink Teal",
+          "hex": "#062d32"
+        },
+        {
+          "name": "Dusty Rose",
+          "hex": "#c9a9b5"
+        },
+        {
+          "name": "Mustard Olive",
+          "hex": "#aa9e54"
+        },
+        {
+          "name": "Slate Teal",
+          "hex": "#344b52"
+        },
+        {
+          "name": "Warm Bone",
+          "hex": "#e9e9e2"
+        },
+        {
+          "name": "Mid Gray",
+          "hex": "#767676"
+        }
+      ],
+      "fonts": [
+        "BasicCommercial LT Com Roman",
+        "Adobe Caslon",
+        "Elementa"
+      ],
+      "northStar": "Dusty rose chapbook with mustard chapter breaks"
+    },
+    {
+      "id": "76483bd1-37d3-4fb9-889b-aecf27b08b83",
+      "siteName": "Woven",
+      "url": "https://wovenwhisky.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Parchment Cream",
+          "hex": "#eeede5"
+        },
+        {
+          "name": "Ink Black",
+          "hex": "#232323"
+        },
+        {
+          "name": "Pure White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Iron Gray",
+          "hex": "#4a4a4a"
+        },
+        {
+          "name": "Soft Stone",
+          "hex": "#ddddda"
+        }
+      ],
+      "fonts": [
+        "Spezia Semi-Mono",
+        "Spezia Medium",
+        "Figtree",
+        "Spezia Semi-Mono Light"
+      ],
+      "northStar": "Ink on cream parchment. A distiller's editorial spread where warm cream canvases, a single dark ink color, and wide-tracked uppercase type create the only visual structure; product photography provides all the color."
+    },
+    {
+      "id": "b2ace2c1-d6ee-4d57-915e-901224cded11",
+      "siteName": "Alison Roman",
+      "url": "https://www.alisoneroman.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Aubergine Ink",
+          "hex": "#290a08"
+        },
+        {
+          "name": "Vintage Burgundy",
+          "hex": "#810c00"
+        },
+        {
+          "name": "Buttery Highlight",
+          "hex": "#fff3cc"
+        },
+        {
+          "name": "Parchment Canvas",
+          "hex": "#f6f0e1"
+        },
+        {
+          "name": "Linen Card",
+          "hex": "#fffaec"
+        },
+        {
+          "name": "Hairline Mist",
+          "hex": "#e5e7eb"
+        }
+      ],
+      "fonts": [
+        "Jannon Neo",
+        "Modale Antique",
+        "-apple-system"
+      ],
+      "northStar": "cookbook pages on warm cream paper — a printed spread from an artisan food memoir, translated to screen with zero loss of tactility"
+    },
+    {
+      "id": "8e1c35bf-f0e8-4889-b869-d9883bb76767",
+      "siteName": "Beautiful™",
+      "url": "https://cookwithbeautiful.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Coral Pop",
+          "hex": "#fa7864"
+        },
+        {
+          "name": "Terracotta Whisper",
+          "hex": "#dc8264"
+        },
+        {
+          "name": "Cream Linen",
+          "hex": "#fff5e6"
+        },
+        {
+          "name": "Ink Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Charcoal",
+          "hex": "#282828"
+        },
+        {
+          "name": "Stone",
+          "hex": "#707070"
+        }
+      ],
+      "fonts": [
+        "GascogneTS",
+        "Basis Grotesque Pro",
+        "BasisGrotesquePro-Mono"
+      ],
+      "northStar": "Warm kitchen on a Sunday morning"
+    },
+    {
+      "id": "ac9b040e-36aa-4881-ada5-72d4744947a4",
+      "siteName": "Kinfolk",
+      "url": "https://www.kinfolk.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Ink Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Bone White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Paper Mist",
+          "hex": "#f4f4f4"
+        },
+        {
+          "name": "Sage Paper",
+          "hex": "#dbded5"
+        }
+      ],
+      "fonts": [
+        "Kinfolk-Serif-Text",
+        "Kinfolk-Serif-Display",
+        "Kinfolk-Serif-Deck",
+        "Kinfolk-Sans",
+        "Arial"
+      ],
+      "northStar": "Editorial broadsheet on bone-white linen — generous margins, ink-black serif, and a single warm-paper accent for section breaks."
+    },
+    {
+      "id": "887f0c74-c696-4589-82ae-85705ecda919",
+      "siteName": "Miti Navi",
+      "url": "https://miti-navi.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Linen",
+          "hex": "#e6dece"
+        },
+        {
+          "name": "Deep Ink",
+          "hex": "#000e13"
+        },
+        {
+          "name": "Carbon",
+          "hex": "#232323"
+        },
+        {
+          "name": "Soft Ash",
+          "hex": "#999999"
+        },
+        {
+          "name": "Warm Apricot",
+          "hex": "#ffdead"
+        },
+        {
+          "name": "Obsidian",
+          "hex": "#000000"
+        }
+      ],
+      "fonts": [
+        "GT Pressura Mono",
+        "Voyage",
+        "GTSectraDisplay",
+        "Times"
+      ],
+      "northStar": "Tuscan sea-view chapbook on raw linen"
+    },
+    {
+      "id": "5528d10f-2e7d-4502-aa49-7bde290e8fe2",
+      "siteName": "Diabla",
+      "url": "https://www.diablaoutdoor.com/en",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Vermillion",
+          "hex": "#ed2e38"
+        },
+        {
+          "name": "Blush Canvas",
+          "hex": "#fcf0f3"
+        },
+        {
+          "name": "Charcoal Ink",
+          "hex": "#333333"
+        },
+        {
+          "name": "Onyx",
+          "hex": "#000000"
+        }
+      ],
+      "fonts": [
+        "LinotypeHelveticaNeueLTStdLt",
+        "LinotypeHelveticaNeueLTStdRoman",
+        "Arial"
+      ],
+      "northStar": "Mediterranean courtyard at noon — sun-bleached pink walls, one bold red canvas awning, and editorial serif headlines stretched across the sky."
+    },
+    {
+      "id": "12b20c12-27f8-4938-89ba-569404d36fe8",
+      "siteName": "Sing-sing",
+      "url": "https://sing-sing.co",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Marigold",
+          "hex": "#fcd579"
+        },
+        {
+          "name": "Sea Glass",
+          "hex": "#81d6b9"
+        },
+        {
+          "name": "Inkstone",
+          "hex": "#171717"
+        },
+        {
+          "name": "Marigold Gradient",
+          "hex": "#efcb75",
+          "gradient": "linear-gradient(90deg, #81d6b9 40%, #efcb75 100%)"
+        }
+      ],
+      "fonts": [
+        "untitledsans",
+        "signifier"
+      ],
+      "northStar": "butter-paper broadsheet at golden hour — a warm saffron canvas with sea-glass ink."
+    },
+    {
+      "id": "6a5f9438-7ae6-4743-a0bd-f9087d467eff",
+      "siteName": "Abetterlou",
+      "url": "https://abetterlou.com",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Espresso",
+          "hex": "#140b00"
+        },
+        {
+          "name": "Midnight Cocoa",
+          "hex": "#0b0600"
+        },
+        {
+          "name": "Warm Cream",
+          "hex": "#fff1e0"
+        },
+        {
+          "name": "Soft Cream",
+          "hex": "#f1f1f1"
+        },
+        {
+          "name": "Walnut",
+          "hex": "#43392d"
+        },
+        {
+          "name": "Cedar",
+          "hex": "#4f4538"
+        }
+      ],
+      "fonts": [
+        "PP Neue Montreal"
+      ],
+      "northStar": "Embers on saddle leather — warm cream typography glowing against deep coffee-black, with amber-gold buttons that feel pressed into the page like heated metalwork."
+    },
+    {
+      "id": "4433dfe7-315a-4459-bfd7-f59ccdc09bad",
+      "siteName": "Atoms",
+      "url": "https://atoms.co",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Champagne Gold",
+          "hex": "#c8ad86"
+        },
+        {
+          "name": "Candlelight Cream",
+          "hex": "#fff7dd"
+        },
+        {
+          "name": "Obsidian Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Ember Ash",
+          "hex": "#66635f"
+        }
+      ],
+      "fonts": [
+        "Switzer",
+        "system-ui sans-serif"
+      ],
+      "northStar": "obsidian monolith in candlelight — a near-black canvas where a single warm champagne accent cuts like a blade through the darkness"
+    },
+    {
+      "id": "5090ce54-9097-4d29-a741-2847dbacc419",
+      "siteName": "Chantlings",
+      "url": "https://www.iorama.studio/chantlings",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Obsidian",
+          "hex": "#222222"
+        },
+        {
+          "name": "Graphite",
+          "hex": "#333333"
+        },
+        {
+          "name": "Bone",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Ember",
+          "hex": "#ffaa20"
+        },
+        {
+          "name": "Amber Glow",
+          "hex": "#ff8800"
+        }
+      ],
+      "fonts": [
+        "Mija"
+      ],
+      "northStar": "Candlelit cave, ember in the void"
+    },
+    {
+      "id": "f240ed7d-d466-478e-bbce-6c93420dfd1c",
+      "siteName": "Slab",
+      "url": "https://slab.com",
+      "colorScheme": "both",
+      "colors": [
+        {
+          "name": "Midnight Wine",
+          "hex": "#42022e",
+          "gradient": "linear-gradient(90deg, #42022, rgba(66, 2, 46, 0))"
+        },
+        {
+          "name": "Coral Ember",
+          "hex": "#ff4143"
+        },
+        {
+          "name": "Slate Ink",
+          "hex": "#455360"
+        },
+        {
+          "name": "Fog Gray",
+          "hex": "#939598"
+        },
+        {
+          "name": "Paper White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Mist",
+          "hex": "#e0e0e0"
+        }
+      ],
+      "fonts": [
+        "Sentinel",
+        "Whitney"
+      ],
+      "northStar": "midnight-wine reading room"
+    },
+    {
+      "id": "d28732de-1b7a-4d37-b7aa-edfa7caf428b",
+      "siteName": "Raus",
+      "url": "https://www.raus.life",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Charcoal",
+          "hex": "#23212c"
+        },
+        {
+          "name": "Paper",
+          "hex": "#f7f0e1"
+        },
+        {
+          "name": "Snow",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Pine",
+          "hex": "#006434"
+        },
+        {
+          "name": "Marigold",
+          "hex": "#fcbd1c"
+        },
+        {
+          "name": "Morning Sky",
+          "hex": "#a6dfff"
+        }
+      ],
+      "fonts": [
+        "neue-haas-unica",
+        "fonts"
+      ],
+      "northStar": "Warm cabin journal on cream paper — every page a postcard from the woods."
+    },
+    {
+      "id": "46c8dbc5-47c8-4796-b94c-5e46dcda3532",
+      "siteName": "BelArosa Chalet",
+      "url": "https://www.belarosa-chalet.ch",
+      "colorScheme": "both",
+      "colors": [
+        {
+          "name": "Mountain Slate",
+          "hex": "#193741"
+        },
+        {
+          "name": "Deep Teal",
+          "hex": "#1d414d"
+        },
+        {
+          "name": "Honey Gold",
+          "hex": "#eac486"
+        },
+        {
+          "name": "Snow White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Warm Parchment",
+          "hex": "#ebe7e1"
+        },
+        {
+          "name": "Stone Gray",
+          "hex": "#8c9ba0"
+        }
+      ],
+      "fonts": [
+        "Avenir LT Pro Roman",
+        "ITC Giovanni Std Bold"
+      ],
+      "northStar": "dusk on alpine vellum"
+    },
+    {
+      "id": "14efe0a8-5abf-441c-919d-add271317bf9",
+      "siteName": "Hartzler Family Dairy",
+      "url": "https://www.hartzlerdairy.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Forest Heritage",
+          "hex": "#035542"
+        },
+        {
+          "name": "Billboard Blue",
+          "hex": "#2b7bb9"
+        },
+        {
+          "name": "Cream Teal",
+          "hex": "#56dddb"
+        },
+        {
+          "name": "Butter Yellow",
+          "hex": "#f9e9a9"
+        },
+        {
+          "name": "Charcoal Press",
+          "hex": "#333333"
+        },
+        {
+          "name": "Cream White",
+          "hex": "#ffffff"
+        }
+      ],
+      "fonts": [
+        "Work Sans",
+        "Font Awesome 5 Brands"
+      ],
+      "northStar": "Creamery billboard at golden hour — the products are the type and the type is the room."
+    },
+    {
+      "id": "fb6ac216-c11a-47c3-88e8-0423541da69c",
+      "siteName": "Monte",
+      "url": "https://montecafe.com.au",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Corten",
+          "hex": "#b84b30"
+        },
+        {
+          "name": "Bordeaux",
+          "hex": "#5f1d1a"
+        },
+        {
+          "name": "Sandstone",
+          "hex": "#f8f4e9"
+        },
+        {
+          "name": "Driftwood",
+          "hex": "#e5e7eb"
+        },
+        {
+          "name": "Charcoal",
+          "hex": "#000000"
+        },
+        {
+          "name": "Bone",
+          "hex": "#ffffff"
+        }
+      ],
+      "fonts": [
+        "Riposte",
+        "Apercu Mono"
+      ],
+      "northStar": "rust-tinted coastal morning"
+    },
+    {
+      "id": "ab7996ed-e0ed-40a0-81a5-d37f19ef35b0",
+      "siteName": "Mr. Pops",
+      "url": "https://mrpops.ua/en",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Cherry Marquee",
+          "hex": "#b00e2f"
+        },
+        {
+          "name": "Cream Bisque",
+          "hex": "#fee5ca"
+        },
+        {
+          "name": "Canvas White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Ink Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Slate Mid",
+          "hex": "#aaaaaa"
+        }
+      ],
+      "fonts": [
+        "Cervo",
+        "HelveticaNeueCyr"
+      ],
+      "northStar": "retro ice cream parlor on cream paper. A bright white shopfront with cherry-red trim, stacked marquee letters, and warm cream cards beneath full-bleed food photography."
+    },
+    {
+      "id": "c6ec55c7-0bd9-47c5-a4d2-669b7790c9cc",
+      "siteName": "OLIPOP",
+      "url": "https://drinkolipop.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Forest Ink",
+          "hex": "#14433d"
+        },
+        {
+          "name": "Cream Paper",
+          "hex": "#fdf7e7"
+        },
+        {
+          "name": "Mint Sage",
+          "hex": "#d3e8e3"
+        },
+        {
+          "name": "Charcoal",
+          "hex": "#3a3a3a"
+        },
+        {
+          "name": "Pure White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Hairline Gray",
+          "hex": "#e3e3e3"
+        }
+      ],
+      "fonts": [
+        "WindsorEF",
+        "Ano",
+        "Helvetica"
+      ],
+      "northStar": "Retro apothecary cream and forest teal — a soda fountain menu printed on warm paper."
+    },
+    {
+      "id": "14f6777e-1f6e-4b33-a7ed-d89c33f35722",
+      "siteName": "Acme Cups New Zealand",
+      "url": "https://acmecups.nz",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Ink Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Gallery White",
+          "hex": "#fefefe"
+        },
+        {
+          "name": "Concrete Canvas",
+          "hex": "#e3e2e2"
+        },
+        {
+          "name": "Ash Border",
+          "hex": "#c3c3c3"
+        },
+        {
+          "name": "Steel Mute",
+          "hex": "#aeaaaa"
+        },
+        {
+          "name": "Pewter Caption",
+          "hex": "#666666"
+        }
+      ],
+      "fonts": [
+        "Helvetica Neue"
+      ],
+      "northStar": "editorial ceramics gallery. A stark white-walled room with a single massive black headline and quiet gray dividers, where handmade cups in terracotta, forest, and teal are the only vivid things visible."
+    },
+    {
+      "id": "9165ecb1-f068-4093-8783-1f3c98898b8a",
+      "siteName": "Monocle",
+      "url": "https://monocle.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Signal Yellow",
+          "hex": "#ffc500"
+        },
+        {
+          "name": "Folio Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Newsprint Cream",
+          "hex": "#fdfcf3"
+        },
+        {
+          "name": "Broadsheet White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Margin White",
+          "hex": "#fdfbe4"
+        },
+        {
+          "name": "Pull Quote Gray",
+          "hex": "#e7e7e7"
+        }
+      ],
+      "fonts": [
+        "Plantin",
+        "Helvetica Neue",
+        "Chanel"
+      ],
+      "northStar": "Quality broadsheet on cream paper. A curated newsroom where every column earns its keep and the only color on the page is the one that matters."
+    },
+    {
+      "id": "e6b53c1e-644b-4300-b42f-0e64905d1443",
+      "siteName": "Relief",
+      "url": "https://www.relief.app",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Warm Cream",
+          "hex": "#f9f7f0"
+        },
+        {
+          "name": "Snow",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Ink",
+          "hex": "#333333"
+        },
+        {
+          "name": "Charcoal",
+          "hex": "#212121"
+        },
+        {
+          "name": "Fog",
+          "hex": "#d0d5dd"
+        },
+        {
+          "name": "Slate",
+          "hex": "#616c8a"
+        }
+      ],
+      "fonts": [
+        "Gilroy"
+      ],
+      "northStar": "Cream-paper harbor under flat sky-blue"
+    },
+    {
+      "id": "f63bf016-5b53-4ddf-9f8c-da43f75a9e2b",
+      "siteName": "VALIENTE BRANDS",
+      "url": "https://valientebrands.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Signal Flare",
+          "hex": "#ff1a00"
+        },
+        {
+          "name": "Sun-Baked Canvas",
+          "hex": "#e7a196"
+        },
+        {
+          "name": "Midnight Frame",
+          "hex": "#0a0a0a"
+        }
+      ],
+      "fonts": [
+        "GT Pressura",
+        "Monument Grotesk"
+      ],
+      "northStar": "Signal flare on sun-baked clay. A single urgent red-orange screaming across a warm matte peach field, held together by a monolithic neo-grotesque and almost nothing else."
+    },
+    {
+      "id": "2a830d03-cebc-48f0-a50f-ad78168c5026",
+      "siteName": "Forner",
+      "url": "https://forner.studio",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Roast Ink",
+          "hex": "#484036"
+        },
+        {
+          "name": "Bone Canvas",
+          "hex": "#faf5eb"
+        },
+        {
+          "name": "Linen Surface",
+          "hex": "#ecece4"
+        },
+        {
+          "name": "Sandstone",
+          "hex": "#cacab0"
+        },
+        {
+          "name": "Pebble",
+          "hex": "#d5d5c4"
+        },
+        {
+          "name": "Manilla Cream",
+          "hex": "#f2e9cf"
+        }
+      ],
+      "fonts": [
+        "Surt",
+        "ClashDisplay",
+        "BigDailyShort"
+      ],
+      "northStar": "Warm earthen atelier — imagine a ceramics studio at golden hour, where every surface is clay, bone, or roasted coffee, and the only chrome is the potter's hand-lettered note pinned to the wall."
+    },
+    {
+      "id": "6da76890-6e04-452a-834d-ff019e232c2b",
+      "siteName": "Touchy Coffee",
+      "url": "https://touchycoffee.com",
+      "colorScheme": "both",
+      "colors": [
+        {
+          "name": "Ink",
+          "hex": "#000000"
+        },
+        {
+          "name": "Sage",
+          "hex": "#788c8c"
+        },
+        {
+          "name": "Cream",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Terracotta",
+          "hex": "#9f4920"
+        },
+        {
+          "name": "Lavender",
+          "hex": "#a697c6"
+        },
+        {
+          "name": "Moss",
+          "hex": "#5b9133"
+        }
+      ],
+      "fonts": [
+        "Apercu Mono",
+        "Touchy Script (custom)",
+        "Apercu Mono Bold"
+      ],
+      "northStar": "Hand-painted coffee zine — earthy paint bands, typewriter labels, and extreme pill buttons on warm matte surfaces."
+    },
+    {
+      "id": "c5326639-873a-4257-ad1a-7da9111e9286",
+      "siteName": "Wise Design",
+      "url": "https://wise.design",
+      "colorScheme": "both",
+      "colors": [
+        {
+          "name": "Lime Volt",
+          "hex": "#87ea5c"
+        },
+        {
+          "name": "Forest Ink",
+          "hex": "#083400"
+        },
+        {
+          "name": "Volt Yellow",
+          "hex": "#ffea4b"
+        },
+        {
+          "name": "Papaya",
+          "hex": "#ffbd89"
+        },
+        {
+          "name": "Cotton Candy",
+          "hex": "#ffd5f0"
+        },
+        {
+          "name": "Aubergine Night",
+          "hex": "#2a0831"
+        }
+      ],
+      "fonts": [
+        "Inter",
+        "Wise Sans",
+        "Zen Kaku Gothic New"
+      ],
+      "northStar": "Neon market stall on a global street — electric lime signage that shouts across a crowded marketplace, then polished product UI slips in behind it."
+    },
+    {
+      "id": "04961c7d-8ca6-4e87-ba88-6ad7ffa3b245",
+      "siteName": "Home page | Impossible Foods",
+      "url": "https://impossiblefoods.com",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Velvet Wine",
+          "hex": "#260212"
+        },
+        {
+          "name": "Burgundy Stage",
+          "hex": "#4f0423"
+        },
+        {
+          "name": "Impossible Red",
+          "hex": "#e10600"
+        },
+        {
+          "name": "Blush Highlight",
+          "hex": "#ffc7c6"
+        },
+        {
+          "name": "Butcher Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Bone White",
+          "hex": "#ffffff"
+        }
+      ],
+      "fonts": [
+        "sans-meat"
+      ],
+      "northStar": "Blood-red punk poster in velvet darkness. A custom condensed display face bleeds across a wine-dark canvas while single-color red CTAs punch through like a price tag on a butcher's chalkboard."
+    },
+    {
+      "id": "6ec18fa7-41ff-41e0-8824-94f6fa104a75",
+      "siteName": "Glyphy",
+      "url": "https://glyphy.io",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Buttercream",
+          "hex": "#fef9e6"
+        },
+        {
+          "name": "Ink",
+          "hex": "#000000"
+        },
+        {
+          "name": "Carbon",
+          "hex": "#060606"
+        },
+        {
+          "name": "Driftwood",
+          "hex": "#c7c3b4"
+        },
+        {
+          "name": "Stone",
+          "hex": "#8d8b80"
+        },
+        {
+          "name": "Amber Pulse",
+          "hex": "#fdc331"
+        }
+      ],
+      "fonts": [
+        "Arial",
+        "Neue Machina",
+        "System85",
+        "Pixel M Plus 10",
+        "System85 Mono"
+      ],
+      "northStar": "buttercream specimen sheet beneath sunset bands. A warm cream page sliced by yellow-to-plum horizontal stripes, anchored by an oversized neo-grotesque wordmark and tiny pixel Japanese eyebrows."
+    },
+    {
+      "id": "8e26bf8a-44b8-4fe1-9b4b-188dd5827c0f",
+      "siteName": "Lama Lama",
+      "url": "https://lamalama.nl",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Ice Cyan",
+          "hex": "#d7f3f5"
+        },
+        {
+          "name": "Void",
+          "hex": "#020203"
+        },
+        {
+          "name": "Carbon",
+          "hex": "#111314"
+        }
+      ],
+      "fonts": [
+        "SuisseIntl",
+        "Suisse Int'l"
+      ],
+      "northStar": "midnight studio with a frozen-white spotlight"
+    },
+    {
+      "id": "a6284fcd-fa69-4469-ac40-4239e5b84a39",
+      "siteName": "Freshman",
+      "url": "https://freshman.tv",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Pure White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Carbon Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Charcoal Shale",
+          "hex": "#101010"
+        },
+        {
+          "name": "Signal Red",
+          "hex": "#ff2936"
+        }
+      ],
+      "fonts": [
+        "Editorial New",
+        "TT Firs Neue",
+        "Altform",
+        "Wasted Year"
+      ],
+      "northStar": "cinema title card on black velvet"
+    },
+    {
+      "id": "5b405eec-67ba-4dd0-8dab-ace000151a78",
+      "siteName": "Michael Wandelmaier",
+      "url": "https://wandelmaier.com",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Inkwell",
+          "hex": "#000000"
+        },
+        {
+          "name": "Bone",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Ash",
+          "hex": "#a9a9a9"
+        },
+        {
+          "name": "Ember",
+          "hex": "#302f2d"
+        },
+        {
+          "name": "Meadow",
+          "hex": "#34a847"
+        },
+        {
+          "name": "Coral Blush",
+          "hex": "#fbcbcb"
+        }
+      ],
+      "fonts": [
+        "Canela Web",
+        "PolySans",
+        "sans-serif (system)"
+      ],
+      "northStar": "museum placard on black velvet — three candy pills, one whisper-weight serif, and almost nothing else."
+    },
+    {
+      "id": "27a4a4fa-4b1a-4e7e-b2c3-3e5bf57f00e5",
+      "siteName": "Bang & Olufsen",
+      "url": "https://bang-olufsen.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Porcelain Canvas",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Bone",
+          "hex": "#fcfaee"
+        },
+        {
+          "name": "Obsidian",
+          "hex": "#191817"
+        },
+        {
+          "name": "Pure Ink",
+          "hex": "#000000"
+        },
+        {
+          "name": "Graphite",
+          "hex": "#555555"
+        },
+        {
+          "name": "Mist",
+          "hex": "#e5e5e5"
+        }
+      ],
+      "fonts": [
+        "BeoSupreme",
+        "object-fit: cover; object-position: center;"
+      ],
+      "northStar": "Scandinavian gallery on porcelain. When a B&O page goes dark, the product is lit like a sculpture in a midnight alcove; when it goes light, the product floats on white silk with nothing else competing for attention."
+    },
+    {
+      "id": "34b4856c-cc2b-4164-ab90-1b87cf8e0213",
+      "siteName": "Everlane",
+      "url": "https://everlane.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Onyx",
+          "hex": "#000000"
+        },
+        {
+          "name": "Paper White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Soot",
+          "hex": "#121212"
+        },
+        {
+          "name": "Ink",
+          "hex": "#161912"
+        },
+        {
+          "name": "Graphite",
+          "hex": "#4c4c4c"
+        },
+        {
+          "name": "Slate",
+          "hex": "#737373"
+        }
+      ],
+      "fonts": [
+        "Maison Neue Book",
+        "Maison Neue Demi",
+        "Maison Neue",
+        "Arial",
+        "GTStandard-M"
+      ],
+      "northStar": "Minimalist atelier on raw linen. White walls, bare architecture, a single sage-green ribbon of light."
+    },
+    {
+      "id": "391bd401-06d7-4444-8243-8573e96eab24",
+      "siteName": "D.S. & DURGA",
+      "url": "https://www.dsanddurga.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Ink Black",
+          "hex": "#000000"
+        },
+        {
+          "name": "Bone White",
+          "hex": "#f2e9de"
+        },
+        {
+          "name": "Dusty Rose",
+          "hex": "#ddc9c0"
+        }
+      ],
+      "fonts": [
+        "Sofia Pro"
+      ],
+      "northStar": "indie perfumery broadsheet on bone-white paper — a single warm cream canvas where black ink and oversized type do all the talking."
+    },
+    {
+      "id": "3a331157-f5a5-4640-ada8-8a3ad262ee6a",
+      "siteName": "Aspelin Reitan",
+      "url": "https://www.aspelineiendom.no",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Warm Parchment",
+          "hex": "#ffebd0"
+        },
+        {
+          "name": "Candlelight",
+          "hex": "#fff8e9"
+        },
+        {
+          "name": "Obsidian",
+          "hex": "#000000"
+        },
+        {
+          "name": "Walnut Shell",
+          "hex": "#2f2116"
+        },
+        {
+          "name": "Aged Bronze",
+          "hex": "#4f3622"
+        },
+        {
+          "name": "Amber Glow",
+          "hex": "#fee197"
+        }
+      ],
+      "fonts": [
+        "ModernEra"
+      ],
+      "northStar": "Candlelit architectural archive — the page reads like a portfolio of built places pinned to a warm cream wall, with a single line of white type floating over each full-bleed image."
+    },
+    {
+      "id": "77a193de-2472-4637-802f-d930ec61c180",
+      "siteName": "Flayks",
+      "url": "https://flayks.com",
+      "colorScheme": "dark",
+      "colors": [
+        {
+          "name": "Forest Ink",
+          "hex": "#00381c"
+        },
+        {
+          "name": "Forest Deep",
+          "hex": "#002d16"
+        },
+        {
+          "name": "Peach Cream",
+          "hex": "#ffe0ce"
+        },
+        {
+          "name": "Bone",
+          "hex": "#f6e9d9"
+        },
+        {
+          "name": "Charcoal",
+          "hex": "#272221"
+        },
+        {
+          "name": "Obsidian",
+          "hex": "#000000"
+        }
+      ],
+      "fonts": [
+        "Mango Grotesque",
+        "Nohemi",
+        "Arial"
+      ],
+      "northStar": "Oversized editorial broadsheet — dark forest green page, peach ink headlines bleeding off the page edges, tiny Nohemi caption text anchoring the corners."
+    },
+    {
+      "id": "abbaa70a-5fe2-44a9-9c5f-272e68c450c3",
+      "siteName": "Customer.io",
+      "url": "https://customer.io",
+      "colorScheme": "both",
+      "colors": [
+        {
+          "name": "Spruce Abyss",
+          "hex": "#00191c"
+        },
+        {
+          "name": "Spruce 900",
+          "hex": "#032125"
+        },
+        {
+          "name": "Spruce 700",
+          "hex": "#0b363b"
+        },
+        {
+          "name": "Spruce 500",
+          "hex": "#437278"
+        },
+        {
+          "name": "Spruce 200",
+          "hex": "#a1c2c6"
+        },
+        {
+          "name": "Spruce Mist",
+          "hex": "#354d51"
+        }
+      ],
+      "fonts": [
+        "Saans"
+      ],
+      "northStar": "dark spruce forest meeting cream paper"
+    },
+    {
+      "id": "b52981ce-fdb2-4ba0-86bb-f5ce0c27a9c6",
+      "siteName": "Arcadia",
+      "url": "https://www.arcadia.com",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Canopy",
+          "hex": "#104336"
+        },
+        {
+          "name": "Mint Pulse",
+          "hex": "#0fff87"
+        },
+        {
+          "name": "Orb Violet",
+          "hex": "#7c18d3"
+        },
+        {
+          "name": "Cream Paper",
+          "hex": "#f3f1ec"
+        },
+        {
+          "name": "Sheet White",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Bark",
+          "hex": "#101f1e"
+        }
+      ],
+      "fonts": [
+        "DM Sans",
+        "Helvetica"
+      ],
+      "northStar": "forest observatory at dawn — deep evergreen authority on warm cream paper, one mint LED accent and pale violet data orbs suspended in soft morning light."
+    },
+    {
+      "id": "3e52dd36-6ab1-48c6-bc40-47ef6d33abc2",
+      "siteName": "monopo saigon",
+      "url": "https://monopo.vn",
+      "colorScheme": "light",
+      "colors": [
+        {
+          "name": "Obsidian",
+          "hex": "#000000"
+        },
+        {
+          "name": "Paper",
+          "hex": "#ffffff"
+        },
+        {
+          "name": "Inkstone",
+          "hex": "#181818"
+        },
+        {
+          "name": "Felt Gray",
+          "hex": "#6d6d6d"
+        },
+        {
+          "name": "Slate Pill",
+          "hex": "#636363"
+        },
+        {
+          "name": "Ash Mist",
+          "hex": "#9a9a9a"
+        }
+      ],
+      "fonts": [
+        "Roobert",
+        "Raleway",
+        "system-ui"
+      ],
+      "northStar": "Liquid iridescence behind editorial silence — a monochrome editorial gallery floating on molten light."
+    }
+  ]
+}

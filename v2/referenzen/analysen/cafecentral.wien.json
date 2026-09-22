@@ -1,0 +1,88 @@
+{
+  "url": "https://www.cafecentral.wien",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:31:14.792Z",
+  "titel": "Café Central",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 5823248
+      },
+      {
+        "hex": "#7f1541",
+        "anzahl": 3414510
+      },
+      {
+        "hex": "#ececec",
+        "anzahl": 1144074
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 1
+      },
+      {
+        "hex": "#7f1541",
+        "anzahl": 24
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 8
+      },
+      {
+        "hex": "#242424",
+        "anzahl": 8
+      },
+      {
+        "hex": "#f8f8f8",
+        "anzahl": 6
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 4
+      },
+      {
+        "hex": "#0000ee",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": "#7f1541"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "FSLola",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 34,
+    "bodyPx": 17,
+    "kontrastVerhaeltnis": 2,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 1,
+    "median": 30,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 1,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 9,
+    "medianDauerMs": 400,
+    "charakter": "lebendig"
+  }
+}

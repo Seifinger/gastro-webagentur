@@ -1,0 +1,70 @@
+{
+  "url": "https://styles.refero.design/style/14f6777e-1f6e-4b33-a7ed-d89c33f35722",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:28:39.564Z",
+  "name": "Acme Cups New Zealand",
+  "originalUrl": "https://acmecups.nz",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "name": "Ink Black",
+        "anzahl": 8
+      },
+      {
+        "hex": "#fefefe",
+        "name": "Gallery White",
+        "anzahl": 7
+      },
+      {
+        "hex": "#e3e2e2",
+        "name": "Concrete Canvas",
+        "anzahl": 6
+      },
+      {
+        "hex": "#c3c3c3",
+        "name": "Ash Border",
+        "anzahl": 5
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#aeaaaa",
+        "name": "Steel Mute",
+        "anzahl": 4
+      },
+      {
+        "hex": "#666666",
+        "name": "Pewter Caption",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "gemischt",
+    "saettigung": "fast unbunt",
+    "akzent": null,
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Helvetica Neue",
+        "anzahl": 5,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "editorial ceramics gallery. A stark white-walled room with a single massive black headline and quiet gray dividers, where handmade cups in terracotta, forest, and teal are the only vivid things visible."
+}

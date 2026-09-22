@@ -1,0 +1,75 @@
+{
+  "url": "https://styles.refero.design/style/2a830d03-cebc-48f0-a50f-ad78168c5026",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:26:47.906Z",
+  "name": "Forner",
+  "originalUrl": "https://forner.studio",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#faf5eb",
+        "name": "Bone Canvas",
+        "anzahl": 7
+      },
+      {
+        "hex": "#ecece4",
+        "name": "Linen Surface",
+        "anzahl": 6
+      },
+      {
+        "hex": "#cacab0",
+        "name": "Sandstone",
+        "anzahl": 5
+      },
+      {
+        "hex": "#d5d5c4",
+        "name": "Pebble",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#484036",
+        "name": "Roast Ink",
+        "anzahl": 8
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": null,
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Surt",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "ClashDisplay",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "BigDailyShort",
+        "anzahl": 3,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Warm earthen atelier — imagine a ceramics studio at golden hour, where every surface is clay, bone, or roasted coffee, and the only chrome is the potter's hand-lettered note pinned to the wall."
+}

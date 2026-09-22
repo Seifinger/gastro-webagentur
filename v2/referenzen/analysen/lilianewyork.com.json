@@ -1,0 +1,81 @@
+{
+  "url": "https://www.lilianewyork.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:26:04.482Z",
+  "titel": "Lilia",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 2280960
+      },
+      {
+        "hex": "#343434",
+        "anzahl": 984960
+      },
+      {
+        "hex": "#757679",
+        "anzahl": 712800
+      },
+      {
+        "hex": "#727b4e",
+        "anzahl": 712800
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 43
+      },
+      {
+        "hex": "#343434",
+        "anzahl": 25
+      },
+      {
+        "hex": "#727b4e",
+        "anzahl": 9
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Pinyon Script",
+        "rolle": "h1",
+        "art": "skript"
+      },
+      {
+        "name": "Raleway",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Schreibschrift führt, Grotesk als Gegenstimme",
+    "displayArt": "skript",
+    "h1Px": 44,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 2.75,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 12,
+    "treffer": 0.67,
+    "median": 72,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 0,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 7,
+    "medianDauerMs": 200,
+    "charakter": "lebendig"
+  }
+}

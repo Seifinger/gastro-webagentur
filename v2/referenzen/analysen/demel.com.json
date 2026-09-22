@@ -1,0 +1,88 @@
+{
+  "url": "https://www.demel.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:31:21.042Z",
+  "titel": "Willkommen bei DEMEL - K.u.K. Hofzuckerbäcker Wien – Demel Wien",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#fdf7f2",
+        "anzahl": 243113
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 171495
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 2
+      },
+      {
+        "hex": "#fdf7f2",
+        "anzahl": 1
+      },
+      {
+        "hex": "#aa8c50",
+        "anzahl": 52
+      },
+      {
+        "hex": "#2f2823",
+        "anzahl": 26
+      },
+      {
+        "hex": "#fdf7f2",
+        "anzahl": 9
+      },
+      {
+        "hex": "#7d736e",
+        "anzahl": 8
+      },
+      {
+        "hex": "#1f1f1f",
+        "anzahl": 3
+      },
+      {
+        "hex": "#333333",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": "#aa8c50"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "PP Neue World",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 120,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 7.5,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 0.77,
+    "median": 100,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.06,
+    "reihen": 16,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 300,
+    "charakter": "ruhig"
+  }
+}

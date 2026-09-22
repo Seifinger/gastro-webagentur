@@ -1,0 +1,101 @@
+{
+  "url": "https://www.ayingers.de",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:33:51.528Z",
+  "titel": "Ayinger am Platzl | Ayinger am Platzl",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#004a25",
+        "anzahl": 1525770
+      },
+      {
+        "hex": "#eaeaea",
+        "anzahl": 1381275
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 921600
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#004a25",
+        "anzahl": 3
+      },
+      {
+        "hex": "#0e3b19",
+        "anzahl": 3
+      },
+      {
+        "hex": "#ccae54",
+        "anzahl": 2
+      },
+      {
+        "hex": "#006432",
+        "anzahl": 1
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 54
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 45
+      },
+      {
+        "hex": "#004a25",
+        "anzahl": 42
+      },
+      {
+        "hex": "#767675",
+        "anzahl": 10
+      },
+      {
+        "hex": "#ccae54",
+        "anzahl": 6
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": "#ccae54"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "FreightMicroSemibold",
+        "rolle": "h1",
+        "art": "serif"
+      },
+      {
+        "name": "FreightMicroBook",
+        "rolle": "body",
+        "art": "serif"
+      }
+    ],
+    "charakter": "Serife führt",
+    "displayArt": "serif",
+    "h1Px": 60,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 3.75,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 8,
+    "treffer": 0.6,
+    "median": 48,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.44,
+    "reihen": 9,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 300,
+    "charakter": "ruhig"
+  }
+}

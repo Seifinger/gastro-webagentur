@@ -1,0 +1,60 @@
+{
+  "url": "https://styles.refero.design/style/f63bf016-5b53-4ddf-9f8c-da43f75a9e2b",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:26:53.335Z",
+  "name": "VALIENTE BRANDS",
+  "originalUrl": "https://valientebrands.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#e7a196",
+        "name": "Sun-Baked Canvas",
+        "anzahl": 7
+      },
+      {
+        "hex": "#0a0a0a",
+        "name": "Midnight Frame",
+        "anzahl": 6
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ff1a00",
+        "name": "Signal Flare",
+        "anzahl": 8
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#ff1a00",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "GT Pressura",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Monument Grotesk",
+        "anzahl": 4,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Signal flare on sun-baked clay. A single urgent red-orange screaming across a warm matte peach field, held together by a monolithic neo-grotesque and almost nothing else."
+}

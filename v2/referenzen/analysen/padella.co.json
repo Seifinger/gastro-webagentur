@@ -1,0 +1,56 @@
+{
+  "url": "https://www.padella.co",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:25:38.729Z",
+  "titel": "Italian Restaurant in Shoreditch, Borough Market & Soho • Padella",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 4320000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 30
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "dunkel",
+    "saettigung": "fast unbunt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Roboto Condensed",
+        "rolle": "body",
+        "art": "schmal"
+      }
+    ],
+    "charakter": "schmale Grotesk führt",
+    "displayArt": "schmal",
+    "h1Px": null,
+    "bodyPx": 22,
+    "kontrastVerhaeltnis": null,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 8,
+    "treffer": 1,
+    "median": 80,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 1,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 1,
+    "medianDauerMs": 200,
+    "charakter": "ruhig"
+  }
+}

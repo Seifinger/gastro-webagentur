@@ -1,0 +1,82 @@
+{
+  "url": "https://www.bargoto.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:30:00.946Z",
+  "titel": "Bar Goto & Bar Goto Niban | Cocktail Bars in New York City",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#222222",
+        "anzahl": 8405119
+      },
+      {
+        "hex": "#fffae9",
+        "anzahl": 1296000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 2
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 47
+      },
+      {
+        "hex": "#222222",
+        "anzahl": 26
+      },
+      {
+        "hex": "#fac51c",
+        "anzahl": 21
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "dunkel",
+    "saettigung": "fast unbunt",
+    "akzent": "#fac51c"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Oswald",
+        "rolle": "h1",
+        "art": "schmal"
+      },
+      {
+        "name": "Reenie Beanie",
+        "rolle": "h2",
+        "art": "grotesk"
+      },
+      {
+        "name": "Montserrat",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "schmale Grotesk führt, Grotesk als Gegenstimme, viel Versalsatz",
+    "displayArt": "schmal",
+    "h1Px": 42,
+    "bodyPx": 14,
+    "kontrastVerhaeltnis": 3,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 5,
+    "treffer": 0.5,
+    "median": 70,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 0,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 58,
+    "medianDauerMs": 200,
+    "charakter": "lebendig"
+  }
+}

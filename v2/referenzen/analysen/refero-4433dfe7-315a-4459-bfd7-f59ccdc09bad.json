@@ -1,0 +1,65 @@
+{
+  "url": "https://styles.refero.design/style/4433dfe7-315a-4459-bfd7-f59ccdc09bad",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:30:14.222Z",
+  "name": "Atoms",
+  "originalUrl": "https://atoms.co",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#fff7dd",
+        "name": "Candlelight Cream",
+        "anzahl": 7
+      },
+      {
+        "hex": "#000000",
+        "name": "Obsidian Black",
+        "anzahl": 6
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#c8ad86",
+        "name": "Champagne Gold",
+        "anzahl": 8
+      },
+      {
+        "hex": "#66635f",
+        "name": "Ember Ash",
+        "anzahl": 5
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "gedeckt",
+    "akzent": "#c8ad86",
+    "schema": "dark"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Switzer",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "system-ui sans-serif",
+        "anzahl": 4,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "obsidian monolith in candlelight — a near-black canvas where a single warm champagne accent cuts like a blade through the darkness"
+}
