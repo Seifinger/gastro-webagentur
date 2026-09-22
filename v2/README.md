@@ -45,9 +45,16 @@ npm run v2:referenzen                                  # Referenzanalyse für al
 npm run v2:designsysteme                               # alle 36 Designsysteme neu erzeugen
 npm run v2:build -- --kueche italienisch --stimmung trattoria --judge
 npm run v2:build:all                                   # alle 36 durch den vollen Zyklus
-npm run v2:wirt -- --betrieb <slug>                    # Wirt-Dashboard mit v2-Theme + Telegram
+npm run v2:medien -- zeigen --slug <slug>             # Bildherkunft je Bildplatz (eigen/KI/Platzhalter)
+npm run v2:vergleich                                   # v1↔v2-Screenshots aller 36 → output/vergleich.md
+npm run v2:wirt -- --betrieb <slug> --kueche bayerisch --stimmung wirtshaus --telegram
 npm run v2:telegram                                    # Telegram-Bot als eigener Dienst
+npm run v2:dashboard-design                            # Token-Set des Agentur-Dashboards neu erzeugen
 ```
+
+Weiterführend: [`integration/TELEGRAM-SETUP.md`](integration/TELEGRAM-SETUP.md),
+[`COPY-PRINZIPIEN.md`](COPY-PRINZIPIEN.md), [`output/vergleich.md`](output/vergleich.md),
+[`ABSCHLUSSBERICHT.md`](ABSCHLUSSBERICHT.md).
 
 ## Verhältnis zu v1
 

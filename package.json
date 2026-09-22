@@ -23,7 +23,8 @@
     "v2:build:all": "node v2/build/cli.js --alle",
     "v2:wirt": "node v2/integration/wirtServerV2.js",
     "v2:telegram": "node v2/integration/telegramBot.js",
-    "v2:dashboard-design": "node v2/build/dashboardDesignsystem.js"
+    "v2:dashboard-design": "node v2/build/dashboardDesignsystem.js",
+    "v2:vergleich": "node v2/build/vergleich.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",

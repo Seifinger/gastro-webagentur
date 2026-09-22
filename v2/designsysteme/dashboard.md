@@ -4,9 +4,9 @@
 
 ## Referenzen
 
-- [Hex](https://styles.refero.design/style/3e32db74) – Serifen-Headline über dichten Daten; cremiger Grund
-- [Midday](https://styles.refero.design/style/3f2b79c1) – Broadsheet-Ruhe; gesperrte Spaltenköpfe
-- [Monocle](https://styles.refero.design/style/9165ecb1) – Spalten-Disziplin; eine Farbe mit Bedeutung
+- [Hex](https://styles.refero.design/style/3e32db74-a61d-4e72-93b8-1fb949af2c00) – Serifen-Headline über dichten Daten; cremiger Grund
+- [Midday](https://styles.refero.design/style/3f2b79c1-d980-4380-a903-29856975fc37) – Broadsheet-Ruhe; gesperrte Spaltenköpfe
+- [Monocle](https://styles.refero.design/style/9165ecb1-f068-4093-8783-1f3c98898b8a) – Spalten-Disziplin; eine Farbe mit Bedeutung
 
 ## Farben
 

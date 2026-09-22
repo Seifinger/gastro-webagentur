@@ -62,9 +62,9 @@ export function erzeugeDashboardDesignsystem() {
     label: "Agentur-Dashboard",
     richtung: "Redaktionelles Arbeitsblatt: Serifenziffern über einer dichten, ruhigen Tabelle; warmes Papier, eine Tinte als Akzent, Bedeutungsfarben nur für Priorität und Bildherkunft.",
     referenzen: [
-      { name: "Hex", url: "https://styles.refero.design/style/3e32db74", typ: "refero", uebernehmen: ["Serifen-Headline über dichten Daten", "cremiger Grund"] },
-      { name: "Midday", url: "https://styles.refero.design/style/3f2b79c1", typ: "refero", uebernehmen: ["Broadsheet-Ruhe", "gesperrte Spaltenköpfe"] },
-      { name: "Monocle", url: "https://styles.refero.design/style/9165ecb1", typ: "refero", uebernehmen: ["Spalten-Disziplin", "eine Farbe mit Bedeutung"] },
+      { name: "Hex", url: "https://styles.refero.design/style/3e32db74-a61d-4e72-93b8-1fb949af2c00", typ: "refero", uebernehmen: ["Serifen-Headline über dichten Daten", "cremiger Grund"] },
+      { name: "Midday", url: "https://styles.refero.design/style/3f2b79c1-d980-4380-a903-29856975fc37", typ: "refero", uebernehmen: ["Broadsheet-Ruhe", "gesperrte Spaltenköpfe"] },
+      { name: "Monocle", url: "https://styles.refero.design/style/9165ecb1-f068-4093-8783-1f3c98898b8a", typ: "refero", uebernehmen: ["Spalten-Disziplin", "eine Farbe mit Bedeutung"] },
     ],
     farben: { schema: "hell", rollen },
     kontrastPaare,

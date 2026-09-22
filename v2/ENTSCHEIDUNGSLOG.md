@@ -336,3 +336,38 @@ höchstens 3 Runden automatisch beendet, die offenen Befunde stehen rechts. Deta
   E2E-Test baut eine v2-Seite im Zyklus (ohne Judge), füllt in Chromium das
   Reservierungsformular aus und prüft `/api/betrieb`, die gemockte Telegram-Nachricht und
   die Bestätigung per Knopf. Ohne Chromium schickt er dieselbe Nutzlast direkt.
+
+## Stage 8 – Rollout, Vergleich, Abschluss
+
+- **E8.1 · Voller Lauf über alle 36.** `npm run v2:build:all -- --judge` (Referenz →
+  Designsystem → Schriften → Medien → Copy → Build ⇄ Judge) in knapp 2 Minuten: 36 gebaut,
+  0 Gate-Abbrüche, 36 in Runde 1 bestanden (34 × 10,0, 2 × 9,4 mit Hero „karte“, siehe
+  E5.5). Das Copy-System war dabei aktiv (je Seite 1–3 Ersetzungen, 0 verbleibend). Die
+  Designsysteme wurden im Zyklus neu erzeugt und sind byte-gleich zum Stand von Stage 2:
+  Der Lauf ist deterministisch.
+- **E8.2 · Vergleich mit v1 als Werkzeug, nicht als Handarbeit.** `npm run v2:vergleich`
+  (`v2/build/vergleich.js`) rendert v1 mit `buildLandingPage()` für denselben
+  synthetischen Lead und dieselbe Küche/Stimmung, so wie v1 veröffentlicht würde
+  (Unsplash-Bilder, Schriften aus `docs/assets/fonts`). Dann fotografiert es beide Seiten
+  (erster Bildschirm, Desktop und Mobil) und misst beide mit dem Judge. Die Bilder sind auf
+  60 % verkleinert und als JPEG (Qualität 60) gespeichert: 144 Bilder, 4,3 MB. Das ist
+  genug für Aufbau, Typografie und Farbe, ohne das Repository aufzublähen.
+- **E8.3 · Fairer Maßstab für v1.** Im ersten Durchlauf wurden die v1-Farben gegen die
+  v2-Palette gemessen. Damit zählte jede v1-Farbe als „fremd“, nur weil v2 andere Farben
+  hat. Korrigiert: v1 wird gegen die **eigene** Theme-Palette und die eigenen Schriften
+  gemessen (`v1Massstab`). Raster, Kontrast, Touch-Ziele und Muster gelten für beide gleich.
+  Ergebnis: v1 im Mittel 6,0 (0/36 bestanden), v2 10,0 (36/36). Häufigste v1-Befunde,
+  beispielhaft an Bayerisch/Wirtshaus: Inter als Textschrift, 149 Abstände außerhalb des
+  8-px-Rasters, 44 hartkodierte Farben, Text auf Foto mit Verlauf, Glas-Effekte, Texte
+  unter 12 px, 15 Touch-Ziele unter 40 px.
+- **E8.4 · Grenze, dokumentiert statt versteckt.** Hellen Text auf Fotos (v1-Hero und
+  v1-Navigation) misst der Judge gegen den Seitengrund und wertet ihn als Kontrastfehler,
+  auch wenn ein Schleier ihn im Bild lesbar macht. Das steht in der Einleitung von
+  `vergleich.md`. Den Judge dafür umzubauen hätte nur v1 geholfen, weil v2 keinen Text auf
+  Fotos setzt.
+- **E8.5 · Gebaute Seiten werden eingecheckt.** `v2/output/sites/` (3,4 MB, 36 Seiten mit
+  Bericht) und `v2/output/assets/fonts` gehören zum Stand, damit der Vergleich und das
+  Dashboard ohne neuen Lauf funktionieren. Entwürfe echter Leads (`v2/output/leads/`) und
+  Judge-Zwischenstände bleiben gitignored.
+- **E8.6 · Keine Veröffentlichung von v2.** `npm run publish-site` bleibt v1. Die Leitplanke
+  „v1 bleibt produktiv und unangetastet“ gilt, bis du v2 freigibst (ABSCHLUSSBERICHT).
