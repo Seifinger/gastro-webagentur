@@ -129,7 +129,7 @@ const SIGNATUR_TEILE = {
 .sig-tafel .karte:nth-child(3) { animation-delay: 14s; }
 .sig-tafel img { width: 100%; height: 100%; object-fit: cover; }
 .sig-tafel .schild { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 14px 12px;
-                     background: linear-gradient(180deg, transparent, rgba(0,0,0,.85));
+                     background: linear-gradient(180deg, transparent, rgba(var(--tint-rgb), .85));
                      color: #fff; font-size: 14px; font-weight: 600; text-align: center; }
 .sig-tafel .schild small { display: block; font-size: 10px; font-weight: 700; letter-spacing: .14em;
                            text-transform: uppercase; opacity: .75; margin-bottom: 3px; }

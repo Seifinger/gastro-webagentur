@@ -17,9 +17,21 @@ import { kuechenMarke } from "../signaturIcons.js";
  */
 export function renderFooter({ name, adresse, telefon, cuisine, handschrift }) {
   const marke = handschrift ? kuechenMarke(cuisine) : "";
+  const telHref = String(telefon ?? "").replace(/[^\d+]/g, "");
   return `<footer>
-  <div class="wrap">
-    <strong>${marke}${escapeHtml(name)}</strong>${adresse ? ` · ${escapeHtml(adresse)}` : ""}${telefon ? ` · ${escapeHtml(telefon)}` : ""}
+  <div class="wrap footer-grid">
+    <div class="footer-col">
+      <strong>${marke}${escapeHtml(name)}</strong>
+      ${adresse ? `<p>${escapeHtml(adresse)}</p>` : ""}
+    </div>
+    <nav class="footer-col footer-nav" aria-label="Seitennavigation">
+      <a href="#karte">Speisekarte</a>
+      <a href="#reservierung">Reservierung</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+    <div class="footer-col footer-kontakt">
+      ${telefon ? `<a href="tel:${escapeHtml(telHref)}">${escapeHtml(telefon)}</a>` : ""}
+    </div>
     <div class="footer-note">
       Unverbindlicher Gestaltungsentwurf. Alles, was auf dieser Seite als Platzhalter gekennzeichnet
       ist – Gerichte, Preise, Öffnungszeiten und die Angaben zu Zubereitung, Herkunft und Geschichte

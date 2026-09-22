@@ -35,16 +35,20 @@ export function heroActionButtons(primaryAction) {
   return `${bestellen("btn-light")}${reservieren("btn-outline-light")}`;
 }
 
+/** Eine Reihe aus fünf Sternen, `rounded` davon gefüllt – ersetzt ★/☆. */
+function sternenreihe(rounded) {
+  return Array.from({ length: 5 }, (_, i) => stern(i < rounded)).join("");
+}
+
 export function renderRating(lead) {
   if (!lead.rating) return "";
   const rounded = Math.round(Number(lead.rating));
-  const stars = "★".repeat(rounded) + "☆".repeat(Math.max(0, 5 - rounded));
   const count = lead.anzahlBewertungen
     ? ` (${formatCount(lead.anzahlBewertungen)} Bewertungen)`
     : "";
   return `
     <div class="rating">
-      <span class="stars" aria-hidden="true">${stars}</span>
+      <span class="stars" aria-hidden="true">${sternenreihe(rounded)}</span>
       <span><strong>${String(lead.rating).replace(".", ",")}/5</strong> auf Google${count}</span>
     </div>`;
 }
@@ -122,7 +126,7 @@ export function renderHeroEditorial(ctx) {
   // Dieselbe Darstellung wie renderRating: gefüllte und leere Sterne, damit
   // aus 4,6 nicht optisch eine glatte Fünf wird.
   const gerundet = Math.round(Number(lead.rating));
-  const sterne = "★".repeat(gerundet) + "☆".repeat(Math.max(0, 5 - gerundet));
+  const sterne = sternenreihe(gerundet);
   const bewertung = lead.rating
     ? `<div class="marginal-zeile"><span>Google</span><strong>${String(lead.rating).replace(".", ",")}/5</strong></div>
       <div class="marginal-zeile"><span class="sterne" aria-hidden="true">${sterne}</span><span>${
@@ -133,6 +137,7 @@ export function renderHeroEditorial(ctx) {
   return `<section class="hero hero-editorial">
   ${renderHeroMedia({ heroImageSrc, heroVideoSrc, name })}
   <div class="hero-overlay"></div>
+  <div class="hero-vignette"></div>
   <div class="hero-inner">
     <div class="hero-text">
       <div class="hero-kicker">${escapeHtml(konzeptLabel)}${ort ? ` · ${escapeHtml(ort)}` : ""}</div>
@@ -183,6 +188,7 @@ export function renderHero(ctx) {
   return `<section class="hero">
   ${renderHeroMedia({ heroImageSrc, heroVideoSrc: videoQuelle, name })}
   <div class="hero-overlay"></div>
+  <div class="hero-vignette"></div>
   ${renderHeroFeature(preset.hero.type, {
     cuisine,
     highlights,
@@ -229,7 +235,9 @@ export function renderHero(ctx) {
  */
 export function renderUspStrip(usps, handschrift = null, lead = null, fiktiv = false) {
   const gezeichnet = Boolean(handschrift);
-  const zeichen = gezeichnet ? haken() : '<span aria-hidden="true">✓</span>';
+  // Der gezeichnete Haken ersetzt das gesetzte ✓ auf jeder Seite, nicht nur
+  // dort, wo ein Archetyp eine eigene Handschrift mitbringt.
+  const zeichen = haken();
   const note =
     gezeichnet && lead?.rating
       ? `<span class="usp-note">${stern()} <strong>${escapeHtml(

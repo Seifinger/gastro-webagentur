@@ -135,14 +135,10 @@ export function renderContact({ kontaktZeilen, hoursRows, strasse, ort, handschr
  * @param {string|null} [ctx.handschrift] - preset.layout.handschrift.
  */
 export function renderKontaktZeilen({ adresse, mapsUrl, telefon, telHref, handschrift }) {
-  // Gezeichnete Zeichen gehören zu jeder Handschrift, nicht zu einer
-  // bestimmten: Sie sind der Satz der Agentur, nicht der eines Archetyps.
-  const gezeichnet = Boolean(handschrift);
-  const zeichen = {
-    ort: gezeichnet ? KONTAKT_IKONEN.ort : "📍",
-    telefon: gezeichnet ? KONTAKT_IKONEN.telefon : "📞",
-    abholung: gezeichnet ? KONTAKT_IKONEN.abholung : "🥡",
-  };
+  // Gezeichnete Zeichen statt Emoji (📍 📞 🥡) auf jeder Seite, nicht nur
+  // dort, wo ein Archetyp eine eigene Handschrift mitbringt: Sie sind der
+  // Satz der Agentur, nicht der eines Archetyps.
+  const zeichen = KONTAKT_IKONEN;
 
   return [
     adresse

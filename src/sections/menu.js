@@ -1,5 +1,6 @@
 import { escapeHtml, formatPrice } from "../htmlHelpers.js";
 import { gerichtId } from "../menuCatalog.js";
+import { plus, chevron } from "../signaturIcons.js";
 
 /**
  * Die vollständige Karte als aufklappbare Liste – direkt im HTML statt als
@@ -20,7 +21,7 @@ function renderMenuAccordion(menu, showBadges, beschreibungFuer) {
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">${formatPrice(gericht.preis)}</span>
-              <button class="mini-add" type="button" data-add="${id}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}" aria-label="${escapeHtml(gericht.name)} vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="${id}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}" aria-label="${escapeHtml(gericht.name)} vorbestellen">${plus()}</button>
             </div>
           </div>`;
         })
@@ -28,7 +29,7 @@ function renderMenuAccordion(menu, showBadges, beschreibungFuer) {
 
       return `
       <details class="kat"${katIndex === 0 ? " open" : ""}>
-        <summary>${escapeHtml(kategorie.name)} <span class="kat-anzahl">${kategorie.gerichte.length} Gerichte</span></summary>
+        <summary>${escapeHtml(kategorie.name)} <span class="kat-anzahl">${kategorie.gerichte.length} Gerichte</span><span class="kat-chevron" aria-hidden="true">${chevron()}</span></summary>
         <div class="kat-body">${gerichte}</div>
       </details>`;
     })

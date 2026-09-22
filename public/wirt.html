@@ -6,86 +6,111 @@
 <title>Tische & Bestellungen</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
 <style>
+  /* Stage 4 des Design-Auftrags: dunkles SaaS-Grundgerüst (DESIGN.md
+     Abschnitt 4/8). Die Variablennamen bleiben identisch zu vorher - nur
+     ihre Werte ändern sich -, damit die vielen inline style="...var(--x)"
+     im generierten Markup unten (renderReservierungen, renderBestellungen
+     usw.) unverändert weiterarbeiten. */
   :root {
-    --bg: #f4f2ee; --card: #fff; --line: #e2ddd4; --text: #221f1a; --muted: #6d655a;
-    --accent: #2f6b4f; --accent-dark: #24543e; --warn: #b4551f; --danger: #a33131;
-    --radius: 12px;
+    --bg: #0f1117; --card: #1a1d27; --surface-2: #20232f;
+    --line: rgba(255,255,255,.08); --text: #e8eaf0; --muted: rgba(232,234,240,.55);
+    --accent: #e8572a; --accent-dark: #c94a22;
+    --warn: #f1c40f; --danger: #e74c3c; --green: #2ecc71;
+    --radius: 12px; --radius-sm: 6px; --radius-lg: 20px; --radius-pill: 999px;
+    --shadow-soft: 0 2px 12px rgba(0,0,0,.25);
+    --shadow-card: 0 8px 28px rgba(0,0,0,.35);
+    --transition-fast: .12s ease; --transition-base: .22s ease;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.55;
          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 18px; }
 
-  header { background: var(--card); border-bottom: 1px solid var(--line); padding: 18px 0; }
+  /* Kopfzeile und Reiter bleiben beim Scrollen sichtbar - auf dem Tablet in
+     der Küche liegt die Seite oft lange offen mit langen Listen darunter. */
+  header { position: sticky; top: 0; z-index: 6; background: var(--bg); border-bottom: 1px solid var(--line); padding: 18px 0; }
   .kopf { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   h1 { font-size: 1.3rem; margin: 0; }
   .betrieb { color: var(--muted); font-size: .85rem; }
   .zaehler { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
-  .pill { background: var(--bg); border: 1px solid var(--line); border-radius: 999px;
+  .pill { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-pill);
           padding: 6px 14px; font-size: .85rem; font-weight: 600; }
-  .pill.aktiv { background: var(--warn); border-color: var(--warn); color: #fff; }
+  .pill.aktiv { background: color-mix(in srgb, var(--warn) 22%, var(--card)); border-color: var(--warn); color: var(--warn); }
 
-  nav { display: flex; gap: 6px; padding: 14px 0 0; flex-wrap: wrap; }
-  nav button { padding: 11px 20px; border: 1px solid var(--line); border-bottom: none;
-               border-radius: 10px 10px 0 0; background: transparent; cursor: pointer;
-               font-family: inherit; font-size: .95rem; font-weight: 600; color: var(--muted); }
-  nav button.aktiv { background: var(--card); color: var(--text); }
+  /* Flache Reiter mit Unterstrich statt Aktenordner-Optik: die Karte darunter
+     ist jetzt eine eigenständige Fläche, keine Fortsetzung eines Tabs mehr. */
+  nav { display: flex; gap: 4px; padding: 10px 0 0; flex-wrap: wrap; }
+  nav button { padding: 11px 18px; border: none; border-bottom: 3px solid transparent; background: transparent; cursor: pointer;
+               font-family: inherit; font-size: .95rem; font-weight: 600; color: var(--muted);
+               transition: color var(--transition-base), border-color var(--transition-base); }
+  nav button:hover { color: var(--text); }
+  nav button.aktiv { color: var(--text); border-color: var(--accent); }
 
-  main { padding: 0 0 70px; }
-  .tafel { background: var(--card); border: 1px solid var(--line); border-radius: 0 var(--radius) var(--radius) var(--radius);
-           padding: 22px; }
+  main { padding: 18px 0 70px; }
+  .tafel { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+           box-shadow: var(--shadow-soft); padding: 22px; }
   section[hidden] { display: none; }
 
   .leiste { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
   label { display: block; font-size: .78rem; font-weight: 700; text-transform: uppercase;
           letter-spacing: .05em; color: var(--muted); margin-bottom: 5px; }
   input, select, textarea { font-family: inherit; font-size: 1rem; color: var(--text);
-    padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fcfbf9; }
-  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
 
-  .knopf { padding: 11px 18px; border-radius: 9px; border: 1px solid var(--accent);
+  .knopf { padding: 11px 18px; border-radius: var(--radius-sm); border: 1px solid var(--accent);
            background: var(--accent); color: #fff; font-family: inherit; font-size: .92rem;
-           font-weight: 600; cursor: pointer; white-space: nowrap; }
+           font-weight: 600; cursor: pointer; white-space: nowrap; transition: background var(--transition-base), border-color var(--transition-base); }
   .knopf:hover { background: var(--accent-dark); }
   .knopf.stumm { background: transparent; color: var(--text); border-color: var(--line); }
-  .knopf.stumm:hover { background: var(--bg); border-color: var(--muted); }
+  .knopf.stumm:hover { background: var(--surface-2); border-color: var(--muted); }
   .knopf.gefahr { background: transparent; color: var(--danger); border-color: var(--line); }
-  .knopf.gefahr:hover { border-color: var(--danger); }
+  .knopf.gefahr:hover { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
   .knopf.klein { padding: 7px 13px; font-size: .84rem; }
 
-  .balken { background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  .balken { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
             padding: 14px 18px; margin-bottom: 20px; }
   .balken .zahl { font-size: 1.5rem; font-weight: 700; }
-  .balken .spur { height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 10px; }
+  .balken .spur { height: 10px; background: var(--line); border-radius: var(--radius-pill); overflow: hidden; margin-top: 10px; }
   .balken .fuellung { height: 100%; background: var(--accent); transition: width .3s ease; }
   .balken .fuellung.voll { background: var(--danger); }
 
   table { width: 100%; border-collapse: collapse; }
   th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
   th { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  /* Reihe unter dem Zeiger hervorheben - bei langen Listen auf dem Tablet
+     sonst leicht die Zeile verloren, in der man gerade tippt. */
+  tbody tr:hover { background: rgba(255,255,255,.025); }
   tr.abgesagt td { opacity: .45; text-decoration: line-through; }
 
-  .marke { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .73rem; font-weight: 700; }
-  .marke.online { background: #e4eef3; color: #2a5a74; }
-  .marke.manuell { background: #efeae1; color: #6d5a3a; }
-  .marke.neu { background: #fbe9dc; color: #8a4318; }
-  .marke.bestaetigt { background: #e2efe7; color: #23543d; }
-  .marke.abgeholt { background: #eceae6; color: #5d564c; }
-  .marke.abgelehnt, .marke.abgesagt { background: #f6e3e3; color: #8d2b2b; }
+  /* Farbige Chips statt Pastell-auf-Weiß: dieselbe Bedeutung je Klasse,
+     nur als getönte Fläche auf dunklem Grund statt als helle Kachel. */
+  .marke { display: inline-block; padding: 3px 10px; border-radius: var(--radius-pill); font-size: .73rem; font-weight: 700; }
+  .marke.online { background: color-mix(in srgb, #4aa8d8 22%, transparent); color: #7ecdf2; }
+  .marke.manuell { background: color-mix(in srgb, #c9a25a 22%, transparent); color: #ddc084; }
+  .marke.neu { background: color-mix(in srgb, var(--warn) 22%, transparent); color: var(--warn); }
+  .marke.bestaetigt { background: color-mix(in srgb, var(--green) 20%, transparent); color: var(--green); }
+  .marke.abgeholt { background: color-mix(in srgb, #fff 12%, transparent); color: var(--muted); }
+  .marke.abgelehnt, .marke.abgesagt { background: color-mix(in srgb, var(--danger) 20%, transparent); color: #ff9086; }
 
   .aktionen { display: flex; gap: 6px; flex-wrap: wrap; }
 
   .karten { display: grid; gap: 16px; grid-template-columns: 1fr; }
   @media (min-width: 780px) { .karten { grid-template-columns: repeat(2, 1fr); } }
-  .karte { border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; background: #fcfbf9; }
-  .karte.ist-neu { border-color: var(--warn); border-width: 2px; }
+  .karte { border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; background: var(--surface-2);
+           box-shadow: var(--shadow-soft); transition: box-shadow var(--transition-base); }
+  .karte.ist-neu { border-color: var(--warn); border-width: 2px; box-shadow: var(--shadow-card); }
   .karte h3 { margin: 0 0 4px; font-size: 1.05rem; }
   .karte .meta { color: var(--muted); font-size: .85rem; margin-bottom: 12px; }
   .karte ul { list-style: none; margin: 0 0 12px; padding: 0; font-size: .92rem; }
   .karte li { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
   .karte .summe { display: flex; justify-content: space-between; font-weight: 700; padding-top: 10px;
                   border-top: 1px solid var(--line); margin-bottom: 14px; }
-  .abholblock { background: var(--card); border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px; }
+  .abholblock { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; }
   .abholblock .wunsch { font-size: .85rem; color: var(--muted); margin-bottom: 8px; }
   .abholzeile { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .hinweis-gast { margin-top: 10px; font-size: .85rem; color: var(--warn); }
@@ -97,24 +122,26 @@
   .felder input, .felder select, .felder textarea { width: 100%; }
 
   .leer { text-align: center; color: var(--muted); padding: 44px 16px; }
-  .fehler { background: #fdecec; border-left: 3px solid var(--danger); color: #7d2525;
-            padding: 11px 15px; border-radius: 8px; margin-bottom: 16px; font-size: .9rem; }
+  .fehler { background: color-mix(in srgb, var(--danger) 16%, var(--card)); border-left: 3px solid var(--danger); color: #ffb4ab;
+            padding: 11px 15px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: .9rem; }
 
   #toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); z-index: 60;
-           background: #221f1a; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: .9rem;
-           opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: 92vw; }
+           background: var(--surface-2); color: var(--text); border: 1px solid var(--line); box-shadow: var(--shadow-card);
+           padding: 12px 20px; border-radius: var(--radius-sm); font-size: .9rem;
+           opacity: 0; pointer-events: none; transition: opacity var(--transition-base), transform var(--transition-base); max-width: 92vw; }
   #toast.sichtbar { opacity: 1; transform: translate(-50%, 0); }
-  #toast.fehlerhaft { background: var(--danger); }
-  #toast.warnend { background: #b45309; }
+  #toast.fehlerhaft { background: color-mix(in srgb, var(--danger) 30%, var(--surface-2)); border-color: var(--danger); }
+  #toast.warnend { background: color-mix(in srgb, var(--warn) 26%, var(--surface-2)); border-color: var(--warn); color: #1a1508; }
 
   /* Tischverteilung geht nicht auf: bleibt stehen, bis der Wirt es löst.
      Ein Hinweis, der nach vier Sekunden verschwindet, ist am Abend vergessen. */
-  .warnbox { display: none; margin: 0 0 18px; border-radius: 10px; overflow: hidden;
-             border: 1px solid #fcd34d; background: #fffbeb; }
+  .warnbox { display: none; margin: 0 0 18px; border-radius: var(--radius-sm); overflow: hidden;
+             border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+             background: color-mix(in srgb, var(--warn) 10%, var(--card)); }
   .warnbox.sichtbar { display: block; }
-  .warnbox h3 { margin: 0; padding: 12px 16px; font-size: .92rem; color: #78350f;
-                background: #fef3c7; display: flex; align-items: center; gap: 9px; }
-  .warnbox ul { margin: 0; padding: 12px 16px 14px 34px; color: #78350f; font-size: .88rem; line-height: 1.5; }
+  .warnbox h3 { margin: 0; padding: 12px 16px; font-size: .92rem; color: #f5d37a;
+                background: color-mix(in srgb, var(--warn) 16%, var(--card)); display: flex; align-items: center; gap: 9px; }
+  .warnbox ul { margin: 0; padding: 12px 16px 14px 34px; color: #f5d37a; font-size: .88rem; line-height: 1.5; }
   .warnbox li + li { margin-top: 7px; }
   .warnbox .wann { font-weight: 700; }
 </style>

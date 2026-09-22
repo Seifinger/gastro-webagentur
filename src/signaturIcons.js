@@ -100,14 +100,40 @@ export function haken() {
 }
 
 /**
- * Der Stern für die Google-Note in der USP-Leiste. Bewusst ungleiche Zacken –
- * ein konstruierter Fünfstern wäre wieder ein Icon-Font-Zeichen.
+ * Der Stern für Google-Noten und Gästestimmen – ersetzt das gesetzte ★/☆.
+ * `gefuellt=false` zeichnet denselben Umriss nur als Kontur (leerer Platz in
+ * einer Bewertungsreihe), damit eine Reihe aus n gefüllten und 5-n leeren
+ * Sternen entsteht, ohne zwei verschiedene Formen pflegen zu müssen.
  */
-export function stern() {
+export function stern(gefuellt = true) {
+  return `<svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="${gefuellt ? "currentColor" : "none"}" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" ${ATTR}><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg>`;
+}
+
+/** Das Plus der Bestell-Knöpfe (Highlights, Speisekarte) statt des gesetzten "+". */
+export function plus() {
+  return strich("0 0 24 24", '<path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/>', "ikon ikon-plus");
+}
+
+/** Der rotierende Pfeil der aufklappbaren Speisekarten-Kategorie statt "+"/"–". */
+export function chevron() {
+  return strich("0 0 24 24", '<path d="M5.5 9.5 12 16l6.5-6.5"/>', "ikon ikon-chevron");
+}
+
+/** Der Haken im Kreis der Bestätigung (Reservierung/Bestellung angenommen). */
+export function checkCircle() {
   return strich(
     "0 0 24 24",
-    '<path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/>',
-    "ikon ikon-stern",
+    '<circle cx="12" cy="12" r="9.3"/><path d="M7.8 12.5 10.4 15.2 16.4 8.7"/>',
+    "ikon ikon-check",
+  );
+}
+
+/** Das Warnzeichen der Bestätigung bei einer abgelehnten Anfrage. */
+export function warnung() {
+  return strich(
+    "0 0 24 24",
+    '<circle cx="12" cy="12" r="9.3"/><path d="M12 7.6v5.6"/><path d="M12 16.6v.15"/>',
+    "ikon ikon-warnung",
   );
 }
 

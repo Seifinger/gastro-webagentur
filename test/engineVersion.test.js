@@ -36,7 +36,7 @@ test("jede erzeugte Seite trägt die Engine-Fassung im head", () => {
   const gestaltung = themeForLead(lead, lead.kueche);
   const html = buildLandingPage(lead, { menu: menuForCuisine(lead.kueche), gestaltung });
 
-  assert.match(html, /<meta name="engine-version" content="2">/);
+  assert.match(html, /<meta name="engine-version" content="3">/);
   assert.equal(leseEngineVersion(html), ENGINE_VERSION);
   assert.equal(leseEngineArchetyp(html), gestaltung.archetyp);
 });
@@ -47,7 +47,7 @@ test("eine Seite ohne Marker gilt als Altbestand", () => {
 });
 
 test("ohne Archetyp bleibt es bei der einen Marker-Zeile", () => {
-  assert.equal(engineMarkerMeta(), '<meta name="engine-version" content="2">');
+  assert.equal(engineMarkerMeta(), '<meta name="engine-version" content="3">');
 });
 
 /* ------------------------------- Manifest ------------------------------- */

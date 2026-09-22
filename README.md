@@ -249,6 +249,47 @@ Alle liegen lokal (`fontLibrary.js` lädt sie einmalig herunter) – eingebunden
 
 Die Zuordnung hängt fest am Lead: derselbe Lead ergibt immer denselben Entwurf.
 
+### Designsystem: die Handschrift eines Archetyps
+
+Der Archetyp trägt nicht nur das Layout, sondern seit einem gezielten
+Anti-Slop-Umbau auch eine eigene **Handschrift** (`src/styles/handschrift.css.js`):
+ein einziger starker Bewegungsmoment statt Gleichverteilung, begründete
+Asymmetrie statt Mittelachse und Dreierraster, und gezeichnete Zeichen
+(`src/signaturIcons.js`) statt Emoji. Alle drei Grundarchetypen haben sie:
+
+| Archetyp | Der eine Moment | Auffälligste Asymmetrie |
+|---|---|---|
+| Traditionell | die Hero-Signatur der Küche | Highlights als Treppe (eine große Karte, dann kleinere) |
+| Abend | die Reservierung | Karte/Stimmen mit Kopf in der linken Randspalte |
+| Hell & modern | das schnelle Auftreten der Highlights | dichte Vierer-Reihe statt Hausempfehlung |
+
+Jede Handschrift ist an ihre eigene Körperklasse gebunden (`.hs-traditionell`,
+`.hs-abend`, `.hs-hell`) und kann dadurch nachweislich keinen anderen
+Archetyp verändern (siehe `test/handschrift.test.js`). Ein Preset ohne
+Handschrift-Anforderung (jede A/B-Variante aus `designPresets.js`) bleibt
+Zeichen für Zeichen die bisherige Seite. Hintergrund und Messwerte zum
+ursprünglichen Befund stehen in `docs-intern/design-audit.md`.
+
+### Designsystem: Token-Set und eine neue Küche ergänzen
+
+**[`DESIGN.md`](DESIGN.md) ist die einzige verbindliche Quelle** für Designentscheidungen – Farbpaletten, Typo-Paare, das globale Token-Set, die Referenzen je Küche. Diese README beschreibt nur, *wo im Code* die Entscheidungen aus DESIGN.md landen; Änderungen an Farbe, Schrift oder Spacing werden zuerst in DESIGN.md dokumentiert, dann hier umgesetzt.
+
+Ein gemeinsames Token-Set (`--space-*`, `--radius-*`, `--shadow-*`, `--transition-*`, `--text-*`, siehe DESIGN.md Abschnitt 4) trägt Buttons, Karten, Formulare und Übergänge auf allen drei Oberflächen – Landing-Pages, Wirt-Dashboard, Nutzer-Dashboard. Die Namen sind überall gleich, die Werte pro Oberfläche eigenständig (dunkel beim Wirt-Dashboard, hell bei den beiden anderen). Wer eine neue Komponente baut, verdrahtet sie über diese Variablen statt neue Pixelwerte zu erfinden.
+
+Wo die Bausteine einer Stimmung liegen:
+
+| Baustein | Datei |
+|---|---|
+| Farbpalette, Typo-Paar, Archetyp je Stimmung | `src/stimmungen.js` (`GRUND_STIMMUNGEN`) |
+| Layout je Archetyp (Reihenfolge der Abschnitte, Kopfzeile fix/scrollend) | `src/designPresets.js` (`ARCHETYP_PRESET`) |
+| Handschrift je Archetyp (der eine Bewegungsmoment, die Asymmetrie) | `src/styles/handschrift.css.js` |
+| Hero-Signatur der Küche (gilt für alle drei Stimmungen) | `src/heroSignature.js` |
+| Küchenmarke, gezeichnete Kontakt-/Bestell-Icons | `src/signaturIcons.js` |
+| Hero- und Interieurbilder | `src/imageLibrary.js` |
+| Speisekarte | `src/menuCatalog.js` |
+
+Eine neue Küche braucht in dieser Reihenfolge: einen Eintrag in `menuCatalog.js` (Gerichte, USPs, Konzepttext), drei bis vier Stimmungen in `stimmungen.js` (gegen Referenzen aus DESIGN.md Abschnitt 3/5 validiert, nicht frei erfunden), ein Bildpaar in `imageLibrary.js`, optional eine eigene Hero-Signatur in `heroSignature.js` und eine Küchenmarke in `signaturIcons.js` (beide rein dekorativ – ohne sie bleibt es beim generischen Hero bzw. ohne Marke). Layout und Handschrift branchen über den Archetyp und müssen nicht angefasst werden.
+
 ### Bilder und Schriften
 
 Stockfotos (Unsplash) und Schriften (Google Fonts, alle unter der SIL Open Font License) werden beim ersten Lauf **einmalig heruntergeladen** und unter `data/landingpages/assets/` abgelegt. Danach funktionieren die Entwürfe komplett offline – praktisch, wenn du sie beim Termin im Lokal auf dem Laptop zeigst und dort kein Empfang ist. Ein erneuter Lauf lädt nur noch Fehlendes nach. Schlägt der Schriften-Download fehl, greifen die Seiten auf Systemschriften zurück.

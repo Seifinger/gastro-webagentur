@@ -18,6 +18,12 @@
     --mittel: #ca8a04;
     --niedrig: #16a34a;
     --pruefen: #6b7280;
+    /* Dasselbe Token-Set wie auf den Landing-Pages (DESIGN.md Abschnitt 4),
+       nur mit den Werten dieses hellen Dashboards. */
+    --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-pill: 999px;
+    --shadow-soft: 0 1px 3px rgba(15,23,42,.06);
+    --shadow-card: 0 10px 28px -8px rgba(15,23,42,.16);
+    --transition-fast: .12s ease; --transition-base: .2s ease;
   }
   * { box-sizing: border-box; }
   body {
@@ -41,12 +47,20 @@
   .stat {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    min-width: 130px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 16px 20px;
+    min-width: 150px;
   }
-  .stat .value { font-size: 1.5rem; font-weight: 700; }
-  .stat .label { font-size: 0.8rem; color: var(--muted); }
+  /* Große, in der jeweiligen Bedeutungsfarbe eingefärbte Zahl statt
+     einheitlichem Schwarz – dieselbe Sprache wie die Prioritäts-Badges
+     darunter in der Tabelle. */
+  .stat .value { font-size: 2.25rem; font-weight: 800; line-height: 1.1; }
+  .stat.gesamt .value { color: var(--accent); }
+  .stat.hoch .value { color: var(--sehr-hoch); }
+  .stat.ohne-website .value { color: var(--mittel); }
+  .stat.entwuerfe .value { color: var(--niedrig); }
+  .stat .label { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
 
   .hinweis {
     display: none;
@@ -74,6 +88,7 @@
     font-size: 0.8rem;
     font-weight: 600;
   }
+  a.entwurf { transition: background var(--transition-fast); }
   a.entwurf:hover { background: #1d4ed8; }
 
   .filter-resonanz { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #475569; }
@@ -92,6 +107,7 @@
     font-weight: 600;
     color: var(--text);
   }
+  a.bearbeiten { transition: border-color var(--transition-fast), color var(--transition-fast); }
   a.bearbeiten:hover { border-color: var(--accent); color: var(--accent); }
 
   select.kueche, select.stimmung {
@@ -106,24 +122,34 @@
     background: var(--card); color: var(--text); font-size: 0.8rem; font-weight: 600;
     font-family: inherit; cursor: pointer; white-space: nowrap;
   }
+  button.pitch { transition: border-color var(--transition-fast), color var(--transition-fast); }
   button.pitch:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* Pitch-Fenster */
+  /* Pitch-Leiste: fährt von rechts ein statt zentriert zu erscheinen - lässt
+     die Tabelle dahinter sichtbar, man verliert nie die Zeile, von der man kam. */
   #pitch { position: fixed; inset: 0; z-index: 100; display: none; }
   #pitch.offen { display: block; }
-  #pitch-hintergrund { position: absolute; inset: 0; background: rgba(20,24,32,.55); }
+  #pitch-hintergrund { position: absolute; inset: 0; background: rgba(20,24,32,.5); opacity: 0; transition: opacity var(--transition-base); }
+  #pitch.offen #pitch-hintergrund { opacity: 1; }
   .pitch-box {
-    position: relative; margin: 4vh auto; width: min(760px, calc(100% - 32px));
-    max-height: 92vh; overflow-y: auto; background: var(--card);
-    border-radius: 14px; box-shadow: 0 30px 70px -28px rgba(0,0,0,.5); padding: 26px 28px 30px;
+    position: fixed; top: 0; right: 0; bottom: 0; margin: 0; width: min(640px, 100%);
+    max-height: none; overflow-y: auto; background: var(--card); border-radius: 0;
+    box-shadow: -24px 0 60px -24px rgba(0,0,0,.4); padding: 26px 26px 30px;
+    transform: translateX(100%); transition: transform var(--transition-base);
   }
+  #pitch.offen .pitch-box { transform: translateX(0); }
   .pitch-kopf { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
   .pitch-kopf h2 { margin: 0; font-size: 1.25rem; }
   .pitch-kopf p { margin: 3px 0 0; font-size: .85rem; color: var(--muted); }
   .pitch-zu { margin-left: auto; border: none; background: transparent; font-size: 1.6rem;
               line-height: 1; cursor: pointer; color: var(--muted); padding: 0 4px; }
   .pitch-raster { display: grid; gap: 22px; grid-template-columns: 1fr; }
-  @media (min-width: 640px) { .pitch-raster { grid-template-columns: 280px 1fr; } }
+  /* Live-Vorschau des Entwurfs direkt in der Leiste - man muss nicht erst in
+     einen neuen Tab wechseln, um zu sehen, wie die Seite gerade aussieht. */
+  .pitch-vorschau-rahmen {
+    width: 100%; height: 360px; border: 1px solid var(--border); border-radius: var(--radius-md);
+    background: #fff; margin-bottom: 18px;
+  }
   .qr-feld { text-align: center; }
   .qr-paar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
   .qr-stueck { flex: 1 1 110px; max-width: 130px; }
@@ -173,17 +199,23 @@
   .controls input, .controls select {
     padding: 8px 10px;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     font-size: 0.9rem;
     background: var(--card);
     color: var(--text);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  }
+  .controls input:focus, .controls select:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
   }
 
   .table-wrap {
     margin: 0 20px 40px;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
     overflow: auto;
   }
   table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
@@ -201,9 +233,20 @@
     user-select: none;
     color: var(--muted);
     font-weight: 600;
+    transition: color var(--transition-fast);
   }
   th:hover { color: var(--text); }
-  tr:hover td { background: #fafbfc; }
+  /* Kleines Dreieck statt reinem Farbwechsel - zeigt auch ohne Hover, wonach
+     gerade sortiert ist und in welche Richtung. */
+  th[data-key] { padding-right: 22px; position: relative; }
+  th[data-key]::after {
+    content: ""; position: absolute; right: 8px; top: 50%; margin-top: -2px;
+    width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent;
+    opacity: .3;
+  }
+  th[data-key].sortiert-asc::after { border-bottom: 5px solid currentColor; opacity: 1; }
+  th[data-key].sortiert-desc::after { border-top: 5px solid currentColor; opacity: 1; }
+  tr:hover td { background: #fafbfc; transition: background var(--transition-fast); }
 
   .badge {
     display: inline-block;
@@ -219,6 +262,17 @@
   .badge.mittel { background: var(--mittel); }
   .badge.niedrig { background: var(--niedrig); }
   .badge.pruefen { background: var(--pruefen); }
+
+  /* Score als kurzer Balken statt reiner Zahl - auf einen Blick sichtbar,
+     ohne dass man die Zahlenspalte lesen muss. */
+  .score-zelle { display: flex; align-items: center; gap: 8px; }
+  .score-zahl { font-weight: 700; min-width: 22px; text-align: right; }
+  .score-spur { width: 56px; height: 6px; border-radius: var(--radius-pill); background: var(--border); overflow: hidden; }
+  .score-fuellung { height: 100%; border-radius: var(--radius-pill); }
+
+  .resonanz-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  .resonanz-dot.still { background: var(--muted); opacity: .5; }
+  .resonanz-dot.offen { background: var(--niedrig); }
 
   .yn { font-size: 1rem; }
   .yn.yes { color: var(--niedrig); }
@@ -297,6 +351,8 @@
       </div>
       <button class="pitch-zu" id="pitch-schliessen" type="button" aria-label="Schließen">×</button>
     </div>
+
+    <iframe class="pitch-vorschau-rahmen" id="pitch-vorschau" title="Vorschau des Entwurfs"></iframe>
 
     <div class="pitch-raster">
       <div class="qr-feld">
@@ -437,6 +493,14 @@ function priorityClass(p) {
   return "pruefen";
 }
 
+function scoreZelle(score) {
+  if (score == null) return "-";
+  const pct = Math.max(0, Math.min(100, score));
+  const klasse = pct >= 80 ? "sehr-hoch" : pct >= 60 ? "hoch" : pct >= 40 ? "mittel" : "niedrig";
+  return `<div class="score-zelle"><span class="score-zahl">${score}</span>` +
+    `<span class="score-spur"><span class="score-fuellung" style="width:${pct}%;background:var(--${klasse})"></span></span></div>`;
+}
+
 function yn(value) {
   if (value === true) return '<span class="yn yes">✔</span>';
   if (value === false) return '<span class="yn no">✘</span>';
@@ -478,7 +542,7 @@ function resonanzZelle(l) {
   const r = l.resonanz;
   // Grau und beiläufig, nicht alarmrot: Bei einem Entwurf von vorgestern ist
   // "noch nicht geöffnet" der Normalfall und keine schlechte Nachricht.
-  if (!r || !r.geoeffnet) return '<span class="resonanz-still">noch nicht geöffnet</span>';
+  if (!r || !r.geoeffnet) return '<span class="resonanz-dot still"></span><span class="resonanz-still">noch nicht geöffnet</span>';
 
   const teile = [r.anzahl > 1 ? `${r.anzahl}×` : "geöffnet", seither(r.letzterAufruf), dauer(r.maxSekunden)];
   // Wer bis zur Reservierung gescrollt ist, hat über die Seite nachgedacht –
@@ -487,7 +551,7 @@ function resonanzZelle(l) {
     ? ' <strong class="resonanz-stark">bis Reservierung</strong>'
     : "";
 
-  return `<span class="resonanz-offen">${teile.filter(Boolean).join(" · ")}</span>${bisReservierung}`;
+  return `<span class="resonanz-dot offen"></span><span class="resonanz-offen">${teile.filter(Boolean).join(" · ")}</span>${bisReservierung}`;
 }
 
 function renderStats(leads) {
@@ -496,10 +560,10 @@ function renderStats(leads) {
   const ohneWebsite = leads.filter((l) => l.hatWebsite === false).length;
   const mitEntwurf = leads.filter((l) => l.entwurf).length;
   document.getElementById("stats").innerHTML = `
-    <div class="stat"><div class="value">${total}</div><div class="label">Leads gesamt</div></div>
-    <div class="stat"><div class="value">${sehrHoch}</div><div class="label">Priorität "Sehr hoch"</div></div>
-    <div class="stat"><div class="value">${ohneWebsite}</div><div class="label">ohne Website</div></div>
-    <div class="stat"><div class="value">${mitEntwurf}</div><div class="label">Entwürfe erstellt</div></div>
+    <div class="stat gesamt"><div class="value">${total}</div><div class="label">Leads gesamt</div></div>
+    <div class="stat hoch"><div class="value">${sehrHoch}</div><div class="label">Priorität "Sehr hoch"</div></div>
+    <div class="stat ohne-website"><div class="value">${ohneWebsite}</div><div class="label">ohne Website</div></div>
+    <div class="stat entwuerfe"><div class="value">${mitEntwurf}</div><div class="label">Entwürfe erstellt</div></div>
   `;
 
   const hinweis = document.getElementById("entwurfHinweis");
@@ -575,7 +639,7 @@ function applyFiltersAndRender() {
   tbody.innerHTML = filtered.map((l) => `
     <tr>
       <td><span class="badge ${priorityClass(l.priorität)}">${l.priorität || "-"}</span></td>
-      <td>${l.score ?? "-"}</td>
+      <td>${scoreZelle(l.score)}</td>
       <td>${esc(l.name)}</td>
       <td>${kuecheSelect(l)}</td>
       <td>${stimmungSelect(l)}</td>
@@ -597,14 +661,23 @@ function applyFiltersAndRender() {
   `).join("");
 }
 
+function markiereSortSpalte() {
+  document.querySelectorAll("th[data-key]").forEach((th) => {
+    th.classList.remove("sortiert-asc", "sortiert-desc");
+    if (th.dataset.key === sortKey) th.classList.add(sortDir === 1 ? "sortiert-asc" : "sortiert-desc");
+  });
+}
+
 document.querySelectorAll("th[data-key]").forEach((th) => {
   th.addEventListener("click", () => {
     const key = th.dataset.key;
     sortDir = sortKey === key ? -sortDir : -1;
     sortKey = key;
+    markiereSortSpalte();
     applyFiltersAndRender();
   });
 });
+markiereSortSpalte();
 
 ["search", "filterOrt", "filterPrioritaet", "filterResonanz"].forEach((id) => {
   document.getElementById(id).addEventListener("input", applyFiltersAndRender);
@@ -679,6 +752,9 @@ function oeffnePitch(placeId) {
   if (!lead) return;
 
   document.getElementById("pitch-titel").textContent = lead.name || "Entwurf";
+  // ?vorschau=1 wie im "Entwurf öffnen"-Link unten: der eigene Blick in die
+  // Leiste darf nicht als Öffnung durch den Wirt in die Resonanz-Zahlen einfließen.
+  document.getElementById("pitch-vorschau").src = lead.veroeffentlicht ? `${lead.demoUrl}?vorschau=1` : "about:blank";
   document.getElementById("pitch-url").value = lead.demoUrl;
   document.getElementById("pitch-qr").src = `/api/qr?url=${encodeURIComponent(lead.demoUrl)}`;
   // Zweiter QR-Code auf dieselbe Seite, nur mit ?bewegung=aus (siehe
@@ -705,6 +781,9 @@ function oeffnePitch(placeId) {
 
 function schliessePitch() {
   document.getElementById("pitch").classList.remove("offen");
+  // Ohne das zurückzusetzen liefe die Vorschau im Hintergrund weiter, auch
+  // während die Leiste zu ist.
+  document.getElementById("pitch-vorschau").src = "about:blank";
 }
 
 document.getElementById("pitch-schliessen").addEventListener("click", schliessePitch);

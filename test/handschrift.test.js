@@ -130,8 +130,12 @@ test("die Seiten der übrigen Archetypen enthalten kein Zeichen der Handschrift"
     for (const teil of ["hs-traditionell", "hl-anordnung", "stimmen-blatt", "hl-siegel", "class=\"marke\""]) {
       assert.ok(!html.includes(teil), `${archetyp}: ${teil} steht fälschlich in der Seite`);
     }
-    // Und sie behalten ihre bisherigen Emoji-Symbole.
-    assert.ok(html.includes("📍"), `${archetyp}: Kontaktsymbol fehlt`);
+    // Die gezeichneten Grundzeichen (signaturIcons.js) gelten seit Stage 3 des
+    // Design-Auftrags für jede Seite, auch ohne eigene Handschrift - nur die
+    // Küchenmarke bleibt ein Vorrecht der Archetypen mit Handschrift (oben
+    // geprüft). Das alte Emoji-Symbol (📍) gibt es dafür nirgends mehr.
+    assert.ok(html.includes(KONTAKT_IKONEN.ort), `${archetyp}: gezeichnetes Kontaktsymbol fehlt`);
+    assert.ok(!html.includes("📍"), `${archetyp}: altes Emoji-Symbol steht noch in der Seite`);
   }
 });
 

@@ -4,6 +4,18 @@ import {
   PLATZHALTER_ERKLAERUNG,
   PLATZHALTER_ERKLAERUNG_OHNE_PLAETZE,
 } from "../testimonials.js";
+import { stern } from "../signaturIcons.js";
+
+/** Initialen aus dem Namen für den Avatar-Kreis – "Maria K." wird "MK". */
+function initialen(name) {
+  const zeichen = String(name ?? "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((teil) => teil[0]?.toUpperCase() ?? "");
+  return zeichen.join("") || "?";
+}
 
 /**
  * Gästestimmen. Bei echten Häusern bewusst Platzhalter: Google-Rezensionen
@@ -18,9 +30,10 @@ export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3", ha
   // Die fünf grauen Sterne des Platzhalters stehen mit 1.14:1 auf ihrem Grund
   // und behaupten nichts, was der Titel nicht schon sagt. Mit Handschrift
   // fallen sie weg; ohne sie bleibt alles wie bisher.
+  const fuenfSterne = (gefuellt) => Array.from({ length: 5 }, () => stern(gefuellt)).join("");
   const leereSterne = handschrift
     ? ""
-    : '<span class="sterne leer" aria-hidden="true">★★★★★</span>\n        ';
+    : `<span class="sterne leer" aria-hidden="true">${fuenfSterne(false)}</span>\n        `;
 
   const karten = platzhalter
     ? slots
@@ -36,9 +49,9 @@ export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3", ha
         .map(
           ({ text, autor, wann }) => `
       <blockquote class="stimme">
-        <span class="sterne" aria-hidden="true">★★★★★</span>
+        <span class="sterne" aria-hidden="true">${fuenfSterne(true)}</span>
         <p>${escapeHtml(text)}</p>
-        <footer><strong>${escapeHtml(autor)}</strong><span>${escapeHtml(wann)}</span></footer>
+        <footer><span class="stimme-avatar" aria-hidden="true">${escapeHtml(initialen(autor))}</span><strong>${escapeHtml(autor)}</strong><span>${escapeHtml(wann)}</span></footer>
       </blockquote>`,
         )
         .join("");
@@ -46,7 +59,7 @@ export function renderStimmen(cuisine, lead, fiktiv, socialLayout = "grid-3", ha
   const note = lead.rating
     ? `<div class="stimmen-note">
          <span class="note">${String(lead.rating).replace(".", ",")}</span>
-         <span class="sterne" aria-hidden="true">${"★".repeat(Math.round(Number(lead.rating)))}</span>
+         <span class="sterne" aria-hidden="true">${Array.from({ length: Math.round(Number(lead.rating)) }, () => stern(true)).join("")}</span>
          <span>von 5 auf Google${
            lead.anzahlBewertungen ? `, aus ${formatCount(lead.anzahlBewertungen)} Bewertungen` : ""
          }</span>
