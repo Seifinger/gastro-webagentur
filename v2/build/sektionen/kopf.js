@@ -11,6 +11,11 @@ const e = escapeHtml;
 export function bild(medium, { klasse = "", alt = "", lazy = true, zeigeBadge = true } = {}) {
   if (!medium?.src) return "";
   const badge = zeigeBadge && medium.badge ? `<span class="herkunft herkunft--${e(medium.herkunft)}">${e(medium.badge)}</span>` : "";
+  if (medium.typ === "video") {
+    // Stumme Endlosschleife; das Poster ist das Titelbild, damit vor dem
+    // ersten Frame und bei abgeschalteter Bewegung nie ein leerer Kasten steht.
+    return `<video${klasse ? ` class="${klasse}"` : ""} src="${e(medium.src)}"${medium.poster ? ` poster="${e(medium.poster)}"` : ""} autoplay muted loop playsinline preload="metadata" aria-label="${e(alt)}" data-herkunft="${e(medium.herkunft ?? "")}"></video>${badge}`;
+  }
   return `<img${klasse ? ` class="${klasse}"` : ""} src="${e(medium.src)}" alt="${e(alt || medium.alt || "")}"${lazy ? ' loading="lazy"' : ""} data-herkunft="${e(medium.herkunft ?? "")}">${badge}`;
 }
 
@@ -50,6 +55,13 @@ function aktionen(ds, texte, { aufTint = false } = {}) {
     : `${bestellen("btn-primary")}${reservieren(zweit)}`;
 }
 
+/** Titelmedium: Video, wenn eins hinterlegt ist (Poster = Titelbild), sonst das Titelbild. */
+function heroMedium(ctx) {
+  const { hero, heroVideo } = ctx.medien;
+  const m = heroVideo ? { ...heroVideo, poster: hero?.src } : hero;
+  return bild(m, { alt: ctx.texte.name, lazy: false });
+}
+
 function textblock({ ds, texte, lead, aufTint = false, klasse = "hero-text" }) {
   return `<div class="${klasse}">
     <p class="rubrik">${e(texte.kicker)}</p>
@@ -63,11 +75,11 @@ function textblock({ ds, texte, lead, aufTint = false, klasse = "hero-text" }) {
 const HERO = {
   "spalte-bild": (ctx) => `<section class="hero hero--spalte-bild" data-hero="spalte-bild">
   ${textblock(ctx)}
-  <figure class="hero-bild">${bild(ctx.medien.hero, { alt: ctx.texte.name, lazy: false })}</figure>
+  <figure class="hero-bild">${heroMedium(ctx)}</figure>
 </section>`,
 
   tafel: (ctx) => `<section class="hero hero--tafel" data-hero="tafel">
-  <figure class="hero-bild">${bild(ctx.medien.hero, { alt: ctx.texte.name, lazy: false })}</figure>
+  <figure class="hero-bild">${heroMedium(ctx)}</figure>
   <div class="rahmen hero-tafel-rahmen">${textblock({ ...ctx, aufTint: true, klasse: "hero-text hero-tafel auf-tint" })}</div>
 </section>`,
 
@@ -84,7 +96,7 @@ const HERO = {
     <aside class="hero-menue" aria-label="${e(ctx.texte.heuteEmpfohlen)}">
       <p class="rubrik">${e(ctx.texte.heuteEmpfohlen)}</p>
       <ol>${zeilen}</ol>
-      <figure class="hero-einschub">${bild(ctx.medien.hero, { alt: ctx.texte.name, lazy: false })}</figure>
+      <figure class="hero-einschub">${heroMedium(ctx)}</figure>
     </aside>
   </div>
 </section>`;
@@ -100,12 +112,12 @@ const HERO = {
       <div class="hero-aktionen">${aktionen(ctx.ds, ctx.texte)}</div>
     </div>
   </div>
-  <figure class="hero-bild hero-band">${bild(ctx.medien.hero, { alt: ctx.texte.name, lazy: false })}</figure>
+  <figure class="hero-bild hero-band">${heroMedium(ctx)}</figure>
 </section>`,
 
   passepartout: (ctx) => `<section class="hero hero--passepartout" data-hero="passepartout">
   <div class="rahmen hero-passepartout-raster">
-    <figure class="hero-bild hero-rahmen">${bild(ctx.medien.hero, { alt: ctx.texte.name, lazy: false })}</figure>
+    <figure class="hero-bild hero-rahmen">${heroMedium(ctx)}</figure>
     ${textblock({ ...ctx, klasse: "hero-text hero-text--versetzt" })}
   </div>
 </section>`,
@@ -114,7 +126,7 @@ const HERO = {
   <div class="rahmen">
     ${textblock({ ...ctx, klasse: "hero-text hero-text--breit" })}
     <div class="hero-streifen">
-      <figure class="hero-bild s-gross">${bild(ctx.medien.hero, { alt: ctx.texte.name, lazy: false })}</figure>
+      <figure class="hero-bild s-gross">${heroMedium(ctx)}</figure>
       <figure class="hero-bild s-mittel">${bild(ctx.medien.gericht(ctx.highlights[0]), { alt: ctx.highlights[0]?.name ?? "" })}</figure>
       <figure class="hero-bild s-klein">${bild(ctx.medien.haus, { alt: ctx.texte.ambiente.slots[0].titel })}</figure>
     </div>

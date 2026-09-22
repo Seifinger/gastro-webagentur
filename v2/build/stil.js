@@ -105,7 +105,7 @@ figure { position: relative; }
 /* Hero – gemeinsame Teile */
 .hero { position: relative; }
 .hero-bild { overflow: hidden; background: var(--flaeche-tief); border-radius: var(--r-bild); }
-.hero-bild img { width: 100%; height: 100%; object-fit: cover; }
+.hero-bild img, .hero-bild video { display: block; width: 100%; height: 100%; object-fit: cover; }
 .hero h1 { font-size: var(--t-h1); }
 .hero-claim { margin-top: var(--s-3); font-size: var(--t-gross); color: var(--text-leise); max-width: 44ch; }
 .hero-aktionen { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-5); }

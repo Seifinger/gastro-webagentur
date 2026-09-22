@@ -37,8 +37,13 @@ export const BEWEGUNG_CSS = `
 
 export const BEWEGUNG_SKRIPT = `
 (function () {
+  var reduziert = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduziert) {
+    // Bewegung abgestellt: Videos bleiben auf ihrem Poster stehen.
+    Array.prototype.forEach.call(document.querySelectorAll("video[autoplay]"), function (v) { v.removeAttribute("autoplay"); v.pause(); });
+    return;
+  }
   if (!("IntersectionObserver" in window)) return;
-  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   var wurzel = document.body;
   var elemente = document.querySelectorAll(".auftritt");
   Array.prototype.forEach.call(elemente, function (el) {

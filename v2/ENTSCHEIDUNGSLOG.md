@@ -130,3 +130,33 @@ Neueste Einträge unten.
   lange Wörter in großer Anzeigeschrift) und verdeckte Fotos durch Bildunterschriften.
   Behoben mit `min-width: 0`, deutscher Silbentrennung in Überschriften und
   Unterschriften unter statt auf dem Bild. Der Überlauf-Check wandert in den Judge.
+
+## Stage 4 – Medien-Pipeline
+
+- **E4.1 · Provider-Schnittstelle.** Ein Provider ist ein Objekt mit `name`, `arten`
+  (bild/video), `kosten`, `verfuegbar()` und `erzeuge()`. Neue Anbieter (OpenAI, fal.ai,
+  Stability, eigenes ComfyUI) kommen als weiteres Objekt in `PROVIDER` dazu.
+- **E4.2 · Reale Anbindung: Replicate.** Gründe: eine API und ein Token für Bild *und*
+  Video, Abrechnung pro Ergebnis ohne Abo (für eine Agentur mit schwankendem Bedarf
+  passender als ein Monatsplan), Modelle per Umgebungsvariable tauschbar
+  (`V2_BILD_MODELL`, Standard FLUX 1.1 pro; `V2_VIDEO_MODELL`, Standard minimax/video-01)
+  – die besten Modelle wechseln schneller als dieser Code. Ohne Token greift
+  automatisch der kostenlose lokale Platzhalter-Provider (gezeichnete SVG-Fläche aus der
+  Palette mit Küchenmarke und „Foto folgt“). Ein echter Lauf gegen Replicate war in
+  dieser Umgebung ohne Token nicht möglich; der Provider ist gegen die dokumentierte API
+  geschrieben und mit gemocktem Netz getestet.
+- **E4.3 · Vorrangregel ohne Ausnahme.** Im Chat gelieferte Medien (registriert mit
+  `npm run v2:medien -- eintragen …`, versioniert unter `v2/medien/eigene/`) >
+  Dashboard-Uploads (v1-Mechanismus `leadEdits.bilder`) > KI-Cache > Stock > SVG. Für
+  Rollen mit eigenen Medien wird nie eine Generierung bezahlt (getestet).
+  Reihenfolge Chat vor Upload, weil der Chat der ausdrückliche Weg des Agenturinhabers
+  ist; beide sind „eigen“ und schlagen alles Generierte.
+- **E4.4 · Kennzeichnung.** Drei Werte, wie beauftragt: „eigenes Foto“, „KI-generiert“,
+  „Platzhalter“ (Stock zählt als Platzhalter, wie in v1). KI-Material trägt auf der Seite
+  immer ein sichtbares Badge (Transparenz gegenüber Gästen), eigene Fotos nie.
+- **E4.5 · Bild-Kanon als Prompt-Quelle.** Prompts entstehen aus `bildKanon` des
+  Designsystems (Licht je Archetyp, Requisiten je Küche, Negativliste) plus Rolle. So
+  sieht ein generiertes Hero-Bild der Kellerstube nach Kerzenlicht und Holz aus und nicht
+  nach Stock.
+- **E4.6 · Seiten bleiben eigenständig.** Eigene und KI-Dateien werden beim Schreiben in
+  `sites/<slug>/medien/` kopiert; jede Seite läuft ohne den Rest des Repos.

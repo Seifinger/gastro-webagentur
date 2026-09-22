@@ -14,7 +14,7 @@
 // Die funktionale Schicht (Warenkorb, Reservierung, No-Show, API-Aufrufe an
 // wirtServer.js) ist das v1-Skript, unverändert (v1Funktionen.js).
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { ladeDesignsystem, HERO_VARIANTEN, SPACING_SKALA } from "./designsystemGenerator.js";
@@ -226,6 +226,13 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   const medien = optionen.medien ?? standardMedien(gestaltung, { bildUrl: optionen.bildUrl, fiktiv, texte });
   if (!medien.bestseller) medien.bestseller = medien.gericht(highlights[0]) ?? medien.haus;
 
+  // Welche Medien diese Seite wirklich benutzt – für den Bericht (Dashboard-
+  // Badges) und damit schreibeSite() lokale Dateien mitkopieren kann.
+  const genutzt = [
+    ...["hero", "heroVideo", "haus", "team", "bestseller"].map((rolle) => [rolle, medien[rolle]]),
+    ...highlights.map((g) => [`gericht:${g.id}`, medien.gericht(g)]),
+  ].filter(([, m]) => m);
+
   const betont = ds.layout.betonterMoment;
   const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv };
 
@@ -317,6 +324,7 @@ ${renderFuss(ctx)}
 
   return {
     html,
+    dateien: genutzt.filter(([, m]) => m.datei).map(([, m]) => ({ datei: m.datei, src: m.src })),
     bericht: {
       engine: ENGINE_KENNUNG,
       designsystem: ds.id,
@@ -330,9 +338,7 @@ ${renderFuss(ctx)}
       kontrast: { geprueft: ds.kontrastPaare.length, fehler: 0 },
       lint: { fehler: 0, warnungen: lintErgebnis.warnungen },
       korrekturen: korrekturProtokoll,
-      medien: Object.fromEntries(
-        ["hero", "haus", "team", "bestseller"].map((rolle) => [rolle, medien[rolle] ? { herkunft: medien[rolle].herkunft, kennzeichnung: medien[rolle].kennzeichnung, quelle: medien[rolle].quelle } : null]),
-      ),
+      medien: Object.fromEntries(genutzt.map(([rolle, m]) => [rolle, { herkunft: m.herkunft, kennzeichnung: m.kennzeichnung, quelle: m.quelle, typ: m.typ ?? "bild" }])),
       copy: copyBericht,
       raster: SPACING_SKALA,
     },
@@ -348,6 +354,11 @@ export function schreibeSite(parameter, { zielDir = SITES_DIR, slug } = {}) {
   const ergebnis = baueSite(parameter);
   const ordner = path.join(zielDir, slug ?? siteSlug(parameter.lead, ergebnis.bericht.kueche, ergebnis.bericht.stimmung));
   mkdirSync(ordner, { recursive: true });
+  for (const { datei, src } of ergebnis.dateien ?? []) {
+    if (!existsSync(datei)) continue;
+    mkdirSync(path.dirname(path.join(ordner, src)), { recursive: true });
+    copyFileSync(datei, path.join(ordner, src));
+  }
   writeFileSync(path.join(ordner, "index.html"), ergebnis.html, "utf-8");
   writeFileSync(path.join(ordner, "bericht.json"), `${JSON.stringify(ergebnis.bericht, null, 2)}\n`, "utf-8");
   return { ...ergebnis, ordner };
