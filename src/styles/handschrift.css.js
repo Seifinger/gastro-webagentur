@@ -38,15 +38,15 @@ import { SIGNATUR_REDUZIERT_REGELN } from "../heroSignature.js";
  *
  * @param {string} klasse - die Körperklasse des Archetyps.
  */
-function bildunterschriftCss(klasse) {
+function bildunterschriftCss(klasse, gross = "20px", klein = "14px") {
   return `
 /* --- Ambiente: die Bildunterschrift steht unter dem Bild ---------------- */
 .${klasse} .foto-slot { border-radius: 0; background: none; overflow: visible;
                         display: flex; flex-direction: column; }
 .${klasse} .foto-slot img { border-radius: var(--radius); }
 .${klasse} .foto-text { position: static; padding: 14px 0 0; background: none; color: var(--ink); }
-.${klasse} .foto-text strong { font-size: 20px; }
-.${klasse} .foto-text span { color: var(--ink-soft); font-size: 14px; margin-top: 3px; }`;
+.${klasse} .foto-text strong { font-size: ${gross}; }
+.${klasse} .foto-text span { color: var(--ink-soft); font-size: ${klein}; margin-top: 3px; }`;
 }
 
 /* ========================================================================= *
@@ -328,19 +328,52 @@ const ABEND = `
 /* Dieselben Regeln, die prefers-reduced-motion setzt – hier dauerhaft.
    Einmal geschrieben in heroSignature.js, nicht ein zweites Mal abgetippt. */
 .hs-abend {
+  /* Die Bewegungssprache dieses Hauses in zwei Kurven. Alles andere auf der
+     Seite steht still; was sich bewegt, bewegt sich nach einer davon.
+     --ease-ruhig laeuft weich aus (Oberflaeche, Rueckmeldung auf einen
+     Griff), --ease-moment setzt spaet und entschieden ein und gehoert
+     allein dem Auftritt der Reservierung. Der Browser-Standard "ease" hat
+     hier nichts zu suchen: Er ist in jeder Seite derselbe. */
+  --ease-ruhig: cubic-bezier(.22,.61,.36,1);
+  --ease-moment: cubic-bezier(.5,0,.1,1);
+  /* Die fuenf Schriftgrade dieses Archetyps, Verhaeltnis rund 1,2.
+     Begruendung und Rollen weiter unten bei "Die Schriftskala". */
+  --t-xs: 12px;
+  --t-s: 14px;
+  --t-m: 17px;
+  --t-l: 21px;
+  --t-xl: 26px;
   ${SIGNATUR_REDUZIERT_REGELN}
+}
+/* Die sieben Uebergaenge, die im Abendhaus ueberhaupt noch laufen. Der Rest
+   ist an anderer Stelle bereits auf "none" gesetzt. */
+.hs-abend {
+  .topbar { transition: background .28s var(--ease-ruhig), box-shadow .28s var(--ease-ruhig); }
+  .topbar::before { transition: opacity .28s var(--ease-ruhig); }
+  .brand { transition: color .28s var(--ease-ruhig); }
+  .btn { transition: transform .12s var(--ease-ruhig), background .16s var(--ease-ruhig), color .16s var(--ease-ruhig); }
+  .add-btn, .mini-add { transition: background .16s var(--ease-ruhig), color .16s var(--ease-ruhig); }
+  .overlay { transition: opacity .22s var(--ease-ruhig); }
+  .drawer { transition: transform .28s var(--ease-ruhig); }
+  .confirm-box { transition: opacity .2s var(--ease-ruhig), transform .2s var(--ease-ruhig); }
 }
 /* Das Sushi-Band ist als einzige Signatur kein Gegenstand, sondern ein
    Mechanismus: Steht es still, liegt ein Filmstreifen quer über dem Hero.
    Im Abendhaus wird daraus ein gesetztes Viererfeld am rechten Rand – vier
    Teller, ruhig nebeneinander, statt eines angehaltenen Laufbands. */
-.hs-abend .sig-band { left: auto; right: 4%; top: 14%; height: auto;
-                      width: clamp(230px, 26vw, 360px); mask-image: none; opacity: .92; }
-.hs-abend .sig-band .band { flex-wrap: wrap; width: 100%; gap: 10px; }
-.hs-abend .sig-band img { width: calc(50% - 5px); height: auto; aspect-ratio: 4 / 3; border-radius: 2px; }
-.hs-abend .sig-band img:nth-child(n + 5) { display: none; }
+.hs-abend .sig-band { left: auto; right: 4%; top: 12%; height: auto;
+                      width: clamp(150px, 16vw, 210px); mask-image: none; opacity: .92; }
+/* Das Laufband haelt sechs Bilder bereit, aber es sind nur drei verschiedene –
+   die zweite Haelfte ist die Wiederholung, die den Lauf nahtlos macht. Steht
+   das Band still, wird daraus ein sichtbarer Doppelgaenger: dasselbe Foto
+   zweimal nebeneinander. Das Abendhaus zeigt deshalb genau die drei
+   verschiedenen, untereinander – drei Teller am rechten Rand, gelesen wie
+   die Karte darunter. */
+.hs-abend .sig-band .band { flex-direction: column; width: 100%; gap: 10px; }
+.hs-abend .sig-band img { width: 100%; height: auto; aspect-ratio: 4 / 3; border-radius: 2px; }
+.hs-abend .sig-band img:nth-child(n + 4) { display: none; }
 @media (max-width: 899px) {
-  .hs-abend .sig-band { right: -6%; top: 9%; width: 46vw; opacity: .5; }
+  .hs-abend .sig-band { right: -4%; top: 8%; width: 30vw; opacity: .5; }
 }
 
 /* Orchidee und Gewürzwölkchen hängen nicht an einer Animation, sondern an
@@ -367,13 +400,13 @@ const ABEND = `
 .hs-abend .reserve-section { background: var(--bg); }
 .hs-abend #reservierung .section-head h2,
 .hs-abend #reservierung h2 { font-size: clamp(30px, 4.6vw, 48px); margin-bottom: 18px; }
-.hs-abend .reserve-grid > div:first-child p { color: var(--ink-soft); font-size: 19px; }
+.hs-abend .reserve-grid > div:first-child p { color: var(--ink-soft); }
 /* Die eine helle Fläche der Seite: Hier wird der Tisch gesichert. */
 .hs-abend .panel { background: var(--surface); padding: 38px; border-color: var(--line); }
-.hs-abend .panel .btn-primary { padding: 16px 26px; font-size: 16px; }
+.hs-abend .panel .btn-primary { padding: 16px 26px; }
 .bewegt .hs-abend .reserve-grid > .auftritt {
   opacity: 0; transform: translateY(20px);
-  transition: opacity .9s cubic-bezier(.5,0,.1,1), transform .9s cubic-bezier(.5,0,.1,1);
+  transition: opacity .9s var(--ease-moment), transform .9s var(--ease-moment);
 }
 .bewegt .hs-abend .reserve-grid > .auftritt.da { opacity: 1; transform: none; }
 
@@ -389,6 +422,20 @@ const ABEND = `
 .hs-abend .add-btn,
 .hs-abend .mini-add { color: var(--accent-bold); }
 .hs-abend .add-btn, .hs-abend .mini-add { border-color: var(--accent-bold); }
+
+/* Die Hauptaktion traegt genau eine Gestalt. Bisher stand "Tisch
+   reservieren" in derselben Ansicht zweimal da: als goldene Pille in der
+   Kopfzeile und als weisse Pille im Hero – der Gast musste aus dem Text
+   erschliessen, dass es dieselbe Handlung ist. Im Abendhaus ist die
+   gefuellte Goldflaeche ab jetzt die Reservierung und sonst nichts: im
+   Hero, in der Aktionsleiste und im Formular. Die Kopfzeile tritt dafuer
+   zurueck – sie ist der Weg dorthin, nicht die Handlung. */
+.hs-abend .hero-actions .btn-light { background: var(--accent); color: var(--on-accent); }
+.hs-abend .hero-actions .btn-light:hover { background: var(--accent-dark); }
+.hs-abend .topbar .btn-primary { background: transparent; color: var(--accent-bold);
+                                 border-color: var(--accent-bold); }
+.hs-abend .topbar .btn-primary:hover { background: var(--accent); color: var(--on-accent);
+                                       border-color: var(--accent); }
 .hs-abend .kat > summary:hover { color: var(--accent-bold); }
 .hs-abend .stimmen-note .sterne,
 .hs-abend .stimme .sterne { color: var(--gold-dunkel); }
@@ -401,10 +448,56 @@ const ABEND = `
 .hs-abend .section { padding: 88px 0; }
 .hs-abend #ambiente { padding: 104px 0 88px; }
 .hs-abend #highlights .section-head h2 { font-size: clamp(26px, 3.6vw, 36px); }
-.hs-abend .section-head p { font-size: 19px; }
-.hs-abend .hint, .hs-abend .error, .hs-abend .footer-note,
-.hs-abend .foto-text span, .hs-abend .demo-note { font-size: 14px; }
-.hs-abend .hl-kat, .hs-abend .veg, .hs-abend .placeholder-badge { font-size: 12px; }
+
+/* --- Die Schriftskala --------------------------------------------------- */
+/* Gemessen stand im Fliessbereich jeder Ganzzahlwert von 11 bis 20 px auf
+   der Seite: 11, 12, 13, 14, 15, 16, 17, 18, 19, 20. Zehn Stufen, von denen
+   keine zwei nebeneinander unterscheidbar waren – das ist keine Skala,
+   sondern eine Liste von Zufaellen. Hier gelten fuenf, jede mit einer
+   Aufgabe, dazu die clamp-Groessen fuer Ueberschriften:
+
+     --t-xs 12  Marke, Kategorie, Abzeichen – Text, der etikettiert
+     --t-s  14  Beiwerk: Beschreibung, Hinweis, Oeffnungszeit, Fussnote
+     --t-m  17  Lesegroesse: Fliesstext, Gerichtzeile, jeder Knopf
+     --t-l  21  Die Stimme des Hauses: Preis, Kategorietitel, Wortmarke
+     --t-xl 26  Einzelzeichen: das Kreuz im Warenkorb, das Haken-Rund
+
+   Nachzulesen in docs-intern/design-tokens/abend.md. */
+.hs-abend {
+  .usp-platzhalter, .foto-badge, .kat-anzahl,
+  .cart-count, .sig-reservation-kicker,
+  .hl-kat, .veg, .placeholder-badge { font-size: var(--t-xs); }
+
+  .hint, .error, .footer-note,
+  .foto-text span, .demo-note,
+  .hl-desc, .gericht-desc, .step p,
+  .step-n, .reserve-pluspunkte li,
+  .stimmen-erklaerung, .confirm-summary,
+  .cart-line-name, .qty span,
+  .rating, .usp-list,
+  .stimme .sterne { font-size: var(--t-s); }
+
+  .topnav, .btn, .mobilebar .btn,
+  .cart-fab, .stimme p, .stars,
+  .step h3, .qty button, footer strong,
+  .sig-reservation-text,
+  .panel .btn-primary { font-size: var(--t-m); }
+
+  .section-head p, .hero-sub,
+  .reserve-grid > div:first-child p,
+  .hl-name, .hl-preis, .brand,
+  .sterne, .stimme .slot-titel,
+  .kat > summary, .mini-add,
+  .drawer-head h3, .totals,
+  .foto-text strong { font-size: var(--t-l); }
+
+  .icon-btn, .confirm-icon { font-size: var(--t-xl); }
+  .hours-head { font-size: var(--t-l); margin-bottom: 12px; }
+}
+
+/* Die Bewertungszahl ueber den Stimmen ist kein Text, sondern eine Ziffer,
+   die auftritt – sie gehoert in den Ueberschriftenbereich. */
+.hs-abend .stimmen-note .note { font-size: clamp(26px, 3vw, 36px); }
 
 /* --- Highlights: die Leseliste ------------------------------------------ */
 /* Im Abendhaus liest man eine Karte, man blättert keine Kacheln. Ein Gericht
@@ -419,10 +512,16 @@ const ABEND = `
                        text-transform: uppercase; color: var(--accent-bold); }
 @media (min-width: 860px) {
   .hs-abend .hl-anordnung { grid-template-columns: 6fr 6fr; gap: 0 54px; align-items: start; }
-  .hs-abend .hl-anordnung > .hl-card:first-child { grid-column: 1; }
-  .hs-abend .hl-anordnung--3 > .hl-card:first-child { grid-row: span 2; }
-  .hs-abend .hl-anordnung--4 > .hl-card:first-child { grid-row: span 3; }
-  .hs-abend .hl-anordnung--6 > .hl-card:first-child { grid-row: span 5; }
+  /* Die Zeilen der Liste sind so hoch wie ihr Text und keinen Millimeter
+     hoeher. Die letzte Zeile ist leer und flexibel: Sie nimmt auf, was das
+     hohe Bild links ueberschiesst. Ohne sie verteilt das Raster die
+     Bildhoehe auf die Textzeilen und reisst Loecher zwischen zwei
+     Gerichte. Weil das Bild eine flexible Zeile mit ueberspannt, zaehlt
+     seine Hoehe bei der Groesse der Textzeilen gar nicht erst mit. */
+  .hs-abend .hl-anordnung > .hl-card:first-child { grid-column: 1; grid-row: 1 / -1; }
+  .hs-abend .hl-anordnung--3 { grid-template-rows: min-content min-content 1fr; }
+  .hs-abend .hl-anordnung--4 { grid-template-rows: repeat(3, min-content) 1fr; }
+  .hs-abend .hl-anordnung--6 { grid-template-rows: repeat(5, min-content) 1fr; }
   .hs-abend .hl-anordnung > .hl-card:first-child .hl-media { aspect-ratio: 4 / 5; }
   .hs-abend .hl-anordnung > .hl-card:first-child .hl-name { font-size: clamp(22px, 2.3vw, 28px); }
   .hs-abend .hl-anordnung > .hl-card:not(:first-child) {
@@ -430,7 +529,7 @@ const ABEND = `
   }
   .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-media { display: none; }
   .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-body { padding: 0; }
-  .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-name { font-size: 19px; }
+  .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-name { font-size: var(--t-l); }
   .hs-abend .hl-anordnung > .hl-card:last-child { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
 }
 
@@ -451,7 +550,6 @@ const ABEND = `
 .hs-abend .stimmen-grid { grid-template-columns: 1fr; gap: 0; }
 .hs-abend .stimmen-grid--list { max-width: none; margin-left: 0; margin-right: 0; }
 .hs-abend .stimmen-note { justify-content: flex-start; margin-bottom: 20px; }
-.hs-abend .stimmen-note .note { font-size: 36px; }
 .hs-abend .stimmen-blatt { display: block; }
 @media (min-width: 960px) {
   .hs-abend #karte .wrap,
@@ -466,7 +564,7 @@ const ABEND = `
   .hs-abend #stimmen .stimmen-erklaerung { grid-column: 2; }
 }
 
-${bildunterschriftCss("hs-abend")}
+${bildunterschriftCss("hs-abend", "var(--t-l)", "var(--t-s)")}
 /* Der Raum führt diesen Archetyp an – er steht über die ganze Breite, Team
    und Bestseller teilen sich die Zeile darunter. */
 @media (min-width: 760px) {
@@ -481,7 +579,7 @@ ${bildunterschriftCss("hs-abend")}
 @media (min-width: 860px) {
   .hs-abend .contact-grid { grid-template-columns: 5fr 7fr; gap: 60px; }
 }
-.hs-abend .hours-row { font-size: 17px; padding: 15px 0; font-variant-numeric: tabular-nums; }
+.hs-abend .hours-row { font-size: var(--t-s); padding: 15px 0; font-variant-numeric: tabular-nums; }
 .hs-abend .contact-list li { gap: 16px; padding: 14px 0; align-items: flex-start; }
 .hs-abend .contact-list .k { font-size: inherit; display: inline-flex; padding-top: .1em; }
 

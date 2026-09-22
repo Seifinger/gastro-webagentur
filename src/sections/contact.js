@@ -109,7 +109,7 @@ export function renderContact({ kontaktZeilen, hoursRows, strasse, ort, handschr
     <div class="contact-grid">
       <ul class="contact-list">${kontaktZeilen}</ul>
       <div>
-        <h3 style="font-size:20px;margin-bottom:12px">Öffnungszeiten<span class="placeholder-badge">Platzhalter</span></h3>
+        <h3${handschrift === "abend" ? ' class="hours-head"' : ' style="font-size:20px;margin-bottom:12px"'}>Öffnungszeiten<span class="placeholder-badge">Platzhalter</span></h3>
         ${hoursRows}
       </div>
     </div>
