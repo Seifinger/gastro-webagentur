@@ -50,12 +50,54 @@ Dieses Designsystem wird verfeinert und an externe Best Practices angeglichen.
 - Keine generischen AI-Standardpaletten (z. B. beliebige Lila/Rosa-Gradients ohne Bezug).
 - Fokus auf kulinarische Atmosphären: Erdtöne, Holz, metallische Highlights, Nachtlicht – validiert gegen Refero-Referenzen und echte Restaurant-Websites.
 
-### Spacing, Radius, Shadow
+### Spacing, Radius, Shadow, Transition – globales Token-Set (Stage 2)
 
-- Spacing: xs/sm/md/lg/xl.
-- Radii: sm/md/lg.
-- Shadows: soft/strong.
-- Konsistent in Sections, Cards, Buttons, Forms, Testimonials.
+Verbindlich für alle Landing-Pages **und** beide Dashboards (Stage 3/4/5).
+Wird als `:root`-Ergänzung in `PAGE_STYLES` (`landingPageGenerator.js`) und in
+den Dashboard-Stylesheets gesetzt – siehe Stage 3a/4a. Bis dahin sind das
+Zielwerte, noch kein Code.
+
+```css
+--space-xs: 6px;
+--space-sm: 12px;
+--space-md: 24px;
+--space-lg: 48px;
+--space-xl: 84px;
+
+--radius-sm: 6px;
+--radius-md: 12px;
+--radius-lg: 20px;
+--radius-pill: 999px;
+
+--shadow-soft: 0 2px 12px rgba(0,0,0,.07);
+--shadow-card: 0 8px 28px rgba(0,0,0,.10);
+--shadow-strong: 0 18px 48px rgba(0,0,0,.18);
+
+--transition-fast: .12s ease;
+--transition-base: .22s ease;
+--transition-slow: .38s cubic-bezier(.22,1,.36,1);
+```
+
+**Wichtiger Unterschied zu den bestehenden Handschrift-Kurven:** Die drei
+Archetypen (traditionell/abend/hell) haben bereits eigene, bewusst
+unterschiedliche Bewegungs-Kurven (siehe Abschnitt 5 unten und
+`styles/handschrift.css.js`) – das bleibt so und wird **nicht** durch
+`--transition-slow` ersetzt. Die neuen `--transition-*`-Tokens gelten für
+Dinge, die bisher gar keine System-Kurve hatten: Hover-States auf Buttons/
+Cards außerhalb der Handschrift-Momente, Formular-Fokus, Dashboard-Interaktionen.
+
+Zusätzlich, für Stage 3b (Typografie-Skala, ergänzt die bestehenden
+Display-Fonts aus Abschnitt 5, ersetzt sie nicht):
+
+```css
+--text-xs: .75rem;
+--text-sm: .875rem;
+--text-base: 1.0625rem;   /* aktuell 17px, Body-Standard */
+--text-lg: 1.125rem;
+--text-xl: 1.25rem;
+--text-2xl: clamp(1.5rem, 3vw, 2rem);
+--text-display: clamp(2.125rem, 7vw, 4.375rem);
+```
 
 ## 5. Theme-Spezifika pro Küche/Stimmung
 
@@ -91,164 +133,172 @@ Format je Küche:
 
 ### Bayerisch
 
-- **Reale Referenz:** Recherche zeigt zwei Pole – klassische Wirtshäuser mit
-  Holztönen/Alpin-Motiven vs. moderne Münchner Wirtshaus-Szene (z. B.
-  Wirtshaus Maximilian: helles, schlichtes Interieur statt dunklem Holz;
-  Servus Heidi: einfache Deko plus Kunst an der Wand). Quelle:
-  [munich.travel – Young Bavarian cuisine](https://www.munich.travel/en/topics/eat-drink/modern-bavarian-taverns),
-  [Time Out – Wirtshaus Maximilian](https://www.timeout.com/munich/restaurants/wirtshaus-maximilian)
-- **Ableitung:**
-  - *Wirtshaus* (traditionell): warme Holztöne, kräftiges Braun/Grün, derbe Typo (Merriweather).
-  - *Kellerstube* (abend): dunkler, gedeckter, Kerzenlicht-Anmutung statt Tageslicht.
-  - *Biergarten* (hell): das "moderne Münchner Wirtshaus" aus der Recherche – helles Interieur, reduzierte Deko, mehr Luft.
+**Reale Referenz:** Wirtshaus Maximilian (München) – helles, schlichtes Interieur statt dunklem Holz
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** Tagesempfehlung wechselt durch (sig-tafel), mit Handschrift zusätzlich der gezeichnete, überlaufende Maßkrug
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Wirtshaus | traditionell | Merriweather | `#fbfaf7` | `#ffffff` | `#23241f` | `#3f5d3a` | `#b8862f` |
+| Kellerstube | abend | Merriweather | `#141013` | `#1d1719` | `#f6f1ec` | `#a8583a` | `#c99a4e` |
+| Biergarten | hell | Cormorant Garamond | `#fbfcfd` | `#ffffff` | `#1c2733` | `#568238` | `#c8a63c` |
 
 ### Italienisch
 
-- **Reale Referenz:** BoccaLupo (Atlanta, Italian Trattoria) und ein in
-  Block-Agency-Roundup beschriebener Trattoria-Stil: Creme-/Off-White-/
-  Erdtöne, elegante Serifen für Headings, klare Sans-Serif im Fließtext –
-  editorial statt rustikal. Quelle:
-  [StartDesigns – 20 Best Restaurant Websites](https://www.startdesigns.com/blog/best-restaurant-websites/),
-  [Block Agency – Restaurant Website Design Examples](https://blockagency.co/blog/restaurant-website-design-examples/)
-- **Ableitung:**
-  - *Trattoria* (traditionell): genau dieser Creme/Erdton-Look mit Playfair Display.
-  - *Osteria Notte* (abend): dieselbe Serifen-Eleganz, aber dunkler getont, mehr Kontrast (DM Serif Display statt Playfair).
-  - *Costiera* (hell): heller, mediterraner – die Serife bleibt, die Erdtöne weichen Küstenfarben.
+**Reale Referenz:** BoccaLupo (Atlanta) – Creme-/Erdtöne, editoriale Serifen-Eleganz
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** zwei Pizzahälften drehen gegenläufig
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Trattoria | traditionell | Playfair Display | `#fdfaf5` | `#ffffff` | `#2a211a` | `#b4451f` | `#c1872c` |
+| Osteria Notte | abend | DM Serif Display | `#141013` | `#1d1719` | `#f6f1ec` | `#ab3946` | `#c39b3f` |
+| Costiera | hell | Cormorant Garamond | `#fbfcfd` | `#ffffff` | `#1c2733` | `#2e7da6` | `#d9a92c` |
 
 ### Griechisch
 
-- **Reale Referenz:** Athens' Akra – minimalistischer Raum (Architektin Myrto
-  Kiourti); Branding-Trend "minimalistisches Design + traditionelle
-  griechische Elemente"; Blau-Weiß-Küstenpalette als Moodboard-Konstante.
-  Quelle: [Reise-Recherche zu Akra/Athen](https://www.travel.gr/en/best-of-en/best-athens-gastro-tavernas/),
-  Pinterest-Moodboards "Greek Taverna Aesthetic"
-- **Ableitung:**
-  - *Taverne am Hafen* (traditionell): Blau-Weiß, gezeichneter Olivenzweig (bereits in heroSignature.js umgesetzt), warme Erdtöne im Interieur.
-  - *Athener Moderne* (abend): reduzierter, dunkler, die minimalistische Akra-Linie – Montserrat als Display bleibt hier laut vorhandenem Audit ein Schwachpunkt (siehe design-audit.md, Punkt 1) und sollte in Stage 3 überprüft werden.
-  - *Olivenhain* (hell): helles Naturmaterial, viel Weißraum, Cormorant Garamond.
+**Reale Referenz:** Akra (Athen) – minimalistischer Raum, Blau-Weiß-Küstenpalette
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** gezeichneter Olivenzweig schaukelt sanft
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Taverne am Hafen | traditionell | Playfair Display | `#fbfcfd` | `#ffffff` | `#1c2733` | `#1f6f9c` | `#cfa53a` |
+| Athener Moderne | abend | Montserrat ⚠ | `#0f1012` | `#17181c` | `#f4f4f6` | `#c9a227` | `#c9a227` |
+| Olivenhain | hell | Cormorant Garamond | `#fbfaf7` | `#ffffff` | `#23241f` | `#6b7d3d` | `#b8923c` |
 
 ### Türkisch
 
-- **Reale Referenz:** Spannbreite von Street-Food-Doner (Istanbul Grill,
-  DonerG – bold colors, smoky grills) bis Fine-Dining (Mikla, Istanbul –
-  Mid-Century-Modern-Eleganz auf dem Dach der Marmara Pera). Quelle:
-  [Websuche Turkish Grill Restaurants](https://istanbulgrillvirginia.com/),
-  Mikla als Fine-Dining-Referenz
-- **Ableitung:**
-  - *Basar* (traditionell): warme, kräftige Farben, Street-Food-Energie, Oswald als schmale Markt-Schrift.
-  - *Bosporus bei Nacht* (abend): die Mikla-Richtung – gedämpft, elegant, Mid-Century statt Basar-Trubel.
-  - *Anatolische Erde* (hell): Terrakotta/Sand-Töne, ruhiger als der Basar.
+**Reale Referenz:** Mikla (Istanbul) – Mid-Century-Eleganz vs. Street-Food-Energie
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** Drehspieß dreht sich endlos
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Basar | traditionell | Oswald | `#fdfbf7` | `#ffffff` | `#2d2519` | `#c0392b` | `#d6a233` |
+| Bosporus bei Nacht | abend | DM Serif Display | `#0d1218` | `#151c24` | `#eef3f8` | `#2b8181` | `#c9a227` |
+| Anatolische Erde | hell | Merriweather | `#fdfbf7` | `#ffffff` | `#2d2519` | `#a85c2e` | `#c08a33` |
 
 ### Syrisch
 
-- **Reale Referenz:** Ammoora (Baltimore, "modern Syrian fine dining") –
-  explizit "warm with plaster, pattern and light", Räume nach Ecken eines
-  Damaszener Hauses modelliert. Quelle: [Ammoora](https://ammoora.com/),
-  [Lebanushi – Levantine warmth](https://lebanushi.com/the-best-levantine-restaurant-in-dubai/)
-- **Ableitung:**
-  - *Damaszener Hof* (traditionell): genau die Ammoora-Idee – Putz-Texturen, warmes Licht, Ornamentik.
-  - *Gewürzbasar* (abend): dunkler, gewürzbetont, die Minztee-Signatur (bereits vorhanden) passt hierher.
-  - *Levante Modern* (hell): reduzierte, helle Variante derselben Warmtöne.
+**Reale Referenz:** Ammoora (Baltimore) – "warm with plaster, pattern and light"
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** Minztee wird eingegossen, das Glas "atmet"
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Damaszener Hof | traditionell | Playfair Display | `#fbfcfd` | `#ffffff` | `#1c2733` | `#3c8369` | `#c9a227` |
+| Gewürzbasar | abend | Oswald | `#141013` | `#1d1719` | `#f6f1ec` | `#c8791f` | `#d8a33c` |
+| Levante Modern | hell | Cormorant Garamond | `#fdfbf7` | `#ffffff` | `#2d2519` | `#8a6a3f` | `#c0994a` |
 
 ### Chinesisch
 
-- **Reale Referenz:** 2026-Trend explizit gegen "Red lacquer walls, gold
-  dragon murals" – stattdessen "Neo-Chinese luxury", gedämpfte, natürliche
-  Paletten mit gezielten Akzentfarben, kulturelle Symbolik reinterpretiert
-  statt wiederholt. Quelle: [Tinggi Design Guide](https://tinggidesign.com/guide-to-chinese-restaurant-design/),
-  Behance "BAO — Modern Chinese Restaurant"
-- **Ableitung:**
-  - *Rote Laterne* (traditionell): bewusst noch die klassischen Signalfarben (Rot/Gold), aber zurückhaltender dosiert als das Klischee.
-  - *Shanghai Nacht* (abend): "Neo-Chinese luxury" – gedämpfte, dunkle Basis mit präzisen Gold-Akzenten statt Fläche.
-  - *Teehaus* (hell): natürliche, ruhige Materialtöne, kaum noch Rot – Cormorant Garamond passt zur reduzierten Linie.
+**Reale Referenz:** Tinggi-Design-Richtlinie "Neo-Chinese luxury" statt Rot/Gold-Klischee
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** Drehteller mit drei Schalen im Kreis
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Rote Laterne | traditionell | Playfair Display | `#fdfaf5` | `#ffffff` | `#2a211a` | `#b31e1e` | `#c9a227` |
+| Shanghai Nacht | abend | Montserrat ⚠ | `#0f1012` | `#17181c` | `#f4f4f6` | `#dd353a` | `#d9a441` |
+| Teehaus | hell | Cormorant Garamond | `#fbfaf7` | `#ffffff` | `#23241f` | `#3f7d6a` | `#b8923c` |
 
 ### Thailändisch
 
-- **Reale Referenz:** Wenig spezifische Awards gefunden; Templatemonster-
-  Kategorisierung zeigt Bandbreite von "neutral, clean" bis "dark,
-  minimalist" – keine dominante Konvention. Orchideen-Motiv (bereits in
-  heroSignature.js) bleibt daher die stärkste kulturelle Ankerreferenz.
-- **Ableitung:**
-  - *Orchidee* (traditionell): die vorhandene Orchid-Bloom-Signatur, warme Farbwelt.
-  - *Streetfood Nacht* (abend): dunkler, Oswald als Street-Schrift (im Audit bereits positiv vermerkt).
-  - *Andamanen* (hell): helle Küstenfarben, aber laut design-audit.md aktuell mit Montserrat statt echter Paarung – Stage 3 prüfen.
+**Reale Referenz:** keine dominante reale Referenz gefunden – Orchid-Signatur bleibt Anker
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** Orchidee blüht auf, sobald der Hero sichtbar wird
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Orchidee | traditionell | Playfair Display | `#fbfcfd` | `#ffffff` | `#1c2733` | `#b13a7a` | `#c9a227` |
+| Streetfood Nacht | abend | Oswald | `#0f1012` | `#17181c` | `#f4f4f6` | `#f36d1f` | `#e3a13a` |
+| Andamanen | hell | Cormorant Garamond | `#fbfcfd` | `#ffffff` | `#1c2733` | `#1a837f` | `#d9a92c` |
 
 ### Vietnamesisch
 
-- **Reale Referenz:** Kaum eigenständige Design-Awards; Branding-Beispiele
-  (Behance: "Pho Saigon – Brand Identity", "MÚC") eher reduziert/modern statt
-  folkloristisch. Quelle: Behance-Suche "Vietnamese Restaurant"
-- **Ableitung:**
-  - *Indochine* (traditionell): wärmere, koloniale Anmutung.
-  - *Hanoi Nacht* (abend): reduziert, dunkel, urban.
-  - *Straßenküche* (hell): hell, unprätentiös, Street-Food-Direktheit – aktuell Montserrat, im Audit als schwache Paarung markiert.
+**Reale Referenz:** Behance "Pho Saigon"/"MÚC" – reduziert statt folkloristisch
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** dampfende Phở-Schale, atmet leicht
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Indochine | traditionell | Playfair Display | `#fdfbf7` | `#ffffff` | `#2d2519` | `#8a5a2b` | `#c0994a` |
+| Hanoi Nacht | abend | DM Serif Display | `#141013` | `#1d1719` | `#f6f1ec` | `#d08a1f` | `#e0ab45` |
+| Straßenküche | hell | Cormorant Garamond | `#fbfaf7` | `#ffffff` | `#23241f` | `#48833a` | `#c8a63c` |
 
 ### Japanisch
 
-- **Reale Referenz:** Fat Cow – dunkle, dramatische Food-Fotografie mit
-  warmen Gold-Akzenten für gehobene Seafood-/Omakase-Anmutung; Fiola als
-  Beispiel für "restrained elegance" (weiche Palette, große Weißräume).
-  Quelle: [Restaurant-Website-Recherche Omakase/Izakaya](https://www.sitebuilderreport.com/inspiration/restaurant-websites)
-- **Ableitung:**
-  - *Izakaya* (traditionell): dunkel, aber lebendig – Sushi-Band-Signatur (vorhanden) plus warme Lichtakzente.
-  - *Omakase* (abend): die Fat-Cow-Richtung – sehr dunkel, wenige Gold-Akzente, DM Serif Display.
-  - *Washitsu* (hell): die Fiola-Richtung – helle, zurückhaltende Eleganz statt Dunkelheit.
+**Reale Referenz:** Fat Cow – dunkel, warme Gold-Akzente / Fiola – restrained elegance
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** Sushi-Band läuft durchs Bild
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Izakaya | traditionell | Montserrat ⚠ | `#141013` | `#1d1719` | `#f6f1ec` | `#c8352f` | `#d9a441` |
+| Omakase | abend | DM Serif Display | `#0f1012` | `#17181c` | `#f4f4f6` | `#b99a4e` | `#b99a4e` |
+| Washitsu | hell | Cormorant Garamond | `#fbfaf7` | `#ffffff` | `#23241f` | `#6b6256` | `#a8905c` |
 
 ### Indisch
 
-- **Reale Referenz:** Tamasha Modern Indian – zeitgenössischer Luxus mit
-  indisch inspirierten Architekturdetails: Samt, Gold-Bögen, Schichtlicht,
-  erdige Texturen; "Spice-Market-Farben" als Web-Übersetzung empfohlen
-  (satte Jeweltöne, Texturüberlagerungen). Quelle:
-  [Tamasha Modern Indian](https://en.wikipedia.org/wiki/Tamasha_Modern_Indian)
-- **Ableitung:**
-  - *Gewürzmarkt* (traditionell): satte Gewürzfarben, Oswald als Markt-Schrift.
-  - *Maharadscha* (abend): die Tamasha-Richtung – Gold-Akzente auf dunklem Grund, DM Serif Display.
-  - *Südindisch hell* (hell): reduzierte, hellere Palette, weniger Gold, mehr Grün/Naturtöne.
+**Reale Referenz:** Tamasha Modern Indian – Samt, Gold-Bögen, Gewürzmarkt-Farben
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** Gewürzwölkchen platzt auf beim Sichtbarwerden
 
-### Asiatisch (gemischt/panasiatisch)
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Gewürzmarkt | traditionell | Oswald | `#fdfbf7` | `#ffffff` | `#2d2519` | `#c87f1e` | `#d8a33c` |
+| Maharadscha | abend | DM Serif Display | `#0d1218` | `#151c24` | `#eef3f8` | `#974381` | `#c9a227` |
+| Südindisch hell | hell | Cormorant Garamond | `#fbfaf7` | `#ffffff` | `#23241f` | `#46833c` | `#c8a63c` |
 
-- **Reale Referenz:** Keine eigenständige reale Referenz sinnvoll (Sammel-
-  kategorie per Definition ohne feste kulinarische Identität, siehe README).
-  Die Laternen-Signatur (bereits vorhanden) bleibt der visuelle Anker; Ton
-  orientiert sich an den Nachbarrecherchen zu Chinesisch/Thailändisch.
-- **Ableitung:**
-  - *Marktstand* (traditionell): warm, belebt.
-  - *Neon* (abend): urban, dunkel, Laternen-Glow als Lichtquelle.
-  - *Fusion Minimal* (hell): reduziert, aktuell laut Audit mit Montserrat – Stage 3 prüfen.
+### Asiatisch (gemischt)
+
+**Reale Referenz:** keine eigene reale Referenz (Sammelkategorie) – Laternen-Signatur als Anker
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** zwei Laternen pulsieren/schaukeln am Rand
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Marktstand | traditionell | Oswald | `#fdfbf7` | `#ffffff` | `#2d2519` | `#c1571d` | `#d8a33c` |
+| Neon | abend | Montserrat ⚠ | `#0f1012` | `#17181c` | `#f4f4f6` | `#dd353a` | `#d9a441` |
+| Fusion Minimal | hell | Cormorant Garamond | `#fbfcfd` | `#ffffff` | `#1c2733` | `#2f4858` | `#a8905c` |
 
 ### Café
 
-- **Reale Referenz:** The Barn (Berlin) – europäischer Minimalismus, neutrale
-  Farbpalette, High-Contrast-Visuals, editorial; Intelligentsia – kräftige
-  Typografie, lebendige Fotografie, Storytelling über Herkunft. Warme
-  Erdtöne (Braun/Creme/Terracotta) dominieren die Kategorie laut Recherche.
-  Quelle: [Colorlib – 25 Best Coffee Shop Websites](https://colorlib.com/wp/coffee-shop-websites/)
-- **Ableitung:**
-  - *Wiener Kaffeehaus* (traditionell): warme Erdtöne, klassische Eleganz, Playfair/Merriweather-Nähe.
-  - *Konditorei* (abend): gedämpfter, edler – DM Serif Display passt zur Patisserie-Anmutung.
-  - *Third Wave* (hell): The-Barn-Minimalismus – neutral, hell, High-Contrast – aktuell Montserrat, im Audit als schwache Paarung markiert.
+**Reale Referenz:** The Barn (Berlin) – europäischer Minimalismus / Intelligentsia – kräftige Typo
+**Hero-Signatur (alle 3 Stimmungen gemeinsam):** Dampf steigt über der Tasse auf
+
+| Stimmung | Archetyp | Display-Font | Hintergrund | Fläche | Text | Akzent | Gold |
+|---|---|---|---|---|---|---|---|
+| Wiener Kaffeehaus | traditionell | Playfair Display | `#fdfaf5` | `#ffffff` | `#2a211a` | `#2f5d4a` | `#b8923c` |
+| Konditorei | abend | DM Serif Display | `#fdfaf5` | `#ffffff` | `#2a211a` | `#b8557a` | `#c9a227` |
+| Third Wave | hell | Cormorant Garamond | `#fbfcfd` | `#ffffff` | `#1c2733` | `#5c6b5a` | `#a8905c` |
+
+*(Konditorei ist bewusst hell trotz Archetyp "abend" – siehe README: "eine Konditorei abendlich und trotzdem hell". Der Archetyp trägt das Layout/die Handschrift, nicht Helligkeit oder Dunkelheit.)*
+
+### Layout- und Motion-Charakter je Archetyp (gilt für alle 12 Küchen gleich)
+
+**traditionell:** Standard-Reihenfolge (Highlights→Karte→Ambiente→Stimmen→Reservierung→Kontakt). Handschrift: Highlights als Treppe (1 große + gestufte Karten), Menütafel mit sticky Kategorie-Spalte, Stimmenblatt (Note groß + Zitate daneben). Kurve: `cubic-bezier(.2,.72,.3,1)`.
+
+**abend:** Ambiente zuerst, Reservierung als einzige Sektion mit Extra-Luft – der eine starke Moment der Seite. Handschrift: Kopf in schmaler linker Randspalte bei Karte/Stimmen, Highlights als Leseliste (1 Foto + Textzeilen). Kurve: `cubic-bezier(.5,0,.1,1)`.
+
+**hell:** Karte zuerst, keine sticky Kopfzeile. Handschrift: dichte Vierer-Reihe der Highlights (jede 3. Karte breiter) als der eine schnelle Moment, Karte/Stimmen ohne Kästen, Kontakt adressen-zuerst. Kurve: `cubic-bezier(.16,1,.3,1)`.
 
 ---
 
 ### 5.1 Wiederkehrendes Muster aus der Recherche
 
-Über alle 12 Küchen hinweg bestätigt die Recherche zwei Dinge aus dem
-Stage-1-Audit:
-
-1. **Die "hell"-Stimmung ist die anfälligste für generische Wirkung.** In
-   5 von 12 Fällen (siehe design-audit.md) läuft dort Montserrat als
-   Display-Schrift neben Inter – die reale Referenz-Recherche zeigt aber,
-   dass gerade die hellen/minimalistischen Restaurant-Referenzen (Akra,
-   Wirtshaus Maximilian, The Barn) sich über **Reduktion und Material**
-   unterscheiden, nicht über eine neutrale Grotesk-Schrift. Empfehlung für
-   Stage 3: pro "hell"-Stimmung prüfen, ob eine der fünf bereits vorhandenen
-   Serifen (z. B. Cormorant Garamond, sehr hell einsetzbar) besser trägt als
-   Montserrat.
-2. **"Abend" ist konsistent die dunkelste, reduzierteste Stimmung** – das
-   deckt sich mit allen recherchierten Fine-Dining-/Nacht-Referenzen (Fat
-   Cow, Mikla, Ammoora-Gewürzbasar, Shanghai Nacht) und bestätigt die
-   bestehende Architektur-Entscheidung in `ARCHETYP_PRESET.abend`.
+1. **Die "hell"-Stimmung war die anfälligste für generische Wirkung – inzwischen behoben.**
+   In 5 von 12 Fällen lief dort Montserrat als Display-Schrift neben Inter (siehe
+   `docs-intern/design-audit.md`, Punkt 1). Das ist seit dem Commit
+   "stimmungen.js: echte Serifen-Paarung statt Montserrat in 5 hell-Stimmungen"
+   gefixt – alle "hell"-Zeilen in der Tabelle oben zeigen jetzt Cormorant
+   Garamond oder eine andere Serife, keine einzige noch Montserrat.
+2. **Vier Montserrat-Stellen bleiben bewusst unverändert** (markiert mit ⚠
+   in der Tabelle): Griechisch/Athener Moderne (abend), Chinesisch/Shanghai
+   Nacht (abend), Japanisch/Izakaya (traditionell), Asiatisch/Neon (abend).
+   Diese Stimmungen sind explizit "urban/modern/Nacht"-Charaktere, bei denen
+   eine uppercase geometrische Grotesk als bewusstes Stilmittel lesbar ist
+   (Kontrast zur ruhigeren Tagesstimmung derselben Küche) – anders als bei
+   "hell", wo Reduktion über Material statt über eine zweite Grotesk-Schrift
+   funktioniert (siehe Stage-1-Audit). Für Stage 3 offen: einzeln prüfen, ob
+   diese vier ebenfalls eine Serife (z. B. DM Serif Display, dort schon in
+   mehreren "abend"-Stimmungen etabliert) besser trüge, oder ob Montserrat
+   dort bewusst bleibt.
+3. **"Abend" ist konsistent die dunkelste, reduzierteste Stimmung** (Ausnahme
+   Café/Konditorei, bewusst hell, siehe Fußnote oben) – das deckt sich mit
+   allen recherchierten Fine-Dining-/Nacht-Referenzen (Fat Cow, Mikla,
+   Ammoora-Gewürzbasar, Shanghai Nacht) und bestätigt die bestehende
+   Architektur-Entscheidung in `ARCHETYP_PRESET.abend`.
 
 ## 6. Komponenten-Guidelines
 
@@ -293,6 +343,7 @@ Stage-1-Audit:
 
 ## 8. Nächste Schritte für Claude
 
-1. Fülle Abschnitt 5 (Theme-Spezifika) für alle Küchen/Stimmungen aus, gestützt auf Refero-Recherche + echte Restaurant-Referenzen.
-2. Leite daraus konkrete Werte für src/designPresets.js ab.
-3. Dokumentiere jede Änderung an designPresets.js mit Verweis auf die hier festgehaltenen Design-Entscheidungen.
+1. ~~Fülle Abschnitt 5 (Theme-Spezifika) für alle Küchen/Stimmungen aus~~ – erledigt (Stage 2): konkrete, aus `stimmungen.js` extrahierte Token-Tabellen für alle 12 Küchen × 3 Stimmungen stehen oben, mit realer Referenz und Hero-Signatur je Küche.
+2. Stage 3: das globale Token-Set aus Abschnitt 4 in `PAGE_STYLES` (`landingPageGenerator.js`) einbauen, Typografie-Skala konsistent nutzen, Komponenten aus Abschnitt 6 schärfen (SVG statt Unicode-Sterne/Icons, Chevron-Animation, Formular-Fokus-Glow).
+3. Stage 4/5: dieselben Tokens (`--space-*`, `--radius-*`, `--shadow-*`) auf Wirt- und Nutzer-Dashboard übertragen – aktuell komplett eigene, unzusammenhängende Farbschemata (siehe Stage-1-Audit).
+4. Jede Preset-/Stimmungs-Änderung weiterhin hier dokumentieren, bevor sie in Code übersetzt wird.
