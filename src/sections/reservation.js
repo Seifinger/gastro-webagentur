@@ -20,7 +20,9 @@ export const PICKUP_SLOTS = [
  *   Handschrift tragen die Pluspunkte den gezeichneten Haken statt des ✓.
  */
 export function renderReservation({ widgetVariant, handschrift }) {
-  const k = handschrift ? haken() : "✓";
+  // Der gezeichnete Haken ersetzt das gesetzte ✓ auf jeder Seite, nicht nur
+  // dort, wo ein Archetyp eine eigene Handschrift mitbringt (vgl. hero.js).
+  const k = haken();
 
   // Im Abendhaus ist die Reservierung der eine starke Moment der Seite (siehe
   // docs-intern/design-tokens/abend.md). Sie bekommt deshalb als einzige

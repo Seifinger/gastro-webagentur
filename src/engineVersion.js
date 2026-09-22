@@ -7,19 +7,23 @@
 // Sammel-Laufs.
 //
 // Wichtig: Das ist bewusst KEIN Schalter zwischen zwei Renderpfaden. Der
-// Umbau der Phasen 0–5 ist für die Archetypen traditionell/abend/hell Zeichen
+// Umbau der Phasen 0–5 war für die Archetypen traditionell/abend/hell Zeichen
 // für Zeichen dieselbe Ausgabe wie vorher (nachgeprüft per Byte-Diff), und
-// alles Neue (Magazin-Raster, größere Typo, zusätzliche Bewegung, der
-// kräftigere accentBold) hängt an einem Preset, das es ausdrücklich anfordert.
-// Zwei Codepfade zu pflegen hätte also nur Kosten und keinen Nutzen.
+// alles Neue hing an einem Preset, das es ausdrücklich anforderte. Diese
+// Garantie galt für den Struktur-Umbau selbst, nicht für alle Zeit: Mit
+// Fassung 3 (Design-Auftrag, Stage 3) bekommt PAGE_STYLES ein gemeinsames
+// Token-Set (Spacing/Radius/Schatten/Übergänge, siehe DESIGN.md Abschnitt 4)
+// und mehrere Komponenten ihre Politur – das betrifft jetzt bewusst jede
+// Seite, nicht nur ein Preset. Zwei Codepfade zu pflegen hätte weiterhin nur
+// Kosten und keinen Nutzen.
 //
 // Der Marker beantwortet deshalb genau eine Frage: Wann wurde diese Seite
 // zuletzt wirklich neu gebaut und veröffentlicht? Daran sieht der
 // Agenturinhaber, welche Kunden noch auf dem alten Stand stehen und für eine
 // Auffrischung in Frage kommen (siehe npm run engine-status).
 
-/** Aktuelle Engine – Stand nach dem Umbau der Phasen 0–5. */
-export const ENGINE_VERSION = 2;
+/** Aktuelle Engine – Stand nach Stage 3 des Design-Auftrags (Token-Set + Komponenten-Politur). */
+export const ENGINE_VERSION = 3;
 
 /**
  * Alles, was schon unter docs/ liegt und keinen Marker trägt, stammt aus der

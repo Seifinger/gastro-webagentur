@@ -1,5 +1,5 @@
 import { escapeHtml, formatPrice, joinClasses } from "../htmlHelpers.js";
-import { kuechenMarke } from "../signaturIcons.js";
+import { kuechenMarke, plus } from "../signaturIcons.js";
 
 /**
  * Eine Highlight-Karte. `gestaltet` ist die Variante für Archetypen mit
@@ -24,7 +24,7 @@ function karte(gericht, { bildUrl, showBadges, beschreibungFuer, medienKlasse, g
             <span class="hl-preis">${formatPrice(gericht.preis)}</span>
             ${veg}
             <button class="add-btn" type="button" data-add="${gericht.id}" data-name="${escapeHtml(gericht.name)}" data-preis="${gericht.preis}">
-              <span aria-hidden="true">+</span> Vorbestellen
+              ${plus()} Vorbestellen
             </button>
           </div>
         </div>

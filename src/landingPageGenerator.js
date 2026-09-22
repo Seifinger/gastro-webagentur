@@ -10,6 +10,7 @@ import { SIGNATUR_CSS, signaturCssFuer } from "./heroSignature.js";
 import { MOTION_CSS, MOTION_SCRIPT, MOTION_EXTRA_CSS, MOTION_EXTRA_SKRIPT } from "./motion.js";
 import { EDITORIAL_CSS, TYPOGRAFIE_CSS } from "./styles/editorial.css.js";
 import { handschriftCss, handschriftKlasse } from "./styles/handschrift.css.js";
+import { checkCircle, warnung } from "./signaturIcons.js";
 import { resonanzSkript } from "./resonanzBeacon.js";
 import { engineMarkerMeta } from "./engineVersion.js";
 import { getPresetVariant, withDesignDefaults, presetFuerArchetyp } from "./designPresets.js";
@@ -235,7 +236,18 @@ p { margin: 0; }
 a { color: inherit; }
 img { display: block; max-width: 100%; }
 .wrap { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 20px; }
-.section { padding: 84px 0; }
+.section { padding: var(--space-xl) 0; }
+
+/* Gezeichnete Zeichen (signaturIcons.js) statt Emoji/Unicode – auf jeder
+   Seite, nicht nur mit Handschrift. Wo ein Archetyp seine eigene Handschrift
+   mitbringt, überschreibt deren spezifischere Regel (styles/handschrift.css.js)
+   diese Basiswerte für dieselben Klassen – siehe DESIGN.md Abschnitt 4. */
+.ikon { width: 1.35em; height: 1.35em; flex: none; vertical-align: -.26em; }
+.ikon-haken { width: 1.05em; height: 1.05em; opacity: .9; }
+.ikon-stern { width: 1em; height: 1em; vertical-align: -.15em; margin-right: 2px; }
+.ikon-plus { width: .85em; height: .85em; vertical-align: -.08em; }
+.ikon-chevron { width: 1.1em; height: 1.1em; }
+.marke { width: 1.9em; height: 1.9em; flex: none; vertical-align: -.48em; }
 /* Die Kopfzeile liegt fest über der Seite – ohne diesen Abstand verdeckt sie
    die Überschrift des angesprungenen Abschnitts. */
 section[id] { scroll-margin-top: 80px; }
@@ -286,9 +298,9 @@ body.veroeffentlicht .topbar { top: 38px; }
 /* Buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 14px 26px; border-radius: 999px; border: 1px solid transparent;
+  padding: 14px 26px; border-radius: var(--radius-pill); border: 1px solid transparent;
   font-size: 15px; font-weight: 600; font-family: inherit; text-decoration: none;
-  cursor: pointer; transition: transform .12s ease, background .16s ease, color .16s ease;
+  cursor: pointer; transition: transform var(--transition-fast), background var(--transition-base), color var(--transition-base);
 }
 .btn:active { transform: translateY(1px); }
 .btn-primary { background: var(--accent); color: var(--on-accent); }
@@ -297,14 +309,16 @@ body.veroeffentlicht .topbar { top: 38px; }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 .btn-light { background: #fff; color: #1a1a1a; }
 .btn-light:hover { background: #ece5db; }
-.btn-outline-light { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.6); }
-.btn-outline-light:hover { background: rgba(255,255,255,.2); border-color: #fff; }
+/* Zweistufiger Hero-CTA: die zweite Aktion liegt als Glas auf dem Foto statt
+   als deckende Fläche – dezenter als der gefüllte Hauptknopf daneben. */
+.btn-outline-light { background: rgba(255,255,255,.12); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); color: #fff; border-color: rgba(255,255,255,.6); }
+.btn-outline-light:hover { background: rgba(255,255,255,.22); border-color: #fff; }
 .btn-block { width: 100%; }
 .btn[disabled] { opacity: .5; cursor: not-allowed; }
 
 /* Hero: auf dem Handy muss alles Wichtige ohne Scrollen sichtbar sein */
 .hero { position: relative; color: #fff; background: var(--tint); overflow: hidden;
-        min-height: 100vh; min-height: 100svh; display: flex; align-items: flex-end; }
+        min-height: 96vh; min-height: 96svh; display: flex; align-items: flex-end; }
 @media (min-width: 900px) { .hero { min-height: 88vh; align-items: center; } }
 .hero-media { position: absolute; inset: 0; }
 .hero-media img { width: 100%; height: 100%; object-fit: cover; }
@@ -313,9 +327,17 @@ body.veroeffentlicht .topbar { top: 38px; }
 @media (min-width: 900px) {
   .hero-overlay { background: linear-gradient(95deg, rgba(var(--tint-rgb), .93) 0%, rgba(var(--tint-rgb), .84) 40%, rgba(var(--tint-rgb), .45) 72%, rgba(var(--tint-rgb), .2) 100%); }
 }
+/* Zweite, eigenständige Ebene nur für den unteren Rand: sorgt unabhängig vom
+   Atmosphären-Gradienten darüber dafür, dass Kicker/Titel auf jedem Foto
+   lesbar bleiben, ohne dass der Grundton in der Bildmitte dunkler werden muss. */
+.hero-vignette { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 55%, rgba(var(--tint-rgb), .5) 100%); }
 .hero-inner { position: relative; z-index: 2; width: 100%; max-width: 1140px; margin: 0 auto; padding: 100px 20px 116px; }
 @media (min-width: 900px) { .hero-inner { padding: 140px 20px 120px; } .hero-inner > * { max-width: 640px; } }
-.hero-kicker { text-transform: uppercase; letter-spacing: .2em; font-size: 12px; font-weight: 700; color: var(--gold); margin-bottom: 16px; }
+/* Der linke Strich gibt dem Kicker die Anmutung eines Zitats – derselbe Ton
+   wie das Gold der Sterne, nur schmal und nicht als Fläche. */
+.hero-kicker { text-transform: uppercase; letter-spacing: .2em; font-size: 12px; font-weight: 700; color: var(--gold);
+               margin-bottom: 16px; border-left: 3px solid var(--gold); padding-left: 12px; }
 .hero h1 { font-size: clamp(34px, 8.4vw, 70px); }
 .hero-sub { margin-top: 16px; font-size: clamp(16px, 2.2vw, 20px); color: rgba(255,255,255,.88); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
@@ -325,30 +347,38 @@ body.veroeffentlicht .topbar { top: 38px; }
 
 /* USP-Leiste */
 .usp-strip { background: var(--accent); color: var(--on-accent); }
-.usp-list { display: flex; flex-wrap: wrap; gap: 10px 30px; justify-content: center; padding: 18px 0; font-size: 15px; font-weight: 600; }
+.usp-list { display: flex; flex-wrap: wrap; gap: 10px var(--space-md); justify-content: center; padding: 18px 0; font-size: 15px; font-weight: 600; }
 .usp-list span { display: inline-flex; align-items: center; gap: 9px; }
+/* Schmale Trennlinie zwischen den Punkten statt reinem Abstand – macht aus
+   der Reihe eine Leiste mit klaren Feldern, nicht nur aneinandergereihten Sätzen. */
+.usp-list span:not(:first-child) { border-left: 1px solid rgba(255,255,255,.35); padding-left: var(--space-md); }
 
 /* Highlights */
 .hl-grid { display: grid; gap: 24px; grid-template-columns: 1fr; }
 @media (min-width: 680px) { .hl-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1000px) { .hl-grid.spalten-3 { grid-template-columns: repeat(3, 1fr); } }
-.hl-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
-           display: flex; flex-direction: column; transition: transform .18s ease; }
-.hl-card:hover { transform: translateY(-4px); }
+/* Schatten statt Kontur: die Karte hebt sich vom Grund ab, ohne dass eine
+   Linie sie einrahmt – beim Hover verstärkt sich derselbe Schatten, statt
+   dass eine zweite, andersartige Wirkung dazukäme. */
+.hl-card { background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-card);
+           display: flex; flex-direction: column; transition: transform var(--transition-slow), box-shadow var(--transition-slow); }
+.hl-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-strong); }
 .hl-media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--soft); }
 .hl-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
 .hl-card:hover .hl-media img { transform: scale(1.05); }
-.hl-kat { position: absolute; left: 13px; top: 13px; background: rgba(var(--tint-rgb), .88); color: #fff;
-          font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 11px; border-radius: 999px; }
+/* Weichgezeichneter Grund statt voller Fläche: das Abzeichen bleibt lesbar,
+   ohne das Foto darunter mit einem harten Farbblock zu verdecken. */
+.hl-kat { position: absolute; left: 13px; top: 13px; background: rgba(var(--tint-rgb), .55); backdrop-filter: blur(6px) saturate(160%); -webkit-backdrop-filter: blur(6px) saturate(160%); color: #fff;
+          font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 11px; border-radius: var(--radius-pill); }
 .hl-body { padding: 21px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .hl-name { font-size: 20px; }
 .hl-desc { color: var(--ink-soft); font-size: 15px; flex: 1; }
 .hl-foot { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
-.hl-preis { font-size: 19px; font-weight: 700; font-family: var(--display); margin-right: auto; }
-.veg { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
-.add-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px;
+.hl-preis { font-size: var(--text-xl); font-weight: 700; font-family: var(--display); margin-right: auto; }
+.veg { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid currentColor; border-radius: var(--radius-pill); padding: 1px 8px; }
+.add-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--radius-pill);
            border: 1px solid var(--accent); background: transparent; color: var(--accent);
-           font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .16s ease, color .16s ease; }
+           font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background var(--transition-base), color var(--transition-base); }
 .add-btn:hover { background: var(--accent); color: var(--on-accent); }
 
 /* Ablauf der Abholung */
@@ -362,23 +392,29 @@ body.veroeffentlicht .topbar { top: 38px; }
 
 /* Speisekarte als Akkordeon */
 .karte-section { background: var(--soft); }
-.kat { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-bottom: 14px; overflow: hidden; }
+/* Der linke Streifen macht aus jeder Kategorie eine eigene Karte mit
+   Anfang – dieselbe Geste wie bei den Gästestimmen weiter unten. */
+.kat { border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--radius); background: var(--surface); margin-bottom: 14px; overflow: hidden; }
 .kat > summary { list-style: none; cursor: pointer; padding: 20px 22px; display: flex; align-items: center; gap: 14px;
                  font-family: var(--display); text-transform: var(--display-transform); font-size: 20px; font-weight: 700; }
 .kat > summary::-webkit-details-marker { display: none; }
-.kat > summary::after { content: "+"; margin-left: auto; font-family: var(--body); font-size: 24px; line-height: 1; color: var(--accent); font-weight: 400; }
-.kat[open] > summary::after { content: "–"; }
 .kat > summary:hover { color: var(--accent); }
 .kat-anzahl { font-family: var(--body); text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+/* Gezeichneter Pfeil statt "+"/"–": dreht sich beim Öffnen, statt das Zeichen
+   auszutauschen – eine Bewegung statt eines Sprungs. */
+.kat-chevron { margin-left: auto; display: inline-flex; color: var(--accent); transition: transform var(--transition-base); }
+.kat[open] .kat-chevron { transform: rotate(180deg); }
 .kat-body { padding: 0 22px 8px; }
 .gericht { display: flex; align-items: flex-start; gap: 16px; padding: 15px 0; border-top: 1px solid var(--line); }
 .gericht-body { flex: 1; min-width: 0; }
 .gericht-name { font-weight: 600; }
 .gericht-desc { color: var(--ink-soft); font-size: 15px; margin-top: 2px; }
 .gericht-seite { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-.gericht-preis { font-weight: 600; white-space: nowrap; }
+.gericht-preis { font-family: var(--display); font-weight: 600; white-space: nowrap; }
 .mini-add { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--accent); background: transparent;
-            color: var(--accent); font-size: 20px; line-height: 1; cursor: pointer; transition: background .16s ease, color .16s ease; }
+            display: inline-flex; align-items: center; justify-content: center;
+            color: var(--accent); cursor: pointer; transition: background var(--transition-base), color var(--transition-base); }
+.mini-add .ikon-plus { width: 16px; height: 16px; vertical-align: 0; }
 .mini-add:hover { background: var(--accent); color: var(--on-accent); }
 
 /* Bildplätze für die eigenen Fotos */
@@ -391,47 +427,68 @@ body.veroeffentlicht .topbar { top: 38px; }
 .foto-text strong { font-family: var(--display); text-transform: var(--display-transform); font-size: 19px; display: block; }
 .foto-text span { font-size: 13px; color: rgba(255,255,255,.82); display: block; margin-top: 4px; }
 .foto-badge { position: absolute; right: 12px; top: 12px; font-size: 11px; font-weight: 700; color: #fff;
-              background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.45); border-radius: 999px; padding: 3px 10px; }
+              background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.45); border-radius: var(--radius-pill); padding: 3px 10px; }
 
 /* Gästestimmen */
 .stimmen-section { background: var(--soft); }
 .stimmen-note { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
                 margin-bottom: 40px; font-size: 17px; }
 .stimmen-note .note { font-family: var(--display); font-size: 34px; font-weight: 700; color: var(--accent); }
-.stimmen-note .sterne { color: var(--gold); letter-spacing: 2px; font-size: 19px; }
+.stimmen-note .sterne { color: var(--gold); font-size: 19px; }
 .stimmen-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
 @media (min-width: 820px) { .stimmen-grid { grid-template-columns: repeat(3, 1fr); } }
 /* social.layout: "list" im Design-Preset – eine gestapelte Spalte statt drei. */
 .stimmen-grid--list { max-width: 640px; margin-left: auto; margin-right: auto; }
 @media (min-width: 820px) { .stimmen-grid--list { grid-template-columns: 1fr; } }
-.stimme { position: relative; background: var(--surface); border: 1px solid var(--line);
-          border-radius: var(--radius); padding: 26px 24px 22px; display: flex; flex-direction: column; gap: 14px; }
-.stimme .sterne { color: var(--gold); letter-spacing: 2px; font-size: 15px; }
+/* Vier Punkt Akzentlinie statt Umrandung + eigener Schatten: dieselbe Geste
+   wie bei den Speisekarten-Kategorien, hier als Zitat-Anfang gelesen. */
+.stimme { position: relative; background: var(--surface); border-left: 4px solid var(--accent);
+          border-radius: var(--radius); padding: 26px 24px 22px; display: flex; flex-direction: column; gap: 14px;
+          box-shadow: var(--shadow-soft); }
+.stimme .sterne { color: var(--gold); font-size: 15px; }
 .stimme p { font-size: 16px; line-height: 1.6; flex: 1; }
-.stimme footer { font-size: 14px; color: var(--ink-soft); display: flex; gap: 8px; flex-wrap: wrap; background: none; padding: 0; }
+.stimme footer { font-size: 14px; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: none; padding: 0; }
 .stimme footer strong { color: var(--ink); font-family: var(--body); font-size: 14px; }
-.stimme.ist-platzhalter { border-style: dashed; background: transparent; min-height: 172px; justify-content: center; }
+/* Initialen statt Foto: ein echtes Bild vom Gast gibt es nie, ein erfundenes
+   wäre irreführend – der Kreis trägt nur, was aus dem Namen folgt. */
+.stimme-avatar { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex: none;
+                 border-radius: 50%; background: var(--accent); color: var(--on-accent); font-size: 12px; font-weight: 700; }
+.stimme.ist-platzhalter { border: 1px dashed var(--line); border-left: 1px dashed var(--line); box-shadow: none; background: transparent; min-height: 172px; justify-content: center; }
 .stimme .sterne.leer { color: var(--line); }
 .stimme .slot-titel { flex: none; color: var(--ink-soft); font-family: var(--display); font-size: 18px; }
 .stimmen-erklaerung { margin-top: 26px; text-align: center; color: var(--ink-soft); font-size: 15px;
                       max-width: 620px; margin-left: auto; margin-right: auto; }
 
-/* Formulare */
+/* Formulare – an den Fokus-/Rahmenregeln bekannter Buchungsstrecken
+   orientiert: dünnerer Rahmen, deutlicher Fokusring statt Browser-Outline,
+   jeder Zustandswechsel läuft über --transition-fast statt hart zu springen. */
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
 .field-grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
 @media (min-width: 680px) { .field-grid { grid-template-columns: 1fr 1fr; } }
 .field { display: flex; flex-direction: column; gap: 7px; }
 .field-wide { grid-column: 1 / -1; }
-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+label { font-size: var(--text-sm); font-weight: 600; letter-spacing: .02em; color: var(--ink); }
 input, select, textarea {
   font-family: inherit; font-size: 16px; color: var(--ink);
-  padding: 13px 15px; border: 1px solid var(--line); border-radius: calc(var(--radius) / 2); background: var(--bg); width: 100%;
+  padding: 13px 15px; border: 1.5px solid var(--line); border-radius: var(--radius-md); background: var(--bg); width: 100%;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
-input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
 textarea { resize: vertical; min-height: 90px; }
 .hint { font-size: 13px; color: var(--ink-soft); font-weight: 400; }
-.error { font-size: 13px; color: var(--accent); display: none; }
-.field.invalid .error { display: block; }
+/* Das Warnzeichen vor dem Fehlertext steht als Maske (currentColor) statt als
+   eigenes Bild – so trägt es automatisch die Akzentfarbe der jeweiligen
+   Küche und muss nicht gesondert gegen jeden der 48 Grundtöne geprüft werden. */
+.error { font-size: 13px; color: var(--accent); display: none; align-items: center; gap: 6px; }
+.error::before {
+  content: ""; width: 13px; height: 13px; flex: none; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9.3'/%3E%3Cpath d='M12 7.6v5.6'/%3E%3Ccircle cx='12' cy='16.6' r='.6' fill='black' stroke='none'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9.3'/%3E%3Cpath d='M12 7.6v5.6'/%3E%3Ccircle cx='12' cy='16.6' r='.6' fill='black' stroke='none'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.field.invalid .error { display: flex; }
 .field.invalid input, .field.invalid select { border-color: var(--accent); }
 .reserve-section { background: var(--soft); }
 .reserve-grid { display: grid; gap: 36px; grid-template-columns: 1fr; align-items: start; }
@@ -442,11 +499,11 @@ textarea { resize: vertical; min-height: 90px; }
 
 /* Warenkorb */
 .cart-fab { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: none; align-items: center; gap: 12px;
-            padding: 15px 24px; border: none; border-radius: 999px; background: var(--accent); color: var(--on-accent);
+            padding: 15px 24px; border: none; border-radius: var(--radius-pill); background: var(--accent); color: var(--on-accent);
             font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 18px 36px -14px rgba(0,0,0,.7); }
 .cart-fab.visible { display: inline-flex; }
 @media (max-width: 899px) { .cart-fab, .cart-fab.visible { display: none; } }
-.cart-count { background: rgba(255,255,255,.28); border-radius: 999px; padding: 1px 9px; font-size: 13px; }
+.cart-count { background: rgba(255,255,255,.28); border-radius: var(--radius-pill); padding: 1px 9px; font-size: 13px; }
 
 /* Feste Aktionsleiste auf dem Handy */
 .mobilebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
@@ -484,10 +541,19 @@ textarea { resize: vertical; min-height: 90px; }
                background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 34px 30px;
                text-align: center; opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
 .confirm-box.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+/* Der Kreis kommt erst mit der Bestätigung selbst herein statt schon vorher
+   zu stehen – ein kleiner, eigener Auftritt statt eines reinen Ausblendens. */
 .confirm-icon { width: 62px; height: 62px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
-                display: grid; place-items: center; font-size: 32px; margin: 0 auto 18px; }
+                display: grid; place-items: center; margin: 0 auto 18px;
+                transform: scale(.9); opacity: 0; transition: transform var(--transition-slow), opacity var(--transition-slow); }
+.confirm-box.open .confirm-icon { transform: scale(1); opacity: 1; }
+.confirm-icon .ci-ok, .confirm-icon .ci-fehler { display: none; grid-area: 1 / 1; }
+.confirm-icon .ci-ok svg, .confirm-icon .ci-fehler svg { width: 30px; height: 30px; }
+.confirm-icon .ci-ok { display: grid; }
 /* Abgelehnte Anfragen dürfen nicht wie Erfolg aussehen. */
 .confirm-box.hat-fehler .confirm-icon { background: #a33131; color: #fff; }
+.confirm-box.hat-fehler .confirm-icon .ci-ok { display: none; }
+.confirm-box.hat-fehler .confirm-icon .ci-fehler { display: grid; }
 .confirm-box.hat-fehler .confirm-summary { display: none; }
 .confirm-box h3 { font-size: 24px; margin-bottom: 12px; }
 .confirm-summary { text-align: left; background: var(--soft); border-radius: calc(var(--radius) / 1.5); padding: 17px 19px; margin: 22px 0; font-size: 15px; }
@@ -504,14 +570,22 @@ textarea { resize: vertical; min-height: 90px; }
 .contact-list a { color: var(--accent); }
 .hours-row { display: flex; justify-content: space-between; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
 .hours-row span:first-child { color: var(--ink-soft); }
-.placeholder-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold-dunkel); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; margin-left: 10px; vertical-align: middle; }
+.placeholder-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold-dunkel); border: 1px solid currentColor; border-radius: var(--radius-pill); padding: 2px 10px; margin-left: 10px; vertical-align: middle; }
 /* Derselbe Hinweis auf der Akzentfläche der USP-Leiste. Dort trägt er
    --on-accent: Das ist der Ton, der gegen --accent geprüft ist. */
-.usp-platzhalter { display: inline-block; font-size: 11px; font-weight: 700; color: var(--on-accent); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; }
+.usp-platzhalter { display: inline-block; font-size: 11px; font-weight: 700; color: var(--on-accent); border: 1px solid currentColor; border-radius: var(--radius-pill); padding: 2px 10px; }
 
-footer { background: var(--tint); color: rgba(255,255,255,.72); padding: 48px 0; font-size: 14px; }
+/* Drei Spalten (Haus / Navigation / Kontakt) statt einer Zeile Fließtext –
+   auf dem Handy fällt das Raster auf eine Spalte zusammen. */
+footer { background: var(--tint); color: rgba(255,255,255,.72); padding: var(--space-xl) 0 var(--space-lg); font-size: 14px; }
+.footer-grid { display: grid; gap: 28px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .footer-grid { grid-template-columns: 1.3fr 1fr 1fr; gap: 32px; } }
 footer strong { color: #fff; font-family: var(--display); text-transform: var(--display-transform); font-size: 17px; }
-.footer-note { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; line-height: 1.6; }
+.footer-col p { margin-top: 8px; }
+.footer-nav, .footer-kontakt { display: flex; flex-direction: column; gap: 8px; }
+.footer-nav a, .footer-kontakt a { color: rgba(255,255,255,.72); text-decoration: none; transition: color var(--transition-fast); }
+.footer-nav a:hover, .footer-kontakt a:hover { color: #fff; }
+.footer-note { grid-column: 1 / -1; margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; line-height: 1.6; }
 `;
 
 const PAGE_SCRIPT = `
@@ -618,7 +692,6 @@ const PAGE_SCRIPT = `
   function showConfirm(title, text, rows, mailto, fehler) {
     byId("confirm-title").textContent = title;
     byId("confirm-text").textContent = text;
-    byId("confirm-icon").textContent = fehler ? "!" : "\\u2713";
     byId("confirm").className = fehler ? "confirm-box hat-fehler" : "confirm-box";
 
     var box = byId("confirm-summary");
@@ -1082,6 +1155,33 @@ ${fontCss}
   --display-transform: ${t.displayTransform};
   --display-tracking: ${t.displayTracking};
   --radius: ${t.radius};
+
+  /* Globales Token-Set (DESIGN.md, Abschnitt 4 "Spacing, Radius, Shadow,
+     Transition"): gilt für UI-Chrome, die keine eigene Küchen-Note trägt
+     (Buttons, Formulare, Karten-Schatten) – anders als --radius oben, das
+     je Stimmung variiert. */
+  --space-xs: 6px;
+  --space-sm: 12px;
+  --space-md: 24px;
+  --space-lg: 48px;
+  --space-xl: 84px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --shadow-soft: 0 2px 12px rgba(0,0,0,.07);
+  --shadow-card: 0 8px 28px rgba(0,0,0,.10);
+  --shadow-strong: 0 18px 48px rgba(0,0,0,.18);
+  --transition-fast: .12s ease;
+  --transition-base: .22s ease;
+  --transition-slow: .38s cubic-bezier(.22,1,.36,1);
+  --text-xs: .75rem;
+  --text-sm: .875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: clamp(1.5rem, 3vw, 2rem);
+  --text-display: clamp(2.125rem, 7vw, 4.375rem);
 }${accentBoldBlock}
 ${PAGE_STYLES}
 ${signaturStil}
@@ -1219,7 +1319,10 @@ ${
 </aside>
 
 <div class="confirm-box" id="confirm" role="dialog" aria-modal="true">
-  <div class="confirm-icon" id="confirm-icon" aria-hidden="true">✓</div>
+  <div class="confirm-icon" id="confirm-icon" aria-hidden="true">
+    <span class="ci-ok">${checkCircle()}</span>
+    <span class="ci-fehler">${warnung()}</span>
+  </div>
   <h3 id="confirm-title"></h3>
   <p id="confirm-text"></p>
   <div class="confirm-summary" id="confirm-summary"></div>
