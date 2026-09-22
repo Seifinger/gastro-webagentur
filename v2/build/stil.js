@@ -298,7 +298,7 @@ textarea { min-height: var(--s-12); resize: vertical; }
 .fuss-nav, .fuss-kontakt { display: flex; flex-direction: column; gap: var(--s-1); }
 .fuss a { color: var(--auf-tint-leise); text-decoration: none; }
 .fuss a:hover { color: var(--auf-tint); }
-.fuss-hinweis { grid-column: 1 / -1; margin-top: var(--s-4); padding-top: var(--s-3); border-top: 1px solid var(--auf-tint-leise); max-width: 90ch; }
+.fuss-hinweis { grid-column: 1 / -1; margin-top: var(--s-4); padding-top: var(--s-3); border-top: 1px solid var(--auf-tint-leise); max-width: 72ch; }
 
 /* Bestellweg: Warenkorb-Knopf, Aktionsleiste, Drawer, Bestätigung */
 .cart-fab { position: fixed; right: var(--s-3); bottom: var(--s-3); z-index: 50; display: none; align-items: center; gap: var(--s-2);

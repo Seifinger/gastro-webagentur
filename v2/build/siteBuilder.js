@@ -10,6 +10,7 @@
 //      die Auswahl hängt deterministisch am Seed des Leads
 //   3. Funktionsvertrag: jede ID/jedes Feld, an dem das v1-Skript hängt
 //   4. Anti-Slop-Lint (antiSlopLint.js)
+//   5. Copy: kein verbleibender Fehler-Treffer des Copy-Refiners
 //
 // Die funktionale Schicht (Warenkorb, Reservierung, No-Show, API-Aufrufe an
 // wirtServer.js) ist das v1-Skript, unverändert (v1Funktionen.js).
@@ -23,6 +24,7 @@ import { STIL } from "./stil.js";
 import { BEWEGUNG_CSS, BEWEGUNG_SKRIPT } from "./bewegung.js";
 import { lint } from "./antiSlopLint.js";
 import { texteFuer } from "./texte.js";
+import { verfeinereTexte } from "./copyRefiner.js";
 import { schriftCss } from "./schriften.js";
 import {
   seitenSkript,
@@ -210,15 +212,16 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   const eigeneTexte = optionen.editUebersteuerung?.texte ?? {};
   const eigeneBeschreibungen = eigeneTexte.highlightBeschreibungen ?? {};
 
-  let texte = texteFuer({ ds, menu, lead, eigeneTexte });
-  let copyBericht = null;
-  if (optionen.texteVerfeinern) {
-    const ergebnis = optionen.texteVerfeinern(texte, ds);
-    texte = ergebnis.texte;
-    copyBericht = ergebnis.bericht;
+  // Gate 5: Copy. Jeder sichtbare Text läuft durch den Copy-Refiner, bevor
+  // er auf die Seite kommt (COPY-PRINZIPIEN.md). Was er nicht automatisch
+  // bereinigen kann, stoppt den Build.
+  const verfeinern = optionen.texteVerfeinern ?? verfeinereTexte;
+  const { texte, bericht: copyBericht } = verfeinern(texteFuer({ ds, menu, lead, eigeneTexte }), ds);
+  if (copyBericht?.verbleibend?.length) {
+    throw new BuildAbbruch("copy", copyBericht.verbleibend.map((v) => `${v.pfad}: ${v.regeln.join(", ")} („${v.text.slice(0, 60)}“)`));
   }
 
-  const kandidaten = highlightCandidates(menu).map((g) => ({ ...g, beschreibung: eigeneBeschreibungen[g.id] ?? g.beschreibung }));
+  const kandidaten = highlightCandidates(menu).map((g) => ({ ...g, beschreibung: verfeinern({ beschreibung: eigeneBeschreibungen[g.id] ?? g.beschreibung }, ds).texte.beschreibung }));
   const start = gestaltung.seed % Math.max(1, kandidaten.length);
   const anzahl = highlightAnzahl(ds.layout.highlights, kandidaten.length);
   const highlights = Array.from({ length: anzahl }, (_, i) => kandidaten[(start + i) % kandidaten.length]);

@@ -160,3 +160,108 @@ Neueste Einträge unten.
   nach Stock.
 - **E4.6 · Seiten bleiben eigenständig.** Eigene und KI-Dateien werden beim Schreiben in
   `sites/<slug>/medien/` kopiert; jede Seite läuft ohne den Rest des Repos.
+
+## Stage 5 – Judge-Protokoll
+
+<!-- judge-protokoll:start -->
+
+### Judge-Läufe (automatisch gepflegt von v2/build/zyklus.js)
+
+Jede Zeile ist der letzte Zyklus einer Seite. „abgeschlossen-mit-befunden“ heißt: nach
+höchstens 3 Runden automatisch beendet, die offenen Befunde stehen rechts. Details je Runde:
+`v2/output/judge-protokoll.json`.
+
+| Seite | Hero | Runden | Mittel | Ergebnis | Angewandte Korrekturen | Offene Befunde |
+|---|---|---|---|---|---|---|
+| asiatisch--fusion-minimal | spalte-bild | 1 | 10 | bestanden | – | – |
+| asiatisch--marktstand | karte | 1 | 9.4 | bestanden | – | – |
+| asiatisch--neon | spalte-bild | 1 | 10 | bestanden | – | – |
+| bayerisch--biergarten | streifen | 1 | 10 | bestanden | – | – |
+| bayerisch--kellerstube | passepartout | 1 | 10 | bestanden | – | – |
+| bayerisch--wirtshaus | passepartout | 1 | 10 | bestanden | – | – |
+| cafe--konditorei | spalte-bild | 1 | 10 | bestanden | – | – |
+| cafe--third-wave | streifen | 1 | 10 | bestanden | – | – |
+| cafe--wiener-kaffeehaus | passepartout | 1 | 10 | bestanden | – | – |
+| chinesisch--rote-laterne | tafel | 1 | 10 | bestanden | – | – |
+| chinesisch--shanghai-nacht | spalte-bild | 1 | 10 | bestanden | – | – |
+| chinesisch--teehaus | spalte-bild | 1 | 10 | bestanden | – | – |
+| griechisch--athener-moderne | tafel | 1 | 10 | bestanden | – | – |
+| griechisch--olivenhain | streifen | 1 | 10 | bestanden | – | – |
+| griechisch--taverne-am-hafen | tafel | 1 | 10 | bestanden | – | – |
+| indisch--gewuerzmarkt | spalte-bild | 1 | 10 | bestanden | – | – |
+| indisch--maharadscha | typo | 1 | 10 | bestanden | – | – |
+| indisch--suedindisch-hell | streifen | 1 | 10 | bestanden | – | – |
+| italienisch--costiera | streifen | 1 | 10 | bestanden | – | – |
+| italienisch--osteria-notte | spalte-bild | 1 | 10 | bestanden | – | – |
+| italienisch--trattoria | tafel | 1 | 10 | bestanden | – | – |
+| japanisch--izakaya | spalte-bild | 1 | 10 | bestanden | – | – |
+| japanisch--omakase | spalte-bild | 1 | 10 | bestanden | – | – |
+| japanisch--washitsu | streifen | 1 | 10 | bestanden | – | – |
+| syrisch--damaszener-hof | tafel | 1 | 10 | bestanden | – | – |
+| syrisch--gewuerzbasar | typo | 1 | 10 | bestanden | – | – |
+| syrisch--levante-modern | typo | 1 | 10 | bestanden | – | – |
+| thailaendisch--andamanen | typo | 1 | 10 | bestanden | – | – |
+| thailaendisch--orchidee | spalte-bild | 1 | 10 | bestanden | – | – |
+| thailaendisch--streetfood-nacht | tafel | 1 | 10 | bestanden | – | – |
+| tuerkisch--anatolische-erde | streifen | 1 | 10 | bestanden | – | – |
+| tuerkisch--basar | passepartout | 1 | 10 | bestanden | – | – |
+| tuerkisch--bosporus-nacht | spalte-bild | 1 | 10 | bestanden | – | – |
+| vietnamesisch--hanoi-nacht | tafel | 1 | 10 | bestanden | – | – |
+| vietnamesisch--indochine | karte | 1 | 9.4 | bestanden | – | – |
+| vietnamesisch--strassenkueche | typo | 1 | 10 | bestanden | – | – |
+
+<!-- judge-protokoll:ende -->
+
+## Stage 5 – Judge-Loop (Entscheidungen)
+
+- **E5.1 · Messen statt Pixel raten.** Der Judge bewertet berechnete Styles im echten
+  Browser (Desktop 1440 und Mobil 390, Bewegung aus, Lazy-Bilder vorher geladen), nicht
+  das Screenshot-Bild. Farben werden der nächsten Palettenrolle zugeordnet (Abstand > 14
+  in RGB = fremd), Kontrast wird gegen den ersten deckenden Grund gemessen, Fließtext ist
+  die Schriftgröße mit den meisten Zeichen, Zeilenlänge = Zeichen ÷ gerenderte Zeilen.
+  Screenshots (erster Bildschirm je Runde) bleiben als Beleg in `v2/output/judge/`.
+- **E5.2 · Schwellen.** Jedes Kriterium ≥ 7 und Mittel ≥ 7,5. Kalibriert per Gegenprobe:
+  dieselbe Messung auf eine v1-Seite derselben Stimmung ergibt 4,4 (Inter, 4 Texte unter
+  AA, 15px-Fließtext, Abstände außerhalb jeder Skala, 19 Touch-Ziele unter 40px), die
+  v2-Seite 9,9.
+- **E5.3 · Judge wurde selbst zweimal korrigiert.** Erster Sammellauf: mehrere Seiten
+  „durchgefallen“ wegen „Fließtext 14px“ – gemessen war die häufigste Absatzgröße, und
+  viele kurze Etiketten überstimmten den Fließtext. Außerdem war die Zeilenlänge nur
+  geschätzt. Beides auf exakte Messung umgestellt; die Seiten wurden dafür nicht
+  verändert. Protokolliert, weil ein Judge, der falsch misst, sonst Seiten „verbessert“,
+  die nicht kaputt waren.
+- **E5.4 · Korrekturvokabular.** Der Judge darf nur vorschlagen, was der Builder kann:
+  akzent-reduzieren, typo-skala, rhythmus, sektionsabstand, hero-variante,
+  bilder-ruhiger – höchstens fünf, kumulativ über die Runden. Was nicht automatisch
+  behebbar ist, steht als „manuell“ in der Liste und beendet die Schleife vorzeitig.
+- **E5.5 · Ergebnis des ersten vollen Laufs.** 36 von 36 in Runde 1 bestanden; 34 mit
+  voller Punktzahl, zwei (Hero-Aufbau „karte“) mit 7/10 bei der Bildintegration, weil das
+  Titelbild dort bewusst ein Einschub unter der Menütafel ist (5 % des ersten Bildschirms).
+  Bewusst nicht „korrigiert“: Der Aufbau ist eine der drei Hero-Varianten, die das Gate
+  verlangt. Dass die Schleife greift, belegt `test/v2-judge.test.js` (Korrektur der
+  Skala in Runde 2, Abschluss nach drei Runden mit Protokoll).
+- **E5.6 · Grenzen.** Der Judge misst Regeln, nicht Geschmack. Bildauswahl (Stockfotos),
+  Ausschnitt und „wirkt das wie ein echtes Haus“ bleiben eine Sichtprüfung – siehe
+  `v2/output/vergleich.md` (Stage 8) und ABSCHLUSSBERICHT.
+
+## Stage 6 – Copy-System
+
+- **E6.1 · Refiner als Gate, nicht als Empfehlung.** Jeder sichtbare Text läuft durch
+  `copyRefiner.js`, auch eigene Texte aus dem Prompt-Editor des Dashboards
+  (`leadEdits.texte`) – dort entstehen durch das Sprachmodell die typischsten KI-Floskeln.
+  Verbleibende Fehler-Treffer stoppen den Build (Gate „copy“).
+- **E6.2 · Streichen und ersetzen statt umdichten.** Regeln können sicher streichen
+  („Willkommen bei …“, Superlativ-Adjektive) und ersetzen (grammatisch passend: „kulinarische
+  Reise“ → „Karte“, „Geschmackserlebnis“ → „Aroma“). Umformulieren überlassen sie dem
+  optionalen Sprachmodell. Unsichere Muster (Superlativ „die beste … der Stadt“, „Egal ob“,
+  Duzen) sind nur Hinweise.
+- **E6.3 · Befund in den v1-Katalogtexten.** Die meisten sind bereits konkret. Drei
+  Floskeln werden auf v2-Seiten bereinigt: „… und echtes Dolce Vita“ (italienisch),
+  „Mediterrane Gastfreundschaft, wie am Meer“ (griechisch, ersetzt durch den ersten
+  konkreten Punkt „Vom Holzkohlegrill“), „Bodenständig, ehrlich und frisch aus der Region“
+  (bayerisch, Adjektivkette → „Frisch aus der Region“). v1 selbst bleibt unverändert.
+- **E6.4 · Sprachmodell optional, eingehegt.** Nur mit `V2_COPY_LLM=1` und
+  `ANTHROPIC_API_KEY`; nur auffällige Textstücke; keine neuen Fakten; Ausgabe läuft erneut
+  durch alle Regeln; Cache je Seite. Modell `claude-opus-5` (Standard der Anthropic-
+  Referenz, per `V2_COPY_MODELL` änderbar) mit `effort: "low"` und serverseitigem
+  Refusal-Fallback. In dieser Umgebung ohne Schlüssel nur gemockt getestet.
