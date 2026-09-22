@@ -265,3 +265,74 @@ höchstens 3 Runden automatisch beendet, die offenen Befunde stehen rechts. Deta
   durch alle Regeln; Cache je Seite. Modell `claude-opus-5` (Standard der Anthropic-
   Referenz, per `V2_COPY_MODELL` änderbar) mit `effort: "low"` und serverseitigem
   Refusal-Fallback. In dieser Umgebung ohne Schlüssel nur gemockt getestet.
+
+## Stage 7 – Anbindung an Wirt-Dashboard, Nutzer-Dashboard, Telegram
+
+- **E7.1 · Adapter statt Umbau.** v2-Seiten binden das Seitenskript aus v1 byte-gleich ein
+  (Stage 3) und sprechen damit exakt die Endpunkte von `src/wirtServer.js` an. Reservierung,
+  Bestellung, Tischplan, No-Show-Zustimmung und Stornierung brauchen deshalb keine
+  Übersetzung. `v2/integration/wirtAdapter.js` ergänzt nur, was v2 zusätzlich kann, und
+  arbeitet ausschließlich über die exportierten Funktionen von `betriebStore.js`.
+  `wirtServer.js` und `betriebStore.js` sind unverändert.
+- **E7.2 · Wirt-Dashboard im Designsystem des Betriebs, ohne wirt.html anzufassen.**
+  `v2/integration/wirtServerV2.js` (`npm run v2:wirt`) ist eine Hülle um den v1-Handler.
+  Sie liefert `public/wirt.html` mit einem zusätzlichen `<style>` aus, das die Rollen des
+  Designsystems auf die Variablen von wirt.html legt (`grund→--bg`, `flaeche→--card`,
+  `textLeise→--muted`, `akzent→--accent` …). Alle Rollen sind im Designsystem schon
+  kontrastgeprüft, deshalb gelten die Kontraste auch hier (per Test belegt). Welches
+  Designsystem, steht im optionalen Feld `v2Design {kueche, stimmung}` des Betriebs
+  (`--kueche/--stimmung` beim Start oder `POST /v2/intern/design`). Ohne das Feld bleibt
+  wirt.html optisch v1.
+- **E7.3 · Nutzer-Dashboard: der einzige Eingriff in v1.** Der Auftrag verlangt die
+  Engine-Wahl ausdrücklich in `src/dashboardServer.js`. Der Eingriff ist auf drei Zeilen
+  plus Import begrenzt: `v2Handler` (eigene Routen), `ergaenzeLeadsV2` (Engine und
+  v2-Status je Lead in `/api/leads`) und `v2HtmlInjektion` (Stil und Skript in
+  dashboard.html/bearbeiten.html, die Dateien selbst bleiben unverändert). Ohne
+  Engine-Datei ist alles v1. Das Dashboard verhält sich dann wie vorher, nur im
+  Token-Set aus `v2/designsysteme/dashboard.json`. Alle bestehenden Dashboard-Tests
+  bleiben grün.
+- **E7.4 · Engine-Wahl global und je Lead.** Gespeichert in `data/v2-engine.json`
+  (gitignored wie die übrigen Laufzeitdaten), Standard per `ENGINE_STANDARD`
+  vorbelegbar. Mit Engine v2 und gebautem Entwurf zeigt „ansehen“ die v2-Seite. v2-Entwürfe
+  echter Leads liegen in `v2/output/leads/` (gitignored, Kundendaten). Das
+  Veröffentlichen nach `docs/` bleibt v1, bis du das umstellst (Folgearbeit im
+  ABSCHLUSSBERICHT).
+- **E7.5 · Dashboard-Designsystem.** Richtung „redaktionelles Arbeitsblatt“ (Refero: Hex,
+  Midday, Monocle): warmes Papier, eine Tinte (#1f4b43) als Akzent, Serifenziffern
+  (Newsreader) für Kennzahlen, Instrument Sans für Tabelle und Text, keine Schatten.
+  Prioritäts- und Badge-Farben werden beim Erzeugen auf ≥ 4,5:1 gegen alle drei Gründe
+  geprüft. Bedeutungsfarben gibt es nur für Priorität und Bildherkunft.
+- **E7.6 · Telegram: Code statt Chat-ID abtippen.** v1 lässt den Wirt seine Chat-ID
+  selbst herausfinden und eintragen. v2 verknüpft per Einmal-Code (6 Zeichen, 30 Minuten,
+  nur einmal gültig, ohne verwechselbare Zeichen wie 0/O und 1/I). Die Chat-ID landet im
+  **bestehenden** Feld `telegramChatId`. Es gibt deshalb keine Migration, und eine in v1
+  eingetragene ID funktioniert weiter. Fehlt sie, gilt „kein Telegram verknüpft“, und
+  der Betrieb arbeitet nur übers Dashboard.
+- **E7.7 · Long Polling statt Webhook.** Ein Webhook bräuchte eine öffentliche
+  HTTPS-Adresse. Der Wirt-Server läuft aber oft im Lokal hinter dem Router. Long Polling
+  funktioniert überall und braucht keine Zusatzdienste. Pro Token holt genau ein Prozess
+  Updates ab (`--telegram` im Wirt-Server oder `npm run v2:telegram` für alle Betriebe).
+- **E7.8 · Küchenstatus Neu → In Zubereitung → Bereit → Abgeholt.** v1 kennt
+  `neu/bestaetigt/abgeholt/abgelehnt/storniert`. Die v2-Stufen werden darauf abgebildet,
+  damit Kapazität, Wartezeit-Lernen und No-Show weiter stimmen: „In Zubereitung“
+  bestätigt mit der gewünschten Abholzeit (v1 `bestaetigt`), „Abgeholt“ setzt v1
+  `abgeholt`. „Bereit“ steht nur im Zusatzfeld `kuechenStatus`.
+- **E7.9 · Keine doppelten Nachrichten.** Mit gesetztem Token ersetzt der v2-Wirt-Server
+  den reinen Text-Rückkanal aus v1 durch die v2-Nachricht mit Knöpfen, sonst käme jede
+  Bestellung zweimal. Der Tausch gilt nur im Prozess von `v2:wirt`. `npm run wirt` bleibt
+  wie gehabt. Pushes gehen nur nach erfolgreicher Anfrage (HTTP 200, `ok: true`) raus.
+  Abgelehnte Anfragen lösen keine aus (Test).
+- **E7.10 · Sicherheit.** Knöpfe wirken nur im Chat, der mit dem Betrieb verknüpft ist. Ein
+  fremder Chat ändert nichts (Test). `/intern/v2/*` im Nutzer-Dashboard hängt am selben
+  `DASHBOARD_TOKEN` wie v1 (Test). Statische v2-Routen lösen Pfade nur innerhalb ihres
+  Ordners auf (Test mit `%2e%2e`). Die `/v2/intern/*`-Routen des Wirt-Servers sind wie die
+  v1-Routen `/intern/*` ungeschützt: Der Wirt-Server lauscht auf `DASHBOARD_HOST`
+  (Standard localhost). Wer ihn öffentlich betreibt, braucht davor dieselbe
+  Zugangskontrolle wie für v1.
+- **E7.11 · Tests nur auf synthetischen Betrieben.** `test/v2-integration.test.js`
+  (`__test-v2-integration`) und `test/v2-e2e.test.js` (`__test-v2-e2e`) legen eigene
+  Dateien an und löschen sie wieder. Der Telegram-Dienst bekommt in Tests die
+  Betriebsliste ausdrücklich übergeben und liest deshalb keine echten Betriebe. Der
+  E2E-Test baut eine v2-Seite im Zyklus (ohne Judge), füllt in Chromium das
+  Reservierungsformular aus und prüft `/api/betrieb`, die gemockte Telegram-Nachricht und
+  die Bestätigung per Knopf. Ohne Chromium schickt er dieselbe Nutzlast direkt.

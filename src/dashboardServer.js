@@ -46,6 +46,8 @@ import { resonanzUebersicht } from "./resonanzStore.js";
 import { ladeStimmungsWahl, speichereStimmung, stimmungFuerLead } from "./stimmungsWahl.js";
 import { stimmungenFuer } from "./stimmungen.js";
 import { ladeManifest, slugFuerPlaceId, placeIdFuerSlug } from "./entwurfsManifest.js";
+// v2-Engine (Stage 7b): einziger Eingriff in v1 – eigene Routen, Engine-Spalte, Design-Tokens.
+import { v2Handler, ergaenzeLeadsV2, v2HtmlInjektion } from "../v2/integration/dashboardV2.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -353,15 +355,17 @@ export const handler = async (req, res) => {
     return;
   }
 
+  if (await v2Handler(req, res, pathname)) return;
+
   if (pathname === "/" || pathname === "/index.html") {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(readFileSync(dashboardHtmlPath, "utf-8"));
+    res.end(v2HtmlInjektion(readFileSync(dashboardHtmlPath, "utf-8"), "dashboard"));
     return;
   }
 
   if (pathname === "/bearbeiten.html") {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(readFileSync(bearbeitenHtmlPath, "utf-8"));
+    res.end(v2HtmlInjektion(readFileSync(bearbeitenHtmlPath, "utf-8"), "bearbeiten"));
     return;
   }
 
@@ -519,7 +523,7 @@ export const handler = async (req, res) => {
   if (pathname === "/api/leads") {
     sendeJson(res, 200, {
       kuechen: kuechenAuswahl(),
-      leads: leadsMitZusatz(),
+      leads: ergaenzeLeadsV2(leadsMitZusatz()),
       resonanzAktiv: Boolean(resonanzUrl),
     });
     return;

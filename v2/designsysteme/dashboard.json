@@ -1,0 +1,413 @@
+{
+  "version": 1,
+  "id": "dashboard",
+  "label": "Agentur-Dashboard",
+  "richtung": "Redaktionelles Arbeitsblatt: Serifenziffern über einer dichten, ruhigen Tabelle; warmes Papier, eine Tinte als Akzent, Bedeutungsfarben nur für Priorität und Bildherkunft.",
+  "referenzen": [
+    {
+      "name": "Hex",
+      "url": "https://styles.refero.design/style/3e32db74",
+      "typ": "refero",
+      "uebernehmen": [
+        "Serifen-Headline über dichten Daten",
+        "cremiger Grund"
+      ]
+    },
+    {
+      "name": "Midday",
+      "url": "https://styles.refero.design/style/3f2b79c1",
+      "typ": "refero",
+      "uebernehmen": [
+        "Broadsheet-Ruhe",
+        "gesperrte Spaltenköpfe"
+      ]
+    },
+    {
+      "name": "Monocle",
+      "url": "https://styles.refero.design/style/9165ecb1",
+      "typ": "refero",
+      "uebernehmen": [
+        "Spalten-Disziplin",
+        "eine Farbe mit Bedeutung"
+      ]
+    }
+  ],
+  "farben": {
+    "schema": "hell",
+    "rollen": {
+      "grund": {
+        "hex": "#f5f3ee",
+        "aufgabe": "Seitengrund des Werkzeugs – warmes Papier"
+      },
+      "flaeche": {
+        "hex": "#fffefb",
+        "aufgabe": "Kennzahl-Kacheln, Tabelle, Seitenleiste"
+      },
+      "flaecheTief": {
+        "hex": "#ece8df",
+        "aufgabe": "Tabellenkopf, Zeilen-Hover, Eingabefelder"
+      },
+      "text": {
+        "hex": "#1e1d1a",
+        "aufgabe": "Text und Kennzahlen"
+      },
+      "textLeise": {
+        "hex": "#6b675e",
+        "aufgabe": "Spaltenköpfe, Metadaten"
+      },
+      "linie": {
+        "hex": "#dcd6ca",
+        "aufgabe": "Zeilen- und Kachelkanten"
+      },
+      "linieStark": {
+        "hex": "#938b7a",
+        "aufgabe": "Eingabefelder, Knöpfe (≥ 3:1)"
+      },
+      "akzent": {
+        "hex": "#1f4b43",
+        "aufgabe": "Tinte: Primäraktion, aktive Sortierung, Fokus"
+      },
+      "akzentTief": {
+        "hex": "#163a33",
+        "aufgabe": "Hover der Primäraktion"
+      },
+      "aufAkzent": {
+        "hex": "#ffffff",
+        "aufgabe": "Schrift auf Tinte"
+      },
+      "akzentText": {
+        "hex": "#1f4b43",
+        "aufgabe": "Links"
+      },
+      "sehrHoch": {
+        "hex": "#a8321f",
+        "aufgabe": "Priorität sehr hoch"
+      },
+      "hoch": {
+        "hex": "#9f5511",
+        "aufgabe": "Priorität hoch"
+      },
+      "mittel": {
+        "hex": "#7c6210",
+        "aufgabe": "Priorität mittel"
+      },
+      "niedrig": {
+        "hex": "#3f6b2c",
+        "aufgabe": "Priorität niedrig"
+      },
+      "pruefen": {
+        "hex": "#6b675e",
+        "aufgabe": "Priorität zu prüfen"
+      },
+      "eigen": {
+        "hex": "#2f6b3a",
+        "aufgabe": "Badge: eigenes Foto"
+      },
+      "ki": {
+        "hex": "#5b3f8c",
+        "aufgabe": "Badge: KI-generiert"
+      },
+      "platzhalter": {
+        "hex": "#7c6210",
+        "aufgabe": "Badge: Platzhalter"
+      },
+      "fehler": {
+        "hex": "#b3261e",
+        "aufgabe": "Fehlermeldungen"
+      }
+    }
+  },
+  "kontrastPaare": [
+    {
+      "vordergrund": "text",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "text",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "text",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "textLeise",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "textLeise",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "textLeise",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "akzentText",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "akzentText",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "akzentText",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "sehrHoch",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "sehrHoch",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "sehrHoch",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "hoch",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "hoch",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "hoch",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "mittel",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "mittel",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "mittel",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "niedrig",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "niedrig",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "niedrig",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "pruefen",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "pruefen",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "pruefen",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "eigen",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "eigen",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "eigen",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "ki",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "ki",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "ki",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "platzhalter",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "platzhalter",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "platzhalter",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "fehler",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "fehler",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "fehler",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "aufAkzent",
+      "hintergrund": "akzent",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "aufAkzent",
+      "hintergrund": "akzentTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "linieStark",
+      "hintergrund": "flaeche",
+      "mindest": 3,
+      "art": "ui"
+    }
+  ],
+  "typografie": {
+    "display": {
+      "familie": "Newsreader",
+      "stapel": "'Newsreader', Georgia, 'Times New Roman', serif",
+      "gewicht": 500
+    },
+    "text": {
+      "familie": "Instrument Sans",
+      "stapel": "'Instrument Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+      "gewicht": 400,
+      "gewichtStark": 600
+    },
+    "skala": {
+      "basisPx": 15,
+      "tabelle": 14,
+      "klein": 13,
+      "kennzahl": 44,
+      "h1": 30
+    }
+  },
+  "spacing": {
+    "raster": 8,
+    "skala": {
+      "1": 8,
+      "2": 16,
+      "3": 24,
+      "4": 32,
+      "5": 40,
+      "6": 48,
+      "8": 64,
+      "10": 80,
+      "12": 96,
+      "16": 128,
+      "halb": 4
+    }
+  },
+  "radius": {
+    "klein": 4,
+    "karte": 8,
+    "knopf": 6,
+    "marke": 999
+  },
+  "schatten": {
+    "stil": "linie",
+    "karte": "0 0 0 1px #dcd6ca"
+  },
+  "motion": {
+    "kurz": 120,
+    "mittel": 200,
+    "kurve": "cubic-bezier(.2,.72,.3,1)"
+  },
+  "verboteneMuster": [
+    "Blaugrauer SaaS-Standard mit Signalblau",
+    "farbige KPI-Zahlen in vier Farben",
+    "Schatten unter jeder Kachel",
+    "Emoji als Spaltenicons"
+  ]
+}
