@@ -39,6 +39,11 @@ const OHNE_HANDSCHRIFT = ["hell", "editorial"];
  * Sammelt alle Selektoren eines CSS-Blocks, die nicht bereits in einem
  * Elternselektor mit der Körperklasse stecken. CSS-Verschachtelung zählt als
  * Bindung (`.hs-abend { ... }`), eine @media-Regel nicht – die bindet nichts.
+ *
+ * Was in einem @keyframes steht (`from`, `to`, `40%`), ist kein Selektor: Es
+ * wählt kein Element aus und kann deshalb keinen anderen Archetyp erreichen.
+ * Der Name des @keyframes selbst ist dagegen global – dass er den Archetyp
+ * nennt, prüft der Test auf eindeutige Namen weiter unten.
  */
 function ungebundeneSelektoren(css, klasse) {
   const ohneKommentare = css.replace(/\/\*[\s\S]*?\*\//g, "");
@@ -52,7 +57,8 @@ function ungebundeneSelektoren(css, klasse) {
     if (zeichen === "{") {
       const sel = ohneKommentare.slice(gelesen, i).trim().replace(/\s+/g, " ");
       const gebundenDurchEltern = stapel.some((eltern) => eltern.includes(klasse));
-      if (sel && !sel.startsWith("@")) {
+      const inKeyframes = stapel.some((eltern) => eltern.startsWith("@keyframes"));
+      if (sel && !sel.startsWith("@") && !inKeyframes) {
         gesamt += 1;
         if (!sel.includes(klasse) && !gebundenDurchEltern) lose.push(sel);
       }
