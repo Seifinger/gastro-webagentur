@@ -249,6 +249,27 @@ Alle liegen lokal (`fontLibrary.js` lädt sie einmalig herunter) – eingebunden
 
 Die Zuordnung hängt fest am Lead: derselbe Lead ergibt immer denselben Entwurf.
 
+### Designsystem: die Handschrift eines Archetyps
+
+Der Archetyp trägt nicht nur das Layout, sondern seit einem gezielten
+Anti-Slop-Umbau auch eine eigene **Handschrift** (`src/styles/handschrift.css.js`):
+ein einziger starker Bewegungsmoment statt Gleichverteilung, begründete
+Asymmetrie statt Mittelachse und Dreierraster, und gezeichnete Zeichen
+(`src/signaturIcons.js`) statt Emoji. Alle drei Grundarchetypen haben sie:
+
+| Archetyp | Der eine Moment | Auffälligste Asymmetrie |
+|---|---|---|
+| Traditionell | die Hero-Signatur der Küche | Highlights als Treppe (eine große Karte, dann kleinere) |
+| Abend | die Reservierung | Karte/Stimmen mit Kopf in der linken Randspalte |
+| Hell & modern | das schnelle Auftreten der Highlights | dichte Vierer-Reihe statt Hausempfehlung |
+
+Jede Handschrift ist an ihre eigene Körperklasse gebunden (`.hs-traditionell`,
+`.hs-abend`, `.hs-hell`) und kann dadurch nachweislich keinen anderen
+Archetyp verändern (siehe `test/handschrift.test.js`). Ein Preset ohne
+Handschrift-Anforderung (jede A/B-Variante aus `designPresets.js`) bleibt
+Zeichen für Zeichen die bisherige Seite. Hintergrund und Messwerte zum
+ursprünglichen Befund stehen in `docs-intern/design-audit.md`.
+
 ### Bilder und Schriften
 
 Stockfotos (Unsplash) und Schriften (Google Fonts, alle unter der SIL Open Font License) werden beim ersten Lauf **einmalig heruntergeladen** und unter `data/landingpages/assets/` abgelegt. Danach funktionieren die Entwürfe komplett offline – praktisch, wenn du sie beim Termin im Lokal auf dem Laptop zeigst und dort kein Empfang ist. Ein erneuter Lauf lädt nur noch Fehlendes nach. Schlägt der Schriften-Download fehl, greifen die Seiten auf Systemschriften zurück.
