@@ -34,6 +34,8 @@ export function parseArgs(argv) {
     // Nur diesen einen Entwurf neu bauen (siehe leadFuerSlug unten) – für
     // Änderungen an einem einzelnen Lead, ohne die übrigen ~55 anzufassen.
     only: null,
+    // Remotion-Signaturen aktivieren: animierte Hero-Elemente statt statische Bilder.
+    remotion: false,
   };
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === "--region") args.region = argv[++i];
@@ -45,6 +47,7 @@ export function parseArgs(argv) {
     if (argv[i] === "--api") args.api = argv[++i];
     if (argv[i] === "--resonanz") args.resonanz = argv[++i];
     if (argv[i] === "--only") args.only = argv[++i];
+    if (argv[i] === "--remotion") args.remotion = true;
   }
   return args;
 }
