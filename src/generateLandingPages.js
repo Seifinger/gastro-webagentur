@@ -120,7 +120,7 @@ async function run() {
     // Ohne resonanzUrl: Die lokale Fassung ist die Vorschau des Betreibers,
     // und die darf die Nachfassliste nicht mit eigenen Aufrufen füllen.
     // Gemessen wird nur, was unter docs/ veröffentlicht beim Wirt landet.
-    schreibeSeiten([entry], landingPagesDir, { kontaktEmail: args.email, fontCss, apiUrl: args.api });
+    schreibeSeiten([entry], landingPagesDir, { kontaktEmail: args.email, fontCss, apiUrl: args.api, remotionSignature: args.remotion });
 
     // Nur den einen Eintrag im Manifest aktualisieren – die Zuordnung der
     // übrigen Leads bleibt unverändert erhalten.
@@ -165,7 +165,7 @@ async function run() {
   console.log("🔤 Prüfe Schriften ...");
   const fontCss = await ladeSchriften(path.join(assetsDir, "fonts"));
 
-  schreibeSeiten(entries, landingPagesDir, { kontaktEmail: args.email, fontCss, apiUrl: args.api });
+  schreibeSeiten(entries, landingPagesDir, { kontaktEmail: args.email, fontCss, apiUrl: args.api, remotionSignature: args.remotion });
 
   const overviewPath = path.join(landingPagesDir, "index.html");
   writeFileSync(overviewPath, buildOverviewPage(entries), "utf-8");
