@@ -156,7 +156,7 @@ const GRUND_STIMMUNGEN = {
       bilder: [2, 3],
     }),
     stimmung("biergarten", "Biergarten", "hell", KALK, {
-      display: SANS_GEOMETRISCH, transform: "none", tracking: "0",
+      display: SERIF_FEIN, tracking: "0",
       radius: "18px",
       accent: "#568238", accentDark: "#44682c", onAccent: "#ffffff",
       gold: "#c8a63c", tint: "#1e2a18", tintRgb: "30,42,24",
@@ -300,7 +300,7 @@ const GRUND_STIMMUNGEN = {
       bilder: [2, 3],
     }),
     stimmung("andamanen", "Andamanen", "hell", KALK, {
-      display: SANS_GEOMETRISCH, tracking: "0",
+      display: SERIF_FEIN, tracking: "0",
       radius: "20px",
       accent: "#1a837f", accentDark: "#15746f", onAccent: "#ffffff",
       gold: "#d9a92c", tint: "#0f3230", tintRgb: "15,50,48",
@@ -324,7 +324,7 @@ const GRUND_STIMMUNGEN = {
       bilder: [2, 3],
     }),
     stimmung("strassenkueche", "Straßenküche", "hell", LEINEN, {
-      display: SANS_GEOMETRISCH, tracking: "0",
+      display: SERIF_FEIN, tracking: "0",
       radius: "18px",
       accent: "#48833a", accentDark: "#3a6b2e", onAccent: "#ffffff",
       gold: "#c8a63c", tint: "#1e2a18", tintRgb: "30,42,24",
@@ -396,7 +396,7 @@ const GRUND_STIMMUNGEN = {
       bilder: [2, 3],
     }),
     stimmung("fusion-minimal", "Fusion Minimal", "hell", KALK, {
-      display: SANS_GEOMETRISCH, tracking: "0",
+      display: SERIF_FEIN, tracking: "0",
       radius: "4px",
       accent: "#2f4858", accentDark: "#1f3240", onAccent: "#ffffff",
       gold: "#a8905c", tint: "#16222b", tintRgb: "22,34,43",
@@ -420,7 +420,7 @@ const GRUND_STIMMUNGEN = {
       bilder: [2, 3],
     }),
     stimmung("third-wave", "Third Wave", "hell", KALK, {
-      display: SANS_GEOMETRISCH, tracking: "0",
+      display: SERIF_FEIN, tracking: "0",
       radius: "4px",
       accent: "#5c6b5a", accentDark: "#434f42", onAccent: "#ffffff",
       gold: "#a8905c", tint: "#242a23", tintRgb: "36,42,35",
