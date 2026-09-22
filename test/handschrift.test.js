@@ -30,8 +30,8 @@ function stimmungFuer(cuisine, archetyp) {
 
 // Welche Archetypen ihre Handschrift schon haben und welche noch nicht. Beim
 // nächsten Archetyp wandert einer von rechts nach links.
-const MIT_HANDSCHRIFT = ["traditionell", "abend"];
-const OHNE_HANDSCHRIFT = ["hell", "editorial"];
+const MIT_HANDSCHRIFT = ["traditionell", "abend", "hell"];
+const OHNE_HANDSCHRIFT = ["editorial"];
 
 /* ---------- Die Handschrift kann keinen anderen Archetyp erreichen ---------- */
 
@@ -72,7 +72,7 @@ test("jeder Selektor der Handschrift hängt an ihrer Körperklasse", () => {
   // nicht verändern, wenn ihn jemand versehentlich überall einhängt.
   // Geprüft wird auch die Fassung, die eine Küche zusätzlich mitbringt (der
   // gezeichnete Maßkrug bei bayerisch).
-  for (const [archetyp, cuisine] of [["traditionell", "bayerisch"], ["abend", "bayerisch"]]) {
+  for (const [archetyp, cuisine] of [["traditionell", "bayerisch"], ["abend", "bayerisch"], ["hell", "bayerisch"]]) {
     const { lose, gesamt } = ungebundeneSelektoren(
       handschriftCss(archetyp, cuisine),
       `.hs-${archetyp}`,
@@ -98,8 +98,8 @@ test("ohne Handschrift gibt es weder Klasse noch CSS", () => {
   assert.equal(handschriftCss(undefined), "");
   assert.equal(handschriftKlasse(null), "");
   // Ein Archetyp, der noch keine Handschrift hat, bekommt auch keine.
-  assert.equal(handschriftCss("hell"), "");
-  assert.equal(handschriftKlasse("hell"), "");
+  assert.equal(handschriftCss("editorial"), "");
+  assert.equal(handschriftKlasse("editorial"), "");
 });
 
 test("jeder Archetyp mit Handschrift nennt seine eigene", () => {

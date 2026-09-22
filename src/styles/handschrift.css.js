@@ -572,9 +572,174 @@ const ABEND_BAYERISCH = `${krugCss("hs-abend")}
 .hs-abend .sig-krug .tropfen { animation: none; }
 `;
 
+/* ========================================================================= *
+ * hell
+ * ------------------------------------------------------------------------- *
+ * Der eine starke Moment: das schnelle Auftreten der Highlights. Das helle
+ * Haus wird auf dem Handy überflogen (die Karte steht zuerst, siehe
+ * ARCHETYP_PRESET.hell) – Tempo ist hier die Aussage, nicht ein einzelnes
+ * Bewegtbild wie bei den anderen beiden Archetypen. Alles andere kommt
+ * darum zur Ruhe: keine Hero-Fahrt, kein Hover-Anheben, kein gestaffelter
+ * Auftritt anderswo – auch der Bierkrug (siehe HELL_BAYERISCH) läuft hier
+ * nicht über, aus demselben Grund, aus dem das Abendhaus ihn stillstellt.
+ *
+ * Das Raster: eine dichte Vierer-Reihe für die Highlights statt einer
+ * einzelnen Hausempfehlung (traditionell) oder einer Leseliste (abend) – wer
+ * überfliegt, will die Auswahl auf einen Blick. Jede dritte Karte ist
+ * breiter, damit der Blick trotzdem Halt findet statt gleichmäßig
+ * abzuperlen. Die Gästestimmen laufen aus demselben Grund als knappe
+ * Kurzfassung nebeneinander statt als Blatt zum Lesen.
+ *
+ * Die Kurve: cubic-bezier(.16,1,.3,1) ("ease-out-expo") – schnell raus,
+ * praktisch ohne Auslaufen. Merklich kürzer als bei den anderen beiden
+ * Handschriften (.22s statt .5-.9s), absichtlich: Tempo ist die Identität
+ * dieses Archetyps.
+ * ========================================================================= */
+const HELL = `
+/* --- Ruhe, bis auf den einen schnellen Moment ---------------------------- */
+.hs-hell .hero-media img { animation: none; }
+.hs-hell .hero-media, .hs-hell .hero-inner { animation: none; }
+.hs-hell .foto-slot img { animation: none; }
+.hs-hell .hl-card, .hs-hell .hl-media img { transition: none; }
+.hs-hell .hl-card:hover { transform: none; }
+.hs-hell .hl-card:hover .hl-media img { transform: none; }
+.hs-hell .section-head .eyebrow::after,
+.hs-hell .step:not(:last-child)::after { transform: scaleX(1); transition: none; }
+.bewegt .hs-hell .section-head.auftritt .eyebrow::after { transform: scaleX(1); }
+.bewegt .hs-hell .auftritt,
+.bewegt .hs-hell .usp-list span {
+  transform: none;
+  transition: opacity .4s cubic-bezier(.16,1,.3,1);
+  transition-delay: 0s;
+}
+/* Der eine Moment: nur die Karten (Highlights, Fotoplätze) behalten Versatz
+   und ein eigenes, schnelleres Tempo. */
+.bewegt .hs-hell .auftritt-karte {
+  transform: translateY(14px);
+  transition: opacity .22s cubic-bezier(.16,1,.3,1), transform .22s cubic-bezier(.16,1,.3,1);
+  transition-delay: calc(var(--takt, 0) * 45ms);
+}
+.bewegt .hs-hell .auftritt-karte.da { opacity: 1; transform: none; }
+
+/* --- Farbe: Text trägt accentBold, Flächen behalten accent --------------- */
+.hs-hell .eyebrow,
+.hs-hell .veg,
+.hs-hell .error,
+.hs-hell .contact-list a,
+.hs-hell .contact-list .k,
+.hs-hell .reserve-pluspunkte .k,
+.hs-hell .stimmen-note .note,
+.hs-hell .kat > summary::after,
+.hs-hell .add-btn,
+.hs-hell .mini-add { color: var(--accent-bold); }
+.hs-hell .add-btn, .hs-hell .mini-add { border-color: var(--accent-bold); }
+.hs-hell .kat > summary:hover { color: var(--accent-bold); }
+.hs-hell .stimmen-note .sterne,
+.hs-hell .stimme .sterne { color: var(--gold-dunkel); }
+.hs-hell .hero-kicker,
+.hs-hell .rating .stars { color: var(--gold-hell); }
+
+/* --- Keine Mittelachse ---------------------------------------------------- */
+.hs-hell .section-head.mitte { margin-left: 0; margin-right: 0; text-align: left; }
+.hs-hell .stimmen-erklaerung { margin-left: 0; margin-right: 0; text-align: left; }
+
+/* --- Rhythmus: knapper als die anderen beiden Handschriften -------------- */
+.hs-hell .section { padding: 72px 0; }
+.hs-hell #karte { padding: 88px 0 72px; }
+.hs-hell .hint, .hs-hell .error, .hs-hell .footer-note,
+.hs-hell .foto-text span, .hs-hell .demo-note { font-size: 14px; }
+.hs-hell .hl-kat, .hs-hell .veg, .hs-hell .placeholder-badge { font-size: 12px; }
+.hs-hell .section-head p { font-size: 16px; }
+
+/* --- Highlights: die dichte Reihe ----------------------------------------- */
+.hs-hell .hl-card { background: transparent; border: 0; border-radius: 0; overflow: visible; }
+.hs-hell .hl-media { border-radius: var(--radius); aspect-ratio: 1 / 1; }
+.hs-hell .hl-body { padding: 14px 0 0; gap: 5px; }
+.hs-hell .hl-kat { position: static; background: none; border-radius: 0; padding: 0;
+                   color: var(--accent-bold); letter-spacing: .14em; font-size: 11px; align-self: start; }
+.hs-hell .hl-name { font-size: 17px; }
+.hs-hell .hl-desc { font-size: 14px; }
+.hs-hell .hl-siegel { display: inline-flex; align-items: center; gap: 8px;
+                      font-size: 12px; font-weight: 700; letter-spacing: .14em;
+                      text-transform: uppercase; color: var(--accent-bold); }
+@media (min-width: 640px) {
+  .hs-hell .hl-anordnung { grid-template-columns: repeat(4, 1fr); gap: 28px 20px; }
+  .hs-hell .hl-anordnung > .hl-card:nth-child(3n+1) { grid-column: span 2; }
+  .hs-hell .hl-anordnung > .hl-card:nth-child(3n+1) .hl-media { aspect-ratio: 16 / 10; }
+}
+
+/* --- Karte: Zeilen statt Kästen, dichter Takt ----------------------------- */
+.hs-hell .karte-section { background: var(--bg); }
+.hs-hell .kat { background: transparent; border: 0; border-top: 1px solid var(--line);
+                border-radius: 0; margin-bottom: 0; overflow: visible; }
+.hs-hell .kat:last-of-type { border-bottom: 1px solid var(--line); }
+.hs-hell .kat > summary { padding: 18px 0; font-size: 17px; }
+.hs-hell .kat-body { padding: 0 0 12px; }
+.hs-hell .gericht { padding: 12px 0; }
+.hs-hell .gericht-preis { font-variant-numeric: tabular-nums; }
+
+/* --- Stimmen: die Kurzfassung ---------------------------------------------- */
+/* Wer überfliegt, braucht keine Lesestunde – die Note reicht als Halt, die
+   drei Zitate stehen knapp und ungerahmt nebeneinander statt untereinander. */
+.hs-hell .stimmen-blatt { display: block; }
+.hs-hell .stimmen-note { justify-content: flex-start; margin-bottom: 18px; }
+.hs-hell .stimmen-note .note { font-size: 32px; }
+.hs-hell .stimme { background: transparent; border: 0; border-top: 1px solid var(--line);
+                   border-radius: 0; padding: 16px 0; gap: 8px; }
+.hs-hell .stimme.ist-platzhalter { border-style: solid; min-height: 0; justify-content: flex-start; }
+.hs-hell .stimmen-grid { grid-template-columns: 1fr; gap: 0; }
+@media (min-width: 720px) {
+  .hs-hell .stimmen-grid { grid-template-columns: repeat(3, 1fr); gap: 0 28px; }
+  .hs-hell .stimmen-grid > .stimme { border-top: 0; border-left: 1px solid var(--line); padding: 0 24px; }
+  .hs-hell .stimmen-grid > .stimme:first-child { border-left: 0; padding-left: 0; }
+}
+
+/* --- Kontakt: Adresse und Telefon zuerst ----------------------------------- */
+/* Wer unterwegs nachsieht, will erst wissen, wo und wie er hinkommt. */
+@media (min-width: 860px) {
+  .hs-hell .contact-grid { grid-template-columns: 7fr 5fr; gap: 54px; }
+}
+.hs-hell .contact-list li { gap: 14px; padding: 14px 0; align-items: flex-start; }
+.hs-hell .contact-list .k { font-size: inherit; display: inline-flex; padding-top: .1em; }
+.hs-hell .hours-row { font-size: 15px; padding: 11px 0; font-variant-numeric: tabular-nums; }
+
+${bildunterschriftCss("hs-hell")}
+@media (min-width: 760px) {
+  .hs-hell .foto-grid { grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+}
+
+/* --- Gezeichnete Zeichen ---------------------------------------------------- */
+.hs-hell .usp-list { justify-content: flex-start; }
+.hs-hell .usp-list span { gap: 9px; }
+.hs-hell .reserve-pluspunkte .k { display: inline-flex; padding-top: .2em; }
+.hs-hell footer strong { display: inline-flex; align-items: center; gap: 9px; }
+.hs-hell .kopf-marke { display: inline-flex; align-items: center; gap: 9px; }
+${ikonenCss("hs-hell")}
+
+/* --- Wer keine Bewegung will, bekommt keine -------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .bewegt .hs-hell .auftritt,
+  .bewegt .hs-hell .auftritt-karte,
+  .bewegt .hs-hell .usp-list span { opacity: 1; transform: none; transition: none; }
+}
+.bewegung-aus .hs-hell .auftritt,
+.bewegung-aus .hs-hell .auftritt-karte,
+.bewegung-aus .hs-hell .usp-list span { opacity: 1; transform: none; transition: none; }
+`;
+
+/* Bayerisch/hell fordert wie bayerisch/traditionell und bayerisch/abend den
+   gezeichneten Maßkrug an (heroSignature.js: handschrift ist auch hier
+   wahr). Er steht hier still, aus demselben Grund wie im Abendhaus: Der eine
+   Moment dieses Archetyps sind die Highlights, kein zweiter Effekt im Hero. */
+const HELL_BAYERISCH = `${krugCss("hs-hell")}
+.hs-hell .sig-krug .schaum,
+.hs-hell .sig-krug .tropfen { animation: none; }
+`;
+
 const HANDSCHRIFTEN = {
   traditionell: TRADITIONELL,
   abend: ABEND,
+  hell: HELL,
 };
 
 // Was eine Handschrift zusätzlich braucht, wenn eine bestimmte Küche sie
@@ -582,6 +747,7 @@ const HANDSCHRIFTEN = {
 const HANDSCHRIFT_JE_KUECHE = {
   "traditionell/bayerisch": TRADITIONELL_BAYERISCH,
   "abend/bayerisch": ABEND_BAYERISCH,
+  "hell/bayerisch": HELL_BAYERISCH,
 };
 
 /**

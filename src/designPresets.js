@@ -187,7 +187,10 @@ export const ARCHETYP_PRESET = {
   // ist auf dem Handy der Weg zur Bestellung.
   hell: withDesignDefaults({
     header: { sticky: false },
-    layout: { sectionOrder: ["karte", "highlights", "ambiente", "stimmen", "reservierung", "kontakt"] },
+    layout: {
+      sectionOrder: ["karte", "highlights", "ambiente", "stimmen", "reservierung", "kontakt"],
+      handschrift: "hell",
+    },
   }),
 
   // Das Magazin. Hier führt nicht die Bestellung, sondern das Bild: ein
