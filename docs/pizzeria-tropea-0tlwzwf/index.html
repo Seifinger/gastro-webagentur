@@ -7,6 +7,8 @@
 <meta name="description" content="Pizzeria Tropea in Tüßling: Holzofenpizza &amp; frische Pasta. Frische Pasta, Holzofenpizza und echtes Dolce Vita – in der Marsstrasse in Tüßling. Jetzt Tisch reservieren oder zur Abholung vorbestellen.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🍽️%3C/text%3E%3C/svg%3E">
 <meta name="robots" content="noindex, nofollow">
+<meta name="engine-version" content="3">
+<meta name="engine-archetype" content="editorial">
 <style>
 @font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/inter-400-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
 @font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('../assets/fonts/inter-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
@@ -29,18 +31,54 @@
   --ink: #2a211a;
   --ink-soft: #6f6154;
   --line: #e9dfd1;
-  --accent: #5f7042;
-  --accent-dark: #46542f;
+  --accent: #b4451f;
+  --accent-dark: #8d3416;
   --on-accent: #ffffff;
   --gold: #c1872c;
-  --tint: #262b1c;
-  --tint-rgb: 38,43,28;
+  /* Gold trägt Text (Platzhalter-Abzeichen, Sterne, Kicker) und erreicht
+     dort auf hellem Grund 2.0-3.1:1. Der abgeleitete Ton steht jeder Seite
+     zur Verfügung, damit ein gekennzeichneter Platzhalter überall lesbar
+     ist - siehe stimmungen.js und scripts/colorSwatchCheck.mjs. */
+  --gold-dunkel: #8f6421;
+  --tint: #2e2018;
+  --tint-rgb: 46,32,24;
   --display: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --display-transform: none;
-  --display-tracking: -0.01em;
-  --radius: 16px;
+  --display-tracking: -0.03em;
+  --radius: 0px;
+
+  /* Globales Token-Set (DESIGN.md, Abschnitt 4 "Spacing, Radius, Shadow,
+     Transition"): gilt für UI-Chrome, die keine eigene Küchen-Note trägt
+     (Buttons, Formulare, Karten-Schatten) – anders als --radius oben, das
+     je Stimmung variiert. */
+  --space-xs: 6px;
+  --space-sm: 12px;
+  --space-md: 24px;
+  --space-lg: 48px;
+  --space-xl: 84px;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --shadow-soft: 0 2px 12px rgba(0,0,0,.07);
+  --shadow-card: 0 8px 28px rgba(0,0,0,.10);
+  --shadow-strong: 0 18px 48px rgba(0,0,0,.18);
+  --transition-fast: .12s ease;
+  --transition-base: .22s ease;
+  --transition-slow: .38s cubic-bezier(.22,1,.36,1);
+  --text-xs: .75rem;
+  --text-sm: .875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: clamp(1.5rem, 3vw, 2rem);
+  --text-display: clamp(2.125rem, 7vw, 4.375rem);
 }
+/* Der kräftigere Akzent aus colorMath.boldAccent – mindestens 4.5:1 gegen den
+   eigenen Grund. Er steht nur dort, wo er gebraucht wird: Die drei bestehenden
+   Archetypen arbeiten unverändert mit --accent. */
+:root { --accent-bold: #c73c0c; }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -63,7 +101,18 @@ p { margin: 0; }
 a { color: inherit; }
 img { display: block; max-width: 100%; }
 .wrap { width: 100%; max-width: 1140px; margin: 0 auto; padding: 0 20px; }
-.section { padding: 84px 0; }
+.section { padding: var(--space-xl) 0; }
+
+/* Gezeichnete Zeichen (signaturIcons.js) statt Emoji/Unicode – auf jeder
+   Seite, nicht nur mit Handschrift. Wo ein Archetyp seine eigene Handschrift
+   mitbringt, überschreibt deren spezifischere Regel (styles/handschrift.css.js)
+   diese Basiswerte für dieselben Klassen – siehe DESIGN.md Abschnitt 4. */
+.ikon { width: 1.35em; height: 1.35em; flex: none; vertical-align: -.26em; }
+.ikon-haken { width: 1.05em; height: 1.05em; opacity: .9; }
+.ikon-stern { width: 1em; height: 1em; vertical-align: -.15em; margin-right: 2px; }
+.ikon-plus { width: .85em; height: .85em; vertical-align: -.08em; }
+.ikon-chevron { width: 1.1em; height: 1.1em; }
+.marke { width: 1.9em; height: 1.9em; flex: none; vertical-align: -.48em; }
 /* Die Kopfzeile liegt fest über der Seite – ohne diesen Abstand verdeckt sie
    die Überschrift des angesprungenen Abschnitts. */
 section[id] { scroll-margin-top: 80px; }
@@ -93,7 +142,7 @@ body.veroeffentlicht .topbar { top: 38px; }
 /* Kopfzeile: liegt transparent über dem Hero und wird beim Scrollen fest */
 .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 40; transition: background .28s ease, box-shadow .28s ease; }
 .topbar::before { content: ""; position: absolute; inset: 0; pointer-events: none; transition: opacity .28s ease;
-                  background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.14) 70%, transparent 100%); }
+                  background: linear-gradient(180deg, rgba(var(--tint-rgb), .55) 0%, rgba(var(--tint-rgb), .14) 70%, transparent 100%); }
 .topbar.scrolled::before { opacity: 0; }
 .topbar-inner { position: relative; display: flex; align-items: center; gap: 18px; height: 70px; }
 .brand { font-family: var(--display); text-transform: var(--display-transform); font-size: 19px; font-weight: 700; margin-right: auto;
@@ -114,9 +163,9 @@ body.veroeffentlicht .topbar { top: 38px; }
 /* Buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 14px 26px; border-radius: 999px; border: 1px solid transparent;
+  padding: 14px 26px; border-radius: var(--radius-pill); border: 1px solid transparent;
   font-size: 15px; font-weight: 600; font-family: inherit; text-decoration: none;
-  cursor: pointer; transition: transform .12s ease, background .16s ease, color .16s ease;
+  cursor: pointer; transition: transform var(--transition-fast), background var(--transition-base), color var(--transition-base);
 }
 .btn:active { transform: translateY(1px); }
 .btn-primary { background: var(--accent); color: var(--on-accent); }
@@ -125,14 +174,16 @@ body.veroeffentlicht .topbar { top: 38px; }
 .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
 .btn-light { background: #fff; color: #1a1a1a; }
 .btn-light:hover { background: #ece5db; }
-.btn-outline-light { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.6); }
-.btn-outline-light:hover { background: rgba(255,255,255,.2); border-color: #fff; }
+/* Zweistufiger Hero-CTA: die zweite Aktion liegt als Glas auf dem Foto statt
+   als deckende Fläche – dezenter als der gefüllte Hauptknopf daneben. */
+.btn-outline-light { background: rgba(255,255,255,.12); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); color: #fff; border-color: rgba(255,255,255,.6); }
+.btn-outline-light:hover { background: rgba(255,255,255,.22); border-color: #fff; }
 .btn-block { width: 100%; }
 .btn[disabled] { opacity: .5; cursor: not-allowed; }
 
 /* Hero: auf dem Handy muss alles Wichtige ohne Scrollen sichtbar sein */
 .hero { position: relative; color: #fff; background: var(--tint); overflow: hidden;
-        min-height: 100vh; min-height: 100svh; display: flex; align-items: flex-end; }
+        min-height: 96vh; min-height: 96svh; display: flex; align-items: flex-end; }
 @media (min-width: 900px) { .hero { min-height: 88vh; align-items: center; } }
 .hero-media { position: absolute; inset: 0; }
 .hero-media img { width: 100%; height: 100%; object-fit: cover; }
@@ -141,9 +192,17 @@ body.veroeffentlicht .topbar { top: 38px; }
 @media (min-width: 900px) {
   .hero-overlay { background: linear-gradient(95deg, rgba(var(--tint-rgb), .93) 0%, rgba(var(--tint-rgb), .84) 40%, rgba(var(--tint-rgb), .45) 72%, rgba(var(--tint-rgb), .2) 100%); }
 }
+/* Zweite, eigenständige Ebene nur für den unteren Rand: sorgt unabhängig vom
+   Atmosphären-Gradienten darüber dafür, dass Kicker/Titel auf jedem Foto
+   lesbar bleiben, ohne dass der Grundton in der Bildmitte dunkler werden muss. */
+.hero-vignette { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 55%, rgba(var(--tint-rgb), .5) 100%); }
 .hero-inner { position: relative; z-index: 2; width: 100%; max-width: 1140px; margin: 0 auto; padding: 100px 20px 116px; }
 @media (min-width: 900px) { .hero-inner { padding: 140px 20px 120px; } .hero-inner > * { max-width: 640px; } }
-.hero-kicker { text-transform: uppercase; letter-spacing: .2em; font-size: 12px; font-weight: 700; color: var(--gold); margin-bottom: 16px; }
+/* Der linke Strich gibt dem Kicker die Anmutung eines Zitats – derselbe Ton
+   wie das Gold der Sterne, nur schmal und nicht als Fläche. */
+.hero-kicker { text-transform: uppercase; letter-spacing: .2em; font-size: 12px; font-weight: 700; color: var(--gold);
+               margin-bottom: 16px; border-left: 3px solid var(--gold); padding-left: 12px; }
 .hero h1 { font-size: clamp(34px, 8.4vw, 70px); }
 .hero-sub { margin-top: 16px; font-size: clamp(16px, 2.2vw, 20px); color: rgba(255,255,255,.88); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
@@ -153,30 +212,38 @@ body.veroeffentlicht .topbar { top: 38px; }
 
 /* USP-Leiste */
 .usp-strip { background: var(--accent); color: var(--on-accent); }
-.usp-list { display: flex; flex-wrap: wrap; gap: 10px 30px; justify-content: center; padding: 18px 0; font-size: 15px; font-weight: 600; }
+.usp-list { display: flex; flex-wrap: wrap; gap: 10px var(--space-md); justify-content: center; padding: 18px 0; font-size: 15px; font-weight: 600; }
 .usp-list span { display: inline-flex; align-items: center; gap: 9px; }
+/* Schmale Trennlinie zwischen den Punkten statt reinem Abstand – macht aus
+   der Reihe eine Leiste mit klaren Feldern, nicht nur aneinandergereihten Sätzen. */
+.usp-list span:not(:first-child) { border-left: 1px solid rgba(255,255,255,.35); padding-left: var(--space-md); }
 
 /* Highlights */
 .hl-grid { display: grid; gap: 24px; grid-template-columns: 1fr; }
 @media (min-width: 680px) { .hl-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1000px) { .hl-grid.spalten-3 { grid-template-columns: repeat(3, 1fr); } }
-.hl-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
-           display: flex; flex-direction: column; transition: transform .18s ease; }
-.hl-card:hover { transform: translateY(-4px); }
+/* Schatten statt Kontur: die Karte hebt sich vom Grund ab, ohne dass eine
+   Linie sie einrahmt – beim Hover verstärkt sich derselbe Schatten, statt
+   dass eine zweite, andersartige Wirkung dazukäme. */
+.hl-card { background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-card);
+           display: flex; flex-direction: column; transition: transform var(--transition-slow), box-shadow var(--transition-slow); }
+.hl-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-strong); }
 .hl-media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--soft); }
 .hl-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
 .hl-card:hover .hl-media img { transform: scale(1.05); }
-.hl-kat { position: absolute; left: 13px; top: 13px; background: rgba(var(--tint-rgb), .88); color: #fff;
-          font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 11px; border-radius: 999px; }
+/* Weichgezeichneter Grund statt voller Fläche: das Abzeichen bleibt lesbar,
+   ohne das Foto darunter mit einem harten Farbblock zu verdecken. */
+.hl-kat { position: absolute; left: 13px; top: 13px; background: rgba(var(--tint-rgb), .55); backdrop-filter: blur(6px) saturate(160%); -webkit-backdrop-filter: blur(6px) saturate(160%); color: #fff;
+          font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 5px 11px; border-radius: var(--radius-pill); }
 .hl-body { padding: 21px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .hl-name { font-size: 20px; }
 .hl-desc { color: var(--ink-soft); font-size: 15px; flex: 1; }
 .hl-foot { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
-.hl-preis { font-size: 19px; font-weight: 700; font-family: var(--display); margin-right: auto; }
-.veg { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
-.add-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px;
+.hl-preis { font-size: var(--text-xl); font-weight: 700; font-family: var(--display); margin-right: auto; }
+.veg { display: inline-block; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid currentColor; border-radius: var(--radius-pill); padding: 1px 8px; }
+.add-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--radius-pill);
            border: 1px solid var(--accent); background: transparent; color: var(--accent);
-           font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .16s ease, color .16s ease; }
+           font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: background var(--transition-base), color var(--transition-base); }
 .add-btn:hover { background: var(--accent); color: var(--on-accent); }
 
 /* Ablauf der Abholung */
@@ -190,23 +257,29 @@ body.veroeffentlicht .topbar { top: 38px; }
 
 /* Speisekarte als Akkordeon */
 .karte-section { background: var(--soft); }
-.kat { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); margin-bottom: 14px; overflow: hidden; }
+/* Der linke Streifen macht aus jeder Kategorie eine eigene Karte mit
+   Anfang – dieselbe Geste wie bei den Gästestimmen weiter unten. */
+.kat { border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: var(--radius); background: var(--surface); margin-bottom: 14px; overflow: hidden; }
 .kat > summary { list-style: none; cursor: pointer; padding: 20px 22px; display: flex; align-items: center; gap: 14px;
                  font-family: var(--display); text-transform: var(--display-transform); font-size: 20px; font-weight: 700; }
 .kat > summary::-webkit-details-marker { display: none; }
-.kat > summary::after { content: "+"; margin-left: auto; font-family: var(--body); font-size: 24px; line-height: 1; color: var(--accent); font-weight: 400; }
-.kat[open] > summary::after { content: "–"; }
 .kat > summary:hover { color: var(--accent); }
 .kat-anzahl { font-family: var(--body); text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+/* Gezeichneter Pfeil statt "+"/"–": dreht sich beim Öffnen, statt das Zeichen
+   auszutauschen – eine Bewegung statt eines Sprungs. */
+.kat-chevron { margin-left: auto; display: inline-flex; color: var(--accent); transition: transform var(--transition-base); }
+.kat[open] .kat-chevron { transform: rotate(180deg); }
 .kat-body { padding: 0 22px 8px; }
 .gericht { display: flex; align-items: flex-start; gap: 16px; padding: 15px 0; border-top: 1px solid var(--line); }
 .gericht-body { flex: 1; min-width: 0; }
 .gericht-name { font-weight: 600; }
 .gericht-desc { color: var(--ink-soft); font-size: 15px; margin-top: 2px; }
 .gericht-seite { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-.gericht-preis { font-weight: 600; white-space: nowrap; }
+.gericht-preis { font-family: var(--display); font-weight: 600; white-space: nowrap; }
 .mini-add { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--accent); background: transparent;
-            color: var(--accent); font-size: 20px; line-height: 1; cursor: pointer; transition: background .16s ease, color .16s ease; }
+            display: inline-flex; align-items: center; justify-content: center;
+            color: var(--accent); cursor: pointer; transition: background var(--transition-base), color var(--transition-base); }
+.mini-add .ikon-plus { width: 16px; height: 16px; vertical-align: 0; }
 .mini-add:hover { background: var(--accent); color: var(--on-accent); }
 
 /* Bildplätze für die eigenen Fotos */
@@ -215,51 +288,72 @@ body.veroeffentlicht .topbar { top: 38px; }
 .foto-slot { position: relative; border-radius: var(--radius); overflow: hidden; background: var(--soft); }
 .foto-slot img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
 .foto-text { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 18px 18px; color: #fff;
-             background: linear-gradient(180deg, transparent, rgba(0,0,0,.82)); }
+             background: linear-gradient(180deg, transparent, rgba(var(--tint-rgb), .82)); }
 .foto-text strong { font-family: var(--display); text-transform: var(--display-transform); font-size: 19px; display: block; }
 .foto-text span { font-size: 13px; color: rgba(255,255,255,.82); display: block; margin-top: 4px; }
 .foto-badge { position: absolute; right: 12px; top: 12px; font-size: 11px; font-weight: 700; color: #fff;
-              background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.45); border-radius: 999px; padding: 3px 10px; }
+              background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.45); border-radius: var(--radius-pill); padding: 3px 10px; }
 
 /* Gästestimmen */
 .stimmen-section { background: var(--soft); }
 .stimmen-note { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
                 margin-bottom: 40px; font-size: 17px; }
 .stimmen-note .note { font-family: var(--display); font-size: 34px; font-weight: 700; color: var(--accent); }
-.stimmen-note .sterne { color: var(--gold); letter-spacing: 2px; font-size: 19px; }
+.stimmen-note .sterne { color: var(--gold); font-size: 19px; }
 .stimmen-grid { display: grid; gap: 20px; grid-template-columns: 1fr; }
 @media (min-width: 820px) { .stimmen-grid { grid-template-columns: repeat(3, 1fr); } }
 /* social.layout: "list" im Design-Preset – eine gestapelte Spalte statt drei. */
 .stimmen-grid--list { max-width: 640px; margin-left: auto; margin-right: auto; }
 @media (min-width: 820px) { .stimmen-grid--list { grid-template-columns: 1fr; } }
-.stimme { position: relative; background: var(--surface); border: 1px solid var(--line);
-          border-radius: var(--radius); padding: 26px 24px 22px; display: flex; flex-direction: column; gap: 14px; }
-.stimme .sterne { color: var(--gold); letter-spacing: 2px; font-size: 15px; }
+/* Vier Punkt Akzentlinie statt Umrandung + eigener Schatten: dieselbe Geste
+   wie bei den Speisekarten-Kategorien, hier als Zitat-Anfang gelesen. */
+.stimme { position: relative; background: var(--surface); border-left: 4px solid var(--accent);
+          border-radius: var(--radius); padding: 26px 24px 22px; display: flex; flex-direction: column; gap: 14px;
+          box-shadow: var(--shadow-soft); }
+.stimme .sterne { color: var(--gold); font-size: 15px; }
 .stimme p { font-size: 16px; line-height: 1.6; flex: 1; }
-.stimme footer { font-size: 14px; color: var(--ink-soft); display: flex; gap: 8px; flex-wrap: wrap; background: none; padding: 0; }
+.stimme footer { font-size: 14px; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: none; padding: 0; }
 .stimme footer strong { color: var(--ink); font-family: var(--body); font-size: 14px; }
-.stimme.ist-platzhalter { border-style: dashed; background: transparent; min-height: 172px; justify-content: center; }
+/* Initialen statt Foto: ein echtes Bild vom Gast gibt es nie, ein erfundenes
+   wäre irreführend – der Kreis trägt nur, was aus dem Namen folgt. */
+.stimme-avatar { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex: none;
+                 border-radius: 50%; background: var(--accent); color: var(--on-accent); font-size: 12px; font-weight: 700; }
+.stimme.ist-platzhalter { border: 1px dashed var(--line); border-left: 1px dashed var(--line); box-shadow: none; background: transparent; min-height: 172px; justify-content: center; }
 .stimme .sterne.leer { color: var(--line); }
 .stimme .slot-titel { flex: none; color: var(--ink-soft); font-family: var(--display); font-size: 18px; }
 .stimmen-erklaerung { margin-top: 26px; text-align: center; color: var(--ink-soft); font-size: 15px;
                       max-width: 620px; margin-left: auto; margin-right: auto; }
 
-/* Formulare */
+/* Formulare – an den Fokus-/Rahmenregeln bekannter Buchungsstrecken
+   orientiert: dünnerer Rahmen, deutlicher Fokusring statt Browser-Outline,
+   jeder Zustandswechsel läuft über --transition-fast statt hart zu springen. */
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; }
 .field-grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
 @media (min-width: 680px) { .field-grid { grid-template-columns: 1fr 1fr; } }
 .field { display: flex; flex-direction: column; gap: 7px; }
 .field-wide { grid-column: 1 / -1; }
-label { font-size: 14px; font-weight: 600; color: var(--ink); }
+label { font-size: var(--text-sm); font-weight: 600; letter-spacing: .02em; color: var(--ink); }
 input, select, textarea {
   font-family: inherit; font-size: 16px; color: var(--ink);
-  padding: 13px 15px; border: 1px solid var(--line); border-radius: calc(var(--radius) / 2); background: var(--bg); width: 100%;
+  padding: 13px 15px; border: 1.5px solid var(--line); border-radius: var(--radius-md); background: var(--bg); width: 100%;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
-input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
 textarea { resize: vertical; min-height: 90px; }
 .hint { font-size: 13px; color: var(--ink-soft); font-weight: 400; }
-.error { font-size: 13px; color: var(--accent); display: none; }
-.field.invalid .error { display: block; }
+/* Das Warnzeichen vor dem Fehlertext steht als Maske (currentColor) statt als
+   eigenes Bild – so trägt es automatisch die Akzentfarbe der jeweiligen
+   Küche und muss nicht gesondert gegen jeden der 48 Grundtöne geprüft werden. */
+.error { font-size: 13px; color: var(--accent); display: none; align-items: center; gap: 6px; }
+.error::before {
+  content: ""; width: 13px; height: 13px; flex: none; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9.3'/%3E%3Cpath d='M12 7.6v5.6'/%3E%3Ccircle cx='12' cy='16.6' r='.6' fill='black' stroke='none'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='9.3'/%3E%3Cpath d='M12 7.6v5.6'/%3E%3Ccircle cx='12' cy='16.6' r='.6' fill='black' stroke='none'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.field.invalid .error { display: flex; }
 .field.invalid input, .field.invalid select { border-color: var(--accent); }
 .reserve-section { background: var(--soft); }
 .reserve-grid { display: grid; gap: 36px; grid-template-columns: 1fr; align-items: start; }
@@ -270,11 +364,11 @@ textarea { resize: vertical; min-height: 90px; }
 
 /* Warenkorb */
 .cart-fab { position: fixed; right: 20px; bottom: 20px; z-index: 50; display: none; align-items: center; gap: 12px;
-            padding: 15px 24px; border: none; border-radius: 999px; background: var(--accent); color: var(--on-accent);
+            padding: 15px 24px; border: none; border-radius: var(--radius-pill); background: var(--accent); color: var(--on-accent);
             font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 18px 36px -14px rgba(0,0,0,.7); }
 .cart-fab.visible { display: inline-flex; }
 @media (max-width: 899px) { .cart-fab, .cart-fab.visible { display: none; } }
-.cart-count { background: rgba(255,255,255,.28); border-radius: 999px; padding: 1px 9px; font-size: 13px; }
+.cart-count { background: rgba(255,255,255,.28); border-radius: var(--radius-pill); padding: 1px 9px; font-size: 13px; }
 
 /* Feste Aktionsleiste auf dem Handy */
 .mobilebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
@@ -312,10 +406,19 @@ textarea { resize: vertical; min-height: 90px; }
                background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 34px 30px;
                text-align: center; opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
 .confirm-box.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+/* Der Kreis kommt erst mit der Bestätigung selbst herein statt schon vorher
+   zu stehen – ein kleiner, eigener Auftritt statt eines reinen Ausblendens. */
 .confirm-icon { width: 62px; height: 62px; border-radius: 50%; background: var(--accent); color: var(--on-accent);
-                display: grid; place-items: center; font-size: 32px; margin: 0 auto 18px; }
+                display: grid; place-items: center; margin: 0 auto 18px;
+                transform: scale(.9); opacity: 0; transition: transform var(--transition-slow), opacity var(--transition-slow); }
+.confirm-box.open .confirm-icon { transform: scale(1); opacity: 1; }
+.confirm-icon .ci-ok, .confirm-icon .ci-fehler { display: none; grid-area: 1 / 1; }
+.confirm-icon .ci-ok svg, .confirm-icon .ci-fehler svg { width: 30px; height: 30px; }
+.confirm-icon .ci-ok { display: grid; }
 /* Abgelehnte Anfragen dürfen nicht wie Erfolg aussehen. */
 .confirm-box.hat-fehler .confirm-icon { background: #a33131; color: #fff; }
+.confirm-box.hat-fehler .confirm-icon .ci-ok { display: none; }
+.confirm-box.hat-fehler .confirm-icon .ci-fehler { display: grid; }
 .confirm-box.hat-fehler .confirm-summary { display: none; }
 .confirm-box h3 { font-size: 24px; margin-bottom: 12px; }
 .confirm-summary { text-align: left; background: var(--soft); border-radius: calc(var(--radius) / 1.5); padding: 17px 19px; margin: 22px 0; font-size: 15px; }
@@ -332,11 +435,22 @@ textarea { resize: vertical; min-height: 90px; }
 .contact-list a { color: var(--accent); }
 .hours-row { display: flex; justify-content: space-between; gap: 20px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
 .hours-row span:first-child { color: var(--ink-soft); }
-.placeholder-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold); border: 1px solid currentColor; border-radius: 999px; padding: 2px 10px; margin-left: 10px; vertical-align: middle; }
+.placeholder-badge { display: inline-block; font-size: 11px; font-weight: 700; color: var(--gold-dunkel); border: 1px solid currentColor; border-radius: var(--radius-pill); padding: 2px 10px; margin-left: 10px; vertical-align: middle; }
+/* Derselbe Hinweis auf der Akzentfläche der USP-Leiste. Dort trägt er
+   --on-accent: Das ist der Ton, der gegen --accent geprüft ist. */
+.usp-platzhalter { display: inline-block; font-size: 11px; font-weight: 700; color: var(--on-accent); border: 1px solid currentColor; border-radius: var(--radius-pill); padding: 2px 10px; }
 
-footer { background: var(--tint); color: rgba(255,255,255,.72); padding: 48px 0; font-size: 14px; }
+/* Drei Spalten (Haus / Navigation / Kontakt) statt einer Zeile Fließtext –
+   auf dem Handy fällt das Raster auf eine Spalte zusammen. */
+footer { background: var(--tint); color: rgba(255,255,255,.72); padding: var(--space-xl) 0 var(--space-lg); font-size: 14px; }
+.footer-grid { display: grid; gap: 28px; grid-template-columns: 1fr; }
+@media (min-width: 760px) { .footer-grid { grid-template-columns: 1.3fr 1fr 1fr; gap: 32px; } }
 footer strong { color: #fff; font-family: var(--display); text-transform: var(--display-transform); font-size: 17px; }
-.footer-note { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; line-height: 1.6; }
+.footer-col p { margin-top: 8px; }
+.footer-nav, .footer-kontakt { display: flex; flex-direction: column; gap: 8px; }
+.footer-nav a, .footer-kontakt a { color: rgba(255,255,255,.72); text-decoration: none; transition: color var(--transition-fast); }
+.footer-nav a:hover, .footer-kontakt a:hover { color: #fff; }
+.footer-note { grid-column: 1 / -1; margin-top: var(--space-md); padding-top: var(--space-md); border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; line-height: 1.6; }
 
 
 .sig { position: absolute; z-index: 1; pointer-events: none; }
@@ -378,6 +492,37 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   .sig-spiess { right: -4%; top: 12%; transform: none; width: 34vw; height: 46vw; opacity: .5; }
 }
 
+/* Syrisch: Minztee wird eingegossen, während das Glas selbst leicht "atmet"
+   und Dampf aufsteigt – eine eigene Signatur statt des mit Türkisch
+   geteilten Spießes. Läuft dauerhaft wie der Bierkrug-Überlauf bei
+   Bayerisch, kein einmaliges .bewegt/.da-Ereignis. */
+.sig-tea-form { right: 5%; top: 50%; transform: translateY(-50%);
+                width: clamp(140px, 20vw, 200px); opacity: .95;
+                filter: drop-shadow(0 20px 36px rgba(0,0,0,.35)); }
+.sig-tea-form svg { width: 100%; height: auto; overflow: visible; }
+.sig-tea-form .tee-fluessigkeit { transform-box: fill-box; transform-origin: bottom;
+                                  animation: sig-tee-atmen 14s ease-in-out infinite alternate; }
+@keyframes sig-tee-atmen { to { transform: scaleY(1.05); } }
+.sig-tea-form .strahl { opacity: 0; animation: sig-tee-strahl 8s ease-in-out infinite; }
+@keyframes sig-tee-strahl {
+  0%, 87% { opacity: 0; }
+  91% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+.sig-tea-form .dampf-tee i { position: absolute; bottom: 0; opacity: 0;
+                             animation: sig-tee-dampf 5.5s ease-in infinite; }
+.sig-tea-form .dampf-tee i:nth-child(1) { left: 20%; }
+.sig-tea-form .dampf-tee i:nth-child(2) { left: 50%; animation-delay: 1.6s; }
+.sig-tea-form .dampf-tee i:nth-child(3) { left: 76%; animation-delay: 3.2s; }
+@keyframes sig-tee-dampf {
+  0% { opacity: 0; transform: translateY(0) scale(.7); }
+  25% { opacity: .7; }
+  100% { opacity: 0; transform: translateY(-60px) scale(1.8); }
+}
+@media (max-width: 899px) {
+  .sig-tea-form { right: -2%; top: 12%; transform: none; width: 26vw; opacity: .55; }
+}
+
 /* Bayerisch: die Tagesempfehlung wechselt durch */
 .sig-tafel { right: 5%; top: 50%; transform: translateY(-50%);
              width: clamp(210px, 27vw, 310px); aspect-ratio: 3 / 4; }
@@ -387,7 +532,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 .sig-tafel .karte:nth-child(3) { animation-delay: 14s; }
 .sig-tafel img { width: 100%; height: 100%; object-fit: cover; }
 .sig-tafel .schild { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 14px 12px;
-                     background: linear-gradient(180deg, transparent, rgba(0,0,0,.85));
+                     background: linear-gradient(180deg, transparent, rgba(var(--tint-rgb), .85));
                      color: #fff; font-size: 14px; font-weight: 600; text-align: center; }
 .sig-tafel .schild small { display: block; font-size: 10px; font-weight: 700; letter-spacing: .14em;
                            text-transform: uppercase; opacity: .75; margin-bottom: 3px; }
@@ -413,6 +558,20 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 }
 @media (max-width: 899px) {
   .sig-diashow { right: -8%; top: 12%; transform: none; width: 46vw; opacity: .5; }
+}
+
+/* Griechisch: ein Olivenzweig schaukelt sanft – ein eigenes, kulturell
+   eindeutiges Motiv statt der bisherigen, kulturell neutralen Fotodiashow.
+   Dieselbe Schaukel-Mechanik wie bei den Laternen (sig-laterne-schaukel),
+   angewandt auf den gesamten Zweig statt auf einzelne Elemente. */
+.sig-olive-form { right: 6%; top: 45%; width: clamp(150px, 22vw, 220px);
+                  transform-origin: 10% 90%; opacity: .95;
+                  filter: drop-shadow(0 18px 32px rgba(0,0,0,.3));
+                  animation: sig-oliven-schaukel 7s ease-in-out infinite; }
+.sig-olive-form svg { width: 100%; height: auto; overflow: visible; }
+@keyframes sig-oliven-schaukel { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@media (max-width: 899px) {
+  .sig-olive-form { right: -4%; top: 12%; width: 40vw; opacity: .55; }
 }
 
 /* Café: aufsteigender Dampf über der Tasse */
@@ -635,6 +794,8 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   .sig-lanterns .laterne { animation: none; }
   .sig-lanterns .laterne .glow { animation: none; opacity: .6; }
   .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
+  .sig-tea-form .tee-fluessigkeit, .sig-tea-form .strahl, .sig-tea-form .dampf-tee i { animation: none; }
+  .sig-olive-form { animation: none; }
 
   /* Nur hier nötig: reagiert auf eine Umstellung mitten im Besuch, bei der
      .bewegt schon gesetzt ist (siehe motion.js). Der URL-Parameter
@@ -662,6 +823,8 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   .sig-lanterns .laterne { animation: none; }
   .sig-lanterns .laterne .glow { animation: none; opacity: .6; }
   .sig-beer .schaum, .sig-beer .tropfen { animation: none; }
+  .sig-tea-form .tee-fluessigkeit, .sig-tea-form .strahl, .sig-tea-form .dampf-tee i { animation: none; }
+  .sig-olive-form { animation: none; }
 
 }
 
@@ -776,9 +939,174 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 
 }
 
+/* --- Magazin-Skala ------------------------------------------------------ */
+.hero-editorial h1 { font-size: clamp(48px, 9vw, 128px); font-weight: 800; letter-spacing: -0.035em; line-height: 0.96; }
+.section-head h2 { font-size: clamp(34px, 6vw, 78px); font-weight: 800; line-height: 1.02; }
+.section-head .eyebrow { font-size: 13px; letter-spacing: .26em; }
+.section-head p { font-size: clamp(17px, 1.6vw, 21px); }
+.hl-name { font-size: clamp(21px, 2.2vw, 30px); }
+.kat > summary { font-size: clamp(21px, 2.6vw, 34px); }
+
+/* === Editorial ========================================================== */
+
+/* --- Hero: Vollbild, Text unten links, Kennziffern rechts ---------------- */
+.hero-editorial { position: relative; color: #fff; background: var(--tint); overflow: hidden;
+                  min-height: 100vh; min-height: 100svh; display: flex; align-items: flex-end; }
+.hero-editorial .hero-media { position: absolute; inset: 0; }
+.hero-editorial .hero-media img { width: 100%; height: 100%; object-fit: cover; }
+.hero-editorial .hero-overlay { position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(var(--tint-rgb), .34) 0%, rgba(var(--tint-rgb), .18) 38%, rgba(var(--tint-rgb), .93) 100%); }
+
+/* Das asymmetrische Raster: Der Text sitzt in den linken sieben von zwölf
+   Spalten, die Kennziffern rechts außen. Unter 900px wird daraus wieder eine
+   Spalte – ein verschobenes Raster auf dem Handy ist nur eng. */
+.hero-editorial .hero-inner { position: relative; z-index: 2; width: 100%; max-width: 1280px;
+                              margin: 0 auto; padding: 120px 20px 112px;
+                              display: grid; gap: 28px; grid-template-columns: 1fr; }
+@media (min-width: 900px) {
+  .hero-editorial .hero-inner { grid-template-columns: repeat(12, 1fr); align-items: end;
+                                padding: 160px 32px 104px; gap: 0 24px; }
+  .hero-editorial .hero-text { grid-column: 1 / span 7; }
+  .hero-editorial .hero-marginal { grid-column: 9 / span 4; padding-bottom: 12px; }
+}
+.hero-editorial .hero-kicker { text-transform: uppercase; letter-spacing: .3em; font-size: 12px;
+                               font-weight: 700; color: var(--gold); margin-bottom: 22px; }
+.hero-editorial h1 { margin: 0; }
+/* Die Überschrift steht zeilenweise im Markup (siehe sections/hero.js) –
+   jede Zeile ein eigenes Element, damit sie nacheinander auftreten können. */
+.hero-editorial .zeile { display: block; }
+.hero-editorial .hero-sub { margin-top: 26px; font-size: clamp(17px, 1.7vw, 21px);
+                            color: rgba(255,255,255,.9); max-width: 44ch; }
+.hero-editorial .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+@media (max-width: 899px) { .hero-editorial .hero-actions { display: none; } }
+
+/* Die Kennziffern rechts: Bewertung und Konzept als gesetzte Randspalte,
+   nicht als Fließtext. */
+.hero-marginal { border-top: 1px solid rgba(255,255,255,.34); padding-top: 18px;
+                 display: flex; flex-direction: column; gap: 14px; }
+.hero-marginal .marginal-zeile { display: flex; justify-content: space-between; gap: 18px;
+                                 font-size: 14px; color: rgba(255,255,255,.82); }
+.hero-marginal .marginal-zeile strong { color: #fff; font-family: var(--display); font-size: 17px; font-weight: 700; }
+.hero-marginal .sterne { color: var(--gold); letter-spacing: 2px; }
+
+/* --- Highlights im versetzten Raster ------------------------------------ */
+/* Zwölf Spalten, die Karten greifen unterschiedlich weit hinein und sitzen
+   auf verschiedenen Höhen. Dadurch entsteht die Magazin-Anmutung, ohne dass
+   eine Karte etwas anderes enthielte als vorher. */
+.hl-grid--magazin { display: grid; gap: 28px; grid-template-columns: 1fr; }
+@media (min-width: 760px) {
+  .hl-grid--magazin { grid-template-columns: repeat(12, 1fr); gap: 40px 28px; }
+  .hl-grid--magazin > .hl-card { grid-column: span 6; }
+  /* Jede dritte Karte läuft breit und bricht die Reihe auf. */
+  .hl-grid--magazin > .hl-card:nth-child(3n + 1) { grid-column: span 7; }
+  .hl-grid--magazin > .hl-card:nth-child(3n + 2) { grid-column: span 5; }
+  .hl-grid--magazin > .hl-card:nth-child(3n + 2) { margin-top: 56px; }
+  .hl-grid--magazin > .hl-card:nth-child(3n) { grid-column: 3 / span 8; }
+}
+/* Die Karte selbst verliert Rahmen und Kasten-Charakter: Im Magazin steht das
+   Bild, darunter der Text – keine Kachel. */
+.hl-grid--magazin > .hl-card { background: transparent; border: 0; border-radius: 0; }
+.hl-grid--magazin > .hl-card:hover { transform: none; }
+.hl-grid--magazin .hl-media { aspect-ratio: 3 / 4; border-radius: 0; }
+.hl-grid--magazin > .hl-card:nth-child(3n) .hl-media { aspect-ratio: 16 / 9; }
+.hl-grid--magazin .hl-body { padding: 20px 0 0; }
+.hl-grid--magazin .hl-kat { background: none; color: var(--accent-bold); left: 0; top: auto; bottom: -34px;
+                            padding: 0; border-radius: 0; letter-spacing: .22em; }
+.hl-grid--magazin .hl-preis { font-size: 22px; color: var(--accent-bold); }
+
+/* --- Karte: gesetztes Menü statt Liste ---------------------------------- */
+.gitter-asymmetrisch .karte-section { background: var(--bg); }
+.gitter-asymmetrisch .kat { border: 0; border-top: 2px solid var(--ink); border-radius: 0;
+                            background: transparent; margin-bottom: 0; }
+.gitter-asymmetrisch .kat > summary { padding: 26px 0; }
+.gitter-asymmetrisch .kat-body { padding: 0 0 22px; }
+@media (min-width: 860px) {
+  /* Zwei Spalten innerhalb einer Kategorie – so liest sich eine lange Karte
+     wie eine Menütafel und nicht wie ein Formular. */
+  .gitter-asymmetrisch .kat-body { columns: 2; column-gap: 54px; }
+  .gitter-asymmetrisch .gericht { break-inside: avoid; }
+}
+.gitter-asymmetrisch .gericht { border-top: 0; border-bottom: 1px solid var(--line); }
+
+/* --- Sektionsköpfe: links, nicht mittig --------------------------------- */
+.gitter-asymmetrisch .section-head.mitte { margin-left: 0; text-align: left; max-width: 18ch; }
+@media (min-width: 900px) { .gitter-asymmetrisch .section-head { max-width: 22ch; } }
+.gitter-asymmetrisch .section-head p { max-width: 52ch; }
+.gitter-asymmetrisch .section { padding: 112px 0; }
+.gitter-asymmetrisch .wrap { max-width: 1280px; }
+.gitter-asymmetrisch .eyebrow { color: var(--accent-bold); }
+
+/* --- Zeilenweiser Auftritt der Überschrift ------------------------------ */
+/* Die Zeilen werden beim Rendern serverseitig in <span class="zeile"> gelegt
+   (siehe sections/hero.js) – kein Zerlegen von Text im Browser, das je nach
+   Schriftgröße anders ausfällt und beim Laden sichtbar springt.
+   Ohne Skript steht die Überschrift ganz normal da: die Startwerte hängen an
+   .bewegt, das erst das Skript setzt. */
+.zeilen { display: block; }
+.zeile { display: block; }
+.bewegt .auftritt-zeile .zeile { opacity: 0; transform: translateY(0.38em);
+                                 transition: opacity .66s cubic-bezier(.22,.61,.36,1),
+                                             transform .66s cubic-bezier(.22,.61,.36,1);
+                                 transition-delay: calc(var(--takt, 0) * 105ms); }
+.bewegt .auftritt-zeile.da .zeile { opacity: 1; transform: none; }
+
+/* --- Bild-Zoom beim Überfahren ----------------------------------------- */
+/* Nur für Geräte mit echtem Zeiger: Auf dem Handy gibt es kein "hover", der
+   Effekt bliebe dort nach dem Antippen hängen. */
+@media (hover: hover) {
+  .bild-zoom { overflow: hidden; }
+  .bild-zoom img { transition: transform .62s cubic-bezier(.22,.61,.36,1); will-change: transform; }
+  .bild-zoom:hover img, .bild-zoom:focus-within img { transform: scale(1.06); }
+}
+
+/* --- Unterstrich, der sich aufzieht ------------------------------------ */
+@media (hover: hover) {
+  .link-strich { position: relative; text-decoration: none; }
+  .link-strich::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px;
+                        background: currentColor; transform: scaleX(0); transform-origin: left;
+                        transition: transform .38s cubic-bezier(.22,.61,.36,1); }
+  .link-strich:hover::after, .link-strich:focus-visible::after { transform: scaleX(1); }
+}
+
+/* --- Video-Hero --------------------------------------------------------- */
+/* Das Poster ist dasselbe Bild, das der Hero ohne Video zeigt. Fehlt das
+   Video oder will der Besucher keine Bewegung, bleibt genau dieses Bild
+   stehen – der Hero ist also nie leer. */
+.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-video-fallback { display: none; }
+/* Angehalten wird das Video vom Skript (MOTION_EXTRA_SKRIPT) über einen
+   IntersectionObserver – genau wie die Hero-Fahrt oben, nur dass ein Video
+   mehr kostet als eine CSS-Animation. Ohne Skript läuft es einfach weiter,
+   ohne Skript UND ohne Bewegungswunsch greift die Regel im Block unten. */
+
+/* --- Wer keine Bewegung will, bekommt keine ----------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .bewegt .auftritt-zeile .zeile { opacity: 1; transform: none; transition: none; }
+  
+  .zeile { opacity: 1; transform: none; transition: none; }
+  .bild-zoom img, .bild-zoom > picture > img { transform: none; transition: none; }
+  .link-strich::after { transform: scaleX(1); transition: none; }
+  .hero-video { display: none; }
+  .hero-video-fallback { display: block; }
+
+}
+
+/* Verkaufsdemo (?bewegung=aus): derselbe Regelblock, verschachtelt. Der
+   .bewegt-Selektor fehlt hier bewusst – bei ?bewegung=aus wird .bewegt gar
+   nicht gesetzt. */
+.bewegung-aus {
+  
+  .zeile { opacity: 1; transform: none; transition: none; }
+  .bild-zoom img, .bild-zoom > picture > img { transform: none; transition: none; }
+  .link-strich::after { transform: scaleX(1); transition: none; }
+  .hero-video { display: none; }
+  .hero-video-fallback { display: block; }
+
+}
+
 </style>
 </head>
-<body class="veroeffentlicht">
+<body class="veroeffentlicht gitter-asymmetrisch">
 
 <div class="entwurf-hinweis"><span>Unverbindlicher Gestaltungsentwurf – <strong>nicht</strong> die offizielle Website von Pizzeria Tropea.</span></div>
 <header class="topbar" id="topbar">
@@ -794,45 +1122,44 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   </div>
 </header>
 
-<section class="hero">
+<section class="hero hero-editorial">
   <div class="hero-media">
-    <img src="https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=1800&amp;h=1000&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Pizzeria Tropea">
+    <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=1800&amp;h=1000&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Pizzeria Tropea">
   </div>
   <div class="hero-overlay"></div>
-  
-      <div class="sig sig-pizza" aria-hidden="true">
-        <div class="haelfte links"><img src="https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""></div>
-        <div class="haelfte rechts"><img src="https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt=""></div>
-      </div>
+  <div class="hero-vignette"></div>
   <div class="hero-inner">
-    <div class="hero-kicker">Holzofenpizza &amp; frische Pasta · in Tüßling</div>
-    <h1>Pizzeria Tropea</h1>
-    
-    <div class="rating">
-      <span class="stars" aria-hidden="true">★★★★★</span>
-      <span><strong>4,5/5</strong> auf Google (90 Bewertungen)</span>
+    <div class="hero-text">
+      <div class="hero-kicker">Holzofenpizza &amp; frische Pasta · Tüßling</div>
+      <h1 class="zeilen auftritt-zeile"><span class="zeile" style="--takt:0">Pizzeria</span><span class="zeile" style="--takt:1">Tropea</span></h1>
+      <p class="hero-sub">Frische Pasta, Holzofenpizza und echtes Dolce Vita – in der Marsstrasse in Tüßling.</p>
+      <div class="hero-actions"><a class="btn btn-light" href="#reservierung">Tisch reservieren</a><a class="btn btn-outline-light" href="#karte">Zur Abholung bestellen</a></div>
     </div>
-    <p class="hero-sub">Frische Pasta, Holzofenpizza und echtes Dolce Vita – in der Marsstrasse in Tüßling.</p>
-    <div class="hero-actions"><a class="btn btn-light" href="#karte">Zur Abholung bestellen</a><a class="btn btn-outline-light" href="#reservierung">Tisch reservieren</a></div>
+    <div class="hero-marginal">
+      <div class="marginal-zeile"><span>Haus</span><strong>Holzofenpizza &amp; frische Pasta</strong></div>
+      <div class="marginal-zeile"><span>Ort</span><strong>Tüßling</strong></div>
+      <div class="marginal-zeile"><span>Google</span><strong>4,5/5</strong></div>
+      <div class="marginal-zeile"><span class="sterne" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span><span>90 Bewertungen</span></div>
+    </div>
   </div>
 </section>
 
 <section class="usp-strip">
-  <div class="wrap"><div class="usp-list"><span><span aria-hidden="true">✓</span> Heiß aus dem Steinofen</span><span><span aria-hidden="true">✓</span> Teig ruht 48 Stunden</span><span><span aria-hidden="true">✓</span> Direkt bei uns, ohne Vermittlungsgebühr</span></div></div>
+  <div class="wrap"><div class="usp-list"><span class="usp-platzhalter">Platzhalter</span><span><svg class="ikon ikon-haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12.4c2.1 1 3.8 2.5 5.1 4.4C12 11.6 15.8 7.4 21 4.6"/></svg> Heiß aus dem Steinofen</span><span><svg class="ikon ikon-haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12.4c2.1 1 3.8 2.5 5.1 4.4C12 11.6 15.8 7.4 21 4.6"/></svg> Teig ruht 48 Stunden</span><span><svg class="ikon ikon-haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12.4c2.1 1 3.8 2.5 5.1 4.4C12 11.6 15.8 7.4 21 4.6"/></svg> Direkt bei uns, ohne Vermittlungsgebühr</span></div></div>
 </section>
 
 
 <section class="section" id="highlights">
   <div class="wrap">
-    <div class="section-head mitte">
+    <div class="section-head">
       <div class="eyebrow">Unsere Highlights</div>
       <h2>Das bestellen unsere Gäste am liebsten</h2>
       <p>Alles frisch zubereitet. Zum Abholen einfach vorbestellen und zur Wunschzeit mitnehmen.</p>
     </div>
 
-    <div class="hl-grid spalten-3">
+    <div class="hl-grid--magazin">
       <article class="hl-card">
-        <div class="hl-media">
+        <div class="hl-media bild-zoom">
           <img src="https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Tartufo" loading="lazy">
           <span class="hl-kat">Pizza aus dem Holzofen</span>
         </div>
@@ -843,13 +1170,13 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             <span class="hl-preis">15,90 €</span>
             <span class="veg">vegetarisch</span>
             <button class="add-btn" type="button" data-add="1-4" data-name="Tartufo" data-preis="15.9">
-              <span aria-hidden="true">+</span> Vorbestellen
+              <svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen
             </button>
           </div>
         </div>
       </article>
       <article class="hl-card">
-        <div class="hl-media">
+        <div class="hl-media bild-zoom">
           <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Tagliatelle al Ragù" loading="lazy">
           <span class="hl-kat">Pasta &amp; Dolci</span>
         </div>
@@ -860,13 +1187,13 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             <span class="hl-preis">14,90 €</span>
             
             <button class="add-btn" type="button" data-add="2-0" data-name="Tagliatelle al Ragù" data-preis="14.9">
-              <span aria-hidden="true">+</span> Vorbestellen
+              <svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen
             </button>
           </div>
         </div>
       </article>
       <article class="hl-card">
-        <div class="hl-media">
+        <div class="hl-media bild-zoom">
           <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Farfalle al Pesto" loading="lazy">
           <span class="hl-kat">Pasta &amp; Dolci</span>
         </div>
@@ -877,13 +1204,13 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             <span class="hl-preis">13,90 €</span>
             <span class="veg">vegetarisch</span>
             <button class="add-btn" type="button" data-add="2-1" data-name="Farfalle al Pesto" data-preis="13.9">
-              <span aria-hidden="true">+</span> Vorbestellen
+              <svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen
             </button>
           </div>
         </div>
       </article>
       <article class="hl-card">
-        <div class="hl-media">
+        <div class="hl-media bild-zoom">
           <img src="https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Penne all&#39;Arrabbiata" loading="lazy">
           <span class="hl-kat">Pasta &amp; Dolci</span>
         </div>
@@ -894,13 +1221,13 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             <span class="hl-preis">12,90 €</span>
             <span class="veg">vegetarisch</span>
             <button class="add-btn" type="button" data-add="2-2" data-name="Penne all&#39;Arrabbiata" data-preis="12.9">
-              <span aria-hidden="true">+</span> Vorbestellen
+              <svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen
             </button>
           </div>
         </div>
       </article>
       <article class="hl-card">
-        <div class="hl-media">
+        <div class="hl-media bild-zoom">
           <img src="https://images.unsplash.com/photo-1544510808-91bcbee1df55?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Panna cotta mit Feigen" loading="lazy">
           <span class="hl-kat">Pasta &amp; Dolci</span>
         </div>
@@ -911,13 +1238,13 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             <span class="hl-preis">8,50 €</span>
             <span class="veg">vegetarisch</span>
             <button class="add-btn" type="button" data-add="2-3" data-name="Panna cotta mit Feigen" data-preis="8.5">
-              <span aria-hidden="true">+</span> Vorbestellen
+              <svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen
             </button>
           </div>
         </div>
       </article>
       <article class="hl-card">
-        <div class="hl-media">
+        <div class="hl-media bild-zoom">
           <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Margherita" loading="lazy">
           <span class="hl-kat">Pizza aus dem Holzofen</span>
         </div>
@@ -928,7 +1255,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             <span class="hl-preis">9,90 €</span>
             <span class="veg">vegetarisch</span>
             <button class="add-btn" type="button" data-add="1-0" data-name="Margherita" data-preis="9.9">
-              <span aria-hidden="true">+</span> Vorbestellen
+              <svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen
             </button>
           </div>
         </div>
@@ -961,7 +1288,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
     </div>
     
       <details class="kat" open>
-        <summary>Antipasti <span class="kat-anzahl">3 Gerichte</span></summary>
+        <summary>Antipasti <span class="kat-anzahl">3 Gerichte</span><span class="kat-chevron" aria-hidden="true"><svg class="ikon ikon-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5.5 9.5 12 16l6.5-6.5"/></svg></span></summary>
         <div class="kat-body">
           <div class="gericht">
             <div class="gericht-body">
@@ -970,7 +1297,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">7,50 €</span>
-              <button class="mini-add" type="button" data-add="0-0" data-name="Bruschetta Classica" data-preis="7.5" aria-label="Bruschetta Classica vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="0-0" data-name="Bruschetta Classica" data-preis="7.5" aria-label="Bruschetta Classica vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div>
           <div class="gericht">
@@ -980,7 +1307,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">12,90 €</span>
-              <button class="mini-add" type="button" data-add="0-1" data-name="Vitello Tonnato" data-preis="12.9" aria-label="Vitello Tonnato vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="0-1" data-name="Vitello Tonnato" data-preis="12.9" aria-label="Vitello Tonnato vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div>
           <div class="gericht">
@@ -990,12 +1317,12 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">10,90 €</span>
-              <button class="mini-add" type="button" data-add="0-2" data-name="Caprese di Bufala" data-preis="10.9" aria-label="Caprese di Bufala vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="0-2" data-name="Caprese di Bufala" data-preis="10.9" aria-label="Caprese di Bufala vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div></div>
       </details>
       <details class="kat">
-        <summary>Pizza aus dem Holzofen <span class="kat-anzahl">5 Gerichte</span></summary>
+        <summary>Pizza aus dem Holzofen <span class="kat-anzahl">5 Gerichte</span><span class="kat-chevron" aria-hidden="true"><svg class="ikon ikon-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5.5 9.5 12 16l6.5-6.5"/></svg></span></summary>
         <div class="kat-body">
           <div class="gericht">
             <div class="gericht-body">
@@ -1004,7 +1331,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">9,90 €</span>
-              <button class="mini-add" type="button" data-add="1-0" data-name="Margherita" data-preis="9.9" aria-label="Margherita vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="1-0" data-name="Margherita" data-preis="9.9" aria-label="Margherita vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div>
           <div class="gericht">
@@ -1014,7 +1341,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">13,90 €</span>
-              <button class="mini-add" type="button" data-add="1-1" data-name="Quattro Formaggi" data-preis="13.9" aria-label="Quattro Formaggi vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="1-1" data-name="Quattro Formaggi" data-preis="13.9" aria-label="Quattro Formaggi vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div>
           <div class="gericht">
@@ -1024,7 +1351,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">12,50 €</span>
-              <button class="mini-add" type="button" data-add="1-2" data-name="Salame Piccante" data-preis="12.5" aria-label="Salame Piccante vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="1-2" data-name="Salame Piccante" data-preis="12.5" aria-label="Salame Piccante vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div>
           <div class="gericht">
@@ -1034,7 +1361,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">13,50 €</span>
-              <button class="mini-add" type="button" data-add="1-3" data-name="Quattro Stagioni" data-preis="13.5" aria-label="Quattro Stagioni vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="1-3" data-name="Quattro Stagioni" data-preis="13.5" aria-label="Quattro Stagioni vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div>
           <div class="gericht">
@@ -1044,12 +1371,12 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">15,90 €</span>
-              <button class="mini-add" type="button" data-add="1-4" data-name="Tartufo" data-preis="15.9" aria-label="Tartufo vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="1-4" data-name="Tartufo" data-preis="15.9" aria-label="Tartufo vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div></div>
       </details>
       <details class="kat">
-        <summary>Pasta &amp; Dolci <span class="kat-anzahl">5 Gerichte</span></summary>
+        <summary>Pasta &amp; Dolci <span class="kat-anzahl">5 Gerichte</span><span class="kat-chevron" aria-hidden="true"><svg class="ikon ikon-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5.5 9.5 12 16l6.5-6.5"/></svg></span></summary>
         <div class="kat-body">
           <div class="gericht">
             <div class="gericht-body">
@@ -1058,7 +1385,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">14,90 €</span>
-              <button class="mini-add" type="button" data-add="2-0" data-name="Tagliatelle al Ragù" data-preis="14.9" aria-label="Tagliatelle al Ragù vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="2-0" data-name="Tagliatelle al Ragù" data-preis="14.9" aria-label="Tagliatelle al Ragù vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div>
           <div class="gericht">
@@ -1068,7 +1395,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">13,90 €</span>
-              <button class="mini-add" type="button" data-add="2-1" data-name="Farfalle al Pesto" data-preis="13.9" aria-label="Farfalle al Pesto vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="2-1" data-name="Farfalle al Pesto" data-preis="13.9" aria-label="Farfalle al Pesto vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div>
           <div class="gericht">
@@ -1078,7 +1405,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">12,90 €</span>
-              <button class="mini-add" type="button" data-add="2-2" data-name="Penne all&#39;Arrabbiata" data-preis="12.9" aria-label="Penne all&#39;Arrabbiata vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="2-2" data-name="Penne all&#39;Arrabbiata" data-preis="12.9" aria-label="Penne all&#39;Arrabbiata vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div>
           <div class="gericht">
@@ -1088,7 +1415,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">8,50 €</span>
-              <button class="mini-add" type="button" data-add="2-3" data-name="Panna cotta mit Feigen" data-preis="8.5" aria-label="Panna cotta mit Feigen vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="2-3" data-name="Panna cotta mit Feigen" data-preis="8.5" aria-label="Panna cotta mit Feigen vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div>
           <div class="gericht">
@@ -1098,7 +1425,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
             </div>
             <div class="gericht-seite">
               <span class="gericht-preis">7,50 €</span>
-              <button class="mini-add" type="button" data-add="2-4" data-name="Tiramisù" data-preis="7.5" aria-label="Tiramisù vorbestellen">+</button>
+              <button class="mini-add" type="button" data-add="2-4" data-name="Tiramisù" data-preis="7.5" aria-label="Tiramisù vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button>
             </div>
           </div></div>
       </details>
@@ -1111,11 +1438,11 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
     <div class="section-head mitte">
       <div class="eyebrow">Bei uns</div>
       <h2>Holzofenpizza &amp; frische Pasta in Tüßling</h2>
-      <p>Unser Teig ruht 48 Stunden, die Soßen kochen wir jeden Morgen frisch, und der Holzofen läuft, seit wir aufgesperrt haben. Rezepte aus Kalabrien – Zutaten, wo immer es geht, von hier.</p>
+      <p>Unser Teig ruht 48 Stunden, die Soßen kochen wir jeden Morgen frisch, und der Holzofen läuft, seit wir aufgesperrt haben. Rezepte aus Kalabrien – Zutaten, wo immer es geht, von hier.<span class="placeholder-badge">Platzhalter</span></p>
     </div>
     <div class="foto-grid">
       <figure class="foto-slot" style="margin:0">
-        <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=900&amp;h=700&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="" loading="lazy">
+        <img src="./bilder/haus.jpg" alt="" loading="lazy">
         <span class="foto-badge">Platzhalter</span>
         <figcaption class="foto-text">
           <strong>Unser Haus</strong>
@@ -1123,7 +1450,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
         </figcaption>
       </figure>
       <figure class="foto-slot" style="margin:0">
-        <img src="https://images.unsplash.com/photo-1428515613728-6b4607e44363?w=900&amp;h=700&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="" loading="lazy">
+        <img src="./bilder/team.jpg" alt="" loading="lazy">
         <span class="foto-badge">Platzhalter</span>
         <figcaption class="foto-text">
           <strong>Ihr Team</strong>
@@ -1150,22 +1477,22 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
       </div>
       <div class="stimmen-note">
          <span class="note">4,5</span>
-         <span class="sterne" aria-hidden="true">★★★★★</span>
+         <span class="sterne" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span>
          <span>von 5 auf Google, aus 90 Bewertungen</span>
        </div>
-      <div class="stimmen-grid">
+      <div class="stimmen-grid stimmen-grid--list">
       <div class="stimme ist-platzhalter">
-        <span class="sterne leer" aria-hidden="true">★★★★★</span>
+        <span class="sterne leer" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span>
         <p class="slot-titel">Ihre erste Bewertung</p>
         <footer><span>wird aus Ihren Google-Bewertungen übernommen</span></footer>
       </div>
       <div class="stimme ist-platzhalter">
-        <span class="sterne leer" aria-hidden="true">★★★★★</span>
+        <span class="sterne leer" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span>
         <p class="slot-titel">Ihre zweite Bewertung</p>
         <footer><span>wird aus Ihren Google-Bewertungen übernommen</span></footer>
       </div>
       <div class="stimme ist-platzhalter">
-        <span class="sterne leer" aria-hidden="true">★★★★★</span>
+        <span class="sterne leer" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span>
         <p class="slot-titel">Ihre dritte Bewertung</p>
         <footer><span>wird aus Ihren Google-Bewertungen übernommen</span></footer>
       </div></div>
@@ -1182,9 +1509,9 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
         <h2 style="font-size:clamp(28px,4.4vw,42px);margin-bottom:16px">Tisch reservieren</h2>
         <p style="color:var(--ink-soft);font-size:18px">Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
         <ul class="reserve-pluspunkte">
-          <li><span class="k">✓</span><span>Rund um die Uhr buchbar, auch außerhalb der Öffnungszeiten</span></li>
-          <li><span class="k">✓</span><span>Sofortige Bestätigung, ganz ohne Anruf</span></li>
-          <li><span class="k">✓</span><span>Sonderwünsche wie Kinderstuhl oder Allergien direkt mitteilen</span></li>
+          <li><span class="k"><svg class="ikon ikon-haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12.4c2.1 1 3.8 2.5 5.1 4.4C12 11.6 15.8 7.4 21 4.6"/></svg></span><span>Rund um die Uhr buchbar, auch außerhalb der Öffnungszeiten</span></li>
+          <li><span class="k"><svg class="ikon ikon-haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12.4c2.1 1 3.8 2.5 5.1 4.4C12 11.6 15.8 7.4 21 4.6"/></svg></span><span>Sofortige Bestätigung, ganz ohne Anruf</span></li>
+          <li><span class="k"><svg class="ikon ikon-haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12.4c2.1 1 3.8 2.5 5.1 4.4C12 11.6 15.8 7.4 21 4.6"/></svg></span><span>Sonderwünsche wie Kinderstuhl oder Allergien direkt mitteilen</span></li>
         </ul>
       </div>
 
@@ -1244,7 +1571,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
       <h2>So finden Sie uns</h2>
     </div>
     <div class="contact-grid">
-      <ul class="contact-list"><li><span class="k">📍</span><span>Marsstrasse, Bahnweg 5, 84577 Tüßling, Germany<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Marsstrasse%2C%20Bahnweg%205%2C%2084577%20T%C3%BC%C3%9Fling%2C%20Germany" target="_blank" rel="noopener">Route planen</a></span></li><li><span class="k">📞</span><span><a href="tel:086336990277">08633 6990277</a><br><span class="hint">Telefonisch erreichbar während der Öffnungszeiten</span></span></li><li><span class="k">🥡</span><span>Abholung vorbestellen – Ihr Essen steht pünktlich bereit</span></li></ul>
+      <ul class="contact-list"><li><span class="k"><svg class="ikon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11.4 20.6V4.3"/><path d="M11.4 5.4h7.9l-1.9 2.7 1.9 2.7h-7.9"/><path d="M8.6 20.8h5.6"/></svg></span><span>Marsstrasse, Bahnweg 5, 84577 Tüßling, Germany<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Marsstrasse%2C%20Bahnweg%205%2C%2084577%20T%C3%BC%C3%9Fling%2C%20Germany" target="_blank" rel="noopener">Route planen</a></span></li><li><span class="k"><svg class="ikon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.9 5.4c1.3-1.2 2.5-1 3.2.1.5.8.9 1.6 1.3 2.4.3.6.1 1.1-.5 1.5l-.9.7c-.3.2-.4.6-.2.9 1 1.9 2.5 3.4 4.4 4.3.3.2.7.1.9-.2l.7-.9c.4-.6 1-.8 1.5-.5.9.4 1.7.9 2.5 1.4 1.1.7 1.2 1.9 0 3.2"/></svg></span><span><a href="tel:086336990277">08633 6990277</a><br><span class="hint">Telefonisch erreichbar während der Öffnungszeiten</span></span></li><li><span class="k"><svg class="ikon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6.3 8.5h11.4l-.9 10.9c0 .7-.6 1.2-1.3 1.2H8.5c-.7 0-1.2-.5-1.3-1.2Z"/><path d="M9.3 8.5c-.1-2.4 1-3.9 2.7-3.9 1.8 0 2.9 1.5 2.8 3.9"/><path d="M6.6 11.7h10.8"/></svg></span><span>Abholung vorbestellen – Ihr Essen steht pünktlich bereit</span></li></ul>
       <div>
         <h3 style="font-size:20px;margin-bottom:12px">Öffnungszeiten<span class="placeholder-badge">Platzhalter</span></h3>
         <div class="hours-row"><span>Montag – Donnerstag</span><span>11:30 – 14:00 &amp; 17:00 – 22:00</span></div><div class="hours-row"><span>Freitag – Samstag</span><span>11:30 – 14:00 &amp; 17:00 – 23:00</span></div><div class="hours-row"><span>Sonntag &amp; Feiertage</span><span>11:30 – 21:00</span></div>
@@ -1259,7 +1586,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   <span id="fab-total">0,00 €</span>
 </button>
 
-<div class="mobilebar" id="mobilebar"><button class="btn btn-primary" id="bar-order" type="button">Bestellen</button><a class="btn btn-ghost" href="#reservierung">Reservieren</a></div>
+<div class="mobilebar" id="mobilebar"><a class="btn btn-primary" href="#reservierung">Reservieren</a><button class="btn btn-ghost" id="bar-order" type="button">Bestellen</button></div>
 
 <div class="overlay" id="overlay"></div>
 
@@ -1296,6 +1623,13 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
           <textarea id="ord-hinweis" name="hinweis" placeholder="Allergien, Sonderwünsche ..."></textarea>
         </div>
       </div>
+      <div class="field" id="ord-noshow-feld" style="display:none;margin-top:14px">
+        <label style="display:flex;align-items:flex-start;gap:8px;font-weight:400;text-transform:none;letter-spacing:normal">
+          <input type="checkbox" id="ord-noshow" name="noShowZustimmung" style="margin-top:3px">
+          <span id="ord-noshow-text"></span>
+        </label>
+        <span class="error">Bitte stimmen Sie zu, um die Bestellung abzuschicken.</span>
+      </div>
       <div class="drawer-foot" style="margin:24px -22px -22px">
         <div class="totals"><span>Gesamt</span><span id="cart-total">0,00 €</span></div>
         <button class="btn btn-primary btn-block" id="order-submit" type="submit">Abholung verbindlich bestellen</button>
@@ -1306,7 +1640,10 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 </aside>
 
 <div class="confirm-box" id="confirm" role="dialog" aria-modal="true">
-  <div class="confirm-icon" id="confirm-icon" aria-hidden="true">✓</div>
+  <div class="confirm-icon" id="confirm-icon" aria-hidden="true">
+    <span class="ci-ok"><svg class="ikon ikon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9.3"/><path d="M7.8 12.5 10.4 15.2 16.4 8.7"/></svg></span>
+    <span class="ci-fehler"><svg class="ikon ikon-warnung" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9.3"/><path d="M12 7.6v5.6"/><path d="M12 16.6v.15"/></svg></span>
+  </div>
   <h3 id="confirm-title"></h3>
   <p id="confirm-text"></p>
   <div class="confirm-summary" id="confirm-summary"></div>
@@ -1316,12 +1653,25 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 </div>
 
 <footer>
-  <div class="wrap">
-    <strong>Pizzeria Tropea</strong> · Marsstrasse, Bahnweg 5, 84577 Tüßling, Germany · 08633 6990277
+  <div class="wrap footer-grid">
+    <div class="footer-col">
+      <strong>Pizzeria Tropea</strong>
+      <p>Marsstrasse, Bahnweg 5, 84577 Tüßling, Germany</p>
+    </div>
+    <nav class="footer-col footer-nav" aria-label="Seitennavigation">
+      <a href="#karte">Speisekarte</a>
+      <a href="#reservierung">Reservierung</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+    <div class="footer-col footer-kontakt">
+      <a href="tel:086336990277">08633 6990277</a>
+    </div>
     <div class="footer-note">
-      Unverbindlicher Gestaltungsentwurf. Gerichte, Preise und Öffnungszeiten sind Platzhalter,
-      die Fotos stammen aus einer Stockbild-Datenbank (Unsplash). Vor einer Veröffentlichung werden
-      beide durch die echten Angaben und Aufnahmen des Hauses ersetzt.
+      Unverbindlicher Gestaltungsentwurf. Alles, was auf dieser Seite als Platzhalter gekennzeichnet
+      ist – Gerichte, Preise, Öffnungszeiten und die Angaben zu Zubereitung, Herkunft und Geschichte
+      des Hauses –, ist ein Vorschlag und noch nicht vom Haus bestätigt. Die Fotos stammen aus einer
+      Stockbild-Datenbank (Unsplash). Vor einer Veröffentlichung werden Angaben und Aufnahmen durch
+      die echten des Hauses ersetzt.
     </div>
   </div>
 </footer>
@@ -1331,6 +1681,7 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
 (function () {
   var data = window.PAGE_DATA;
   var cart = {};
+  var noShowEinstellungen = null;
 
   function euro(value) { return value.toFixed(2).replace(".", ",") + " \u20AC"; }
   function byId(id) { return document.getElementById(id); }
@@ -1430,7 +1781,6 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   function showConfirm(title, text, rows, mailto, fehler) {
     byId("confirm-title").textContent = title;
     byId("confirm-text").textContent = text;
-    byId("confirm-icon").textContent = fehler ? "!" : "\u2713";
     byId("confirm").className = fehler ? "confirm-box hat-fehler" : "confirm-box";
 
     var box = byId("confirm-summary");
@@ -1535,7 +1885,40 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
     showConfirm("Das hat nicht geklappt", text, [], "", true);
   }
 
+  /**
+   * Holt beim Laden der Seite die aktuellen No-Show-Einstellungen des
+   * Betriebs (falls das Lokal die Funktion eingeschaltet hat) und zeigt bei
+   * Bedarf die Zustimmungs-Checkbox mit dem exakten, serverseitig
+   * mitgeführten Text an. Ohne apiUrl (Vorschau) oder ohne aktivierten
+   * Schutz bleibt das Formular unverändert wie zuvor.
+   */
+  function ladeNoShowEinstellungen() {
+    if (!data.apiUrl) return;
+
+    fetch(data.apiUrl + "/oeffentlich/no-show-einstellungen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    })
+      .then(function (antwort) { return antwort.json(); })
+      .then(function (ergebnis) {
+        if (!ergebnis || !ergebnis.aktiv) return;
+        noShowEinstellungen = ergebnis;
+
+        var betrag = Number(ergebnis.gebuehrBetrag || 0).toFixed(2).replace(".", ",");
+        byId("ord-noshow-text").textContent =
+          "Ich stimme zu: Bei Nichtabholung ohne Stornierung bis " + ergebnis.stornofensterMinuten +
+          " Minuten vor der Abholzeit wird eine Ausfallpauschale von " + betrag + " \u20AC in Rechnung gestellt.";
+        byId("ord-noshow-feld").style.display = "block";
+      })
+      .catch(function () {
+        // Ohne Antwort bleibt die Checkbox einfach aus - keine Bestellung
+        // darf an einem nicht erreichbaren Einstellungs-Abruf scheitern.
+      });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
+    ladeNoShowEinstellungen();
     Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function (button) {
       button.addEventListener("click", function () {
         addToCart(button.getAttribute("data-add"), button.getAttribute("data-name"), Number(button.getAttribute("data-preis")));
@@ -1582,6 +1965,14 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
       if (lines().length === 0) return;
       if (!validate(form, ["name", "telefon", "abholzeit"])) return;
 
+      var noShowFeld = byId("ord-noshow-feld");
+      var noShowAktiv = noShowEinstellungen && noShowEinstellungen.aktiv;
+      if (noShowAktiv) {
+        var angehakt = byId("ord-noshow").checked;
+        noShowFeld.className = angehakt ? "field" : "field invalid";
+        if (!angehakt) return;
+      }
+
       var nummer = referenz("AB");
       var zeit = form.elements.abholzeit.value;
       var summary = lines().map(function (line) {
@@ -1606,7 +1997,8 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
         abholzeit: zeit,
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
-        hinweis: form.elements.hinweis.value
+        hinweis: form.elements.hinweis.value,
+        noShowZustimmung: noShowAktiv ? true : false
       }, byId("order-submit")).then(function (ergebnis) {
         // Die Abholzeit ist zun\u00E4chst nur ein Wunsch: ob sie machbar ist,
         // best\u00E4tigt die K\u00FCche.
@@ -1780,5 +2172,59 @@ footer strong { color: #fff; font-family: var(--display); text-transform: var(--
   if (ruhig.addEventListener) ruhig.addEventListener("change", aus);
 })();
 </script>
+<script>
+(function () {
+  var erzwungenRuhig = new URLSearchParams(location.search).get("bewegung") === "aus";
+  if (erzwungenRuhig) document.documentElement.classList.add("bewegung-aus");
+
+  var ruhig = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var video = document.querySelector(".hero-video");
+
+  // Ohne Bewegung bleibt das Poster stehen: Das Video wird per CSS versteckt,
+  // hier wird es zusätzlich angehalten, damit es keine Daten nachlädt.
+  if (ruhig.matches || erzwungenRuhig) {
+    if (video) { video.pause(); video.removeAttribute("autoplay"); }
+    return;
+  }
+
+  if (!("IntersectionObserver" in window)) return;
+
+  // Video anhalten, sobald der Hero durch ist – wie die Hero-Fahrt oben.
+  if (video) {
+    new IntersectionObserver(function (eintraege) {
+      if (eintraege[0].isIntersecting) {
+        var versuch = video.play();
+        if (versuch && versuch.catch) versuch.catch(function () {});
+      } else {
+        video.pause();
+      }
+    }, { threshold: 0 }).observe(video);
+  }
+
+  var zeilenBloecke = document.querySelectorAll(".auftritt-zeile");
+  if (zeilenBloecke.length === 0) return;
+  document.documentElement.classList.add("bewegt");
+
+  var beobachter = new IntersectionObserver(function (eintraege) {
+    eintraege.forEach(function (eintrag) {
+      if (!eintrag.isIntersecting) return;
+      eintrag.target.classList.add("da");
+      beobachter.unobserve(eintrag.target);
+    });
+  }, { threshold: 0.1 });
+
+  Array.prototype.forEach.call(zeilenBloecke, function (el) { beobachter.observe(el); });
+
+  // Stellt jemand die Bewegung mitten im Besuch ab, wird sofort alles gezeigt.
+  var aus = function () {
+    if (!ruhig.matches) return;
+    beobachter.disconnect();
+    Array.prototype.forEach.call(zeilenBloecke, function (el) { el.classList.add("da"); });
+    if (video) video.pause();
+  };
+  if (ruhig.addEventListener) ruhig.addEventListener("change", aus);
+})();
+</script>
+
 </body>
 </html>
