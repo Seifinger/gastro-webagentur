@@ -38,15 +38,15 @@ import { SIGNATUR_REDUZIERT_REGELN } from "../heroSignature.js";
  *
  * @param {string} klasse - die Körperklasse des Archetyps.
  */
-function bildunterschriftCss(klasse) {
+function bildunterschriftCss(klasse, gross = "20px", klein = "14px") {
   return `
 /* --- Ambiente: die Bildunterschrift steht unter dem Bild ---------------- */
 .${klasse} .foto-slot { border-radius: 0; background: none; overflow: visible;
                         display: flex; flex-direction: column; }
 .${klasse} .foto-slot img { border-radius: var(--radius); }
 .${klasse} .foto-text { position: static; padding: 14px 0 0; background: none; color: var(--ink); }
-.${klasse} .foto-text strong { font-size: 20px; }
-.${klasse} .foto-text span { color: var(--ink-soft); font-size: 14px; margin-top: 3px; }`;
+.${klasse} .foto-text strong { font-size: ${gross}; }
+.${klasse} .foto-text span { color: var(--ink-soft); font-size: ${klein}; margin-top: 3px; }`;
 }
 
 /* ========================================================================= *
@@ -328,19 +328,54 @@ const ABEND = `
 /* Dieselben Regeln, die prefers-reduced-motion setzt – hier dauerhaft.
    Einmal geschrieben in heroSignature.js, nicht ein zweites Mal abgetippt. */
 .hs-abend {
+  /* Zwei Kurven statt des Browser-Standards "ease", der in jeder Seite
+     derselbe ist. Rollen: docs-intern/design-tokens/abend.md */
+  --ease-ruhig: cubic-bezier(.22,.61,.36,1);
+  --ease-moment: cubic-bezier(.5,0,.1,1);
+  /* Vier Fliess- und drei Anzeigestufen, Verhaeltnis mindestens 1,2 an
+     jeder Breite. Rollen: docs-intern/design-tokens/abend.md */
+  --t-xs: 12px;
+  --t-s: 14px;
+  --t-m: 17px;
+  --t-l: 21px;
+  /* --d-2 gehoert allein der Reservierung: der eine Moment dieser Seite. */
+  --d-1: clamp(40px, 6.4vw, 70px);
+  --d-2: clamp(32px, 4.4vw, 46px);
+  --d-3: clamp(26px, 3.2vw, 34px);
+  /* Alle Abstaende aus derselben Acht; vorher liefen 17 gap-Werte lose. */
+  --r-1: 8px;
+  --r-2: 16px;
+  --r-3: 24px;
+  --r-4: 32px;
+  --r-5: 56px;
   ${SIGNATUR_REDUZIERT_REGELN}
+}
+/* Die sieben Uebergaenge, die hier ueberhaupt noch laufen. */
+.hs-abend {
+  .topbar { transition: background .28s var(--ease-ruhig), box-shadow .28s var(--ease-ruhig); }
+  .topbar::before { transition: opacity .28s var(--ease-ruhig); }
+  .brand { transition: color .28s var(--ease-ruhig); }
+  .btn { transition: transform .12s var(--ease-ruhig), background .16s var(--ease-ruhig), color .16s var(--ease-ruhig); }
+  .add-btn, .mini-add { transition: background .16s var(--ease-ruhig), color .16s var(--ease-ruhig); }
+  .overlay { transition: opacity .22s var(--ease-ruhig); }
+  .drawer { transition: transform .28s var(--ease-ruhig); }
+  .confirm-box { transition: opacity .2s var(--ease-ruhig), transform .2s var(--ease-ruhig); }
 }
 /* Das Sushi-Band ist als einzige Signatur kein Gegenstand, sondern ein
    Mechanismus: Steht es still, liegt ein Filmstreifen quer über dem Hero.
-   Im Abendhaus wird daraus ein gesetztes Viererfeld am rechten Rand – vier
-   Teller, ruhig nebeneinander, statt eines angehaltenen Laufbands. */
-.hs-abend .sig-band { left: auto; right: 4%; top: 14%; height: auto;
-                      width: clamp(230px, 26vw, 360px); mask-image: none; opacity: .92; }
-.hs-abend .sig-band .band { flex-wrap: wrap; width: 100%; gap: 10px; }
-.hs-abend .sig-band img { width: calc(50% - 5px); height: auto; aspect-ratio: 4 / 3; border-radius: 2px; }
-.hs-abend .sig-band img:nth-child(n + 5) { display: none; }
+   Im Abendhaus wird daraus eine ruhige Spalte am rechten Rand. */
+.hs-abend .sig-band { left: auto; right: 4%; top: 12%; height: auto;
+                      width: clamp(150px, 16vw, 210px); mask-image: none; opacity: .92; }
+/* Sechs Bilder, aber nur drei verschiedene: Die zweite Haelfte ist die
+   Wiederholung, die den Lauf nahtlos macht. Stillstehend waere das ein
+   sichtbarer Doppelgaenger, also zeigt das Abendhaus nur die drei. */
+.hs-abend .sig-band .band { flex-direction: column; width: 100%; gap: var(--r-1); }
+.hs-abend .sig-band img { width: 100%; height: auto; aspect-ratio: 4 / 3; border-radius: 2px; }
+.hs-abend .sig-band img:nth-child(n + 4) { display: none; }
 @media (max-width: 899px) {
-  .hs-abend .sig-band { right: -6%; top: 9%; width: 46vw; opacity: .5; }
+  /* Buendig an der Kante statt halb darueber: Ein Anschnitt mitten im Bild
+     liest sich als Fehler, ein Abschluss an der Kante als Absicht. */
+  .hs-abend .sig-band { right: 0; top: 8%; width: 28vw; opacity: .5; }
 }
 
 /* Orchidee und Gewürzwölkchen hängen nicht an einer Animation, sondern an
@@ -363,17 +398,17 @@ const ABEND = `
 .hs-abend .usp-platzhalter { color: var(--gold-dunkel); }
 .hs-abend .step-n { background: transparent; color: var(--accent-bold); border: 1px solid var(--line); }
 
-.hs-abend #reservierung { padding: 124px 0; }
+.hs-abend #reservierung { padding: 128px 0; }
 .hs-abend .reserve-section { background: var(--bg); }
 .hs-abend #reservierung .section-head h2,
-.hs-abend #reservierung h2 { font-size: clamp(30px, 4.6vw, 48px); margin-bottom: 18px; }
-.hs-abend .reserve-grid > div:first-child p { color: var(--ink-soft); font-size: 19px; }
+.hs-abend #reservierung h2 { font-size: var(--d-2); margin-bottom: var(--r-2); }
+.hs-abend .reserve-grid > div:first-child p { color: var(--ink-soft); }
 /* Die eine helle Fläche der Seite: Hier wird der Tisch gesichert. */
-.hs-abend .panel { background: var(--surface); padding: 38px; border-color: var(--line); }
-.hs-abend .panel .btn-primary { padding: 16px 26px; font-size: 16px; }
+.hs-abend .panel { background: var(--surface); padding: 40px; border-color: var(--line); }
+.hs-abend .panel .btn-primary { padding: var(--r-2) var(--r-3); }
 .bewegt .hs-abend .reserve-grid > .auftritt {
   opacity: 0; transform: translateY(20px);
-  transition: opacity .9s cubic-bezier(.5,0,.1,1), transform .9s cubic-bezier(.5,0,.1,1);
+  transition: opacity .9s var(--ease-moment), transform .9s var(--ease-moment);
 }
 .bewegt .hs-abend .reserve-grid > .auftritt.da { opacity: 1; transform: none; }
 
@@ -389,49 +424,157 @@ const ABEND = `
 .hs-abend .add-btn,
 .hs-abend .mini-add { color: var(--accent-bold); }
 .hs-abend .add-btn, .hs-abend .mini-add { border-color: var(--accent-bold); }
+
+/* Gerade Kanten auch an den Knoepfen: --radius gilt hier fuer jede Flaeche.
+   Rund bleibt allein, was rund gemeint ist – die Ziffer des Abholwegs, der
+   Zaehler am Warenkorb, das Haken-Rund der Bestaetigung. */
+.hs-abend .btn,
+.hs-abend .add-btn,
+.hs-abend .mini-add,
+.hs-abend .veg,
+.hs-abend .placeholder-badge,
+.hs-abend .usp-platzhalter,
+.hs-abend .cart-fab { border-radius: var(--radius); }
+
+/* Die gefuellte Goldflaeche gehoert der Reservierung und sonst nichts. */
+.hs-abend .hero-actions .btn-light { background: var(--accent); color: var(--on-accent); }
+.hs-abend .hero-actions .btn-light:hover { background: var(--accent-dark); }
+/* Die Uebergabe: Solange der Hero im Bild steht, traegt sein Knopf die
+   Goldflaeche und die Kopfzeile bleibt Kontur. Danach ist der Kopfzeilen-
+   Knopf der einzige mitlaufende Weg zur Reservierung (die bei 85 %
+   Scrolltiefe liegt) und uebernimmt sie. Keine Bewegung, sondern ein
+   Zustandswechsel – laeuft deshalb auch bei prefers-reduced-motion. Ohne
+   Scroll-Zeitachse steht er durchgehend gefuellt. */
+.hs-abend .topbar .btn-primary { background: var(--accent); color: var(--on-accent);
+                                 border-color: var(--accent); }
+@supports (animation-timeline: view()) {
+  .hs-abend { timeline-scope: --abend-hero; }
+  .hs-abend .hero { view-timeline: --abend-hero block; }
+  .hs-abend .topbar .btn-primary {
+    background: transparent; color: var(--accent-bold); border-color: var(--accent-bold);
+    /* Ein Schritt, kein Verlauf: Auf halbem Weg stuenden Goldschrift auf
+       Goldgrund – jede Zwischenstufe waere unleserlich. */
+    animation: abend-kopf-uebergabe steps(1, jump-end) both;
+    animation-timeline: --abend-hero;
+    animation-range: exit 0% exit 78%;
+  }
+  @keyframes abend-kopf-uebergabe {
+    to { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  }
+}
 .hs-abend .kat > summary:hover { color: var(--accent-bold); }
 .hs-abend .stimmen-note .sterne,
 .hs-abend .stimme .sterne { color: var(--gold-dunkel); }
+/* Auf dem Foto spricht das Haus in Weiss, das Gold faengt an, wo die Seite
+   anfaengt: Farbiger Kleintext auf einem Foto laesst sich ueber zwoelf
+   Paletten nicht auf 4.5:1 absichern. Messung und Begruendung in
+   docs-intern/design-tokens/abend.md. */
+.hs-abend .hero-kicker, .hs-abend .hero .stars { color: #fff; }
+
+/* Das Formular fuehrt sonst als einziger Bereich eine fremde Groesse. */
+.hs-abend input, .hs-abend select, .hs-abend textarea {
+  font-size: var(--t-m); padding: 12px var(--r-2); line-height: 1.5;
+}
+/* Native Felder rechnen ihre Hoehe jeweils anders aus; in einer Zeile
+   laufen die Unterkanten sonst auseinander. 48 = 6x8. */
+.hs-abend input:not([type="checkbox"]):not([type="radio"]),
+.hs-abend select { height: 48px; padding-block: 0; box-sizing: border-box; }
 
 /* --- Keine Mittelachse -------------------------------------------------- */
 .hs-abend .section-head.mitte { margin-left: 0; margin-right: 0; text-align: left; }
 .hs-abend .stimmen-erklaerung { margin-left: 0; margin-right: 0; text-align: left; }
 
 /* --- Rhythmus ----------------------------------------------------------- */
+/* Sektionspolster als Vielfache der Acht: 88, 104, 128. */
 .hs-abend .section { padding: 88px 0; }
 .hs-abend #ambiente { padding: 104px 0 88px; }
-.hs-abend #highlights .section-head h2 { font-size: clamp(26px, 3.6vw, 36px); }
-.hs-abend .section-head p { font-size: 19px; }
-.hs-abend .hint, .hs-abend .error, .hs-abend .footer-note,
-.hs-abend .foto-text span, .hs-abend .demo-note { font-size: 14px; }
-.hs-abend .hl-kat, .hs-abend .veg, .hs-abend .placeholder-badge { font-size: 12px; }
+.hs-abend {
+  .add-btn, .field, .btn, .rating { gap: var(--r-1); }
+  .hero-actions, .gericht-seite, .hl-foot, .stimmen-note, .step,
+  .gericht, .topbar-inner, .field-grid, summary,
+  .reserve-pluspunkte li { gap: var(--r-2); }
+  .steps, .topnav { gap: var(--r-3); }
+  .usp-list { gap: var(--r-1) var(--r-4); }
+  .reserve-grid { gap: var(--r-5); }
+}
+.hs-abend .hero h1 { font-size: var(--d-1); }
+.hs-abend .section-head h2 { font-size: var(--d-3); }
+
+/* --- Die Schriftskala --------------------------------------------------- */
+/* Vorher stand im Fliessbereich jeder Ganzzahlwert von 11 bis 20 px auf der
+   Seite – zehn Stufen ohne unterscheidbare Aufgabe. Jetzt vier, jede mit
+   einer Rolle (docs-intern/design-tokens/abend.md). */
+.hs-abend {
+  .usp-platzhalter, .foto-badge, .kat-anzahl,
+  .cart-count, .sig-reservation-kicker,
+  .hl-kat, .veg, .placeholder-badge { font-size: var(--t-xs); }
+
+  .hint, .error, .footer-note,
+  .foto-text span, .demo-note,
+  .hl-desc, .gericht-desc, .step p,
+  .step-n, .reserve-pluspunkte li,
+  .stimmen-erklaerung, .confirm-summary,
+  .cart-line-name, .qty span,
+  .rating, .usp-list,
+  .stimme .sterne { font-size: var(--t-s); }
+
+  .topnav, .btn, .mobilebar .btn,
+  .cart-fab, .stimme p, .stars,
+  .step h3, .qty button, footer strong,
+  .sig-reservation-text,
+  .panel .btn-primary { font-size: var(--t-m); }
+
+  .section-head p, .hero-sub,
+  .reserve-grid > div:first-child p,
+  .hl-name, .hl-preis, .brand,
+  .sterne, .stimme .slot-titel,
+  .kat > summary, .mini-add,
+  .drawer-head h3, .totals,
+  .foto-text strong { font-size: var(--t-l); }
+
+  .icon-btn, .confirm-icon { font-size: var(--t-l); }
+  .hours-head { font-size: var(--t-l); margin-bottom: 12px; }
+}
+
+/* Die Bewertungszahl ueber den Stimmen ist kein Text, sondern eine Ziffer,
+   die auftritt – sie gehoert in den Ueberschriftenbereich. */
+.hs-abend .stimmen-note .note { font-size: var(--d-3); }
 
 /* --- Highlights: die Leseliste ------------------------------------------ */
 /* Im Abendhaus liest man eine Karte, man blättert keine Kacheln. Ein Gericht
    steht mit Bild, die übrigen als Zeilen daneben – Name, Beschreibung, Preis. */
 .hs-abend .hl-card { background: transparent; border: 0; border-radius: 0; overflow: visible; }
 .hs-abend .hl-media { border-radius: var(--radius); }
-.hs-abend .hl-body { padding: 16px 0 0; gap: 6px; }
+.hs-abend .hl-body { padding: var(--r-2) 0 0; gap: var(--r-1); }
 .hs-abend .hl-kat { position: static; background: none; border-radius: 0; padding: 0;
                     color: var(--accent-bold); letter-spacing: .16em; align-self: start; }
-.hs-abend .hl-siegel { display: inline-flex; align-items: center; gap: 8px;
+.hs-abend .hl-siegel { display: inline-flex; align-items: center; gap: var(--r-1);
                        font-size: 12px; font-weight: 700; letter-spacing: .14em;
                        text-transform: uppercase; color: var(--accent-bold); }
 @media (min-width: 860px) {
-  .hs-abend .hl-anordnung { grid-template-columns: 6fr 6fr; gap: 0 54px; align-items: start; }
-  .hs-abend .hl-anordnung > .hl-card:first-child { grid-column: 1; }
-  .hs-abend .hl-anordnung--3 > .hl-card:first-child { grid-row: span 2; }
-  .hs-abend .hl-anordnung--4 > .hl-card:first-child { grid-row: span 3; }
-  .hs-abend .hl-anordnung--6 > .hl-card:first-child { grid-row: span 5; }
-  .hs-abend .hl-anordnung > .hl-card:first-child .hl-media { aspect-ratio: 4 / 5; }
-  .hs-abend .hl-anordnung > .hl-card:first-child .hl-name { font-size: clamp(22px, 2.3vw, 28px); }
+  .hs-abend .hl-anordnung { grid-template-columns: 6fr 6fr; gap: 0 var(--r-5); align-items: stretch; }
+  /* Die Zeilen teilen sich die Hoehe des Bildes gleichmaessig, ihr Text
+     steht mittig darin, die Trennlinien liegen auf den Zeilengrenzen. So
+     schliesst die letzte Linie genau auf der Bildunterkante ab, statt ein
+     Loch neben dem Bild zu lassen. */
+  .hs-abend .hl-anordnung > .hl-card:first-child { grid-column: 1; grid-row: 1 / -1; }
+  .hs-abend .hl-anordnung--3 { grid-template-rows: repeat(2, 1fr); }
+  .hs-abend .hl-anordnung--4 { grid-template-rows: repeat(3, 1fr); }
+  .hs-abend .hl-anordnung--6 { grid-template-rows: repeat(5, 1fr); }
+  /* Breiter Anschnitt statt Hochformat: Ein hohes Bild zwingt die zwei
+     Zeilen daneben auseinander (gemessen 62 % Leerraum je Zeile). */
+  .hs-abend .hl-anordnung > .hl-card:first-child .hl-media { aspect-ratio: 2 / 1; }
+  .hs-abend .hl-anordnung > .hl-card:first-child .hl-name { font-size: var(--d-3); }
   .hs-abend .hl-anordnung > .hl-card:not(:first-child) {
-    grid-column: 2; border-top: 1px solid var(--line); padding-top: 18px;
+    grid-column: 2; border-top: 1px solid var(--line);
+    display: flex; flex-direction: column; justify-content: center;
   }
   .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-media { display: none; }
-  .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-body { padding: 0; }
-  .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-name { font-size: 19px; }
-  .hs-abend .hl-anordnung > .hl-card:last-child { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+  /* Sonst draengt .hl-desc als flex:1 den Preis an den Zeilenfuss. */
+  .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-body { padding: 0; flex: none; }
+  .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-desc { flex: none; }
+  .hs-abend .hl-anordnung > .hl-card:not(:first-child) .hl-name { font-size: var(--t-l); }
+  .hs-abend .hl-anordnung > .hl-card:last-child { border-bottom: 1px solid var(--line); }
 }
 
 /* --- Karte und Stimmen: der Kopf steht in der Randspalte ---------------- */
@@ -446,17 +589,16 @@ const ABEND = `
 .hs-abend .kat-body { padding: 0 0 14px; }
 .hs-abend .gericht-preis { font-variant-numeric: tabular-nums; }
 .hs-abend .stimme { background: transparent; border: 0; border-top: 1px solid var(--line);
-                    border-radius: 0; padding: 22px 0; gap: 10px; }
+                    border-radius: 0; padding: var(--r-3) 0; gap: var(--r-2); }
 .hs-abend .stimme.ist-platzhalter { border-style: solid; min-height: 0; justify-content: flex-start; }
 .hs-abend .stimmen-grid { grid-template-columns: 1fr; gap: 0; }
 .hs-abend .stimmen-grid--list { max-width: none; margin-left: 0; margin-right: 0; }
 .hs-abend .stimmen-note { justify-content: flex-start; margin-bottom: 20px; }
-.hs-abend .stimmen-note .note { font-size: 36px; }
 .hs-abend .stimmen-blatt { display: block; }
 @media (min-width: 960px) {
   .hs-abend #karte .wrap,
   .hs-abend #stimmen .wrap { display: grid; grid-template-columns: 4fr 8fr;
-                             column-gap: 54px; align-items: start; }
+                             column-gap: var(--r-5); align-items: start; }
   .hs-abend #karte .section-head,
   .hs-abend #stimmen .section-head { grid-column: 1; margin-bottom: 0; max-width: none; }
   .hs-abend #karte .kat,
@@ -466,11 +608,11 @@ const ABEND = `
   .hs-abend #stimmen .stimmen-erklaerung { grid-column: 2; }
 }
 
-${bildunterschriftCss("hs-abend")}
+${bildunterschriftCss("hs-abend", "var(--t-l)", "var(--t-s)")}
 /* Der Raum führt diesen Archetyp an – er steht über die ganze Breite, Team
    und Bestseller teilen sich die Zeile darunter. */
 @media (min-width: 760px) {
-  .hs-abend .foto-grid { grid-template-columns: 1fr 1fr; gap: 26px; }
+  .hs-abend .foto-grid { grid-template-columns: 1fr 1fr; gap: var(--r-3); }
   .hs-abend .foto-slot:first-child { grid-column: 1 / -1; }
   .hs-abend .foto-slot:first-child img { aspect-ratio: 21 / 9; }
 }
@@ -479,17 +621,17 @@ ${bildunterschriftCss("hs-abend")}
 /* Umgekehrt zum traditionellen Archetyp: Wer einen Abend plant, will zuerst
    wissen, ob offen ist – die Adresse findet er danach. */
 @media (min-width: 860px) {
-  .hs-abend .contact-grid { grid-template-columns: 5fr 7fr; gap: 60px; }
+  .hs-abend .contact-grid { grid-template-columns: 5fr 7fr; gap: var(--r-5); }
 }
-.hs-abend .hours-row { font-size: 17px; padding: 15px 0; font-variant-numeric: tabular-nums; }
-.hs-abend .contact-list li { gap: 16px; padding: 14px 0; align-items: flex-start; }
+.hs-abend .hours-row { font-size: var(--t-s); padding: var(--r-2) 0; gap: var(--r-3); font-variant-numeric: tabular-nums; }
+.hs-abend .contact-list li { gap: var(--r-2); padding: var(--r-2) 0; align-items: flex-start; }
 .hs-abend .contact-list .k { font-size: inherit; display: inline-flex; padding-top: .1em; }
 
 /* --- Gezeichnete Zeichen ------------------------------------------------ */
-.hs-abend .usp-list span { gap: 10px; }
+.hs-abend .usp-list span { gap: var(--r-1); }
 .hs-abend .reserve-pluspunkte .k { display: inline-flex; padding-top: .2em; }
-.hs-abend footer strong { display: inline-flex; align-items: center; gap: 10px; }
-.hs-abend .kopf-marke { display: inline-flex; align-items: center; gap: 10px; }
+.hs-abend footer strong { display: inline-flex; align-items: center; gap: var(--r-1); }
+.hs-abend .kopf-marke { display: inline-flex; align-items: center; gap: var(--r-1); }
 ${ikonenCss("hs-abend")}
 
 /* --- Wer keine Bewegung will, bekommt keine ----------------------------- */
@@ -572,9 +714,266 @@ const ABEND_BAYERISCH = `${krugCss("hs-abend")}
 .hs-abend .sig-krug .tropfen { animation: none; }
 `;
 
+/* ========================================================================= *
+ * hell
+ * ------------------------------------------------------------------------- *
+ * Das Haus, das unterwegs auf dem Handy ueberflogen wird. Jede Entscheidung
+ * hier ist bei 390 px getroffen; was dort nicht traegt, kommt nicht auf den
+ * Desktop.
+ *
+ * Der eine starke Moment: die SPEISEKARTE. Sie steht in diesem Archetyp
+ * zuerst, und sie ist der Grund, warum jemand die Seite unterwegs ueberhaupt
+ * oeffnet. Sie ist deshalb die einzige Sektion, die aus dem Satzspiegel der
+ * Seite ausbricht: eigene weisse Flaeche ueber die volle Breite, eigenes,
+ * schmaleres Mass, die groesste Schrift nach dem Namen des Hauses. Eine Karte
+ * an der Wand, in die Seite gelegt.
+ *
+ * Damit man das sieht, steht der Rest still – und zwar vollstaendig: Die
+ * Hero-Fahrt ist aus, die Parallaxe ist aus, die Fotos zoomen nicht, und die
+ * Signatur der Kueche bewegt sich nicht. Eine Seite, die man im Gehen liest,
+ * bewegt sich nicht mit.
+ * ========================================================================= */
+const HELL = `
+.hs-hell {
+  /* Eine Kurve. Was sich hier bewegt, ist Rueckmeldung auf einen Griff,
+     nichts sonst. */
+  --ease-ruhig: cubic-bezier(.2,.7,.3,1);
+  /* Vier Fliess- und drei Anzeigestufen. Gelesen wird auf dem Handy, also
+     liegt die Lesegroesse hoeher als in den dunklen Archetypen.
+     Rollen: docs-intern/design-tokens/hell.md */
+  --t-xs: 12px;
+  --t-s: 15px;
+  --t-m: 18px;
+  --t-l: 23px;
+  --d-3: clamp(27px, 3.3vw, 34px);
+  --d-2: clamp(33px, 4.6vw, 46px);
+  --d-1: clamp(40px, 7vw, 64px);
+  /* Abstaende aus der Acht, oben hin offener als in den dunklen Haeusern. */
+  --r-1: 8px;
+  --r-2: 16px;
+  --r-3: 24px;
+  --r-4: 40px;
+  --r-5: 64px;
+  ${SIGNATUR_REDUZIERT_REGELN}
+}
+
+/* --- Die Ruhe ----------------------------------------------------------- */
+.hs-hell .hero-media, .hs-hell .hero-inner { animation: none; transform: none; }
+.hs-hell .foto-slot img { animation: none; transform: none; }
+.hs-hell .hl-card, .hs-hell .hl-media img,
+.hs-hell .step:not(:last-child)::after,
+.hs-hell .section-head .eyebrow::after { transition: none; transform: none; }
+.bewegt .hs-hell .sig-orchid .bluete, .bewegt .hs-hell .sig-orchid.da .bluete {
+  opacity: 1; transform: none; transition: none;
+}
+.bewegt .hs-hell .sig-spice .puff, .bewegt .hs-hell .sig-spice.da .puff,
+.bewegt .hs-hell .sig-spice .fleck, .bewegt .hs-hell .sig-spice.da .fleck {
+  opacity: 1; transform: none; animation: none;
+}
+/* Die Uebergaenge, die ueberhaupt noch laufen – alle ueber die eine Kurve. */
+.hs-hell {
+  .topbar { transition: background .28s var(--ease-ruhig), box-shadow .28s var(--ease-ruhig); }
+  .topbar::before { transition: opacity .28s var(--ease-ruhig); }
+  .brand { transition: color .28s var(--ease-ruhig); }
+  .btn { transition: transform .12s var(--ease-ruhig), background .16s var(--ease-ruhig), color .16s var(--ease-ruhig); }
+  .add-btn, .mini-add { transition: background .16s var(--ease-ruhig), color .16s var(--ease-ruhig); }
+  .overlay { transition: opacity .22s var(--ease-ruhig); }
+  .drawer { transition: transform .28s var(--ease-ruhig); }
+  .confirm-box { transition: opacity .2s var(--ease-ruhig), transform .2s var(--ease-ruhig); }
+}
+
+/* --- Keine Schattenkarte ohne Abgrenzungsgrund -------------------------- */
+/* Eine Kachel mit Rundung und Schlagschatten sagt "hier endet etwas". In
+   einer Liste gleichartiger Gerichte endet aber nichts – die Linie reicht. */
+.hs-hell .hl-card, .hs-hell .kat, .hs-hell .stimme {
+  background: transparent; border: 0; border-radius: 0; box-shadow: none; overflow: visible;
+}
+.hs-hell .foto-slot { box-shadow: none; }
+
+/* --- Farbe: Text traegt accentBold -------------------------------------- */
+/* Sechs der zwoelf Akzente liegen als Textfarbe auf bg unter 4.5:1 – bg ist
+   hier ein leicht getoentes Weiss. Flaechen behalten accent. */
+.hs-hell .eyebrow,
+.hs-hell .veg,
+.hs-hell .error,
+.hs-hell .contact-list a,
+.hs-hell .contact-list .k,
+.hs-hell .reserve-pluspunkte .k,
+.hs-hell .stimmen-note .note,
+.hs-hell .kat > summary::after,
+.hs-hell .hl-rang,
+.hs-hell .add-btn,
+.hs-hell .mini-add { color: var(--accent-bold); }
+.hs-hell .add-btn, .hs-hell .mini-add { border-color: var(--accent-bold); }
+.hs-hell .kat > summary:hover { color: var(--accent-bold); }
+
+/* Auf dem Foto spricht das Haus in Weiss, das Gold faengt an, wo die Seite
+   anfaengt: Farbiger Kleintext auf einem Foto laesst sich ueber zwoelf
+   Paletten nicht auf 4.5:1 absichern. Messung in
+   docs-intern/design-tokens/hell.md. */
+.hs-hell .hero-kicker, .hs-hell .hero .stars { color: #fff; }
+
+/* --- Keine Mittelachse -------------------------------------------------- */
+.hs-hell .section-head.mitte { margin-left: 0; margin-right: 0; text-align: left; }
+.hs-hell .stimmen-erklaerung { margin-left: 0; margin-right: 0; text-align: left; }
+
+/* --- Schriftskala ------------------------------------------------------- */
+.hs-hell {
+  .hl-kat, .veg, .placeholder-badge, .usp-platzhalter, .foto-badge,
+  .kat-anzahl, .cart-count, .hl-siegel, .eyebrow,
+  .sig-reservation-kicker { font-size: var(--t-xs); }
+
+  .hint, .error, .footer-note, .foto-text span, .demo-note,
+  .hl-desc, .gericht-desc, .step p, .step-n, .reserve-pluspunkte li,
+  .stimmen-erklaerung, .confirm-summary, .cart-line-name, .qty span,
+  .rating, .usp-list, .stimme .sterne, .hours-row { font-size: var(--t-s); }
+
+  .topnav, .btn, .mobilebar .btn, .cart-fab, .stimme p, .stars,
+  .step h3, .qty button, footer strong, .sig-reservation-text,
+  .hl-desc, .section-head p { font-size: var(--t-m); }
+
+  .hero-sub, .brand, .hl-name, .hl-preis, .sterne, .stimme .slot-titel,
+  .mini-add, .drawer-head h3, .totals, .contact-list .k,
+  .foto-text strong, .icon-btn, .confirm-icon, .hours-head { font-size: var(--t-l); }
+}
+.hs-hell .hero h1 { font-size: var(--d-1); }
+.hs-hell .section-head h2 { font-size: var(--d-3); }
+.hs-hell #karte .section-head h2 { font-size: var(--d-2); }
+.hs-hell .stimmen-note .note { font-size: var(--d-1); }
+
+/* --- Abstandsskala ------------------------------------------------------ */
+.hs-hell {
+  .add-btn, .field, .btn, .rating, .hl-body, .hl-siegel,
+  .sig-band .band, .usp-list span, .kopf-marke { gap: var(--r-1); }
+  .hero-actions, .gericht-seite, .hl-foot, .stimmen-note, .step,
+  .gericht, .topbar-inner, .field-grid, summary,
+  .reserve-pluspunkte li, .contact-list li { gap: var(--r-2); }
+  .steps, .topnav, .foto-grid, .hours-row { gap: var(--r-3); }
+  .usp-list { gap: var(--r-1) var(--r-4); }
+  .reserve-grid, .contact-grid { gap: var(--r-5); }
+}
+.hs-hell .section { padding: 80px 0; }
+.hs-hell #kontakt { padding: 80px 0 96px; }
+
+/* --- Der eine Moment: die Karte bricht aus ------------------------------ */
+/* Jede andere Sektion steht im Satzspiegel der Seite. Diese nicht: eigene
+   weisse Flaeche ueber die volle Breite, eigenes schmaleres Mass. So liegt
+   eine Karte in der Seite statt in einer Kachelsammlung zu stehen. */
+.hs-hell .karte-section {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 96px 0;
+}
+.hs-hell .karte-section .wrap { max-width: 880px; }
+.hs-hell .karte-section .section-head { margin-bottom: var(--r-4); }
+.hs-hell .kat { border-top: 1px solid var(--line); margin-bottom: 0; }
+.hs-hell .kat:last-of-type { border-bottom: 1px solid var(--line); }
+.hs-hell .kat > summary { padding: var(--r-3) 0; font-size: var(--d-3); }
+.hs-hell .kat-body { padding: 0 0 var(--r-3); }
+/* Die Zeile einer Speisekarte: Name links, Preis rechts auf einer festen
+   Achse. Nicht zentriert, nicht gleichmaessig – so haengt eine Karte an der
+   Wand. */
+.hs-hell .gericht { align-items: baseline; padding: var(--r-2) 0; border-bottom: 1px solid var(--line); }
+.hs-hell .kat-body > .gericht:last-child { border-bottom: 0; }
+.hs-hell .gericht-name { font-size: var(--t-m); }
+.hs-hell .gericht-seite { min-width: 112px; justify-content: flex-end; }
+.hs-hell .gericht-preis { font-variant-numeric: tabular-nums; font-size: var(--t-m); }
+
+/* --- Highlights: die Rangfolge ------------------------------------------ */
+/* "Das bestellen unsere Gaeste am liebsten" ist eine Liste mit einer
+   Reihenfolge. Also steht sie da – als gezeichnete Ziffer in einer schmalen
+   Spalte links, die auf 390 px genauso traegt wie auf 1440. Die Gewichtung
+   liegt in der Zeile, nicht im Raster: Platz eins bekommt das grosse Bild,
+   die uebrigen ein Vorschaubild neben dem Text. */
+.hs-hell .hl-anordnung { display: grid; grid-template-columns: 1fr; gap: 0; }
+.hs-hell .hl-anordnung > .hl-card {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  grid-template-areas: "rang bild" "rang text";
+  column-gap: var(--r-3);
+  border-top: 1px solid var(--line);
+  padding: var(--r-3) 0;
+}
+.hs-hell .hl-anordnung > .hl-card:last-child { border-bottom: 1px solid var(--line); }
+.hs-hell .hl-rang {
+  grid-area: rang; font-size: var(--d-3); line-height: 1;
+  display: flex; justify-content: flex-start; padding-top: .1em;
+}
+.hs-hell .hl-media { grid-area: bild; border-radius: var(--radius); }
+.hs-hell .hl-body { grid-area: text; padding: var(--r-2) 0 0; }
+.hs-hell .hl-anordnung > .hl-card:first-child .hl-media { aspect-ratio: 3 / 2; }
+.hs-hell .hl-anordnung > .hl-card:not(:first-child) {
+  grid-template-columns: 44px 104px 1fr;
+  grid-template-areas: "rang bild text";
+  align-items: start;
+}
+.hs-hell .hl-anordnung > .hl-card:not(:first-child) .hl-media { aspect-ratio: 1 / 1; }
+.hs-hell .hl-anordnung > .hl-card:not(:first-child) .hl-body { padding: 0; }
+.hs-hell .hl-kat {
+  position: static; background: none; border-radius: 0; padding: 0;
+  color: var(--accent-bold); letter-spacing: .14em; align-self: start;
+}
+.hs-hell .hl-siegel {
+  display: inline-flex; align-items: center;
+  font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent-bold);
+}
+/* Die USP-Leiste gibt ihre gefuellte Flaeche ab: Eine einzige Akzentflaeche
+   traegt auf dieser Seite die Bestellung, nicht eine Aufzaehlung. */
+.hs-hell .usp-strip {
+  background: var(--soft); color: var(--ink-soft);
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.hs-hell .usp-list { justify-content: flex-start; font-weight: 500; }
+.hs-hell .usp-platzhalter { color: var(--gold-dunkel); }
+.hs-hell .step-n {
+  background: transparent; color: var(--accent-bold);
+  border: 0; font-size: var(--t-l); display: flex; align-items: center; justify-content: center;
+}
+
+/* --- Stimmen: die Zahl traegt ------------------------------------------- */
+/* Bisher standen hier drei leere Kacheln auf der Mittelachse und warteten
+   auf Bewertungen, die es noch nicht gibt. Was es gibt, ist die Zahl. */
+.hs-hell .stimmen-section { background: var(--bg); }
+.hs-hell .stimmen-note { justify-content: flex-start; align-items: baseline; }
+.hs-hell .stimmen-note .note { line-height: 1; font-variant-numeric: tabular-nums; }
+.hs-hell .stimmen-grid--list { max-width: none; }
+.hs-hell .stimme { border-top: 1px solid var(--line); padding: var(--r-3) 0; }
+
+/* --- Kontakt: die Zeiten stehen vorn ------------------------------------ */
+/* Unterwegs lautet die Frage "habt ihr jetzt offen?", nicht "wo seid ihr?".
+   Also tragen die Zeiten die breite Spalte und stehen zuerst. */
+.hs-hell .hours-head {
+  display: inline-flex; align-items: center; gap: var(--r-1);
+  margin-bottom: var(--r-2);
+}
+.hs-hell .hours-row {
+  padding: var(--r-2) 0; font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--line);
+}
+.hs-hell .contact-list .k { display: inline-flex; padding-top: .1em; }
+.hs-hell .contact-list li { padding: var(--r-2) 0; align-items: flex-start; }
+@media (min-width: 900px) {
+  .hs-hell .contact-grid { grid-template-columns: 7fr 5fr; align-items: start; }
+  .hs-hell .contact-grid > .contact-list { order: 2; }
+  .hs-hell .contact-grid > div { order: 1; }
+  .hs-hell .reserve-grid { grid-template-columns: 5fr 7fr; }
+}
+${bildunterschriftCss("hs-hell", "var(--t-l)", "var(--t-s)")}
+${ikonenCss("hs-hell", { ziffer: true, uhr: true })}
+`;
+
+/* Auch im hellen Haus steht der Krug still: Es bewegt sich hier nichts. */
+const HELL_BAYERISCH = `${krugCss("hs-hell")}
+.hs-hell .sig-krug .schaum,
+.hs-hell .sig-krug .tropfen { animation: none; }
+`;
+
 const HANDSCHRIFTEN = {
   traditionell: TRADITIONELL,
   abend: ABEND,
+  hell: HELL,
 };
 
 // Was eine Handschrift zusätzlich braucht, wenn eine bestimmte Küche sie
@@ -582,6 +981,7 @@ const HANDSCHRIFTEN = {
 const HANDSCHRIFT_JE_KUECHE = {
   "traditionell/bayerisch": TRADITIONELL_BAYERISCH,
   "abend/bayerisch": ABEND_BAYERISCH,
+  "hell/bayerisch": HELL_BAYERISCH,
 };
 
 /**

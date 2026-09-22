@@ -44,7 +44,7 @@ export function renderReservation({ widgetVariant, handschrift }) {
       <div>
         ${eyebrow}
         ${ueberschrift}
-        <p style="color:var(--ink-soft);font-size:18px">Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
+        <p${handschrift === "abend" ? ' class="reserve-intro"' : ' style="color:var(--ink-soft);font-size:18px"'}>Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
         <ul class="reserve-pluspunkte">
           <li><span class="k">${k}</span><span>Rund um die Uhr buchbar, auch außerhalb der Öffnungszeiten</span></li>
           <li><span class="k">${k}</span><span>Sofortige Bestätigung, ganz ohne Anruf</span></li>

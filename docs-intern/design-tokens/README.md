@@ -7,6 +7,11 @@ späteren Sitzung – muss sich an die Werte und die Verbotsliste der jeweiligen
 Datei halten.** Wer etwas anderes braucht, ändert zuerst die Datei und
 begründet es dort.
 
+Für eine Inspiration – wie eine *begründete* Entscheidung aussieht, bevor man
+in Richtung Vorlage abdriftet – siehe `../design-memory.md`: eine Sammlung
+echter, sorgfältig gestalteter Marken. Auch die ist keine Vorgabe, sondern
+Kalibrierung.
+
 ## Woher die Werte kommen
 
 | Was | Quelle im Code |
