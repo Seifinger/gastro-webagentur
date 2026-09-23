@@ -1,0 +1,103 @@
+{
+  "engine": "v2",
+  "designsystem": "bayerisch--wirtshaus",
+  "kueche": "bayerisch",
+  "stimmung": "wirtshaus",
+  "archetyp": "traditionell",
+  "seed": 2687991120,
+  "heroVariante": "passepartout",
+  "heroVarianten": [
+    "spalte-bild",
+    "karte",
+    "passepartout",
+    "tafel"
+  ],
+  "highlights": [
+    "1-0",
+    "1-1",
+    "1-2"
+  ],
+  "kontrast": {
+    "geprueft": 23,
+    "fehler": 0
+  },
+  "lint": {
+    "fehler": 0,
+    "warnungen": []
+  },
+  "korrekturen": [],
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1558030006-450675393462",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1552566626-52f8b828add9",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1432139555190-58524dae6a55",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1432139555190-58524dae6a55",
+      "typ": "bild"
+    },
+    "gericht:1-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1599921841143-819065a55cc6",
+      "typ": "bild"
+    },
+    "gericht:1-2": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1558030006-450675393462",
+      "typ": "bild"
+    }
+  },
+  "copy": {
+    "ersetzungen": [
+      {
+        "pfad": "claim",
+        "regeln": [
+          "adjektiv-kette"
+        ],
+        "vorher": "Bodenständig, ehrlich und frisch aus der Region – in der Münchener Straße in Mühldorf am Inn.",
+        "nachher": "Frisch aus der Region – in der Münchener Straße in Mühldorf am Inn."
+      }
+    ],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  },
+  "raster": {
+    "1": 8,
+    "2": 16,
+    "3": 24,
+    "4": 32,
+    "5": 40,
+    "6": 48,
+    "8": 64,
+    "10": 80,
+    "12": 96,
+    "16": 128,
+    "halb": 4
+  }
+}

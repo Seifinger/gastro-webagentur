@@ -332,7 +332,14 @@ const px = (n) => `${Math.round(n)}px`;
 const rem = (n) => `${Number((n / 16).toFixed(3))}rem`;
 
 export function leiteTypografieAb(kueche, stimmung, signal) {
-  const paar = SCHRIFTPAARE[kueche]?.[stimmung.id];
+  // Fallback für v1-Stimmungen mit "-editorial"-Suffix (z. B. "trattoria-editorial"):
+  // Editorial-Stimmungen nutzen die Schriftpaare und Typografie ihrer Basis-Stimmung.
+  const archetyp = stimmung.archetyp === "editorial" ? "traditionell" : stimmung.archetyp;
+  let schriftpaareId = stimmung.id;
+  if (schriftpaareId.endsWith("-editorial")) {
+    schriftpaareId = schriftpaareId.replace(/-editorial$/, "");
+  }
+  const paar = SCHRIFTPAARE[kueche]?.[schriftpaareId];
   if (!paar) throw new Error(`Kein Schriftpaar für ${kueche}/${stimmung.id}`);
   for (const familie of [paar.display, paar.text]) {
     if (istVerboten(familie)) throw new Error(`${familie} ist verboten`);
@@ -347,10 +354,10 @@ export function leiteTypografieAb(kueche, stimmung, signal) {
       : "Keine Referenz lieferte eine auswertbare Anzeigeschrift – Wahl nach Stimmung.",
   );
 
-  let ratio = SKALA_JE_ARCHETYP[stimmung.archetyp] ?? 1.25;
+  let ratio = SKALA_JE_ARCHETYP[archetyp] ?? 1.25;
   // Kontrastreiche Referenzen (große Headline, kleiner Text) heben die Skala
   // um eine Stufe – aber nie über die Quarte hinaus bei hellen Häusern.
-  if (signal.dichte === "luftig" && stimmung.archetyp !== "hell" && ratio < 1.333) {
+  if (signal.dichte === "luftig" && archetyp !== "hell" && ratio < 1.333) {
     ratio = 1.333;
     herleitung.push("Skala auf Quarte angehoben: Referenzen sind luftig, große Headlines tragen.");
   }
@@ -423,7 +430,8 @@ function snap(n, schritt = 4) {
 }
 
 export function leiteSpacingAb(stimmung, signal) {
-  const dichte = signal.dichte ?? (stimmung.archetyp === "hell" ? "ausgewogen" : "luftig");
+  const archetyp = stimmung.archetyp === "editorial" ? "traditionell" : stimmung.archetyp;
+  const dichte = signal.dichte ?? (archetyp === "hell" ? "ausgewogen" : "luftig");
   const sektion = {
     luftig: { desktop: 128, mobil: 64 },
     ausgewogen: { desktop: 96, mobil: 64 },
@@ -436,7 +444,7 @@ export function leiteSpacingAb(stimmung, signal) {
     sektion,
     sektionBetont: { desktop: sektion.desktop + 32, mobil: sektion.mobil + 16 },
     sektionEng: { desktop: 48, mobil: 32 },
-    rinne: stimmung.archetyp === "hell" ? 24 : 32,
+    rinne: archetyp === "hell" ? 24 : 32,
     rand: { desktop: 48, mobil: 24 },
     herleitung: [
       signal.dichte
@@ -449,7 +457,7 @@ export function leiteSpacingAb(stimmung, signal) {
 
 export function leiteRadiusAb(stimmung) {
   const v1 = parseInt(stimmung.radius, 10) || 8;
-  const archetyp = stimmung.archetyp;
+  const archetyp = stimmung.archetyp === "editorial" ? "traditionell" : stimmung.archetyp;
   const karte = archetyp === "abend" ? Math.min(snap(v1), 8) : snap(v1);
   return {
     klein: archetyp === "abend" ? 2 : snap(Math.max(2, karte / 3), 2),
@@ -486,9 +494,10 @@ const MOTION_JE_ARCHETYP = {
 };
 
 export function leiteMotionAb(stimmung, signal) {
-  const basis = MOTION_JE_ARCHETYP[stimmung.archetyp] ?? MOTION_JE_ARCHETYP.traditionell;
+  const archetyp = stimmung.archetyp === "editorial" ? "traditionell" : stimmung.archetyp;
+  const basis = MOTION_JE_ARCHETYP[archetyp] ?? MOTION_JE_ARCHETYP.traditionell;
   let { dauer, distanz } = basis;
-  const herleitung = [`Kurve ${basis.kurve} aus der v1-Handschrift „${stimmung.archetyp}“.`];
+  const herleitung = [`Kurve ${basis.kurve} aus der v1-Handschrift „${archetyp}“.`];
   if (signal.motion === "lebendig") {
     dauer = Math.round(dauer * 0.85);
     herleitung.push("Referenzen bewegen sich lebendig – Auftritte 15 % kürzer.");
@@ -535,9 +544,11 @@ const HERO_JE_ARCHETYP = {
 };
 
 export function leiteLayoutAb(stimmung, signal) {
-  const preset = presetFuerArchetyp(stimmung.archetyp);
-  const herleitung = [`Sektionsfolge, Kopfzeile und Hauptaktion aus designPresets.js (Archetyp „${stimmung.archetyp}“).`];
-  let hero = [...HERO_JE_ARCHETYP[stimmung.archetyp]];
+  // Fallback für editorial: nutzt die Layout-Werte der Basis-Archetyp (traditionell)
+  const archetyp = stimmung.archetyp === "editorial" ? "traditionell" : stimmung.archetyp;
+  const preset = presetFuerArchetyp(archetyp);
+  const herleitung = [`Sektionsfolge, Kopfzeile und Hauptaktion aus designPresets.js (Archetyp „${archetyp}“).`];
+  let hero = [...HERO_JE_ARCHETYP[archetyp]];
   const asymmetrisch = signal.layout === "versetzt/asymmetrisch" || signal.layout === "gemischt";
   if (!asymmetrisch) {
     // Streng symmetrische Referenzen: die versetzten Aufbauten nach hinten.
@@ -546,9 +557,9 @@ export function leiteLayoutAb(stimmung, signal) {
   } else {
     herleitung.push(`Referenzen ${signal.layout} – asymmetrisches Raster 5/7.`);
   }
-  const betont = { traditionell: "hero", abend: "reservierung", hell: "highlights" }[stimmung.archetyp];
+  const betont = { traditionell: "hero", abend: "reservierung", hell: "highlights" }[archetyp];
   return {
-    maxBreite: { traditionell: 1200, abend: 1120, hell: 1280 }[stimmung.archetyp],
+    maxBreite: { traditionell: 1200, abend: 1120, hell: 1280 }[archetyp],
     spalten: 12,
     verhaeltnis: asymmetrisch ? "5/7" : "6/6",
     textBreite: "62ch",
@@ -557,9 +568,9 @@ export function leiteLayoutAb(stimmung, signal) {
     kopfzeileFest: preset.header.sticky !== false,
     primaerAktion: preset.hero.primaryAction,
     mobileAktionsleiste: preset.mobile.stickyActionBar !== false,
-    highlights: { traditionell: "treppe", abend: "leseliste", hell: "reihe" }[stimmung.archetyp],
-    karte: { traditionell: "tafel", abend: "spalten", hell: "liste" }[stimmung.archetyp],
-    stimmen: { traditionell: "blatt", abend: "zitat", hell: "zeilen" }[stimmung.archetyp],
+    highlights: { traditionell: "treppe", abend: "leseliste", hell: "reihe" }[archetyp],
+    karte: { traditionell: "tafel", abend: "spalten", hell: "liste" }[archetyp],
+    stimmen: { traditionell: "blatt", abend: "zitat", hell: "zeilen" }[archetyp],
     betonterMoment: betont,
     sektionsWechsel: "Flächenwechsel grund ↔ flaecheTief statt Trennlinien",
     herleitung,

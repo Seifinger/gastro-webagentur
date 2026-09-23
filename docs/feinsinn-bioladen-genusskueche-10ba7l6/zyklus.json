@@ -1,0 +1,83 @@
+{
+  "site": "feinsinn-bioladen-genusskueche-10ba7l6",
+  "designsystem": "bayerisch--biergarten",
+  "heroVariante": "streifen",
+  "runden": [
+    {
+      "runde": 1,
+      "bestanden": null,
+      "korrekturen": []
+    }
+  ],
+  "ergebnis": "ohne-judge",
+  "stufen": [
+    {
+      "stufe": "referenz",
+      "neu": 0,
+      "gesamt": 3
+    },
+    {
+      "stufe": "designsystem",
+      "id": "bayerisch--biergarten"
+    },
+    {
+      "stufe": "copy",
+      "sprachmodell": false
+    }
+  ],
+  "copy": {
+    "ersetzungen": 1,
+    "verbleibend": 0
+  },
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1414235077428-338989a2e8c0",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1555396273-367ea4eb4db5",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1476224203421-9ac39bcb3327",
+      "typ": "bild"
+    },
+    "gericht:1-5": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1476224203421-9ac39bcb3327",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1432139555190-58524dae6a55",
+      "typ": "bild"
+    },
+    "gericht:1-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1599921841143-819065a55cc6",
+      "typ": "bild"
+    },
+    "gericht:1-2": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1558030006-450675393462",
+      "typ": "bild"
+    }
+  },
+  "zeitpunkt": "2026-09-23T05:39:29.869Z"
+}

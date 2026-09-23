@@ -1,0 +1,104 @@
+{
+  "engine": "v2",
+  "designsystem": "griechisch--taverne-am-hafen",
+  "kueche": "griechisch",
+  "stimmung": "taverne-am-hafen",
+  "archetyp": "traditionell",
+  "seed": 550198632,
+  "heroVariante": "passepartout",
+  "heroVarianten": [
+    "spalte-bild",
+    "karte",
+    "passepartout",
+    "tafel"
+  ],
+  "highlights": [
+    "0-1",
+    "1-0",
+    "1-1"
+  ],
+  "kontrast": {
+    "geprueft": 23,
+    "fehler": 0
+  },
+  "lint": {
+    "fehler": 0,
+    "warnungen": []
+  },
+  "korrekturen": [],
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1559339352-11d035aa65de",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1540189549336-e6e99c3679fe",
+      "typ": "bild"
+    },
+    "gericht:0-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1540189549336-e6e99c3679fe",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1529006557810-274b9b2fc783",
+      "typ": "bild"
+    },
+    "gericht:1-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+      "typ": "bild"
+    }
+  },
+  "copy": {
+    "ersetzungen": [
+      {
+        "pfad": "claim",
+        "regeln": [
+          "klischee-wie-am-meer",
+          "klischee-gastfreundschaft"
+        ],
+        "vorher": "Mediterrane Gastfreundschaft, wie am Meer – direkt am Stadtplatz in Mühldorf am Inn.",
+        "nachher": "Vom Holzkohlegrill – direkt am Stadtplatz in Mühldorf am Inn."
+      }
+    ],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 1,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  },
+  "raster": {
+    "1": 8,
+    "2": 16,
+    "3": 24,
+    "4": 32,
+    "5": 40,
+    "6": 48,
+    "8": 64,
+    "10": 80,
+    "12": 96,
+    "16": 128,
+    "halb": 4
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "engine": "v2",
+  "designsystem": "cafe--third-wave",
+  "kueche": "cafe",
+  "stimmung": "third-wave",
+  "archetyp": "hell",
+  "seed": 4051602401,
+  "heroVariante": "spalte-bild",
+  "heroVarianten": [
+    "typo",
+    "karte",
+    "streifen",
+    "spalte-bild"
+  ],
+  "highlights": [
+    "0-1",
+    "0-2",
+    "2-0",
+    "0-0"
+  ],
+  "kontrast": {
+    "geprueft": 23,
+    "fehler": 0
+  },
+  "lint": {
+    "fehler": 0,
+    "warnungen": []
+  },
+  "korrekturen": [],
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1546069901-ba9599a7e63c",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1552566626-52f8b828add9",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1567620905732-2d1ec7ab7445",
+      "typ": "bild"
+    },
+    "gericht:0-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1567620905732-2d1ec7ab7445",
+      "typ": "bild"
+    },
+    "gericht:0-2": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1546069901-ba9599a7e63c",
+      "typ": "bild"
+    },
+    "gericht:2-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1495474472287-4d71bcdd2085",
+      "typ": "bild"
+    },
+    "gericht:0-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1509440159596-0249088772ff",
+      "typ": "bild"
+    }
+  },
+  "copy": {
+    "ersetzungen": [
+      {
+        "pfad": "claim",
+        "regeln": [
+          "klischee-gemuetlich"
+        ],
+        "vorher": "Hausgemachter Kuchen und gemütliche Stunden – in der Ludwigstraße in Neuötting.",
+        "nachher": "Hausgemachter Kuchen – in der Ludwigstraße in Neuötting."
+      }
+    ],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "direkt und praktisch – beantwortet zuerst: was, wann, wie schnell"
+  },
+  "raster": {
+    "1": 8,
+    "2": 16,
+    "3": 24,
+    "4": 32,
+    "5": 40,
+    "6": 48,
+    "8": 64,
+    "10": 80,
+    "12": 96,
+    "16": 128,
+    "halb": 4
+  }
+}

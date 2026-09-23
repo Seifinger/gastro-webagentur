@@ -1,0 +1,103 @@
+{
+  "engine": "v2",
+  "designsystem": "italienisch--trattoria",
+  "kueche": "italienisch",
+  "stimmung": "trattoria",
+  "archetyp": "traditionell",
+  "seed": 1282225278,
+  "heroVariante": "spalte-bild",
+  "heroVarianten": [
+    "spalte-bild",
+    "karte",
+    "tafel",
+    "passepartout"
+  ],
+  "highlights": [
+    "2-2",
+    "2-3",
+    "1-0"
+  ],
+  "kontrast": {
+    "geprueft": 23,
+    "fehler": 0
+  },
+  "lint": {
+    "fehler": 0,
+    "warnungen": []
+  },
+  "korrekturen": [],
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1481931098730-318b6f776db0",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1517248135467-4c7edcad34c4",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1621996346565-e3dbc646d9a9",
+      "typ": "bild"
+    },
+    "gericht:2-2": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1621996346565-e3dbc646d9a9",
+      "typ": "bild"
+    },
+    "gericht:2-3": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1544510808-91bcbee1df55",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1574071318508-1cdbab80d002",
+      "typ": "bild"
+    }
+  },
+  "copy": {
+    "ersetzungen": [
+      {
+        "pfad": "claim",
+        "regeln": [
+          "klischee-dolce-vita"
+        ],
+        "vorher": "Frische Pasta, Holzofenpizza und echtes Dolce Vita – in der Bahnhofstraße in Altötting.",
+        "nachher": "Frische Pasta und Holzofenpizza – in der Bahnhofstraße in Altötting."
+      }
+    ],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  },
+  "raster": {
+    "1": 8,
+    "2": 16,
+    "3": 24,
+    "4": 32,
+    "5": 40,
+    "6": 48,
+    "8": 64,
+    "10": 80,
+    "12": 96,
+    "16": 128,
+    "halb": 4
+  }
+}
