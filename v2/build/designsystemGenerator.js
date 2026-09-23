@@ -494,10 +494,10 @@ const MOTION_JE_ARCHETYP = {
 };
 
 export function leiteMotionAb(stimmung, signal) {
-  const archetyp = stimmung.archetyp === “editorial” ? “traditionell” : stimmung.archetyp;
+  const archetyp = stimmung.archetyp === "editorial" ? "traditionell" : stimmung.archetyp;
   const basis = MOTION_JE_ARCHETYP[archetyp] ?? MOTION_JE_ARCHETYP.traditionell;
   let { dauer, distanz } = basis;
-  const herleitung = [`Kurve ${basis.kurve} aus der v1-Handschrift „${archetyp}”.`];
+  const herleitung = [`Kurve ${basis.kurve} aus der v1-Handschrift „${archetyp}“.`];
   if (signal.motion === "lebendig") {
     dauer = Math.round(dauer * 0.85);
     herleitung.push("Referenzen bewegen sich lebendig – Auftritte 15 % kürzer.");
@@ -545,19 +545,19 @@ const HERO_JE_ARCHETYP = {
 
 export function leiteLayoutAb(stimmung, signal) {
   // Fallback für editorial: nutzt die Layout-Werte der Basis-Archetyp (traditionell)
-  const archetyp = stimmung.archetyp === “editorial” ? “traditionell” : stimmung.archetyp;
+  const archetyp = stimmung.archetyp === "editorial" ? "traditionell" : stimmung.archetyp;
   const preset = presetFuerArchetyp(archetyp);
-  const herleitung = [`Sektionsfolge, Kopfzeile und Hauptaktion aus designPresets.js (Archetyp „${archetyp}”).`];
+  const herleitung = [`Sektionsfolge, Kopfzeile und Hauptaktion aus designPresets.js (Archetyp „${archetyp}“).`];
   let hero = [...HERO_JE_ARCHETYP[archetyp]];
-  const asymmetrisch = signal.layout === “versetzt/asymmetrisch” || signal.layout === “gemischt”;
+  const asymmetrisch = signal.layout === "versetzt/asymmetrisch" || signal.layout === "gemischt";
   if (!asymmetrisch) {
     // Streng symmetrische Referenzen: die versetzten Aufbauten nach hinten.
-    hero = [...hero.filter((h) => ![“passepartout”, “streifen”].includes(h)), ...hero.filter((h) => [“passepartout”, “streifen”].includes(h))];
-    herleitung.push(“Referenzen eher symmetrisch – versetzte Hero-Aufbauten nachrangig.”);
+    hero = [...hero.filter((h) => !["passepartout", "streifen"].includes(h)), ...hero.filter((h) => ["passepartout", "streifen"].includes(h))];
+    herleitung.push("Referenzen eher symmetrisch – versetzte Hero-Aufbauten nachrangig.");
   } else {
     herleitung.push(`Referenzen ${signal.layout} – asymmetrisches Raster 5/7.`);
   }
-  const betont = { traditionell: “hero”, abend: “reservierung”, hell: “highlights” }[archetyp];
+  const betont = { traditionell: "hero", abend: "reservierung", hell: "highlights" }[archetyp];
   return {
     maxBreite: { traditionell: 1200, abend: 1120, hell: 1280 }[archetyp],
     spalten: 12,
