@@ -24,6 +24,7 @@ import { ladeDesignsystem, HERO_VARIANTEN } from "../build/designsystemGenerator
 import { OUTPUT_DIR, FONTS_DIR } from "../build/siteBuilder.js";
 import { schriftCss } from "../build/schriften.js";
 import { loeseMedien, medienUebersicht } from "../assets-pipeline/mediaGenerator.js";
+import { creativeHandler } from "./creativeDashboard.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.join(__dirname, "..", "..");
@@ -391,6 +392,8 @@ const LEAD_DETAIL = /^\/api\/v2\/lead\/([^/]+)$/;
 
 /** Liefert true, wenn die Anfrage eine v2-Route war (dann ist sie beantwortet). */
 export async function v2Handler(req, res, pathname) {
+  // Briefing und Creative Direction je Restaurant (Art-Direction-Runde)
+  if (await creativeHandler(req, res, pathname)) return true;
   if (pathname === "/v2/dashboard.css") return sende(res, 200, dashboardCss(), "text/css; charset=utf-8"), true;
   if (pathname === "/v2/dashboard.js") return sende(res, 200, DASHBOARD_SKRIPT, "text/javascript; charset=utf-8"), true;
   if (pathname === "/v2/bearbeiten.js") return sende(res, 200, BEARBEITEN_SKRIPT, "text/javascript; charset=utf-8"), true;

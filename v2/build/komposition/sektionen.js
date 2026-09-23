@@ -59,6 +59,8 @@ export function hauptAktionHref(k) {
 
 export function renderKopf(k, anker) {
   const links = anker.map(([id, label]) => `<a href="#${id}">${e(label)}</a>`).join("");
+  // Im mobilen Menü steht die Hauptaktion als Knopf – derselbe Anker nicht noch einmal als Link.
+  const linksMobil = anker.filter(([id]) => `#${id}` !== hauptAktionHref(k)).map(([id, label]) => `<a href="#${id}">${e(label)}</a>`).join("");
   return `<header class="kopfzeile k-kopfzeile" id="topbar">
   <div class="rahmen kopfzeile-innen">
     <a class="marke-name" href="#">${e(k.texte.name)}</a>
@@ -66,7 +68,7 @@ export function renderKopf(k, anker) {
     <a class="btn btn-primary kopf-aktion" href="${e(hauptAktionHref(k))}">${e(k.texte.ctaHaupt)}</a>
     <details class="k-menue">
       <summary>${e(k.texte.menueKnopf)}</summary>
-      <nav class="k-menue-liste" aria-label="Hauptnavigation mobil">${links}<a class="btn btn-primary" href="${e(hauptAktionHref(k))}">${e(k.texte.ctaHaupt)}</a></nav>
+      <nav class="k-menue-liste" aria-label="Hauptnavigation mobil">${linksMobil}<a class="btn btn-primary" href="${e(hauptAktionHref(k))}">${e(k.texte.ctaHaupt)}</a></nav>
     </details>
   </div>
 </header>`;

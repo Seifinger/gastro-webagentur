@@ -18,7 +18,7 @@ Eine gedruckte Trattoria-Karte auf warmem Papier: Titelblatt mit dem Namen, ein 
 
 - Bild/Text-Balance: **ausgewogen**
 - Auswahl: Nur Gerichte, die genau so auf der Karte stehen (Margherita, Tagliatelle al Ragù, Penne all’Arrabbiata). Abgelehnt: Spaghetti mit Rioja-Korken (falsches Land, falsches Gericht), BBQ-Pizza (ist keine Quattro Stagioni). Kein Stockfoto als „Unser Haus“ – der Raum bleibt ungezeigt, bis es eigene Fotos gibt.
-- Zuschnitt: Teller angeschnitten, wie ein aufgelegtes Foto im Titelblatt; mobil quadratisch mit der Tellermitte im Fokus.
+- Zuschnitt: Teller angeschnitten, wie ein aufgelegtes Foto im Titelblatt (4:5); mobil flach 4:3, damit Name und „Tisch reservieren“ in den ersten Bildschirm passen.
 - Farbklima: warmes Tageslicht, cremiges Papier, Tomatenrot als einzige laute Farbe
 
 ## 5. Typografie

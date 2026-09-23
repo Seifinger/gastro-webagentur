@@ -31,6 +31,8 @@ import { feldAn, istTatsache, istZeigbar, tatsache } from "../briefing/briefing.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const CD_DIR = path.join(__dirname, "..", "creative-direction");
+// Tests setzen V2_CD_DIR auf ein Wegwerfverzeichnis.
+const cdDir = () => process.env.V2_CD_DIR || CD_DIR;
 
 /** Abschnitte, die die Komposition kennt. */
 export const ABSCHNITTE = {
@@ -203,17 +205,17 @@ export function pruefeCreativeDirection(cd) {
 /* Speichern / Laden                                                   */
 /* ------------------------------------------------------------------ */
 
-export function cdPfad(slug, dir = CD_DIR) {
+export function cdPfad(slug, dir = cdDir()) {
   if (!/^[a-z0-9][a-z0-9-]*$/.test(String(slug))) throw new Error(`Ungültiger Slug „${slug}“`);
   return path.join(dir, `${slug}.json`);
 }
 
-export function ladeCreativeDirection(slug, dir = CD_DIR) {
+export function ladeCreativeDirection(slug, dir = cdDir()) {
   const datei = cdPfad(slug, dir);
   return existsSync(datei) ? JSON.parse(readFileSync(datei, "utf-8")) : null;
 }
 
-export function speichereCreativeDirection(cd, dir = CD_DIR) {
+export function speichereCreativeDirection(cd, dir = cdDir()) {
   const fehler = pruefeCreativeDirection(cd);
   if (fehler.length) throw new Error(`Creative Direction ungültig: ${fehler.join("; ")}`);
   mkdirSync(dir, { recursive: true });
@@ -223,11 +225,11 @@ export function speichereCreativeDirection(cd, dir = CD_DIR) {
 }
 
 /** Gespeicherte Fassung, sonst ein frischer Entwurf (nicht gespeichert). */
-export function creativeDirectionFuer(briefing, ds, dir = CD_DIR) {
+export function creativeDirectionFuer(briefing, ds, dir = cdDir()) {
   return ladeCreativeDirection(briefing.slug, dir) ?? erzeugeCreativeDirection(briefing, ds);
 }
 
-export function alleCreativeDirections(dir = CD_DIR) {
+export function alleCreativeDirections(dir = cdDir()) {
   if (!existsSync(dir)) return [];
   return readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => JSON.parse(readFileSync(path.join(dir, f), "utf-8")));
 }

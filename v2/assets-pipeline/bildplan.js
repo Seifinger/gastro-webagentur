@@ -50,17 +50,28 @@ export function stockEignung(id, slot, kueche, katalog = stockKatalog()) {
   if (HAUS_PLAETZE.has(slot.slot)) return `Stockfoto zeigt einen fremden Ort („${e.zeigt}“) – für „${slot.motiv}“ nur eigene Fotos`;
   if (e.probleme?.length) return e.probleme.join("; ");
   if (slot.gericht && !(e.gerichte ?? []).includes(slot.gericht)) return `zeigt „${e.zeigt}“, nicht ${slot.gericht}`;
-  if (!slot.gericht && e.kueche?.length && !e.kueche.includes(kueche)) return `passt nicht zur Küche (${e.kueche.join(", ")})`;
+  if (!slot.gericht) {
+    // Stimmungsplätze (Raum, Tresen, Eingang) brauchen ein Foto, das als Raum/Stimmung gesichtet ist –
+    // ein Tellerfoto ist kein „Tresen am Abend“.
+    const rolle = slot.slot === "hero" ? "hero" : "ambiente";
+    if (!(e.rollen ?? []).includes(rolle)) return `zeigt „${e.zeigt}“ – kein ${slot.motiv}`;
+    if (e.kueche?.length && !e.kueche.includes(kueche)) return `passt nicht zur Küche (${e.kueche.join(", ")})`;
+  }
   return null;
 }
 
-function eigeneKandidaten(briefing, slotName) {
+function eigeneKandidaten(briefing, slot) {
   const fotos = feldAn(briefing, "medien.fotos").wert ?? [];
-  return fotos.filter((m) => m.datei && (m.herkunft === "eigen" || m.herkunft === "ki") && m.rolle === slotName);
+  const passt = (m) => (slot.gericht ? m.gericht === slot.gericht || m.rolle === slot.slot : m.rolle === slot.slot || (slot.slot === "hero" && m.rolle === "hero"));
+  return fotos.filter((m) => m.datei && ["eigen", "ki", "unklar"].includes(m.herkunft) && passt(m));
 }
 
 function waehle(slot, kandidatenIds, briefing, abgelehnt, katalog) {
-  for (const m of eigeneKandidaten(briefing, slot.slot)) {
+  for (const m of eigeneKandidaten(briefing, slot)) {
+    if (m.herkunft === "unklar") {
+      abgelehnt.push({ quelle: m.datei, herkunft: m.herkunft, grund: "Herkunft ungeklärt (Internet/Social Media) – Rechte klären" });
+      continue;
+    }
     if (!m.freigabe) {
       abgelehnt.push({ quelle: m.datei, herkunft: m.herkunft, grund: "Nutzungsfreigabe ungeklärt – Rückfrage nötig" });
       continue;

@@ -27,6 +27,8 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const BRIEFING_DIR = path.join(__dirname, "..", "briefings");
+// Tests setzen V2_BRIEFING_DIR auf ein Wegwerfverzeichnis.
+const briefingDir = () => process.env.V2_BRIEFING_DIR || BRIEFING_DIR;
 
 export const STATUS = {
   bestaetigt: "vom Kunden bestätigt",
@@ -172,7 +174,9 @@ export function pruefeBriefing(briefing) {
   if (!leer(aktion.wert) && !HAUPTAKTIONEN.includes(aktion.wert)) fehler.push(`aktion.haupt muss eins von ${HAUPTAKTIONEN.join("/")} sein`);
   for (const m of feldAn(briefing, "medien.fotos").wert ?? []) {
     if (!m.datei && !m.stock) fehler.push(`medien.fotos: Eintrag ohne datei/stock (${m.motiv ?? "?"})`);
-    if (m.herkunft === "eigen" && !m.freigabe) fehler.push(`medien.fotos: eigenes Foto ${m.datei} ohne Nutzungsfreigabe`);
+    if (!["eigen", "ki", "stock", "unklar"].includes(m.herkunft)) fehler.push(`medien.fotos: unbekannte Herkunft ${m.herkunft}`);
+    // Fehlende Nutzungsfreigabe ist kein Fehler im Briefing, sondern ein offener
+    // Punkt: Der Bildplan verwendet das Foto dann nicht und meldet die Rückfrage.
   }
   return fehler;
 }
@@ -231,17 +235,17 @@ export function leiteBriefingAb({ lead, kueche, stimmung = null, menu = null, ed
 /* Speichern / Laden                                                   */
 /* ------------------------------------------------------------------ */
 
-export function briefingPfad(slug, dir = BRIEFING_DIR) {
+export function briefingPfad(slug, dir = briefingDir()) {
   if (!/^[a-z0-9][a-z0-9-]*$/.test(String(slug))) throw new Error(`Ungültiger Slug „${slug}“`);
   return path.join(dir, `${slug}.json`);
 }
 
-export function ladeBriefing(slug, dir = BRIEFING_DIR) {
+export function ladeBriefing(slug, dir = briefingDir()) {
   const datei = briefingPfad(slug, dir);
   return existsSync(datei) ? JSON.parse(readFileSync(datei, "utf-8")) : null;
 }
 
-export function speichereBriefing(briefing, dir = BRIEFING_DIR) {
+export function speichereBriefing(briefing, dir = briefingDir()) {
   const fehler = pruefeBriefing(briefing);
   if (fehler.length) throw new Error(`Briefing ungültig: ${fehler.join("; ")}`);
   mkdirSync(dir, { recursive: true });
@@ -249,7 +253,7 @@ export function speichereBriefing(briefing, dir = BRIEFING_DIR) {
   return briefing;
 }
 
-export function alleBriefings(dir = BRIEFING_DIR) {
+export function alleBriefings(dir = briefingDir()) {
   if (!existsSync(dir)) return [];
   return readdirSync(dir).filter((f) => f.endsWith(".json")).map((f) => JSON.parse(readFileSync(path.join(dir, f), "utf-8")));
 }
