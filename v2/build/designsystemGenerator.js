@@ -332,7 +332,13 @@ const px = (n) => `${Math.round(n)}px`;
 const rem = (n) => `${Number((n / 16).toFixed(3))}rem`;
 
 export function leiteTypografieAb(kueche, stimmung, signal) {
-  const paar = SCHRIFTPAARE[kueche]?.[stimmung.id];
+  // Fallback für v1-Stimmungen mit "-editorial"-Suffix (z. B. "trattoria-editorial"):
+  // Editorial-Stimmungen nutzen die Schriftpaare ihrer Basis-Stimmung.
+  let schriftpaareId = stimmung.id;
+  if (schriftpaareId.endsWith("-editorial")) {
+    schriftpaareId = schriftpaareId.replace(/-editorial$/, "");
+  }
+  const paar = SCHRIFTPAARE[kueche]?.[schriftpaareId];
   if (!paar) throw new Error(`Kein Schriftpaar für ${kueche}/${stimmung.id}`);
   for (const familie of [paar.display, paar.text]) {
     if (istVerboten(familie)) throw new Error(`${familie} ist verboten`);
