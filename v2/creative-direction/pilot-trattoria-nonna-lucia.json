@@ -10,7 +10,7 @@
   "bilder": {
     "balance": "ausgewogen",
     "auswahl": "Nur Gerichte, die genau so auf der Karte stehen (Margherita, Tagliatelle al Ragù, Penne all’Arrabbiata). Abgelehnt: Spaghetti mit Rioja-Korken (falsches Land, falsches Gericht), BBQ-Pizza (ist keine Quattro Stagioni). Kein Stockfoto als „Unser Haus“ – der Raum bleibt ungezeigt, bis es eigene Fotos gibt.",
-    "zuschnitt": "Teller angeschnitten, wie ein aufgelegtes Foto im Titelblatt; mobil quadratisch mit der Tellermitte im Fokus.",
+    "zuschnitt": "Teller angeschnitten, wie ein aufgelegtes Foto im Titelblatt (4:5); mobil flach 4:3, damit Name und „Tisch reservieren“ in den ersten Bildschirm passen.",
     "farbklima": "warmes Tageslicht, cremiges Papier, Tomatenrot als einzige laute Farbe",
     "slots": [
       {
@@ -27,8 +27,8 @@
             5
           ],
           "mobil": [
-            1,
-            1
+            4,
+            3
           ]
         }
       },

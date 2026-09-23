@@ -1,0 +1,118 @@
+{
+  "url": "file:///home/user/gastro-webagentur/v2/output/piloten/pilot-gasthaus-alte-linde/index.html",
+  "name": "pilot-gasthaus-alte-linde",
+  "zeitpunkt": "2026-09-23T04:26:03.031Z",
+  "viewports": {
+    "desktop": {
+      "screenshot": "pilot-gasthaus-alte-linde--desktop.jpg",
+      "befunde": [],
+      "fehlendeAssets": [],
+      "skriptFehler": [],
+      "tastatur": {
+        "erreicht": 18,
+        "ohneFokus": []
+      }
+    },
+    "tablet": {
+      "screenshot": "pilot-gasthaus-alte-linde--tablet.jpg",
+      "befunde": [],
+      "fehlendeAssets": [],
+      "skriptFehler": [],
+      "tastatur": {
+        "erreicht": 18,
+        "ohneFokus": []
+      }
+    },
+    "mobil": {
+      "screenshot": "pilot-gasthaus-alte-linde--mobil.jpg",
+      "befunde": [],
+      "fehlendeAssets": [],
+      "skriptFehler": [],
+      "tastatur": {
+        "erreicht": 18,
+        "ohneFokus": []
+      }
+    }
+  },
+  "zustaende": {
+    "desktop": [
+      {
+        "zustand": "formularfehler",
+        "ok": true,
+        "detail": "4 Felder als fehlerhaft markiert",
+        "screenshot": "pilot-gasthaus-alte-linde--desktop--formularfehler.jpg"
+      },
+      {
+        "zustand": "reservierung-bestaetigt",
+        "ok": true,
+        "detail": "Tisch reserviert",
+        "screenshot": "pilot-gasthaus-alte-linde--desktop--reservierung-bestaetigt.jpg"
+      },
+      {
+        "zustand": "warenkorb",
+        "ok": true,
+        "detail": "1 Positionen im Warenkorb",
+        "screenshot": "pilot-gasthaus-alte-linde--desktop--warenkorb.jpg"
+      },
+      {
+        "zustand": "bestellung-bestaetigt",
+        "ok": true,
+        "detail": "Bestellung aufgenommen",
+        "screenshot": "pilot-gasthaus-alte-linde--desktop--bestellung-bestaetigt.jpg"
+      }
+    ],
+    "mobil": [
+      {
+        "zustand": "mobile-navigation",
+        "ok": true,
+        "detail": "5 Einträge sichtbar",
+        "screenshot": "pilot-gasthaus-alte-linde--mobil--mobile-navigation.jpg"
+      },
+      {
+        "zustand": "formularfehler",
+        "ok": true,
+        "detail": "4 Felder als fehlerhaft markiert",
+        "screenshot": "pilot-gasthaus-alte-linde--mobil--formularfehler.jpg"
+      },
+      {
+        "zustand": "reservierung-bestaetigt",
+        "ok": true,
+        "detail": "Tisch reserviert",
+        "screenshot": "pilot-gasthaus-alte-linde--mobil--reservierung-bestaetigt.jpg"
+      },
+      {
+        "zustand": "warenkorb",
+        "ok": true,
+        "detail": "1 Positionen im Warenkorb",
+        "screenshot": "pilot-gasthaus-alte-linde--mobil--warenkorb.jpg"
+      },
+      {
+        "zustand": "bestellung-bestaetigt",
+        "ok": true,
+        "detail": "Bestellung aufgenommen",
+        "screenshot": "pilot-gasthaus-alte-linde--mobil--bestellung-bestaetigt.jpg"
+      }
+    ]
+  },
+  "labor": {
+    "desktop": {
+      "lcpMs": 100,
+      "cls": 0,
+      "inpNaeherungMs": 16
+    },
+    "mobil": {
+      "lcpMs": 212,
+      "cls": 0.018,
+      "inpNaeherungMs": 24
+    }
+  },
+  "automatisch": {
+    "fehler": [],
+    "warnungen": []
+  },
+  "zusammenfassung": {
+    "fehler": 0,
+    "warnungen": 0,
+    "laborHinweis": "Laborwerte aus einem Headless-Lauf (Desktop ungedrosselt, Mobil mit Slow-4G- und 4×-CPU-Drosselung) über einen Proxy, Bilder von images.unsplash.com, Schriften lokal. Keine Felddaten – über echte Nutzer sagen sie nichts aus."
+  }
+}

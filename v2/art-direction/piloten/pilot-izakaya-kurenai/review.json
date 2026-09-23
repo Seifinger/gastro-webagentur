@@ -1,0 +1,118 @@
+{
+  "url": "file:///home/user/gastro-webagentur/v2/output/piloten/pilot-izakaya-kurenai/index.html",
+  "name": "pilot-izakaya-kurenai",
+  "zeitpunkt": "2026-09-23T04:26:18.591Z",
+  "viewports": {
+    "desktop": {
+      "screenshot": "pilot-izakaya-kurenai--desktop.jpg",
+      "befunde": [],
+      "fehlendeAssets": [],
+      "skriptFehler": [],
+      "tastatur": {
+        "erreicht": 18,
+        "ohneFokus": []
+      }
+    },
+    "tablet": {
+      "screenshot": "pilot-izakaya-kurenai--tablet.jpg",
+      "befunde": [],
+      "fehlendeAssets": [],
+      "skriptFehler": [],
+      "tastatur": {
+        "erreicht": 18,
+        "ohneFokus": []
+      }
+    },
+    "mobil": {
+      "screenshot": "pilot-izakaya-kurenai--mobil.jpg",
+      "befunde": [],
+      "fehlendeAssets": [],
+      "skriptFehler": [],
+      "tastatur": {
+        "erreicht": 18,
+        "ohneFokus": []
+      }
+    }
+  },
+  "zustaende": {
+    "desktop": [
+      {
+        "zustand": "formularfehler",
+        "ok": true,
+        "detail": "4 Felder als fehlerhaft markiert",
+        "screenshot": "pilot-izakaya-kurenai--desktop--formularfehler.jpg"
+      },
+      {
+        "zustand": "reservierung-bestaetigt",
+        "ok": true,
+        "detail": "Tisch reserviert",
+        "screenshot": "pilot-izakaya-kurenai--desktop--reservierung-bestaetigt.jpg"
+      },
+      {
+        "zustand": "warenkorb",
+        "ok": true,
+        "detail": "1 Positionen im Warenkorb",
+        "screenshot": "pilot-izakaya-kurenai--desktop--warenkorb.jpg"
+      },
+      {
+        "zustand": "bestellung-bestaetigt",
+        "ok": true,
+        "detail": "Bestellung aufgenommen",
+        "screenshot": "pilot-izakaya-kurenai--desktop--bestellung-bestaetigt.jpg"
+      }
+    ],
+    "mobil": [
+      {
+        "zustand": "mobile-navigation",
+        "ok": true,
+        "detail": "5 Einträge sichtbar",
+        "screenshot": "pilot-izakaya-kurenai--mobil--mobile-navigation.jpg"
+      },
+      {
+        "zustand": "formularfehler",
+        "ok": true,
+        "detail": "4 Felder als fehlerhaft markiert",
+        "screenshot": "pilot-izakaya-kurenai--mobil--formularfehler.jpg"
+      },
+      {
+        "zustand": "reservierung-bestaetigt",
+        "ok": true,
+        "detail": "Tisch reserviert",
+        "screenshot": "pilot-izakaya-kurenai--mobil--reservierung-bestaetigt.jpg"
+      },
+      {
+        "zustand": "warenkorb",
+        "ok": true,
+        "detail": "1 Positionen im Warenkorb",
+        "screenshot": "pilot-izakaya-kurenai--mobil--warenkorb.jpg"
+      },
+      {
+        "zustand": "bestellung-bestaetigt",
+        "ok": true,
+        "detail": "Bestellung aufgenommen",
+        "screenshot": "pilot-izakaya-kurenai--mobil--bestellung-bestaetigt.jpg"
+      }
+    ]
+  },
+  "labor": {
+    "desktop": {
+      "lcpMs": 212,
+      "cls": 0,
+      "inpNaeherungMs": 16
+    },
+    "mobil": {
+      "lcpMs": 568,
+      "cls": 0.016,
+      "inpNaeherungMs": 24
+    }
+  },
+  "automatisch": {
+    "fehler": [],
+    "warnungen": []
+  },
+  "zusammenfassung": {
+    "fehler": 0,
+    "warnungen": 0,
+    "laborHinweis": "Laborwerte aus einem Headless-Lauf (Desktop ungedrosselt, Mobil mit Slow-4G- und 4×-CPU-Drosselung) über einen Proxy, Bilder von images.unsplash.com, Schriften lokal. Keine Felddaten – über echte Nutzer sagen sie nichts aus."
+  }
+}

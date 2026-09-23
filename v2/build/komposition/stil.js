@@ -17,7 +17,14 @@ export const KOMPOSITION_STIL = `
 .k-kopf .intro { margin-top: var(--s-2); }
 .abschnitt-text h2, .k-text-titel h2 { font-family: var(--f-text); font-weight: var(--f-text-stark); text-transform: none; letter-spacing: 0; }
 
-/* Kopfzeile: mobile Navigation ohne Skript */
+/* Datumsfeld: Fokus auf dem Kalender-Knopf im Feld sichtbar machen */
+input[type="date"]:focus-within { outline: 2px solid var(--akzent-text); outline-offset: 0; }
+
+/* Kopfzeile: mobile Navigation ohne Skript. Der Name bricht um statt abgeschnitten zu werden. */
+@media (max-width: 1023px) {
+  .k-fuss .fuss-nav a, .k-fuss .fuss-kontakt a { display: flex; align-items: center; min-height: var(--s-5); }
+  .k-kopfzeile .marke-name { display: inline-flex; align-items: center; min-height: var(--s-5); white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.15; font-size: var(--t-basis); }
+}
 .k-menue { display: none; position: relative; }
 .k-menue summary { list-style: none; cursor: pointer; min-height: var(--s-5); display: inline-flex; align-items: center; padding: var(--s-halb) var(--s-2);
   border: 1px solid var(--linie-stark); border-radius: var(--r-knopf); font-weight: var(--f-text-stark); }
@@ -194,5 +201,6 @@ export const KOMPOSITION_STIL = `
   .k-plan-notiz { grid-column: 1 / -1; }
   .k-plan-notiz:empty { display: none; }
   .k-schild { font-size: var(--t-h1); }
+  .k-titel-text h1, .k-werkbank h1 { font-size: var(--t-h1); }
 }
 `;

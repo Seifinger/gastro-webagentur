@@ -402,16 +402,18 @@ export function mobilLeiste(k) {
   return `<div class="mobilebar k-leiste" id="mobilebar">${knoepfe}${versteckt}</div>`;
 }
 
-/** Leiste erst zeigen, wenn die Hero-Aktionen aus dem Blick sind (kein Doppel, kein Verdecken). */
+/** Leiste nur zeigen, wenn die Hero-Aktionen nicht im Blick sind (kein Doppel, kein Verdecken). */
 export const LEISTE_SKRIPT = `
 (function () {
-  var hero = document.querySelector("[data-hero]");
+  // Beobachtet werden die Knöpfe im Hero, nicht der ganze Hero: Liegen sie
+  // unter dem ersten Bildschirm, ist die Leiste sofort da.
+  var hero = document.querySelector("[data-hero] .hero-aktionen");
   var leiste = document.getElementById("mobilebar");
   if (!hero || !leiste || !("IntersectionObserver" in window)) return;
   document.body.classList.add("k-leiste-bereit");
   new IntersectionObserver(function (e) {
     leiste.classList.toggle("k-leiste--da", !e[0].isIntersecting);
-  }, { threshold: 0.15 }).observe(hero);
+  }, { threshold: 0.5 }).observe(hero);
 })();
 `;
 
