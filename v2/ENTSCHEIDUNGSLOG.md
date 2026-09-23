@@ -371,3 +371,38 @@ höchstens 3 Runden automatisch beendet, die offenen Befunde stehen rechts. Deta
   Judge-Zwischenstände bleiben gitignored.
 - **E8.6 · Keine Veröffentlichung von v2.** `npm run publish-site` bleibt v1. Die Leitplanke
   „v1 bleibt produktiv und unangetastet“ gilt, bis du v2 freigibst (ABSCHLUSSBERICHT).
+
+## Art-Direction-Runde (23.09.2026)
+
+- **AD1 – Basis ist der v2-Pipeline-Branch.** Die „abgeschlossene v2“ lag nur auf
+  `claude/gastro-v2-pipeline-01hf58` (8 Commits vor `main`). Der Arbeitsbranch wurde per
+  Fast-Forward darauf gesetzt; nichts aus v2 wurde umgeschrieben.
+- **AD2 – Parallel statt ersetzen.** Die Komposition (`build/komposition/`) ist ein zweiter Baupfad
+  neben `siteBuilder.baueSite()`. Die 36 bestehenden Seiten, ihre Tests und der Judge bleiben
+  unverändert; nur Seiten mit Briefing + Creative Direction laufen über den neuen Pfad.
+- **AD3 – Vier Status statt Ja/Nein.** bestätigt / übernommen / Vorschlag / unbekannt je Feld; nur die
+  ersten beiden sind Tatsachen. Begründung: Der Unterschied zwischen „Google sagt“ und „Wirt sagt“
+  ist für Öffnungszeiten und Bewertungen relevant, für die Darstellung aber gleichwertig.
+- **AD4 – Fiktive Piloten.** Echte Betriebe gibt es in dieser Umgebung nicht (data/betrieb leer).
+  Drei Piloten sind erfundene Beispielbetriebe mit reichem Briefing, einer simuliert einen echten Lead
+  mit Google-Daten. Gerichte/Preise ausschließlich aus dem bestehenden Katalog.
+- **AD5 – Signaturen brauchen Belege.** Jede Signatur nennt Briefing-Felder und ein Erkennungsmuster;
+  fehlt der Beleg, fällt sie beim Bau weg. Das macht den Tauschtest prüfbar.
+- **AD6 – Kein Hash in der Komposition.** Struktur folgt allein der Creative Direction; identischer
+  Input ergibt byte-identische Ausgabe (Test).
+- **AD7 – Stock nur gesichtet und nie als Tatsache.** 22 Motive von Hand gesichtet (Kontaktbogen);
+  ungesichtete Stockfotos werden nicht verwendet. Plätze, die etwas über das Haus behaupten, nehmen
+  nur eigene Fotos. Stimmungsplätze verlangen ein als Raum gesichtetes Foto (nach Tauschprobe
+  verschärft, AD11).
+- **AD8 – Keine Gästestimmen, keine Häkchen-Leiste auf den Piloten.** Es gibt keine freigegebenen
+  Zitate; die Leiste bestand aus unbelegten Katalog-USPs.
+- **AD9 – Screenshot-Review getrennt vom Judge.** Messbares automatisch mit Schwellen, Subjektives als
+  begründeter Text je Pilot. Kein numerischer „Agenturqualitäts“-Wert.
+- **AD10 – Mobile Laborwerte gedrosselt.** Slow 4G + 4× CPU, sonst sind Labor-LCPs geschönt. Trotzdem
+  keine Aussage über Felddaten.
+- **AD11 – Tauschprobe fand einen Bildplan-Fehler.** Ein Pizzafoto wurde als „Tresen am Abend“
+  akzeptiert, weil nur die Küche verglichen wurde. Seitdem verlangen Stimmungsplätze die passende Rolle
+  im Stock-Katalog.
+- **AD12 – Dashboard-Hook minimal.** Eine Zeile in `integration/dashboardV2.js` bindet
+  `creativeDashboard.js` ein; `src/` wurde in dieser Runde nicht verändert. Speichern baut zuerst und
+  schreibt nur, wenn alle Gates bestehen.

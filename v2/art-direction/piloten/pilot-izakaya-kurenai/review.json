@@ -1,7 +1,7 @@
 {
   "url": "file:///home/user/gastro-webagentur/v2/output/piloten/pilot-izakaya-kurenai/index.html",
   "name": "pilot-izakaya-kurenai",
-  "zeitpunkt": "2026-09-23T04:26:18.591Z",
+  "zeitpunkt": "2026-09-23T04:34:09.348Z",
   "viewports": {
     "desktop": {
       "screenshot": "pilot-izakaya-kurenai--desktop.jpg",
@@ -65,7 +65,7 @@
       {
         "zustand": "mobile-navigation",
         "ok": true,
-        "detail": "5 Einträge sichtbar",
+        "detail": "4 Einträge sichtbar",
         "screenshot": "pilot-izakaya-kurenai--mobil--mobile-navigation.jpg"
       },
       {
@@ -96,14 +96,14 @@
   },
   "labor": {
     "desktop": {
-      "lcpMs": 212,
+      "lcpMs": 220,
       "cls": 0,
       "inpNaeherungMs": 16
     },
     "mobil": {
-      "lcpMs": 568,
-      "cls": 0.016,
-      "inpNaeherungMs": 24
+      "lcpMs": 576,
+      "cls": 0,
+      "inpNaeherungMs": 16
     }
   },
   "automatisch": {

@@ -1,7 +1,7 @@
 {
   "url": "file:///home/user/gastro-webagentur/v2/output/piloten/pilot-roesterei-kornfeld/index.html",
   "name": "pilot-roesterei-kornfeld",
-  "zeitpunkt": "2026-09-23T04:26:36.022Z",
+  "zeitpunkt": "2026-09-23T04:34:26.640Z",
   "viewports": {
     "desktop": {
       "screenshot": "pilot-roesterei-kornfeld--desktop.jpg",
@@ -65,7 +65,7 @@
       {
         "zustand": "mobile-navigation",
         "ok": true,
-        "detail": "6 Einträge sichtbar",
+        "detail": "5 Einträge sichtbar",
         "screenshot": "pilot-roesterei-kornfeld--mobil--mobile-navigation.jpg"
       },
       {
@@ -96,12 +96,12 @@
   },
   "labor": {
     "desktop": {
-      "lcpMs": 208,
+      "lcpMs": 216,
       "cls": 0,
-      "inpNaeherungMs": 16
+      "inpNaeherungMs": 24
     },
     "mobil": {
-      "lcpMs": 436,
+      "lcpMs": 728,
       "cls": 0.047,
       "inpNaeherungMs": 24
     }

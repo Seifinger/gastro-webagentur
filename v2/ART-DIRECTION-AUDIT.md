@@ -132,8 +132,10 @@ steht pünktlich bereit“. Die **Google-Note erscheint dreimal** (Hero, Leiste,
   2 Spalten, rechts neben identischen drei Häkchen. Es nimmt die Farbwelt auf, aber nicht
   die Idee des Hauses – bei der Rösterei (die man kaum reserviert) hat es dasselbe Gewicht
   wie bei der Trattoria.
-- Das Datumsfeld zeigt das **US-Format „09/22/2026“** (Browser-Locale, `lang="de"` wirkt
-  beim nativen Datepicker nicht) – im deutschen Auftritt ein sichtbarer Bruch.
+- ~~Das Datumsfeld zeigt das US-Format „09/22/2026“.~~ **Korrigiert nach Phase G:** Das Format
+  kommt von der Oberflächensprache des Test-Chromiums (auch mit `locale: "de-DE"` im Kontext).
+  In einem deutschsprachigen Browser zeigt das native Feld `TT.MM.JJJJ`. Kein Seitenfehler –
+  aber Screenshots für Kunden sollten mit deutscher Browser-Oberfläche entstehen.
 - **Mobile Aktionsleiste verdeckt den Hero.** Bei 390 × 844 liegt die feste Leiste
   „Bestellen / Reservieren“ im ersten Bildschirm genau über dem zweiten Hero-Knopf
   (Izakaya) bzw. über dem Claim (Wirtshaus) – dieselben zwei Aktionen stehen doppelt

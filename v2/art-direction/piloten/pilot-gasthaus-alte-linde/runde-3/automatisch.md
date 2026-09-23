@@ -1,4 +1,4 @@
-### Automatische Prüfung (2026-09-23 04:26)
+### Automatische Prüfung (2026-09-23 04:33)
 
 **0 Fehler, 0 Warnungen.**
 
@@ -12,7 +12,7 @@
 
 | Labor (kein Feld!) | LCP | CLS | INP-Näherung |
 |---|---|---|---|
-| desktop | 100 ms (≤ 2,5 s) | 0 | 16 ms |
-| mobil | 212 ms (≤ 2,5 s) | 0.018 | 24 ms |
+| desktop | 88 ms (≤ 2,5 s) | 0 | 16 ms |
+| mobil | 84 ms (≤ 2,5 s) | 0.001 | 24 ms |
 
 _Laborwerte aus einem Headless-Lauf (Desktop ungedrosselt, Mobil mit Slow-4G- und 4×-CPU-Drosselung) über einen Proxy, Bilder von images.unsplash.com, Schriften lokal. Keine Felddaten – über echte Nutzer sagen sie nichts aus._

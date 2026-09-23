@@ -77,3 +77,19 @@ Alle Zufallsentscheidungen hängen wie in v1 am Seed des Leads: derselbe Lead
 ergibt immer dieselbe Seite.
 
 Jede autonome Entscheidung steht in [`ENTSCHEIDUNGSLOG.md`](ENTSCHEIDUNGSLOG.md).
+
+## Art-Direction: Briefing → Creative Direction → Komposition
+
+Zweiter Baupfad für Kundenseiten mit echtem Gespräch (Details:
+[`ART-DIRECTION-BERICHT.md`](ART-DIRECTION-BERICHT.md), Audit: [`ART-DIRECTION-AUDIT.md`](ART-DIRECTION-AUDIT.md)).
+
+```bash
+npm run v2:briefing -- ableiten --slug <slug> --kueche <k> --stimmung <s> --name "…"   # Briefing aus Lead-Daten
+npm run v2:briefing -- aus-chat --slug <slug> --kueche <k> --name "…" --text "…" --dateien a.jpg,b.jpg
+npm run v2:pilot                         # alle Briefings mit Creative Direction bauen → output/piloten/
+npm run v2:art-review -- --runde <n>     # Screenshot-Review mit Zuständen → art-direction/piloten/
+npm run v2:tauschprobe                   # Gestaltung A + Inhalte B
+npm run v2:art-audit                     # Struktur-/Bild-/Überschriften-Wiederholungen der 36 Seiten
+```
+
+Im Agentur-Dashboard: `/v2/creative` (Briefing mit Status je Feld, Creative Direction, Bildplan, Editor).
