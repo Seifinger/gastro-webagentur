@@ -56,7 +56,7 @@ async function sichereReferenzen(kueche, stimmung, { browser, offline }) {
  * @param {object} [p.browser] - wiederverwendeter Browser (Sammelläufe)
  * @param {boolean} [p.medienErzeugen] - fehlende Medien über den Provider erzeugen
  */
-export async function baueImZyklus({ lead, kueche, stimmung, judge = true, optionen = {}, zielDir, slug, browser = null, medienErzeugen = false, offline = false, log = () => {}, beurteileFn = beurteile, judgeDir = JUDGE_DIR }) {
+export async function baueImZyklus({ lead, kueche, stimmung, judge = true, optionen = {}, zielDir, slug, browser = null, medienErzeugen = false, offline = false, fontsDir = FONTS_DIR, fontsPfad, log = () => {}, beurteileFn = beurteile, judgeDir = JUDGE_DIR }) {
   const gestaltung = themeForLead(lead, kueche, stimmung);
   const id = `${gestaltung.cuisine}--${gestaltung.stimmung}`;
   const siteId = slug ?? siteSlug(lead, gestaltung.cuisine, gestaltung.stimmung);
@@ -81,7 +81,7 @@ export async function baueImZyklus({ lead, kueche, stimmung, judge = true, optio
       { familie: ds.typografie.text.familie, gewicht: ds.typografie.text.gewichtStark },
       ...(ds.typografie.label ? [{ familie: ds.typografie.label.familie, gewicht: 400 }] : []),
     ];
-    if (!offline) await stelleSchriftenBereit(familien, FONTS_DIR);
+    if (!offline) await stelleSchriftenBereit(familien, fontsDir);
 
     // 3. Medien
     if (medienErzeugen) {
@@ -110,7 +110,7 @@ export async function baueImZyklus({ lead, kueche, stimmung, judge = true, optio
           lead,
           kueche: gestaltung.cuisine,
           stimmung: gestaltung.stimmung,
-          optionen: { fiktiv: lead.fiktiv, ...optionen, designsystem: ds, medien, korrekturen, texteVerfeinern },
+          optionen: { fiktiv: lead.fiktiv, ...optionen, designsystem: ds, medien, korrekturen, texteVerfeinern, fontsDir, ...(fontsPfad ? { fontsPfad } : {}) },
         },
         { zielDir, slug: siteId },
       );

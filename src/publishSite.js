@@ -19,6 +19,39 @@ import {
   ladeSchriften,
   schreibeSeiten,
 } from "./buildSite.js";
+import { ladeEngineWahl, engineFuerLead } from "../v2/integration/dashboardV2.js";
+import { baueImZyklus } from "../v2/build/zyklus.js";
+
+/**
+ * Baut einen Entwurf über die v2-Engine nach zielordner/<slug>/ – dieselbe
+ * Engine-Wahl (data/v2-engine.json bzw. ENGINE_STANDARD), die auch das
+ * Dashboard für den Einzel-Build nutzt (v2/integration/dashboardV2.js).
+ * Fonts landen unter zielordner/assets/fonts (wie bei v1), damit sich beide
+ * Engines denselben Ordner unter docs/ teilen können.
+ *
+ * Bekannte Lücke gegenüber v1: das Resonanz-Beacon (Öffnungs-Tracking) ist
+ * in v2 noch nicht verdrahtet – veröffentlichte v2-Seiten senden aktuell
+ * keine Resonanz-Daten.
+ */
+async function baueUndSchreibeV2Entwurf(lead, slug, kueche, stimmung, { email = "", api = "", zielordner = docsDir, judge = false, fiktiv = false } = {}) {
+  const { protokoll, ordner } = await baueImZyklus({
+    lead,
+    kueche,
+    stimmung,
+    judge,
+    zielDir: zielordner,
+    slug,
+    fontsDir: path.join(zielordner, "assets", "fonts"),
+    fontsPfad: "../assets/fonts",
+    optionen: {
+      fiktiv,
+      apiUrl: api,
+      kontaktEmail: email,
+      editUebersteuerung: fiktiv ? undefined : loadLeadEdits(slug),
+    },
+  });
+  return { slug, ordner, protokoll };
+}
 
 const HINWEIS =
   "Alle hier gezeigten Lokale sind frei erfunden – es sind Beispielseiten, keine Kunden. " +
@@ -172,6 +205,15 @@ export async function baueUndSchreibeEinzelnenEntwurf(
   }
 
   mkdirSync(zielordner, { recursive: true });
+
+  if (engineFuerLead(lead.placeId) === "v2") {
+    const { ordner } = await baueUndSchreibeV2Entwurf(lead, entry.slug, entry.cuisine, entry.gestaltung?.stimmung, { email, api, zielordner });
+    if (zielordner === docsDir) {
+      merkeVeroeffentlichung({ placeId: lead.placeId, slug: entry.slug, archetyp: entry.gestaltung?.archetyp ?? "" });
+    }
+    return { slug: entry.slug, ordner };
+  }
+
   const fontCss = await ladeSchriften(path.join(zielordner, "assets", "fonts"));
 
   schreibeSeiten(
@@ -265,8 +307,26 @@ async function run() {
   };
 
   // Echte Leads: veröffentlicht, aber von nirgendwo verlinkt. Nur wer den
-  // QR-Code oder Link bekommen hat, findet den Entwurf.
-  schreibeSeiten(entries, docsDir, gemeinsam);
+  // QR-Code oder Link bekommen hat, findet den Entwurf. Die Engine-Wahl
+  // (Dashboard-Toggle bzw. ENGINE_STANDARD) entscheidet pro Lead, welche
+  // der beiden Engines tatsächlich schreibt.
+  const wahl = ladeEngineWahl();
+  const v1Entries = entries.filter((e) => engineFuerLead(e.lead.placeId, wahl) !== "v2");
+  const v2Entries = entries.filter((e) => engineFuerLead(e.lead.placeId, wahl) === "v2");
+
+  if (v1Entries.length) schreibeSeiten(v1Entries, docsDir, gemeinsam);
+
+  if (v2Entries.length) {
+    console.log(`\n🧬 Baue ${v2Entries.length} Entwurf/Entwürfe über die v2-Engine ...`);
+    for (const entry of v2Entries) {
+      console.log(`  ▶ ${entry.slug}`);
+      await baueUndSchreibeV2Entwurf(entry.lead, entry.slug, entry.cuisine, entry.gestaltung?.stimmung, {
+        email: args.email,
+        api: args.api,
+        zielordner: docsDir,
+      });
+    }
+  }
 
   // Jede Seite, die dieser Lauf wirklich nach docs/ geschrieben hat, bekommt
   // den aktuellen Engine-Stand ins Manifest. Der Archetyp bleibt dabei der,
@@ -282,7 +342,9 @@ async function run() {
     });
   }
 
-  // Erfundene Lokale: das, was auf der Startseite steht.
+  // Erfundene Lokale: das, was auf der Startseite steht. Nutzen dieselbe
+  // Engine-Wahl wie die echten Leads (Standard, keine Einzelübersteuerung
+  // in data/v2-engine.json vorgesehen).
   const demoEntries = DEMO_LEADS.map((lead) => ({
     lead,
     cuisine: lead.kueche,
@@ -290,7 +352,23 @@ async function run() {
     slug: `beispiel-${lead.kueche}`,
     menu: menuForCuisine(lead.kueche),
   }));
-  schreibeSeiten(demoEntries, docsDir, { ...gemeinsam, fiktiv: true });
+  const demoV1 = demoEntries.filter((e) => engineFuerLead(e.lead.placeId, wahl) !== "v2");
+  const demoV2 = demoEntries.filter((e) => engineFuerLead(e.lead.placeId, wahl) === "v2");
+
+  if (demoV1.length) schreibeSeiten(demoV1, docsDir, { ...gemeinsam, fiktiv: true });
+
+  if (demoV2.length) {
+    console.log(`\n🧬 Baue ${demoV2.length} Beispiel-Entwurf/Entwürfe über die v2-Engine ...`);
+    for (const entry of demoV2) {
+      console.log(`  ▶ ${entry.slug}`);
+      await baueUndSchreibeV2Entwurf(entry.lead, entry.slug, entry.cuisine, entry.gestaltung?.stimmung, {
+        email: args.email,
+        api: args.api,
+        zielordner: docsDir,
+        fiktiv: true,
+      });
+    }
+  }
 
   writeFileSync(path.join(docsDir, "index.html"), buildShowcasePage(demoEntries, args.kontakt), "utf-8");
   writeFileSync(path.join(docsDir, ".nojekyll"), "", "utf-8");
