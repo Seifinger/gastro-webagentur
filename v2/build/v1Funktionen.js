@@ -47,7 +47,10 @@ export function seitenSkript() {
   const start = quelle.indexOf("const PAGE_SCRIPT = `");
   if (start === -1) throw new Error("PAGE_SCRIPT nicht in src/landingPageGenerator.js gefunden.");
   const inhaltStart = start + "const PAGE_SCRIPT = ".length;
-  const ende = quelle.indexOf("`;\n", inhaltStart + 1);
+  // Robuster gegen verschiedene Zeilenenden (LF vs CRLF):
+  // Suche nach Backtick gefolgt von Semikolon und optional Carriage Return + Newline
+  let ende = quelle.indexOf("`;\r\n", inhaltStart + 1);
+  if (ende === -1) ende = quelle.indexOf("`;\n", inhaltStart + 1);
   if (ende === -1) throw new Error("Ende von PAGE_SCRIPT nicht gefunden.");
   const literal = quelle.slice(inhaltStart, ende + 1);
   if (/\$\{/.test(literal)) throw new Error("PAGE_SCRIPT enthält Platzhalter – Auslesen wäre nicht mehr 1:1.");
