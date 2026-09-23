@@ -1,0 +1,157 @@
+{
+  "url": "https://www.speedboatbar.co.uk",
+  "quelle": "website",
+  "modus": "statisch",
+  "zeitpunkt": "2026-09-22T19:29:31.764Z",
+  "titel": "Speedboat Bar – Rupert St, London - Speedboat Bar",
+  "cssBytes": 244405,
+  "stylesheets": {
+    "gefunden": 8,
+    "geladen": 8
+  },
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#eeeeee",
+        "anzahl": 22
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 19
+      },
+      {
+        "hex": "#001e96",
+        "anzahl": 13
+      },
+      {
+        "hex": "#cccccc",
+        "anzahl": 7
+      },
+      {
+        "hex": "#e30917",
+        "anzahl": 5
+      },
+      {
+        "hex": "#dddddd",
+        "anzahl": 4
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 3
+      },
+      {
+        "hex": "#fffa90",
+        "anzahl": 2
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#001e96",
+        "anzahl": 18
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 15
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 10
+      },
+      {
+        "hex": "#333333",
+        "anzahl": 10
+      },
+      {
+        "hex": "#cccccc",
+        "anzahl": 8
+      },
+      {
+        "hex": "#e3121c",
+        "anzahl": 7
+      },
+      {
+        "hex": "#eeeeee",
+        "anzahl": 6
+      },
+      {
+        "hex": "#444444",
+        "anzahl": 4
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": "#001e96"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "henriette",
+        "anzahl": 31,
+        "art": "grotesk"
+      },
+      {
+        "name": "Roboto",
+        "anzahl": 6,
+        "art": "grotesk"
+      },
+      {
+        "name": "adobe-thai",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Archivo Black",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "Helvetica",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "Source Serif Pro",
+        "anzahl": 2,
+        "art": "serif"
+      }
+    ],
+    "charakter": "Grotesk führt, Serife als Gegenstimme, viel Versalsatz",
+    "groessteSchrift": 75,
+    "kontrastVerhaeltnis": 5.77,
+    "versalienAnteil": 0.07,
+    "mittlereSperrungEm": 0,
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": 5,
+    "treffer": 0.41,
+    "haeufigste": [
+      20,
+      8,
+      16,
+      2,
+      10,
+      3,
+      5,
+      6
+    ],
+    "median": 11,
+    "dichte": "dicht"
+  },
+  "layout": {
+    "wert": 0.33,
+    "ungleicheRaster": 1,
+    "gleicheRaster": 7,
+    "zentrierAnteil": 0.78,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "uebergaenge": 26,
+    "keyframes": 34,
+    "medianDauerMs": 400,
+    "haeufigsteKurve": "linear",
+    "respektiertReducedMotion": true,
+    "charakter": "lebendig"
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "url": "https://styles.refero.design/style/f1b6a7d6-1ecb-4f1c-95b0-e03323363999",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:25:54.759Z",
+  "name": "Limón",
+  "originalUrl": "https://limonoslo.no",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#1d0b0d",
+        "name": "Black Olive",
+        "anzahl": 8
+      },
+      {
+        "hex": "#103b15",
+        "name": "Forest Ink",
+        "anzahl": 7
+      },
+      {
+        "hex": "#fcf9f0",
+        "name": "Warm Cream",
+        "anzahl": 5
+      },
+      {
+        "hex": "#dbe2dc",
+        "name": "Sage Mist",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#f7ea48",
+        "name": "Lemon Zest",
+        "anzahl": 6
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#f7ea48",
+    "schema": "dark"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "VenusCom",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Font Awesome 6 Free",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "Font Awesome 6 Brands",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "Times",
+        "anzahl": 2,
+        "art": "serif"
+      },
+      {
+        "name": "Helvetica",
+        "anzahl": 1,
+        "art": "grotesk"
+      },
+      {
+        "name": "FreeSans",
+        "anzahl": 0,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, Serife als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "moody brasserie under candlelight"
+}

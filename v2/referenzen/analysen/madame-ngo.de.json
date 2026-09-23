@@ -1,0 +1,69 @@
+{
+  "url": "https://www.madame-ngo.de",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:29:49.602Z",
+  "titel": "Madame Ngo – Une Brasserie Hanoi – Indochine French Cuisine Berlin",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 7498519
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#141617",
+        "anzahl": 32
+      },
+      {
+        "hex": "#009004",
+        "anzahl": 7
+      },
+      {
+        "hex": "#0f3412",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#009004"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Cormorant Garamond",
+        "rolle": "h1",
+        "art": "serif"
+      },
+      {
+        "name": "Arimo",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Serife führt, Grotesk als Gegenstimme, viel Versalsatz",
+    "displayArt": "serif",
+    "h1Px": 50,
+    "bodyPx": 18,
+    "kontrastVerhaeltnis": 2.78,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0.33,
+    "reihen": 6,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 12,
+    "medianDauerMs": 300,
+    "charakter": "lebendig"
+  }
+}

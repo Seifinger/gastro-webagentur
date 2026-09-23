@@ -1,0 +1,99 @@
+{
+  "site": "indisch--suedindisch-hell",
+  "designsystem": "indisch--suedindisch-hell",
+  "heroVariante": "streifen",
+  "runden": [
+    {
+      "runde": 1,
+      "bestanden": true,
+      "mittel": 10,
+      "noten": {
+        "farbdisziplin": 10,
+        "typografie": 10,
+        "rhythmus": 10,
+        "bildintegration": 10,
+        "verboteneMuster": 10
+      },
+      "befunde": {
+        "farbdisziplin": [],
+        "typografie": [],
+        "rhythmus": [],
+        "bildintegration": [],
+        "verboteneMuster": []
+      },
+      "angewandteKorrekturen": [],
+      "naechsteKorrekturen": []
+    }
+  ],
+  "ergebnis": "bestanden",
+  "stufen": [
+    {
+      "stufe": "referenz",
+      "neu": 0,
+      "gesamt": 2
+    },
+    {
+      "stufe": "designsystem",
+      "id": "indisch--suedindisch-hell"
+    },
+    {
+      "stufe": "copy",
+      "sprachmodell": false
+    }
+  ],
+  "copy": {
+    "ersetzungen": 0,
+    "verbleibend": 0
+  },
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1631452180539-96aca7d48617",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1517248135467-4c7edcad34c4",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1565557623262-b51c2513a641",
+      "typ": "bild"
+    },
+    "gericht:2-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1565557623262-b51c2513a641",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1603894584373-5ac82b2ae398",
+      "typ": "bild"
+    },
+    "gericht:1-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1603496987351-f84a3ba5ec85",
+      "typ": "bild"
+    },
+    "gericht:1-2": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1631452180519-c014fe946bc7",
+      "typ": "bild"
+    }
+  },
+  "zeitpunkt": "2026-09-22T20:20:02.898Z"
+}

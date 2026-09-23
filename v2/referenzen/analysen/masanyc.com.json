@@ -1,0 +1,56 @@
+{
+  "url": "https://www.masanyc.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:30:14.221Z",
+  "titel": "Masa NYC",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#262520",
+        "anzahl": 2592000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#f8f7f3",
+        "anzahl": 6
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "dunkel",
+    "saettigung": "fast unbunt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Brut Grotesque Web",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": null,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": null,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 0,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 250,
+    "charakter": "ruhig"
+  }
+}

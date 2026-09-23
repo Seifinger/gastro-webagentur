@@ -1,0 +1,56 @@
+{
+  "url": "https://www.smokinggoatbar.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:33:40.377Z",
+  "titel": "SMOKING GOAT | Shoreditch | Thai Bar & Grill",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 3057000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 9
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Gotham",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": null,
+    "bodyPx": 8,
+    "kontrastVerhaeltnis": null,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 0,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": null,
+    "charakter": "statisch"
+  }
+}

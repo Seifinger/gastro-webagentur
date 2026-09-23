@@ -1,0 +1,3474 @@
+{
+  "bayerisch--wirtshaus": {
+    "site": "bayerisch--wirtshaus",
+    "designsystem": "bayerisch--wirtshaus",
+    "heroVariante": "passepartout",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "bayerisch--wirtshaus"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1528605248644-14dd04022da1",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1552566626-52f8b828add9",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "typ": "bild"
+      },
+      "gericht:1-4": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "typ": "bild"
+      },
+      "gericht:1-5": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1476224203421-9ac39bcb3327",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1432139555190-58524dae6a55",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:18:28.352Z"
+  },
+  "bayerisch--kellerstube": {
+    "site": "bayerisch--kellerstube",
+    "designsystem": "bayerisch--kellerstube",
+    "heroVariante": "passepartout",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "bayerisch--kellerstube"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599921841143-819065a55cc6",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1528605248644-14dd04022da1",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1558030006-450675393462",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1558030006-450675393462",
+        "typ": "bild"
+      },
+      "gericht:1-4": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "typ": "bild"
+      },
+      "gericht:1-5": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1476224203421-9ac39bcb3327",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1432139555190-58524dae6a55",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:18:31.743Z"
+  },
+  "bayerisch--biergarten": {
+    "site": "bayerisch--biergarten",
+    "designsystem": "bayerisch--biergarten",
+    "heroVariante": "streifen",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "bayerisch--biergarten"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1555396273-367ea4eb4db5",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599921841143-819065a55cc6",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599921841143-819065a55cc6",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1558030006-450675393462",
+        "typ": "bild"
+      },
+      "gericht:1-4": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "typ": "bild"
+      },
+      "gericht:1-5": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1476224203421-9ac39bcb3327",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:18:35.062Z"
+  },
+  "italienisch--trattoria": {
+    "site": "italienisch--trattoria",
+    "designsystem": "italienisch--trattoria",
+    "heroVariante": "tafel",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "italienisch--trattoria"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1481931098730-318b6f776db0",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1517248135467-4c7edcad34c4",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1565299624946-b28f40a0ae38",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1565299624946-b28f40a0ae38",
+        "typ": "bild"
+      },
+      "gericht:1-4": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1593560708920-61dd98c46a4e",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1551183053-bf91a1d81141",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:18:38.698Z"
+  },
+  "italienisch--osteria-notte": {
+    "site": "italienisch--osteria-notte",
+    "designsystem": "italienisch--osteria-notte",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "italienisch--osteria-notte"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1551892374-ecf8754cf8b0",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1552566626-52f8b828add9",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1574071318508-1cdbab80d002",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1574071318508-1cdbab80d002",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1513104890138-7c749659a591",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1565299624946-b28f40a0ae38",
+        "typ": "bild"
+      },
+      "gericht:1-4": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1593560708920-61dd98c46a4e",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:18:41.882Z"
+  },
+  "italienisch--costiera": {
+    "site": "italienisch--costiera",
+    "designsystem": "italienisch--costiera",
+    "heroVariante": "streifen",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "italienisch--costiera"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1565299624946-b28f40a0ae38",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1555396273-367ea4eb4db5",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1551183053-bf91a1d81141",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1551183053-bf91a1d81141",
+        "typ": "bild"
+      },
+      "gericht:2-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1473093295043-cdd812d0e601",
+        "typ": "bild"
+      },
+      "gericht:2-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1621996346565-e3dbc646d9a9",
+        "typ": "bild"
+      },
+      "gericht:2-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544510808-91bcbee1df55",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:18:45.185Z"
+  },
+  "griechisch--taverne-am-hafen": {
+    "site": "griechisch--taverne-am-hafen",
+    "designsystem": "griechisch--taverne-am-hafen",
+    "heroVariante": "tafel",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "griechisch--taverne-am-hafen"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1559339352-11d035aa65de",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1529006557810-274b9b2fc783",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1529006557810-274b9b2fc783",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:18:48.257Z"
+  },
+  "griechisch--athener-moderne": {
+    "site": "griechisch--athener-moderne",
+    "designsystem": "griechisch--athener-moderne",
+    "heroVariante": "tafel",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "griechisch--athener-moderne"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1559339352-11d035aa65de",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1552566626-52f8b828add9",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1540189549336-e6e99c3679fe",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1540189549336-e6e99c3679fe",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1529006557810-274b9b2fc783",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:18:51.441Z"
+  },
+  "griechisch--olivenhain": {
+    "site": "griechisch--olivenhain",
+    "designsystem": "griechisch--olivenhain",
+    "heroVariante": "streifen",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "griechisch--olivenhain"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1554118811-1e0d58224f24",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1529006557810-274b9b2fc783",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1529006557810-274b9b2fc783",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1540189549336-e6e99c3679fe",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:18:54.685Z"
+  },
+  "tuerkisch--basar": {
+    "site": "tuerkisch--basar",
+    "designsystem": "tuerkisch--basar",
+    "heroVariante": "passepartout",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "tuerkisch--basar"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1554118811-1e0d58224f24",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1561651823-34feb02250e4",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1561651823-34feb02250e4",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1529006557810-274b9b2fc783",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:18:57.818Z"
+  },
+  "tuerkisch--bosporus-nacht": {
+    "site": "tuerkisch--bosporus-nacht",
+    "designsystem": "tuerkisch--bosporus-nacht",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "tuerkisch--bosporus-nacht"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1555396273-367ea4eb4db5",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1529006557810-274b9b2fc783",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1529006557810-274b9b2fc783",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1561651823-34feb02250e4",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:00.927Z"
+  },
+  "tuerkisch--anatolische-erde": {
+    "site": "tuerkisch--anatolische-erde",
+    "designsystem": "tuerkisch--anatolische-erde",
+    "heroVariante": "streifen",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 2
+      },
+      {
+        "stufe": "designsystem",
+        "id": "tuerkisch--anatolische-erde"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1528605248644-14dd04022da1",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1590846406792-0adc7f938f1d",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1529006557810-274b9b2fc783",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1561651823-34feb02250e4",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:03.928Z"
+  },
+  "syrisch--damaszener-hof": {
+    "site": "syrisch--damaszener-hof",
+    "designsystem": "syrisch--damaszener-hof",
+    "heroVariante": "tafel",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "syrisch--damaszener-hof"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1583060095186-852adde6b819",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1554118811-1e0d58224f24",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1752795646140-eb70cf30640e",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1752795646140-eb70cf30640e",
+        "typ": "bild"
+      },
+      "gericht:0-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1768812910769-d037b90aee77",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1699728088614-7d1d4277414b",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:07.342Z"
+  },
+  "syrisch--gewuerzbasar": {
+    "site": "syrisch--gewuerzbasar",
+    "designsystem": "syrisch--gewuerzbasar",
+    "heroVariante": "typo",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "syrisch--gewuerzbasar"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1752795646140-eb70cf30640e",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1562560471-cb5b5f96c1ab",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1752795646140-eb70cf30640e",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1752795646140-eb70cf30640e",
+        "typ": "bild"
+      },
+      "gericht:0-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1768812910769-d037b90aee77",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1699728088614-7d1d4277414b",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1583060095186-852adde6b819",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:10.653Z"
+  },
+  "syrisch--levante-modern": {
+    "site": "syrisch--levante-modern",
+    "designsystem": "syrisch--levante-modern",
+    "heroVariante": "typo",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "syrisch--levante-modern"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1530469912745-a215c6b256ea",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1555396273-367ea4eb4db5",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1768812910769-d037b90aee77",
+        "typ": "bild"
+      },
+      "gericht:0-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1768812910769-d037b90aee77",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1699728088614-7d1d4277414b",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1583060095186-852adde6b819",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1752795646140-eb70cf30640e",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:13.862Z"
+  },
+  "chinesisch--rote-laterne": {
+    "site": "chinesisch--rote-laterne",
+    "designsystem": "chinesisch--rote-laterne",
+    "heroVariante": "tafel",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "chinesisch--rote-laterne"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1523905330026-b8bd1f5f320e",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1672756214803-61e605da34fc",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1496116218417-1a781b1c416c",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1496116218417-1a781b1c416c",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1504674900247-0877df9cc836",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1512058564366-18510be2db19",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:17.192Z"
+  },
+  "chinesisch--shanghai-nacht": {
+    "site": "chinesisch--shanghai-nacht",
+    "designsystem": "chinesisch--shanghai-nacht",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "chinesisch--shanghai-nacht"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1504674900247-0877df9cc836",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1590846406792-0adc7f938f1d",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1512058564366-18510be2db19",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1512058564366-18510be2db19",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1585032226651-759b368d7246",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1523905330026-b8bd1f5f320e",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1496116218417-1a781b1c416c",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:20.519Z"
+  },
+  "chinesisch--teehaus": {
+    "site": "chinesisch--teehaus",
+    "designsystem": "chinesisch--teehaus",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "chinesisch--teehaus"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1563245372-f21724e3856d",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1555396273-367ea4eb4db5",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1523905330026-b8bd1f5f320e",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1523905330026-b8bd1f5f320e",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1496116218417-1a781b1c416c",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1504674900247-0877df9cc836",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1512058564366-18510be2db19",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:23.774Z"
+  },
+  "thailaendisch--orchidee": {
+    "site": "thailaendisch--orchidee",
+    "designsystem": "thailaendisch--orchidee",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "thailaendisch--orchidee"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1628432017781-49e012d769b3",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1746003668321-d400319650ce",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1618449840665-9ed506d73a34",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1618449840665-9ed506d73a34",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1559314809-0d155014e29e",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1455619452474-d2be8b1e70cd",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:26.941Z"
+  },
+  "thailaendisch--streetfood-nacht": {
+    "site": "thailaendisch--streetfood-nacht",
+    "designsystem": "thailaendisch--streetfood-nacht",
+    "heroVariante": "tafel",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "thailaendisch--streetfood-nacht"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1455619452474-d2be8b1e70cd",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1590846406792-0adc7f938f1d",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1455619452474-d2be8b1e70cd",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1455619452474-d2be8b1e70cd",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1587040690786-b091531837a2",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1628432017781-49e012d769b3",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1618449840665-9ed506d73a34",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:30.072Z"
+  },
+  "thailaendisch--andamanen": {
+    "site": "thailaendisch--andamanen",
+    "designsystem": "thailaendisch--andamanen",
+    "heroVariante": "typo",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "thailaendisch--andamanen"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1548943487-a2e4e43b4853",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1517248135467-4c7edcad34c4",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1559314809-0d155014e29e",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1559314809-0d155014e29e",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1455619452474-d2be8b1e70cd",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1587040690786-b091531837a2",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1628432017781-49e012d769b3",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:33.192Z"
+  },
+  "vietnamesisch--indochine": {
+    "site": "vietnamesisch--indochine",
+    "designsystem": "vietnamesisch--indochine",
+    "heroVariante": "karte",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 9.4,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 7,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [
+            "Titelbild füllt nur 5 % des ersten Bildschirms"
+          ],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "vietnamesisch--indochine"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1589570658214-002314b1520f",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1693822998952-b8d18c61043b",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1677354469642-3e4fc5dbbb4a",
+        "typ": "bild"
+      },
+      "gericht:2-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1677354469642-3e4fc5dbbb4a",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1597345637412-9fd611e758f3",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1589570658214-002314b1520f",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:36.715Z"
+  },
+  "vietnamesisch--hanoi-nacht": {
+    "site": "vietnamesisch--hanoi-nacht",
+    "designsystem": "vietnamesisch--hanoi-nacht",
+    "heroVariante": "tafel",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 2
+      },
+      {
+        "stufe": "designsystem",
+        "id": "vietnamesisch--hanoi-nacht"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1582878826629-29b7ad1cdc43",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1562560471-cb5b5f96c1ab",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1589570658214-002314b1520f",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1589570658214-002314b1520f",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1582878826629-29b7ad1cdc43",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1710532774170-9844f837ae54",
+        "typ": "bild"
+      },
+      "gericht:2-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1677354469642-3e4fc5dbbb4a",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:39.873Z"
+  },
+  "vietnamesisch--strassenkueche": {
+    "site": "vietnamesisch--strassenkueche",
+    "designsystem": "vietnamesisch--strassenkueche",
+    "heroVariante": "typo",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 2
+      },
+      {
+        "stufe": "designsystem",
+        "id": "vietnamesisch--strassenkueche"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1631709497146-a239ef373cf1",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1555396273-367ea4eb4db5",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1710532774170-9844f837ae54",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1710532774170-9844f837ae54",
+        "typ": "bild"
+      },
+      "gericht:2-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1677354469642-3e4fc5dbbb4a",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1597345637412-9fd611e758f3",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1589570658214-002314b1520f",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:43.192Z"
+  },
+  "japanisch--izakaya": {
+    "site": "japanisch--izakaya",
+    "designsystem": "japanisch--izakaya",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "japanisch--izakaya"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1569718212165-3a8278d5f624",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1693822998952-b8d18c61043b",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1588166524938-1ee110d7dcef",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1588166524938-1ee110d7dcef",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1553621042-f6e147245754",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1569718212165-3a8278d5f624",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:46.510Z"
+  },
+  "japanisch--omakase": {
+    "site": "japanisch--omakase",
+    "designsystem": "japanisch--omakase",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "japanisch--omakase"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1626322751504-930506dd41ca",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1746003668321-d400319650ce",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1569718212165-3a8278d5f624",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1569718212165-3a8278d5f624",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1588166524938-1ee110d7dcef",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1553621042-f6e147245754",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:49.754Z"
+  },
+  "japanisch--washitsu": {
+    "site": "japanisch--washitsu",
+    "designsystem": "japanisch--washitsu",
+    "heroVariante": "streifen",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "japanisch--washitsu"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1534422298391-e4f8c172dddb",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1590846406792-0adc7f938f1d",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1588166524938-1ee110d7dcef",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1588166524938-1ee110d7dcef",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1553621042-f6e147245754",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1569718212165-3a8278d5f624",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:52.990Z"
+  },
+  "indisch--gewuerzmarkt": {
+    "site": "indisch--gewuerzmarkt",
+    "designsystem": "indisch--gewuerzmarkt",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "indisch--gewuerzmarkt"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1603894584373-5ac82b2ae398",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1672756214803-61e605da34fc",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1603894584373-5ac82b2ae398",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1603894584373-5ac82b2ae398",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1603496987351-f84a3ba5ec85",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1631452180519-c014fe946bc7",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:56.224Z"
+  },
+  "indisch--maharadscha": {
+    "site": "indisch--maharadscha",
+    "designsystem": "indisch--maharadscha",
+    "heroVariante": "typo",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 2
+      },
+      {
+        "stufe": "designsystem",
+        "id": "indisch--maharadscha"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1565557623262-b51c2513a641",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1562560471-cb5b5f96c1ab",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1588166524941-3bf61a9c41db",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1588166524941-3bf61a9c41db",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1565557623262-b51c2513a641",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1603894584373-5ac82b2ae398",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1603496987351-f84a3ba5ec85",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:19:59.615Z"
+  },
+  "indisch--suedindisch-hell": {
+    "site": "indisch--suedindisch-hell",
+    "designsystem": "indisch--suedindisch-hell",
+    "heroVariante": "streifen",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 2
+      },
+      {
+        "stufe": "designsystem",
+        "id": "indisch--suedindisch-hell"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1631452180539-96aca7d48617",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1517248135467-4c7edcad34c4",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1565557623262-b51c2513a641",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1565557623262-b51c2513a641",
+        "typ": "bild"
+      },
+      "gericht:1-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1603894584373-5ac82b2ae398",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1603496987351-f84a3ba5ec85",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1631452180519-c014fe946bc7",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:20:02.898Z"
+  },
+  "asiatisch--marktstand": {
+    "site": "asiatisch--marktstand",
+    "designsystem": "asiatisch--marktstand",
+    "heroVariante": "karte",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 9.4,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 7,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [
+            "Titelbild füllt nur 5 % des ersten Bildschirms"
+          ],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "asiatisch--marktstand"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1569718212165-3a8278d5f624",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1590846406792-0adc7f938f1d",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1512058564366-18510be2db19",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1512058564366-18510be2db19",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1585032226651-759b368d7246",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1553621042-f6e147245754",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:20:06.110Z"
+  },
+  "asiatisch--neon": {
+    "site": "asiatisch--neon",
+    "designsystem": "asiatisch--neon",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 2
+      },
+      {
+        "stufe": "designsystem",
+        "id": "asiatisch--neon"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1553621042-f6e147245754",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1517248135467-4c7edcad34c4",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1504674900247-0877df9cc836",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1504674900247-0877df9cc836",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1512058564366-18510be2db19",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1585032226651-759b368d7246",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1553621042-f6e147245754",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:20:09.137Z"
+  },
+  "asiatisch--fusion-minimal": {
+    "site": "asiatisch--fusion-minimal",
+    "designsystem": "asiatisch--fusion-minimal",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 2
+      },
+      {
+        "stufe": "designsystem",
+        "id": "asiatisch--fusion-minimal"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 0,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1512058564366-18510be2db19",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1555396273-367ea4eb4db5",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1504674900247-0877df9cc836",
+        "typ": "bild"
+      },
+      "gericht:1-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1504674900247-0877df9cc836",
+        "typ": "bild"
+      },
+      "gericht:1-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1512058564366-18510be2db19",
+        "typ": "bild"
+      },
+      "gericht:1-3": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1585032226651-759b368d7246",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1553621042-f6e147245754",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:20:12.173Z"
+  },
+  "cafe--wiener-kaffeehaus": {
+    "site": "cafe--wiener-kaffeehaus",
+    "designsystem": "cafe--wiener-kaffeehaus",
+    "heroVariante": "passepartout",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "cafe--wiener-kaffeehaus"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1495474472287-4d71bcdd2085",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1554118811-1e0d58224f24",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1509440159596-0249088772ff",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1509440159596-0249088772ff",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1567620905732-2d1ec7ab7445",
+        "typ": "bild"
+      },
+      "gericht:0-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1546069901-ba9599a7e63c",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:20:15.428Z"
+  },
+  "cafe--konditorei": {
+    "site": "cafe--konditorei",
+    "designsystem": "cafe--konditorei",
+    "heroVariante": "spalte-bild",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "cafe--konditorei"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1567620905732-2d1ec7ab7445",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1517248135467-4c7edcad34c4",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1546069901-ba9599a7e63c",
+        "typ": "bild"
+      },
+      "gericht:0-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1546069901-ba9599a7e63c",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1495474472287-4d71bcdd2085",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1509440159596-0249088772ff",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1567620905732-2d1ec7ab7445",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:20:18.593Z"
+  },
+  "cafe--third-wave": {
+    "site": "cafe--third-wave",
+    "designsystem": "cafe--third-wave",
+    "heroVariante": "streifen",
+    "runden": [
+      {
+        "runde": 1,
+        "bestanden": true,
+        "mittel": 10,
+        "noten": {
+          "farbdisziplin": 10,
+          "typografie": 10,
+          "rhythmus": 10,
+          "bildintegration": 10,
+          "verboteneMuster": 10
+        },
+        "befunde": {
+          "farbdisziplin": [],
+          "typografie": [],
+          "rhythmus": [],
+          "bildintegration": [],
+          "verboteneMuster": []
+        },
+        "angewandteKorrekturen": [],
+        "naechsteKorrekturen": []
+      }
+    ],
+    "ergebnis": "bestanden",
+    "stufen": [
+      {
+        "stufe": "referenz",
+        "neu": 0,
+        "gesamt": 3
+      },
+      {
+        "stufe": "designsystem",
+        "id": "cafe--third-wave"
+      },
+      {
+        "stufe": "copy",
+        "sprachmodell": false
+      }
+    ],
+    "copy": {
+      "ersetzungen": 1,
+      "verbleibend": 0
+    },
+    "medien": {
+      "hero": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1544510808-91bcbee1df55",
+        "typ": "bild"
+      },
+      "haus": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1552566626-52f8b828add9",
+        "typ": "bild"
+      },
+      "team": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1428515613728-6b4607e44363",
+        "typ": "bild"
+      },
+      "bestseller": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1567620905732-2d1ec7ab7445",
+        "typ": "bild"
+      },
+      "gericht:0-1": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1567620905732-2d1ec7ab7445",
+        "typ": "bild"
+      },
+      "gericht:0-2": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1546069901-ba9599a7e63c",
+        "typ": "bild"
+      },
+      "gericht:2-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1495474472287-4d71bcdd2085",
+        "typ": "bild"
+      },
+      "gericht:0-0": {
+        "herkunft": "platzhalter",
+        "kennzeichnung": "Platzhalter",
+        "quelle": "stock:photo-1509440159596-0249088772ff",
+        "typ": "bild"
+      }
+    },
+    "zeitpunkt": "2026-09-22T20:20:21.869Z"
+  }
+}

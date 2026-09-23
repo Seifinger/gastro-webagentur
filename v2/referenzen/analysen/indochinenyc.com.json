@@ -1,0 +1,81 @@
+{
+  "url": "https://www.indochinenyc.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:29:37.738Z",
+  "titel": "Indochine | New York",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 1296000
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 829440
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ed1b24",
+        "anzahl": 1
+      },
+      {
+        "hex": "#ed1b24",
+        "anzahl": 16
+      },
+      {
+        "hex": "#f7eee4",
+        "anzahl": 8
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 6
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "fast unbunt",
+    "akzent": "#ed1b24"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Big Shoulders Display",
+        "rolle": "h1",
+        "art": "schmal"
+      },
+      {
+        "name": "Jost",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "schmale Grotesk führt, Grotesk als Gegenstimme, viel Versalsatz",
+    "displayArt": "schmal",
+    "h1Px": 68,
+    "bodyPx": 17,
+    "kontrastVerhaeltnis": 4,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 1,
+    "median": 50,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 0,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 1,
+    "medianDauerMs": 200,
+    "charakter": "ruhig"
+  }
+}

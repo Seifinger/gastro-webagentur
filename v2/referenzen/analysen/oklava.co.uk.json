@@ -1,0 +1,77 @@
+{
+  "url": "https://www.oklava.co.uk",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:27:20.405Z",
+  "titel": "Best Non Gamstop Casinos - New UK Sites Not on Gamstop",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#133027",
+        "anzahl": 16422265
+      },
+      {
+        "hex": "#0d2519",
+        "anzahl": 4498200
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#cfe0d6",
+        "anzahl": 111
+      },
+      {
+        "hex": "#eef4ef",
+        "anzahl": 64
+      },
+      {
+        "hex": "#14301f",
+        "anzahl": 45
+      },
+      {
+        "hex": "#a9c4b4",
+        "anzahl": 36
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "dunkel",
+    "saettigung": "gedeckt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Bricolage Grotesque",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "Hanken Grotesk",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 50,
+    "bodyPx": 14,
+    "kontrastVerhaeltnis": 3.57,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0.86,
+    "median": 24,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 0,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 120,
+    "charakter": "lebendig"
+  }
+}

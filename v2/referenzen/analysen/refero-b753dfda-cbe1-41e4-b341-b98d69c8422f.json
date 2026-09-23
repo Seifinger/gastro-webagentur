@@ -1,0 +1,70 @@
+{
+  "url": "https://styles.refero.design/style/b753dfda-cbe1-41e4-b341-b98d69c8422f",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:30:51.826Z",
+  "name": "Amrit Palace",
+  "originalUrl": "https://amritpalace.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#d8cbb8",
+        "name": "Parchment",
+        "anzahl": 8
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#bfb4a3",
+        "name": "Linen",
+        "anzahl": 7
+      },
+      {
+        "hex": "#b6ab9c",
+        "name": "Warm Stone",
+        "anzahl": 6
+      },
+      {
+        "hex": "#978e81",
+        "name": "Walnut",
+        "anzahl": 5
+      },
+      {
+        "hex": "#615b53",
+        "name": "Espresso",
+        "anzahl": 4
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "fast unbunt",
+    "akzent": null,
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "TT Ramillas Variable",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Satoshi",
+        "anzahl": 4,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "spiced parchment gallery — a candlelit beige wall holding sparse saffron punctuation beneath breath-soft serif headlines."
+}

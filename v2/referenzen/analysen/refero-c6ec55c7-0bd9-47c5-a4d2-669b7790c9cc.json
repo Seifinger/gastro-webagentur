@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/c6ec55c7-0bd9-47c5-a4d2-669b7790c9cc",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:27:32.474Z",
+  "name": "OLIPOP",
+  "originalUrl": "https://drinkolipop.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#fdf7e7",
+        "name": "Cream Paper",
+        "anzahl": 7
+      },
+      {
+        "hex": "#d3e8e3",
+        "name": "Mint Sage",
+        "anzahl": 6
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Pure White",
+        "anzahl": 4
+      },
+      {
+        "hex": "#e3e3e3",
+        "name": "Hairline Gray",
+        "anzahl": 3
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#14433d",
+        "name": "Forest Ink",
+        "anzahl": 8
+      },
+      {
+        "hex": "#3a3a3a",
+        "name": "Charcoal",
+        "anzahl": 5
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": null,
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "WindsorEF",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Ano",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "Helvetica",
+        "anzahl": 3,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Retro apothecary cream and forest teal — a soda fountain menu printed on warm paper."
+}

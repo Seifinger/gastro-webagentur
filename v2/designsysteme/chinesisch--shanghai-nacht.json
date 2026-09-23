@@ -1,0 +1,716 @@
+{
+  "version": 1,
+  "id": "chinesisch--shanghai-nacht",
+  "kueche": "chinesisch",
+  "kuecheLabel": "Chinesisch",
+  "stimmung": "shanghai-nacht",
+  "label": "Shanghai Nacht",
+  "archetyp": "abend",
+  "archetypLabel": "Abend",
+  "richtung": "Shanghai Nacht: Art-déco-Bar, Schwarz, Rot als Licht.",
+  "referenzen": [
+    {
+      "name": "Hakkasan",
+      "url": "https://hakkasan.com",
+      "typ": "restaurant",
+      "uebernehmen": [
+        "Schwarzgrund",
+        "sparsamer roter Akzent"
+      ],
+      "nichtUebernehmen": [
+        "Club-/Event-Fokus"
+      ]
+    },
+    {
+      "name": "Mott 32",
+      "url": "https://www.mott32.com",
+      "typ": "restaurant",
+      "uebernehmen": [
+        "dunkle, satte Bilder",
+        "reduzierte Typo"
+      ],
+      "nichtUebernehmen": [
+        "Standort-Wahl vor Inhalt"
+      ]
+    },
+    {
+      "name": "Freshman",
+      "url": "https://styles.refero.design/style/a6284fcd-fa69-4469-ac40-4239e5b84a39",
+      "typ": "refero",
+      "uebernehmen": [
+        "Titelkarten-Typografie",
+        "Rot #ff2936 als einziger Akzent"
+      ],
+      "nichtUebernehmen": [
+        "Kinofilm-Layout"
+      ]
+    }
+  ],
+  "referenzSignal": {
+    "quellen": [
+      {
+        "name": "Hakkasan",
+        "typ": "restaurant",
+        "modus": "browser"
+      },
+      {
+        "name": "Mott 32",
+        "typ": "restaurant",
+        "modus": "browser"
+      },
+      {
+        "name": "Freshman",
+        "typ": "refero",
+        "modus": "refero"
+      }
+    ],
+    "fehlend": [],
+    "temperatur": "neutral",
+    "helligkeit": "dunkel",
+    "saettigung": "fast unbunt",
+    "akzente": [
+      "#ff2936"
+    ],
+    "dichte": "luftig",
+    "rasterBasis": "12",
+    "layout": "versetzt/asymmetrisch",
+    "motion": "ruhig",
+    "displayArten": [
+      "grotesk",
+      "grotesk",
+      "serif"
+    ],
+    "versalien": 2,
+    "leitsaetze": [
+      "cinema title card on black velvet"
+    ]
+  },
+  "farben": {
+    "schema": "dunkel",
+    "rollen": {
+      "grund": {
+        "hex": "#0f1012",
+        "aufgabe": "Seitengrund – trägt rund 60 % der Fläche",
+        "verwendung": [
+          "body",
+          "Sektionen ohne eigene Fläche"
+        ]
+      },
+      "flaeche": {
+        "hex": "#17181c",
+        "aufgabe": "Erhöhte Fläche – Formulare, Warenkorb, Tafeln",
+        "verwendung": [
+          "Formular-Panel",
+          "Drawer",
+          "Menütafel"
+        ]
+      },
+      "flaecheTief": {
+        "hex": "#141519",
+        "aufgabe": "Zweiter Grund für Sektionswechsel – ersetzt Trennlinien",
+        "verwendung": [
+          "jede zweite Sektion",
+          "Passepartout"
+        ]
+      },
+      "text": {
+        "hex": "#f4f4f6",
+        "aufgabe": "Fließtext und Überschriften",
+        "verwendung": [
+          "body",
+          "h1–h3"
+        ]
+      },
+      "textLeise": {
+        "hex": "#a0a0ac",
+        "aufgabe": "Nebeninformation: Beschreibungen, Hinweise, Zeiten",
+        "verwendung": [
+          "Gerichtsbeschreibung",
+          "Formularhinweis"
+        ]
+      },
+      "linie": {
+        "hex": "#2a2b33",
+        "aufgabe": "Dekorative Haarlinie – nie alleiniger Träger von Information",
+        "verwendung": [
+          "Tabellenzeilen",
+          "Sektionskanten"
+        ]
+      },
+      "linieStark": {
+        "hex": "#999a9e",
+        "aufgabe": "Begrenzung von Bedienelementen (≥ 3:1)",
+        "verwendung": [
+          "Eingabefelder",
+          "Mengenknöpfe"
+        ]
+      },
+      "akzent": {
+        "hex": "#d53c42",
+        "aufgabe": "Handlung – ausschließlich Knöpfe und aktive Zustände",
+        "verwendung": [
+          "Primärknopf",
+          "Fokusring",
+          "aktive Rubrik"
+        ],
+        "maxFlaechenAnteil": 0.08
+      },
+      "akzentTief": {
+        "hex": "#d63d43",
+        "aufgabe": "Hover/gedrückt des Primärknopfs",
+        "verwendung": [
+          "Primärknopf :hover"
+        ]
+      },
+      "aufAkzent": {
+        "hex": "#ffffff",
+        "aufgabe": "Schrift auf Akzentfläche",
+        "verwendung": [
+          "Primärknopf-Beschriftung"
+        ]
+      },
+      "akzentText": {
+        "hex": "#da555a",
+        "aufgabe": "Akzent als Schrift – Links, Rubriken, Preise",
+        "verwendung": [
+          "Links",
+          "Rubrik",
+          "Plus-Knopf"
+        ]
+      },
+      "signal": {
+        "hex": "#d9a441",
+        "aufgabe": "Signalton für kleine Marken – nie als Fläche",
+        "verwendung": [
+          "Sterne",
+          "Hausempfehlung-Siegel"
+        ]
+      },
+      "signalText": {
+        "hex": "#d9a441",
+        "aufgabe": "Signalton als lesbare Schrift auf hellen Gründen",
+        "verwendung": [
+          "Platzhalter-Kennzeichnung",
+          "Note"
+        ]
+      },
+      "tint": {
+        "hex": "#08090b",
+        "aufgabe": "Dunkle Tafel – Hero-Tafel, Fußzeile, Overlay",
+        "verwendung": [
+          "Hero-Tafel",
+          "Fußzeile"
+        ],
+        "rgb": "8,9,11"
+      },
+      "aufTint": {
+        "hex": "#f4f4f6",
+        "aufgabe": "Schrift auf der Tafel",
+        "verwendung": [
+          "Hero-Tafel",
+          "Fußzeile"
+        ]
+      },
+      "aufTintLeise": {
+        "hex": "#b2b2b4",
+        "aufgabe": "Nebenschrift auf der Tafel",
+        "verwendung": [
+          "Fußzeilen-Links"
+        ]
+      },
+      "signalAufTint": {
+        "hex": "#d9a441",
+        "aufgabe": "Signalton auf der Tafel",
+        "verwendung": [
+          "Sterne im Hero"
+        ]
+      },
+      "fehler": {
+        "hex": "#ff8a80",
+        "aufgabe": "Fehlermeldungen in Formularen",
+        "verwendung": [
+          "Formularfehler",
+          "Ablehnung"
+        ]
+      }
+    },
+    "herleitung": [
+      "Akzent gedämpft (#dd353a → #cc464a, Sättigung ×0.8), Referenzen sind fast unbunt.",
+      "Akzent 20 % Richtung Referenz-Akzent #ff2936 gezogen (#cc464a → #d64046).",
+      "Akzent für lesbare Knopfschrift und 3:1 gegen den Grund verschoben (#d64046 → #d53c42)."
+    ]
+  },
+  "kontrastPaare": [
+    {
+      "vordergrund": "text",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "text",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "text",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "textLeise",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "textLeise",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "textLeise",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "akzentText",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "akzentText",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "akzentText",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "aufAkzent",
+      "hintergrund": "akzent",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "aufAkzent",
+      "hintergrund": "akzentTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "signalText",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "signalText",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "signalText",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "aufTint",
+      "hintergrund": "tint",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "aufTintLeise",
+      "hintergrund": "tint",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "signalAufTint",
+      "hintergrund": "tint",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "fehler",
+      "hintergrund": "flaeche",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "fehler",
+      "hintergrund": "grund",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "fehler",
+      "hintergrund": "flaecheTief",
+      "mindest": 4.5,
+      "art": "text"
+    },
+    {
+      "vordergrund": "linieStark",
+      "hintergrund": "flaeche",
+      "mindest": 3,
+      "art": "ui"
+    },
+    {
+      "vordergrund": "linieStark",
+      "hintergrund": "grund",
+      "mindest": 3,
+      "art": "ui"
+    },
+    {
+      "vordergrund": "akzent",
+      "hintergrund": "grund",
+      "mindest": 3,
+      "art": "ui"
+    }
+  ],
+  "typografie": {
+    "display": {
+      "familie": "Poiret One",
+      "stapel": "'Poiret One', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+      "gewicht": 400,
+      "art": "grotesk",
+      "charakter": "Art-déco-Linie – Shanghai-Bar der 30er",
+      "versalien": true,
+      "sperrung": "0.04em",
+      "zeilenhoehe": 1.06
+    },
+    "text": {
+      "familie": "Instrument Sans",
+      "stapel": "'Instrument Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+      "gewicht": 400,
+      "gewichtStark": 600,
+      "art": "grotesk",
+      "charakter": "präzise, schmal laufende Grotesk",
+      "zeilenhoehe": 1.6
+    },
+    "label": null,
+    "rubrik": {
+      "stil": "versal",
+      "beschreibung": "Versalien, weit gesperrt (0.14em), klein"
+    },
+    "skala": {
+      "verhaeltnis": 1.333,
+      "name": "Quarte",
+      "basisPx": 17,
+      "stufen": {
+        "klein": {
+          "px": 14,
+          "einsatz": "Labels, Hinweise, Rubriken",
+          "rem": "0.875rem"
+        },
+        "basis": {
+          "px": 17,
+          "einsatz": "Fließtext, Formular",
+          "rem": "1.063rem"
+        },
+        "gross": {
+          "px": 23,
+          "einsatz": "Einleitungen, Preise der Hausempfehlung",
+          "rem": "1.438rem"
+        },
+        "h3": {
+          "px": 30,
+          "einsatz": "Gerichtsnamen, Kartenköpfe",
+          "rem": "1.875rem"
+        },
+        "h2": {
+          "px": 54,
+          "mobil": 40,
+          "einsatz": "Sektionstitel",
+          "rem": "3.375rem",
+          "fluessig": "clamp(2.5rem, 4.22vw, 3.375rem)"
+        },
+        "h1": {
+          "px": 95,
+          "mobil": 62,
+          "einsatz": "Name des Hauses",
+          "rem": "5.938rem",
+          "fluessig": "clamp(3.875rem, 7.42vw, 5.938rem)"
+        },
+        "display": {
+          "px": 127,
+          "mobil": 72,
+          "einsatz": "Typo-Hero",
+          "rem": "7.938rem",
+          "fluessig": "clamp(4.5rem, 9.92vw, 7.938rem)"
+        }
+      }
+    },
+    "herleitung": [
+      "2 von 3 ausgewerteten Referenzen führen ebenfalls mit Grotesk (grotesk, grotesk, serif)."
+    ]
+  },
+  "spacing": {
+    "raster": 8,
+    "halbschritt": 4,
+    "skala": {
+      "1": 8,
+      "2": 16,
+      "3": 24,
+      "4": 32,
+      "5": 40,
+      "6": 48,
+      "8": 64,
+      "10": 80,
+      "12": 96,
+      "16": 128,
+      "halb": 4
+    },
+    "sektion": {
+      "desktop": 128,
+      "mobil": 64
+    },
+    "sektionBetont": {
+      "desktop": 160,
+      "mobil": 80
+    },
+    "sektionEng": {
+      "desktop": 48,
+      "mobil": 32
+    },
+    "rinne": 32,
+    "rand": {
+      "desktop": 48,
+      "mobil": 24
+    },
+    "herleitung": [
+      "Sektionsabstand 128px: Referenzen sind mehrheitlich „luftig“.",
+      "Referenzen nutzen ein 12px-Grundmaß – v2 setzt einheitlich 8px (4px nur als Halbschritt)."
+    ]
+  },
+  "radius": {
+    "klein": 2,
+    "karte": 8,
+    "knopf": 2,
+    "bild": 0,
+    "marke": 999,
+    "herleitung": [
+      "Kartenradius aus v1-Stimmung (6px) auf 4px gerastert, im Abendhaus auf höchstens 8px begrenzt; Pillenform nur für kleine Marken."
+    ]
+  },
+  "schatten": {
+    "stil": "linie",
+    "karte": "0 0 0 1px #2a2b33",
+    "schwebend": "0 24px 48px -24px rgba(8,9,11,.55)",
+    "herleitung": [
+      "Dunkler Grund: Schatten wären unsichtbar – Kanten statt Schatten."
+    ]
+  },
+  "motion": {
+    "kurve": "cubic-bezier(.5,0,.1,1)",
+    "dauerMs": {
+      "kurz": 160,
+      "mittel": 432,
+      "lang": 720
+    },
+    "auftrittDistanzPx": 16,
+    "versatzMs": 120,
+    "regeln": [
+      "Animiert werden nur transform und opacity.",
+      "Startzustände hängen an einer Klasse, die erst das Skript setzt – ohne JS ist alles sichtbar.",
+      "prefers-reduced-motion: reduce schaltet jede Bewegung ab.",
+      "Genau ein betonter Moment je Seite (siehe layout.betonterMoment)."
+    ],
+    "herleitung": [
+      "Kurve cubic-bezier(.5,0,.1,1) aus der v1-Handschrift „abend“."
+    ]
+  },
+  "layout": {
+    "maxBreite": 1120,
+    "spalten": 12,
+    "verhaeltnis": "5/7",
+    "textBreite": "62ch",
+    "heroVarianten": [
+      "tafel",
+      "passepartout",
+      "typo",
+      "spalte-bild"
+    ],
+    "sektionsReihenfolge": [
+      "ambiente",
+      "karte",
+      "highlights",
+      "stimmen",
+      "reservierung",
+      "kontakt"
+    ],
+    "kopfzeileFest": true,
+    "primaerAktion": "reservation",
+    "mobileAktionsleiste": true,
+    "highlights": "leseliste",
+    "karte": "spalten",
+    "stimmen": "zitat",
+    "betonterMoment": "reservierung",
+    "sektionsWechsel": "Flächenwechsel grund ↔ flaecheTief statt Trennlinien",
+    "herleitung": [
+      "Sektionsfolge, Kopfzeile und Hauptaktion aus designPresets.js (Archetyp „abend“).",
+      "Referenzen versetzt/asymmetrisch – asymmetrisches Raster 5/7."
+    ]
+  },
+  "verboteneMuster": {
+    "global": [
+      {
+        "id": "drei-gleiche-karten",
+        "beschreibung": "Drei gleich gebaute Karten (Bild/Icon + Überschrift + Text) nebeneinander",
+        "pruefung": "lint"
+      },
+      {
+        "id": "mehrfarb-verlauf",
+        "beschreibung": "Verläufe über mehrere Farbtöne (Lila→Blau, Sonnenuntergang); erlaubt ist nur ein Ton in verschiedenen Deckkräften",
+        "pruefung": "lint"
+      },
+      {
+        "id": "generische-schrift",
+        "beschreibung": "Inter, Roboto, system-ui und die übrigen Standardschriften generierter Seiten",
+        "pruefung": "lint"
+      },
+      {
+        "id": "kleine-textschrift",
+        "beschreibung": "Fließtext unter 16px",
+        "pruefung": "lint"
+      },
+      {
+        "id": "raster-bruch",
+        "beschreibung": "Abstände außerhalb des 8px-Rasters (4px nur als Halbschritt)",
+        "pruefung": "lint"
+      },
+      {
+        "id": "text-auf-foto-mit-verlauf",
+        "beschreibung": "Zentrierter Text direkt auf abgedunkeltem Foto mit Verlaufsschleier",
+        "pruefung": "lint"
+      },
+      {
+        "id": "glasmorphismus",
+        "beschreibung": "Milchglas-Flächen (backdrop-filter: blur)",
+        "pruefung": "lint"
+      },
+      {
+        "id": "emoji-icons",
+        "beschreibung": "Emoji als Symbole statt gezeichneter Zeichen",
+        "pruefung": "lint"
+      },
+      {
+        "id": "leucht-schatten",
+        "beschreibung": "Leuchtende text-shadow/box-shadow in Akzentfarbe (Neon-Glow)",
+        "pruefung": "lint"
+      },
+      {
+        "id": "pillen-flut",
+        "beschreibung": "Pillenform (radius 999) auf Knöpfen und Karten – nur kleine Marken dürfen rund sein",
+        "pruefung": "lint"
+      },
+      {
+        "id": "akzent-flut",
+        "beschreibung": "Akzentfarbe auf mehr als 8 % der sichtbaren Fläche",
+        "pruefung": "judge"
+      },
+      {
+        "id": "fremde-farben",
+        "beschreibung": "Farben, die nicht aus der Palette stammen",
+        "pruefung": "judge"
+      },
+      {
+        "id": "gleichfoermige-sektionen",
+        "beschreibung": "Jede Sektion gleich hoch, gleich zentriert, gleich gepolstert",
+        "pruefung": "judge"
+      },
+      {
+        "id": "werbe-floskeln",
+        "beschreibung": "„Willkommen bei“, „Tauchen Sie ein“, „kulinarische Reise“ und verwandte Formeln",
+        "pruefung": "copy"
+      }
+    ],
+    "kueche": [
+      {
+        "beschreibung": "Drachen und Glückskatzen",
+        "pruefung": "manuell"
+      },
+      {
+        "beschreibung": "Gold auf Rot als Vollfläche",
+        "pruefung": "manuell"
+      },
+      {
+        "beschreibung": "Pinsel-Imitationsschriften",
+        "pruefung": "manuell"
+      }
+    ],
+    "archetyp": [
+      {
+        "beschreibung": "helle Vollflächen-Sektionen",
+        "pruefung": "judge"
+      },
+      {
+        "beschreibung": "mehr als ein Akzentton",
+        "pruefung": "judge"
+      },
+      {
+        "beschreibung": "schnelle Bewegungen unter 300ms",
+        "pruefung": "judge"
+      }
+    ]
+  },
+  "bildKanon": {
+    "motiv": "Dim Sum im Bambuskorb",
+    "licht": "Pendel- oder Kerzenlicht, tiefe Schatten, warm (ca. 2700 K), Hintergrund fällt ins Dunkle",
+    "perspektive": "nah, geringe Schärfentiefe, ein Gericht oder ein Glas als einziges Licht im Bild",
+    "farbstimmung": "dunkel, satt; Akzent #dd353a darf im Bild vorkommen (Serviette, Keramik), sonst warme Neutrale",
+    "requisiten": [
+      "Bambuskörbe",
+      "Porzellan mit Craquelé",
+      "Lacktablett",
+      "Tonteekanne"
+    ],
+    "verboten": [
+      "Menschen, die in die Kamera lächeln",
+      "Hochglanz-Überschärfe und plastische Haut",
+      "Schrift, Logos oder Wasserzeichen im Bild",
+      "Gerichte mit unmöglich vielen Zutaten",
+      "aufgesetzte Dampfschwaden",
+      "Bokeh-Lichtkreise als Deko"
+    ],
+    "promptBasis": "editorial restaurant photography, low pendant or candle light, deep shadows, warm 2700K, background falling into darkness, close-up, shallow depth of field, a single dish or glass as the only lit object, bamboo steamers, crackle-glaze porcelain, lacquer tray, clay teapot, dark moody palette, natural imperfections, real restaurant setting, 35mm film look, no text, no people facing camera",
+    "negativPrompt": "text, watermark, logo, oversaturated, plastic, cgi, 3d render, bokeh circles, smiling people, steam effect, extra fingers",
+    "rollen": {
+      "hero": "Das Hausgericht im Licht des Hauses, Querformat 16:9, Raum links oder rechts für Text frei",
+      "haus": "Außenansicht oder Eingang, so dass Gäste das Haus auf der Straße erkennen",
+      "team": "Hände bei der Arbeit, kein Gruppenfoto",
+      "bestseller": "Das meistbestellte Gericht, ehrlich, ohne Deko",
+      "gericht": "Ein Gericht, freigestellt auf der Oberfläche des Hauses, 4:3"
+    }
+  },
+  "sprache": {
+    "ton": "ruhig und knapp – wenige Worte, eher Einladung als Werbung",
+    "anrede": "Sie",
+    "satzlaenge": "kurz, 6–14 Wörter",
+    "wortfeld": [
+      "Wok",
+      "Dampfkorb",
+      "Teigtaschen",
+      "Szechuanpfeffer",
+      "Tee"
+    ],
+    "regeln": [
+      "Konkrete Dinge statt Adjektive: „Teig ruht 48 Stunden“ statt „authentischer Genuss“.",
+      "Keine Anrede-Floskeln („Willkommen bei …“), keine Aufforderungen zum Eintauchen oder Entdecken.",
+      "Höchstens ein Ausrufezeichen pro Seite.",
+      "Zahlen als Ziffern, Zeiten im 24-Stunden-Format."
+    ]
+  }
+}

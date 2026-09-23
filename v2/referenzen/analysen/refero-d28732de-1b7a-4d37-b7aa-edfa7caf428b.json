@@ -1,0 +1,75 @@
+{
+  "url": "https://styles.refero.design/style/d28732de-1b7a-4d37-b7aa-edfa7caf428b",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:25:02.810Z",
+  "name": "Raus",
+  "originalUrl": "https://www.raus.life",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#f7f0e1",
+        "name": "Paper",
+        "anzahl": 7
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Snow",
+        "anzahl": 6
+      },
+      {
+        "hex": "#a6dfff",
+        "name": "Morning Sky",
+        "anzahl": 3
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#23212c",
+        "name": "Charcoal",
+        "anzahl": 8
+      },
+      {
+        "hex": "#006434",
+        "name": "Pine",
+        "anzahl": 5
+      },
+      {
+        "hex": "#fcbd1c",
+        "name": "Marigold",
+        "anzahl": 4
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#006434",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "neue-haas-unica",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "fonts",
+        "anzahl": 4,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Warm cabin journal on cream paper — every page a postcard from the woods."
+}

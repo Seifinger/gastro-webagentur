@@ -1,0 +1,80 @@
+{
+  "url": "https://n-naka.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:30:23.976Z",
+  "titel": "n/naka – a michelin-starred restaurant in los angeles by chef niki nakayama",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#fafafa",
+        "anzahl": 11571911
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 8035219
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 1
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 23
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 7
+      },
+      {
+        "hex": "#8b8b8b",
+        "anzahl": 6
+      },
+      {
+        "hex": "#212121",
+        "anzahl": 1
+      },
+      {
+        "hex": "#4f6e18",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#4f6e18"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Montserrat",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 28,
+    "bodyPx": 14,
+    "kontrastVerhaeltnis": 2,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 5,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 7,
+    "medianDauerMs": 200,
+    "charakter": "lebendig"
+  }
+}

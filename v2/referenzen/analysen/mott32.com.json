@@ -1,0 +1,76 @@
+{
+  "url": "https://www.mott32.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:28:33.974Z",
+  "titel": "Mott 32 is one of the most awarded Chinese restaurant brands in the world",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#0a253d",
+        "anzahl": 4491165
+      },
+      {
+        "hex": "#313131",
+        "anzahl": 1296000
+      },
+      {
+        "hex": "#001524",
+        "anzahl": 960345
+      },
+      {
+        "hex": "#081c2e",
+        "anzahl": 631992
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#a4916d",
+        "anzahl": 2
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 103
+      },
+      {
+        "hex": "#a4916d",
+        "anzahl": 7
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "dunkel",
+    "saettigung": "kräftig",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "futura-pt",
+        "rolle": "h2",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 50,
+    "bodyPx": 18,
+    "kontrastVerhaeltnis": 2.78,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 6,
+    "treffer": 1,
+    "median": 18,
+    "dichte": "dicht"
+  },
+  "layout": {
+    "wert": 0.14,
+    "reihen": 7,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 300,
+    "charakter": "ruhig"
+  }
+}

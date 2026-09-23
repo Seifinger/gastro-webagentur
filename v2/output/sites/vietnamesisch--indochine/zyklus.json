@@ -1,0 +1,95 @@
+{
+  "site": "vietnamesisch--indochine",
+  "designsystem": "vietnamesisch--indochine",
+  "heroVariante": "karte",
+  "runden": [
+    {
+      "runde": 1,
+      "bestanden": true,
+      "mittel": 9.4,
+      "noten": {
+        "farbdisziplin": 10,
+        "typografie": 10,
+        "rhythmus": 10,
+        "bildintegration": 7,
+        "verboteneMuster": 10
+      },
+      "befunde": {
+        "farbdisziplin": [],
+        "typografie": [],
+        "rhythmus": [],
+        "bildintegration": [
+          "Titelbild füllt nur 5 % des ersten Bildschirms"
+        ],
+        "verboteneMuster": []
+      },
+      "angewandteKorrekturen": [],
+      "naechsteKorrekturen": []
+    }
+  ],
+  "ergebnis": "bestanden",
+  "stufen": [
+    {
+      "stufe": "referenz",
+      "neu": 0,
+      "gesamt": 3
+    },
+    {
+      "stufe": "designsystem",
+      "id": "vietnamesisch--indochine"
+    },
+    {
+      "stufe": "copy",
+      "sprachmodell": false
+    }
+  ],
+  "copy": {
+    "ersetzungen": 0,
+    "verbleibend": 0
+  },
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1589570658214-002314b1520f",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1693822998952-b8d18c61043b",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1677354469642-3e4fc5dbbb4a",
+      "typ": "bild"
+    },
+    "gericht:2-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1677354469642-3e4fc5dbbb4a",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1597345637412-9fd611e758f3",
+      "typ": "bild"
+    },
+    "gericht:1-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1589570658214-002314b1520f",
+      "typ": "bild"
+    }
+  },
+  "zeitpunkt": "2026-09-22T20:19:36.715Z"
+}

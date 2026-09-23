@@ -1,0 +1,100 @@
+{
+  "url": "https://www.thebarn.de",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:31:47.762Z",
+  "titel": "THE BARN Coffee Roasters - Freshly Roasted Coffee to your door",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#0f1115",
+        "anzahl": 7097175
+      },
+      {
+        "hex": "#0d0c0b",
+        "anzahl": 725760
+      },
+      {
+        "hex": "#323232",
+        "anzahl": 446934
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#a67c52",
+        "anzahl": 4
+      },
+      {
+        "hex": "#0d0c0b",
+        "anzahl": 2
+      },
+      {
+        "hex": "#e6eaf2",
+        "anzahl": 1
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 1
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 106
+      },
+      {
+        "hex": "#e6eaf2",
+        "anzahl": 68
+      },
+      {
+        "hex": "#ede8df",
+        "anzahl": 10
+      },
+      {
+        "hex": "#a67c52",
+        "anzahl": 8
+      },
+      {
+        "hex": "#141414",
+        "anzahl": 2
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "dunkel",
+    "saettigung": "fast unbunt",
+    "akzent": "#a67c52"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Assistant",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 40,
+    "bodyPx": 12,
+    "kontrastVerhaeltnis": 3.33,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 0.67,
+    "median": 20,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "wert": 0.31,
+    "reihen": 16,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 17,
+    "medianDauerMs": 100,
+    "charakter": "lebendig"
+  }
+}

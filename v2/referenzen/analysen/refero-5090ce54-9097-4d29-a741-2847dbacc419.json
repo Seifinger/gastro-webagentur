@@ -1,0 +1,65 @@
+{
+  "url": "https://styles.refero.design/style/5090ce54-9097-4d29-a741-2847dbacc419",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:27:44.374Z",
+  "name": "Chantlings",
+  "originalUrl": "https://www.iorama.studio/chantlings",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#222222",
+        "name": "Obsidian",
+        "anzahl": 8
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Bone",
+        "anzahl": 6
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#333333",
+        "name": "Graphite",
+        "anzahl": 7
+      },
+      {
+        "hex": "#ffaa20",
+        "name": "Ember",
+        "anzahl": 5
+      },
+      {
+        "hex": "#ff8800",
+        "name": "Amber Glow",
+        "anzahl": 4
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "gedeckt",
+    "akzent": "#ffaa20",
+    "schema": "dark"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Mija",
+        "anzahl": 5,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Candlelit cave, ember in the void"
+}

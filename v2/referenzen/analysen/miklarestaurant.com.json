@@ -1,0 +1,76 @@
+{
+  "url": "https://www.miklarestaurant.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:27:01.182Z",
+  "titel": "Mikla Restaurant",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#1a1a1a",
+        "anzahl": 924480
+      },
+      {
+        "hex": "#f8f8f8",
+        "anzahl": 898560
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#1a1a1a",
+        "anzahl": 10
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 8
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 6
+      },
+      {
+        "hex": "#9a9a9a",
+        "anzahl": 6
+      },
+      {
+        "hex": "#9f9f9f",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "gemischt",
+    "saettigung": "fast unbunt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Roobert-Medium",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 72,
+    "bodyPx": 30,
+    "kontrastVerhaeltnis": 2.4,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 12,
+    "treffer": 0.75,
+    "median": 120,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 5,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 4,
+    "medianDauerMs": 1000,
+    "charakter": "ruhig"
+  }
+}

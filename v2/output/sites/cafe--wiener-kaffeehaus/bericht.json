@@ -1,0 +1,103 @@
+{
+  "engine": "v2",
+  "designsystem": "cafe--wiener-kaffeehaus",
+  "kueche": "cafe",
+  "stimmung": "wiener-kaffeehaus",
+  "archetyp": "traditionell",
+  "seed": 2019774380,
+  "heroVariante": "passepartout",
+  "heroVarianten": [
+    "spalte-bild",
+    "karte",
+    "tafel",
+    "passepartout"
+  ],
+  "highlights": [
+    "0-0",
+    "0-1",
+    "0-2"
+  ],
+  "kontrast": {
+    "geprueft": 23,
+    "fehler": 0
+  },
+  "lint": {
+    "fehler": 0,
+    "warnungen": []
+  },
+  "korrekturen": [],
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1495474472287-4d71bcdd2085",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1554118811-1e0d58224f24",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1509440159596-0249088772ff",
+      "typ": "bild"
+    },
+    "gericht:0-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1509440159596-0249088772ff",
+      "typ": "bild"
+    },
+    "gericht:0-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1567620905732-2d1ec7ab7445",
+      "typ": "bild"
+    },
+    "gericht:0-2": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1546069901-ba9599a7e63c",
+      "typ": "bild"
+    }
+  },
+  "copy": {
+    "ersetzungen": [
+      {
+        "pfad": "claim",
+        "regeln": [
+          "klischee-gemuetlich"
+        ],
+        "vorher": "Hausgemachter Kuchen und gemütliche Stunden – direkt am Kapellplatz in Altötting.",
+        "nachher": "Hausgemachter Kuchen – direkt am Kapellplatz in Altötting."
+      }
+    ],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  },
+  "raster": {
+    "1": 8,
+    "2": 16,
+    "3": 24,
+    "4": 32,
+    "5": 40,
+    "6": 48,
+    "8": 64,
+    "10": 80,
+    "12": 96,
+    "16": 128,
+    "halb": 4
+  }
+}

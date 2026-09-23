@@ -1,0 +1,70 @@
+{
+  "url": "https://styles.refero.design/style/6a5f9438-7ae6-4743-a0bd-f9087d467eff",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:25:12.566Z",
+  "name": "Abetterlou",
+  "originalUrl": "https://abetterlou.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#140b00",
+        "name": "Espresso",
+        "anzahl": 8
+      },
+      {
+        "hex": "#0b0600",
+        "name": "Midnight Cocoa",
+        "anzahl": 7
+      },
+      {
+        "hex": "#fff1e0",
+        "name": "Warm Cream",
+        "anzahl": 6
+      },
+      {
+        "hex": "#f1f1f1",
+        "name": "Soft Cream",
+        "anzahl": 5
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#43392d",
+        "name": "Walnut",
+        "anzahl": 4
+      },
+      {
+        "hex": "#4f4538",
+        "name": "Cedar",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": null,
+    "schema": "dark"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "PP Neue Montreal",
+        "anzahl": 5,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Embers on saddle leather — warm cream typography glowing against deep coffee-black, with amber-gold buttons that feel pressed into the page like heated metalwork."
+}

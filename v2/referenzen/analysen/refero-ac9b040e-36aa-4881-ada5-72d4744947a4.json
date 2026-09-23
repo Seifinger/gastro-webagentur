@@ -1,0 +1,79 @@
+{
+  "url": "https://styles.refero.design/style/ac9b040e-36aa-4881-ada5-72d4744947a4",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:30:23.977Z",
+  "name": "Kinfolk",
+  "originalUrl": "https://www.kinfolk.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "name": "Ink Black",
+        "anzahl": 8
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Bone White",
+        "anzahl": 7
+      },
+      {
+        "hex": "#f4f4f4",
+        "name": "Paper Mist",
+        "anzahl": 6
+      },
+      {
+        "hex": "#dbded5",
+        "name": "Sage Paper",
+        "anzahl": 5
+      }
+    ],
+    "vordergrund": [],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": null,
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Kinfolk-Serif-Text",
+        "anzahl": 5,
+        "art": "serif"
+      },
+      {
+        "name": "Kinfolk-Serif-Display",
+        "anzahl": 4,
+        "art": "serif"
+      },
+      {
+        "name": "Kinfolk-Serif-Deck",
+        "anzahl": 3,
+        "art": "serif"
+      },
+      {
+        "name": "Kinfolk-Sans",
+        "anzahl": 2,
+        "art": "serif"
+      },
+      {
+        "name": "Arial",
+        "anzahl": 1,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Serife führt, Grotesk als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Editorial broadsheet on bone-white linen — generous margins, ink-black serif, and a single warm-paper accent for section breaks."
+}

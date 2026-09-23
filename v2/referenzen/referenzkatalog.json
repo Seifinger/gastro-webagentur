@@ -1,0 +1,1742 @@
+{
+  "version": 1,
+  "erstellt": "2026-09-22",
+  "beschreibung": "Kuratierte Design-Referenzen je Küche × Stimmung. Jede Referenz ist ein Startpunkt, keine Vorlage: 'uebernehmen' nennt, was ins Designsystem einfließt, 'nichtUebernehmen', was bewusst draußen bleibt.",
+  "quellen": {
+    "refero": "https://styles.refero.design – öffentliche JSON-API, Volltextsuche über den Gesamtkatalog mit v2/build/referoSuche.js; relevanter Auszug in refero-auszug.json",
+    "restaurants": "Reale Restaurant-Websites, per Websuche und eigener Recherche ausgewählt, Erreichbarkeit geprüft; Analyse in analysen/"
+  },
+  "kombinationen": [
+    {
+      "kueche": "bayerisch",
+      "stimmung": "wirtshaus",
+      "label": "Wirtshaus",
+      "archetyp": "traditionell",
+      "richtung": "Wirtshaus heißt hier nicht Folklore-Karo, sondern Holz, Papier, Gewölbe: ruhige Serife, warmer Papiergrund, ein tiefes Grün als einzige Farbe.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Augustiner Klosterwirt",
+          "url": "https://www.augustiner-klosterwirt.de",
+          "warum": "Münchner Traditionshaus mit zurückhaltendem, papierhaftem Auftritt statt Bierzelt-Optik.",
+          "uebernehmen": [
+            "warmer, heller Grund",
+            "Serifen-Überschriften in normaler Groß-/Kleinschreibung",
+            "Speisekarte als ruhige Liste"
+          ],
+          "nichtUebernehmen": [
+            "Bildslider mit Autoplay"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Ayingers Wirtshaus",
+          "url": "https://www.ayingers.de",
+          "warum": "Brauerei-Wirtshaus am Platzl – zeigt, wie viel Tradition eine reduzierte Fläche trägt.",
+          "uebernehmen": [
+            "Grün als Hausfarbe",
+            "großzügige Bildflächen des Gastraums"
+          ],
+          "nichtUebernehmen": [
+            "Dropdown-Navigation mit vielen Ebenen"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Raus",
+          "url": "https://styles.refero.design/style/d28732de-1b7a-4d37-b7aa-edfa7caf428b",
+          "originalUrl": "https://www.raus.life",
+          "leitsatz": "Warm cabin journal on cream paper — every page a postcard from the woods.",
+          "warum": "Kein Gastro-Style, aber die treffendste Stimmung im Refero-Katalog: Holz, Papier, Postkarte.",
+          "uebernehmen": [
+            "Cream-Papier + fast schwarze Tinte",
+            "ein Grün als Signal",
+            "Postkarten-Bildformat"
+          ],
+          "nichtUebernehmen": [
+            "Neue Haas als Textschrift (zu technisch)"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "bayerisch",
+      "stimmung": "kellerstube",
+      "label": "Kellerstube",
+      "archetyp": "abend",
+      "richtung": "Die Kellerstube ist der Abend: dunkles Holz, Kupferlicht, Reservierung als Hauptsache.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Ratskeller München",
+          "url": "https://www.ratskeller.com",
+          "warum": "Gewölbekeller im Rathaus – der Archetyp der Kellerstube.",
+          "uebernehmen": [
+            "dunkler, warmer Grund",
+            "Kupfer-/Terrakotta-Akzent"
+          ],
+          "nichtUebernehmen": [
+            "Pop-up-Banner"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Spatenhaus an der Oper",
+          "url": "https://www.kuffler.de/de/spatenhaus",
+          "warum": "Holzvertäfelte Stuben, abendlicher Auftritt eines großen Münchner Hauses.",
+          "uebernehmen": [
+            "Reservierung prominent",
+            "ruhige Serifen-Hierarchie"
+          ],
+          "nichtUebernehmen": [
+            "Gruppen-Portal-Navigation"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Abetterlou",
+          "url": "https://styles.refero.design/style/6a5f9438-7ae6-4743-a0bd-f9087d467eff",
+          "originalUrl": "https://abetterlou.com",
+          "leitsatz": "Embers on saddle leather — warm cream typography glowing against deep coffee-black, with amber-gold buttons that feel pressed into the page like heated metalwork.",
+          "warum": "„Embers on saddle leather“: Glut auf Leder – genau das Licht einer Kellerstube.",
+          "uebernehmen": [
+            "Cream-Schrift auf Kaffeeschwarz",
+            "bernsteinfarbene, gedrückt wirkende Knöpfe"
+          ],
+          "nichtUebernehmen": [
+            "Grotesk als Überschrift"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "bayerisch",
+      "stimmung": "biergarten",
+      "label": "Biergarten",
+      "archetyp": "hell",
+      "richtung": "Biergarten ist Tageslicht unter Kastanien: viel Luft, Grün, nichts Schweres.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Königlicher Hirschgarten",
+          "url": "https://www.hirschgarten.de/en/",
+          "warum": "Größter Biergarten der Welt – Tageslicht-Auftritt mit viel Grün und Weiß.",
+          "uebernehmen": [
+            "heller, kühler Grund",
+            "Grün als Akzent",
+            "Öffnungszeiten weit oben"
+          ],
+          "nichtUebernehmen": [
+            "Wetter-Widgets"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Seehaus im Englischen Garten",
+          "url": "https://www.kuffler.de/de/seehaus",
+          "warum": "Biergarten am Wasser, luftig und hell fotografiert.",
+          "uebernehmen": [
+            "große, helle Bildflächen",
+            "wenig Text pro Abschnitt"
+          ],
+          "nichtUebernehmen": [
+            "Konzern-Kopfzeile"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "sweetgreen",
+          "url": "https://styles.refero.design/style/d91841cf-c717-43ef-97a2-400778fa6e1a",
+          "originalUrl": "https://www.sweetgreen.com",
+          "leitsatz": "farm-stand chalkboard at golden hour",
+          "warum": "sweetgreen – „farm-stand chalkboard at golden hour“: frisch, grün, draußen.",
+          "uebernehmen": [
+            "tiefes Grün + heller Grund",
+            "freundliche, runde Flächen"
+          ],
+          "nichtUebernehmen": [
+            "Neon-Limette (zu digital)"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "italienisch",
+      "stimmung": "trattoria",
+      "label": "Trattoria",
+      "archetyp": "traditionell",
+      "richtung": "Trattoria: Kochbuchseite, Terrakotta, Papier – nicht rot-weißes Karo.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Bocca di Lupo",
+          "url": "https://www.boccadilupo.com",
+          "warum": "Londoner Trattoria mit regionaler Karte – Menü als Kern der Seite.",
+          "uebernehmen": [
+            "Karte als lange, gut gesetzte Liste",
+            "warmer Grund"
+          ],
+          "nichtUebernehmen": [
+            "kleine Schrift in der Karte"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Padella",
+          "url": "https://www.padella.co",
+          "warum": "Pasta-Bar, deren Seite fast nur aus Foto und Adresse besteht – maximaler Verzicht.",
+          "uebernehmen": [
+            "großflächiges Foto",
+            "wenige, klare Wege"
+          ],
+          "nichtUebernehmen": [
+            "schwarzer Vollflächen-Grund"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Alison Roman",
+          "url": "https://styles.refero.design/style/b2ace2c1-d6ee-4d57-915e-901224cded11",
+          "originalUrl": "https://www.alisoneroman.com",
+          "leitsatz": "cookbook pages on warm cream paper — a printed spread from an artisan food memoir, translated to screen with zero loss of tactility",
+          "warum": "Alison Roman – Kochbuchseiten auf warmem Papier: der Ton einer Trattoria ohne Klischee.",
+          "uebernehmen": [
+            "Cream-Papier",
+            "tiefes Rot-Braun als Tinte",
+            "Serifen-Überschriften"
+          ],
+          "nichtUebernehmen": [
+            "Systemschrift als Text"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "italienisch",
+      "stimmung": "osteria-notte",
+      "label": "Osteria Notte",
+      "archetyp": "abend",
+      "richtung": "Osteria am Abend: Kerzenlicht, Weinrot, eine starke Kontrast-Serife.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Carbone",
+          "url": "https://www.carbonenewyork.com",
+          "warum": "Italo-amerikanischer Abend-Klassiker, dunkel und theatralisch.",
+          "uebernehmen": [
+            "dunkler Grund",
+            "Weinrot",
+            "Reservierung als erste Aktion"
+          ],
+          "nichtUebernehmen": [
+            "Overlays mit Musik"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Il Buco",
+          "url": "https://www.ilbuco.com",
+          "warum": "Kerzen, Holz, Keller – die Stimmung einer Osteria am Abend.",
+          "uebernehmen": [
+            "gedämpfte, warme Töne",
+            "Serifen-Typografie"
+          ],
+          "nichtUebernehmen": [
+            "Shop-Integration"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Limón",
+          "url": "https://styles.refero.design/style/f1b6a7d6-1ecb-4f1c-95b0-e03323363999",
+          "originalUrl": "https://limonoslo.no",
+          "leitsatz": "moody brasserie under candlelight",
+          "warum": "Limón – „moody brasserie under candlelight“: die einzige Brasserie im Refero-Katalog.",
+          "uebernehmen": [
+            "Beinahe-Schwarz mit Rotstich",
+            "Creme als Schrift"
+          ],
+          "nichtUebernehmen": [
+            "Neongelb"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "italienisch",
+      "stimmung": "costiera",
+      "label": "Costiera",
+      "archetyp": "hell",
+      "richtung": "Costiera: Amalfi-Mittag, Kalkweiß, Meeresblau, eine feine Serife.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Il San Pietro di Positano",
+          "url": "https://www.ilsanpietro.it",
+          "warum": "Hotel-Restaurant an der Amalfiküste – Licht, Meer, Weißraum.",
+          "uebernehmen": [
+            "heller, kühler Grund",
+            "Meeresblau als Akzent",
+            "sehr viel Weißraum"
+          ],
+          "nichtUebernehmen": [
+            "Buchungs-Widget eines Hotels"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Lilia",
+          "url": "https://www.lilianewyork.com",
+          "warum": "Pasta-Restaurant mit hellem, luftigem Auftritt und klarer Typo.",
+          "uebernehmen": [
+            "luftige Abstände",
+            "klare Serifen/Grotesk-Paarung"
+          ],
+          "nichtUebernehmen": [
+            "Wartelisten-Popup"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Miti Navi",
+          "url": "https://styles.refero.design/style/887f0c74-c696-4589-82ae-85705ecda919",
+          "originalUrl": "https://miti-navi.com",
+          "leitsatz": "Tuscan sea-view chapbook on raw linen",
+          "warum": "Miti Navi – „Tuscan sea-view chapbook on raw linen“.",
+          "uebernehmen": [
+            "Leinen-Grund",
+            "Tiefsee-Blauschwarz als Text",
+            "Mono-Details für Zeiten/Preise"
+          ],
+          "nichtUebernehmen": [
+            "zu kleine Mono-Schrift"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "griechisch",
+      "stimmung": "taverne-am-hafen",
+      "label": "Taverne am Hafen",
+      "archetyp": "traditionell",
+      "richtung": "Taverne am Hafen: Kalk, Ägäisblau, Tischdecke – ohne Säulen-Kitsch.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Taverna Kyclades",
+          "url": "https://www.tavernakyclades.com",
+          "warum": "Griechische Fischtaverne in New York mit klarem Blau-Weiß.",
+          "uebernehmen": [
+            "Blau-Weiß-Palette",
+            "Fisch/Tagesfang als Bildthema"
+          ],
+          "nichtUebernehmen": [
+            "Mäander-Ornamente"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "The Real Greek",
+          "url": "https://www.therealgreek.com",
+          "warum": "Große Kette, aber mit disziplinierter, heller Mezze-Präsentation.",
+          "uebernehmen": [
+            "Mezze als Raster aus Bild + Preis",
+            "heller Grund"
+          ],
+          "nichtUebernehmen": [
+            "Aktions-Banner"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Relief",
+          "url": "https://styles.refero.design/style/e6b53c1e-644b-4300-b42f-0e64905d1443",
+          "originalUrl": "https://www.relief.app",
+          "leitsatz": "Cream-paper harbor under flat sky-blue",
+          "warum": "Relief – „Cream-paper harbor under flat sky-blue“: Hafen auf Papier.",
+          "uebernehmen": [
+            "Cream + flaches Himmelblau",
+            "ruhige Flächen"
+          ],
+          "nichtUebernehmen": [
+            "Gilroy (generische Geometrie-Grotesk)"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "griechisch",
+      "stimmung": "athener-moderne",
+      "label": "Athener Moderne",
+      "archetyp": "abend",
+      "richtung": "Athener Moderne: Galerie bei Nacht, Gold als einzige Farbe.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Delta (Athen)",
+          "url": "https://www.deltarestaurant.gr",
+          "warum": "Zwei-Sterne-Restaurant in Athen – dunkel, museal, reduziert.",
+          "uebernehmen": [
+            "fast schwarzer Grund",
+            "sehr wenig Text",
+            "große Bildflächen"
+          ],
+          "nichtUebernehmen": [
+            "Videohintergrund ohne Pause"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Estiatorio Milos",
+          "url": "https://www.estiatoriomilos.com",
+          "warum": "Griechische Fine-Dining-Marke mit reduzierter, edler Typografie.",
+          "uebernehmen": [
+            "Versal-Kapitälchen für Rubriken",
+            "Gold/Messing als Detail"
+          ],
+          "nichtUebernehmen": [
+            "Standort-Auswahl als Einstieg"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Michael Wandelmaier",
+          "url": "https://styles.refero.design/style/5b405eec-67ba-4dd0-8dab-ace000151a78",
+          "originalUrl": "https://wandelmaier.com",
+          "leitsatz": "museum placard on black velvet — three candy pills, one whisper-weight serif, and almost nothing else.",
+          "warum": "Museum-Placard auf schwarzem Samt – die Haltung der Athener Moderne.",
+          "uebernehmen": [
+            "Schwarz + Weiß + ein Akzent",
+            "eine feine Serife"
+          ],
+          "nichtUebernehmen": [
+            "Bonbon-Pillen"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "griechisch",
+      "stimmung": "olivenhain",
+      "label": "Olivenhain",
+      "archetyp": "hell",
+      "richtung": "Olivenhain: Leinen, Olivgrün, Mittagssonne – ruhig und hell.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Opso",
+          "url": "https://www.opso.co.uk",
+          "warum": "Modernes griechisches Restaurant in London – hell, reduziert, mit Pflanzen und Holz.",
+          "uebernehmen": [
+            "heller Leinen-Grund",
+            "Oliv als Akzent"
+          ],
+          "nichtUebernehmen": [
+            "Stock-Illustrationen"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "GRAZA",
+          "url": "https://styles.refero.design/style/f2a84e0f-cf77-41fa-ade0-b062a3a42495",
+          "originalUrl": "https://graza.co",
+          "leitsatz": "Mediterranean deli counter, sunlit and hand-set",
+          "warum": "GRAZA – „Mediterranean deli counter, sunlit and hand-set“ (Olivenöl-Marke).",
+          "uebernehmen": [
+            "Oliv-Dunkelgrün als Text",
+            "Schreibmaschinen-Details",
+            "hand-gesetzter Charakter"
+          ],
+          "nichtUebernehmen": [
+            "Neon-Grün"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Forner",
+          "url": "https://styles.refero.design/style/2a830d03-cebc-48f0-a50f-ad78168c5026",
+          "originalUrl": "https://forner.studio",
+          "leitsatz": "Warm earthen atelier — imagine a ceramics studio at golden hour, where every surface is clay, bone, or roasted coffee, and the only chrome is the potter's hand-lettered note pinned to the wall.",
+          "warum": "Forner – Keramik-Atelier im goldenen Licht: Ton, Knochen, Leinen.",
+          "uebernehmen": [
+            "erdige Neutrale",
+            "matte Oberflächen"
+          ],
+          "nichtUebernehmen": [
+            "ClashDisplay (Trend-Schrift)"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "tuerkisch",
+      "stimmung": "basar",
+      "label": "Basar",
+      "archetyp": "traditionell",
+      "richtung": "Basar: Schildermalerei, schmale Versalien, Rot auf Sand – laut, aber gesetzt.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Karaköy Lokantası",
+          "url": "https://www.karakoylokantasi.com",
+          "warum": "Istanbuler Lokanta mit türkisblau gefliestem Raum und klarer Karte.",
+          "uebernehmen": [
+            "Karte als Tafel",
+            "Sandtöne"
+          ],
+          "nichtUebernehmen": [
+            "Mehrsprachen-Switcher als Hauptelement"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "VALIENTE BRANDS",
+          "url": "https://styles.refero.design/style/f63bf016-5b53-4ddf-9f8c-da43f75a9e2b",
+          "originalUrl": "https://valientebrands.com",
+          "leitsatz": "Signal flare on sun-baked clay. A single urgent red-orange screaming across a warm matte peach field, held together by a monolithic neo-grotesque and almost nothing else.",
+          "warum": "VALIENTE – „Signal flare on sun-baked clay“: ein Rot auf warmem Ton.",
+          "uebernehmen": [
+            "ein einziges lautes Rot",
+            "warmer Tongrund",
+            "monolithische Grotesk"
+          ],
+          "nichtUebernehmen": [
+            "Pfirsich-Vollfläche"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Roberta's Pizza",
+          "url": "https://styles.refero.design/style/3e497155-bd96-4134-a4a5-855bd885a25c",
+          "originalUrl": "https://www.robertaspizza.com",
+          "leitsatz": "Brooklyn pizza punk parlor — a checkered tablecloth lit by neon red signage, where every screen is a poster.",
+          "warum": "Roberta's Pizza – jeder Screen ein Plakat; die Marktschild-Energie des Basars.",
+          "uebernehmen": [
+            "Plakat-Hierarchie",
+            "Rot als Signal"
+          ],
+          "nichtUebernehmen": [
+            "Karo-Muster"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "tuerkisch",
+      "stimmung": "bosporus-nacht",
+      "label": "Bosporus bei Nacht",
+      "archetyp": "abend",
+      "richtung": "Bosporus bei Nacht: Wasser, Petrol, Messing, eine Kontrast-Serife.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Mikla",
+          "url": "https://www.miklarestaurant.com",
+          "warum": "Istanbuler Dachrestaurant über dem Bosporus – nachtblau, reduziert.",
+          "uebernehmen": [
+            "nachtblauer Grund",
+            "große Panorama-Bilder"
+          ],
+          "nichtUebernehmen": [
+            "Hotel-Navigation"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Neolokal",
+          "url": "https://www.neolokal.com",
+          "warum": "Modern-anatolisches Fine Dining in Istanbul, dunkel und typografisch.",
+          "uebernehmen": [
+            "dunkler Grund",
+            "sehr ruhige Typo-Hierarchie"
+          ],
+          "nichtUebernehmen": [
+            "Scroll-Hijacking"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Customer.io",
+          "url": "https://styles.refero.design/style/abbaa70a-5fe2-44a9-9c5f-272e68c450c3",
+          "originalUrl": "https://customer.io",
+          "leitsatz": "dark spruce forest meeting cream paper",
+          "warum": "Customer.io – „dark spruce forest meeting cream paper“: Petrol-Nacht mit Papier.",
+          "uebernehmen": [
+            "Petrol/Fichte als Grund",
+            "Cream als Text"
+          ],
+          "nichtUebernehmen": [
+            "SaaS-Kartenraster"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "tuerkisch",
+      "stimmung": "anatolische-erde",
+      "label": "Anatolische Erde",
+      "archetyp": "hell",
+      "richtung": "Anatolische Erde: Ton, Terrakotta, Leinen – hell und erdig.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Oklava",
+          "url": "https://www.oklava.co.uk",
+          "warum": "Türkisch-zypriotische Küche in London mit warmem, hellem Auftritt.",
+          "uebernehmen": [
+            "Terrakotta-Akzent",
+            "warme helle Flächen"
+          ],
+          "nichtUebernehmen": [
+            "Instagram-Wand"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Fallen Grape",
+          "url": "https://styles.refero.design/style/17ce9ad2-f22d-4e48-92de-e28fb8551cc5",
+          "originalUrl": "https://www.fallengrape.com",
+          "leitsatz": "Sun-drenched vineyard at golden hour. Warm cream paper, walnut ink, terracotta warmth — a wine label breathed into a full interface.",
+          "warum": "Fallen Grape – Weinberg im goldenen Licht: Walnuss-Tinte, Terrakotta.",
+          "uebernehmen": [
+            "Cream + Walnuss + Terrakotta",
+            "Etiketten-Typografie"
+          ],
+          "nichtUebernehmen": [
+            "Arial Narrow"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "syrisch",
+      "stimmung": "damaszener-hof",
+      "label": "Damaszener Hof",
+      "archetyp": "traditionell",
+      "richtung": "Damaszener Hof: Innenhof, Brunnen, Fliesengrün – kühl und festlich.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Malakeh",
+          "url": "https://www.malakeh.de",
+          "warum": "Syrisches Restaurant in Berlin (Köchin Malakeh Jazmati) – Heimatküche mit eigener Stimme.",
+          "uebernehmen": [
+            "Hausgeschichte weit vorn",
+            "warme Gastfreundschaft in der Sprache"
+          ],
+          "nichtUebernehmen": [
+            "Stockfotos"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Lawrence Berlin",
+          "url": "https://lawrence.berlin/en/arabic-restaurant/",
+          "warum": "Levantinische Küche in Mitte, von syrischen und libanesischen Köchen.",
+          "uebernehmen": [
+            "Mezze-Karte klar gegliedert",
+            "gedeckte, edle Töne"
+          ],
+          "nichtUebernehmen": [
+            "Event-Buchung im Vordergrund"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "OLIPOP",
+          "url": "https://styles.refero.design/style/c6ec55c7-0bd9-47c5-a4d2-669b7790c9cc",
+          "originalUrl": "https://drinkolipop.com",
+          "leitsatz": "Retro apothecary cream and forest teal — a soda fountain menu printed on warm paper.",
+          "warum": "OLIPOP – „Retro apothecary cream and forest teal“: Fliesengrün auf Papier.",
+          "uebernehmen": [
+            "Waldpetrol + Cream",
+            "Menü-Karten-Anmutung"
+          ],
+          "nichtUebernehmen": [
+            "Soda-Bildsprache"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "syrisch",
+      "stimmung": "gewuerzbasar",
+      "label": "Gewürzbasar",
+      "archetyp": "abend",
+      "richtung": "Gewürzbasar: Nacht, Glut, Kurkuma – schmale Versalien, ein warmer Akzent.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "963 Berlin",
+          "url": "https://www.963berlin.com",
+          "warum": "Third-Culture-Levante-Küche in Berlin, 2023 als bestes neues Restaurant nominiert.",
+          "uebernehmen": [
+            "dunkler Auftritt",
+            "moderne Levante-Bildsprache"
+          ],
+          "nichtUebernehmen": [
+            "Video-Autoplay"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Bubala",
+          "url": "https://www.bubala.co.uk",
+          "warum": "Nahöstliches Gemüse-Restaurant in London mit markanter, warmer Typo.",
+          "uebernehmen": [
+            "warmer Akzent",
+            "selbstbewusste Headlines"
+          ],
+          "nichtUebernehmen": [
+            "Newsletter-Popup"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Chantlings",
+          "url": "https://styles.refero.design/style/5090ce54-9097-4d29-a741-2847dbacc419",
+          "originalUrl": "https://www.iorama.studio/chantlings",
+          "leitsatz": "Candlelit cave, ember in the void",
+          "warum": "Chantlings – „Candlelit cave, ember in the void“: Glut in der Dunkelheit.",
+          "uebernehmen": [
+            "Schwarzgrund",
+            "ein Bernstein/Orange als einziges Licht"
+          ],
+          "nichtUebernehmen": [
+            "Illustrationsstil"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "syrisch",
+      "stimmung": "levante-modern",
+      "label": "Levante Modern",
+      "archetyp": "hell",
+      "richtung": "Levante modern: Ottolenghi-Helligkeit, Knochenweiß, Tinte, ein Braun.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Ottolenghi",
+          "url": "https://ottolenghi.co.uk",
+          "warum": "Die Referenz für helle, moderne Levante-Küche.",
+          "uebernehmen": [
+            "heller, warmer Grund",
+            "große Food-Fotografie",
+            "ruhige Serife"
+          ],
+          "nichtUebernehmen": [
+            "Shop-Mega-Menü"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Honey & Co",
+          "url": "https://www.honeyandco.co.uk",
+          "warum": "Nahöstliches Café-Restaurant mit Kochbuch-Anmutung.",
+          "uebernehmen": [
+            "Kochbuch-Ton",
+            "warme Details"
+          ],
+          "nichtUebernehmen": [
+            "kleinteilige Kacheln"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "D.S. & DURGA",
+          "url": "https://styles.refero.design/style/391bd401-06d7-4444-8243-8573e96eab24",
+          "originalUrl": "https://www.dsanddurga.com",
+          "leitsatz": "indie perfumery broadsheet on bone-white paper — a single warm cream canvas where black ink and oversized type do all the talking.",
+          "warum": "D.S. & DURGA – Parfümerie-Broadsheet auf knochenweißem Papier.",
+          "uebernehmen": [
+            "Knochenweiß + schwarze Tinte",
+            "übergroße Schrift als einziger Schmuck"
+          ],
+          "nichtUebernehmen": [
+            "Sofia Pro"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "chinesisch",
+      "stimmung": "rote-laterne",
+      "label": "Rote Laterne",
+      "archetyp": "traditionell",
+      "richtung": "Rote Laterne: Rot auf Papier – als Tinte, nicht als Fläche; kein Gold-Drachen-Klischee.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Din Tai Fung",
+          "url": "https://www.dintaifung.com.tw",
+          "warum": "Dim-Sum-Institution aus Taipeh – klar, hell, produktzentriert.",
+          "uebernehmen": [
+            "heller Grund",
+            "Gerichte groß und klar freigestellt"
+          ],
+          "nichtUebernehmen": [
+            "Karussell mit Aktionen"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Xi'an Famous Foods",
+          "url": "https://www.xianfoods.com",
+          "warum": "Nudel-Institution aus New York mit plakativer Typo und Rot.",
+          "uebernehmen": [
+            "Rot als Signal",
+            "direkte, kurze Texte"
+          ],
+          "nichtUebernehmen": [
+            "Merch-Shop"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Redbrick Coffee",
+          "url": "https://styles.refero.design/style/9307193e-7ce3-48c1-b650-8ab77aa83c3f",
+          "originalUrl": "https://redbrick.coffee",
+          "leitsatz": "Scarlet ink editorial on butcher paper",
+          "warum": "Redbrick Coffee – „Scarlet ink editorial on butcher paper“: Rot als Tinte.",
+          "uebernehmen": [
+            "Scharlachrot auf Papier",
+            "Editorial-Serife"
+          ],
+          "nichtUebernehmen": [
+            "Kaffee-Bildsprache"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "chinesisch",
+      "stimmung": "shanghai-nacht",
+      "label": "Shanghai Nacht",
+      "archetyp": "abend",
+      "richtung": "Shanghai Nacht: Art-déco-Bar, Schwarz, Rot als Licht.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Hakkasan",
+          "url": "https://hakkasan.com",
+          "warum": "Kantonesisches Nacht-Restaurant – dunkel, Lattenwerk, Licht.",
+          "uebernehmen": [
+            "Schwarzgrund",
+            "sparsamer roter Akzent"
+          ],
+          "nichtUebernehmen": [
+            "Club-/Event-Fokus"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Mott 32",
+          "url": "https://www.mott32.com",
+          "warum": "Hongkonger Fine Dining mit Industrial-Art-déco-Interieur.",
+          "uebernehmen": [
+            "dunkle, satte Bilder",
+            "reduzierte Typo"
+          ],
+          "nichtUebernehmen": [
+            "Standort-Wahl vor Inhalt"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Freshman",
+          "url": "https://styles.refero.design/style/a6284fcd-fa69-4469-ac40-4239e5b84a39",
+          "originalUrl": "https://freshman.tv",
+          "leitsatz": "cinema title card on black velvet",
+          "warum": "Freshman – „cinema title card on black velvet“ mit einem Rot.",
+          "uebernehmen": [
+            "Titelkarten-Typografie",
+            "Rot #ff2936 als einziger Akzent"
+          ],
+          "nichtUebernehmen": [
+            "Kinofilm-Layout"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "chinesisch",
+      "stimmung": "teehaus",
+      "label": "Teehaus",
+      "archetyp": "hell",
+      "richtung": "Teehaus: Porzellan, Jade, Leere – die leiseste der drei chinesischen Welten.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Yauatcha",
+          "url": "https://www.yauatcha.com",
+          "warum": "Teehaus und Dim Sum in Soho – Patisserie-Leichtigkeit, Türkis/Jade.",
+          "uebernehmen": [
+            "Jade-Akzent",
+            "helle, glatte Flächen"
+          ],
+          "nichtUebernehmen": [
+            "Grußkarten-Aktionen"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Acme Cups New Zealand",
+          "url": "https://styles.refero.design/style/14f6777e-1f6e-4b33-a7ed-d89c33f35722",
+          "originalUrl": "https://acmecups.nz",
+          "leitsatz": "editorial ceramics gallery. A stark white-walled room with a single massive black headline and quiet gray dividers, where handmade cups in terracotta, forest, and teal are the only vivid things visible.",
+          "warum": "Acme Cups – Keramik-Galerie: weißer Raum, eine schwarze Headline.",
+          "uebernehmen": [
+            "Weißraum",
+            "graue Haarlinien als Trenner"
+          ],
+          "nichtUebernehmen": [
+            "Helvetica Neue"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Woven",
+          "url": "https://styles.refero.design/style/76483bd1-37d3-4fb9-889b-aecf27b08b83",
+          "originalUrl": "https://wovenwhisky.com",
+          "leitsatz": "Ink on cream parchment. A distiller's editorial spread where warm cream canvases, a single dark ink color, and wide-tracked uppercase type create the only visual structure; product photography provides all the color.",
+          "warum": "Woven Whisky – Tinte auf Cream, weit gesperrte Versalien.",
+          "uebernehmen": [
+            "weit gesperrte Versal-Rubriken",
+            "eine Tintenfarbe"
+          ],
+          "nichtUebernehmen": [
+            "Semi-Mono als Fließtext"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "thailaendisch",
+      "stimmung": "orchidee",
+      "label": "Orchidee",
+      "archetyp": "traditionell",
+      "richtung": "Orchidee: festlich, Orchideenpink, Kalk – ein gedeckter Farbton, keine Tempel-Deko.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Som Saa",
+          "url": "https://www.somsaa.com",
+          "warum": "Thai-Restaurant in Spitalfields – regionale Küche, eigener Ton.",
+          "uebernehmen": [
+            "Karte mit Herkunft der Gerichte",
+            "warmer Akzent"
+          ],
+          "nichtUebernehmen": [
+            "Instagram-Einbettung"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Kin Khao",
+          "url": "https://www.kinkhao.com",
+          "warum": "Michelin-besterntes Thai in San Francisco mit heller, persönlicher Seite.",
+          "uebernehmen": [
+            "heller Grund",
+            "persönliche Sprache"
+          ],
+          "nichtUebernehmen": [
+            "kleine Grauschrift"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Essie Wine",
+          "url": "https://styles.refero.design/style/07f5281d-2a18-4e12-a8ff-d54d3e03d198",
+          "originalUrl": "https://www.essiewine.com",
+          "leitsatz": "Dusty rose chapbook with mustard chapter breaks",
+          "warum": "Essie Wine – „Dusty rose chapbook with mustard chapter breaks“.",
+          "uebernehmen": [
+            "Altrosa/Orchidee",
+            "Senf als Kapitelmarke"
+          ],
+          "nichtUebernehmen": [
+            "Weinshop-Mechanik"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "thailaendisch",
+      "stimmung": "streetfood-nacht",
+      "label": "Streetfood Nacht",
+      "archetyp": "abend",
+      "richtung": "Streetfood Nacht: Grill, Neon, Kurkuma – schmale Versalien, Orange als Licht.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Smoking Goat",
+          "url": "https://www.smokinggoatbar.com",
+          "warum": "Nordthailändischer Grill in Shoreditch, rau und nächtlich.",
+          "uebernehmen": [
+            "dunkler Grund",
+            "kurze, laute Headlines"
+          ],
+          "nichtUebernehmen": [
+            "Merch-Links"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Night + Market",
+          "url": "https://www.nightmarketsong.com",
+          "warum": "Thai-Streetfood aus L.A. – Plastikhocker-Energie, Plakat-Typo.",
+          "uebernehmen": [
+            "Plakat-Hierarchie",
+            "warmes Orange"
+          ],
+          "nichtUebernehmen": [
+            "knallbunte Mehrfarbigkeit"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Wise Design",
+          "url": "https://styles.refero.design/style/c5326639-873a-4257-ad1a-7da9111e9286",
+          "originalUrl": "https://wise.design",
+          "leitsatz": "Neon market stall on a global street — electric lime signage that shouts across a crowded marketplace, then polished product UI slips in behind it.",
+          "warum": "Wise Design – „Neon market stall on a global street“.",
+          "uebernehmen": [
+            "Marktstand-Signalfarbe",
+            "laute Headline, ruhiger Rest"
+          ],
+          "nichtUebernehmen": [
+            "Limettengrün"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "thailaendisch",
+      "stimmung": "andamanen",
+      "label": "Andamanen",
+      "archetyp": "hell",
+      "richtung": "Andamanen: Wasser, Petrol, Sonne – hell, küstig, feine Serife.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Kiln Soho",
+          "url": "https://www.kilnsoho.com",
+          "warum": "Thai-Grill mit Tresen – klare, helle Seite.",
+          "uebernehmen": [
+            "heller Grund",
+            "wenige, klare Wege"
+          ],
+          "nichtUebernehmen": [
+            "Wartelisten-Hinweis"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Speedboat Bar",
+          "url": "https://www.speedboatbar.co.uk",
+          "warum": "Bangkok-Chinatown-Stimmung mit Retro-Fliesen.",
+          "uebernehmen": [
+            "Retro-Fliesen-Akzente",
+            "freundliche Sprache"
+          ],
+          "nichtUebernehmen": [
+            "Pool-Table-Bildwelt"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Sing-sing",
+          "url": "https://styles.refero.design/style/12b20c12-27f8-4938-89ba-569404d36fe8",
+          "originalUrl": "https://sing-sing.co",
+          "leitsatz": "butter-paper broadsheet at golden hour — a warm saffron canvas with sea-glass ink.",
+          "warum": "Sing-sing – Butterpapier, Safran, Seeglas-Tinte.",
+          "uebernehmen": [
+            "Seeglas/Petrol als Tinte",
+            "warmer Papiergrund"
+          ],
+          "nichtUebernehmen": [
+            "Safran als Vollfläche"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "vietnamesisch",
+      "stimmung": "indochine",
+      "label": "Indochine",
+      "archetyp": "traditionell",
+      "richtung": "Indochine: Kolonialhaus, Rattan, Bambus – Braun, Papier, Kontrast-Serife.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Indochine NYC",
+          "url": "https://www.indochinenyc.com",
+          "warum": "Legendäres französisch-vietnamesisches Restaurant seit 1984.",
+          "uebernehmen": [
+            "Bananenblatt-Grün/Braun",
+            "Serifen-Eleganz"
+          ],
+          "nichtUebernehmen": [
+            "Tapetenmuster als Hintergrund"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "The Slanted Door",
+          "url": "https://www.slanteddoor.com",
+          "warum": "Charles Phans modern-vietnamesisches Restaurant in San Francisco.",
+          "uebernehmen": [
+            "ruhige Hierarchie",
+            "Speisekarte im Mittelpunkt"
+          ],
+          "nichtUebernehmen": [
+            "kleine Grau-Typo"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Aspelin Reitan",
+          "url": "https://styles.refero.design/style/3a331157-f5a5-4640-ada8-8a3ad262ee6a",
+          "originalUrl": "https://www.aspelineiendom.no",
+          "leitsatz": "Candlelit architectural archive — the page reads like a portfolio of built places pinned to a warm cream wall, with a single line of white type floating over each full-bleed image.",
+          "warum": "Aspelin Reitan – Kerzenlicht-Archiv auf warmem Cream.",
+          "uebernehmen": [
+            "Cream + Tabakbraun",
+            "Archiv-Ruhe"
+          ],
+          "nichtUebernehmen": [
+            "ModernEra"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "vietnamesisch",
+      "stimmung": "hanoi-nacht",
+      "label": "Hanoi Nacht",
+      "archetyp": "abend",
+      "richtung": "Hanoi Nacht: Laternenlicht, Bernstein, Rauch – dunkel und warm.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Madame Ngo",
+          "url": "https://www.madame-ngo.de",
+          "warum": "Vietnamesische Brasserie in Berlin – modern, stilvoll, abendlich.",
+          "uebernehmen": [
+            "dunkle, warme Töne",
+            "Brasserie-Eleganz"
+          ],
+          "nichtUebernehmen": [
+            "Standard-Theme-Elemente"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Assembly Coffee London",
+          "url": "https://styles.refero.design/style/8288950a-2731-44fd-85ef-211aecd8091d",
+          "originalUrl": "https://assemblycoffee.co.uk",
+          "leitsatz": "Embers in a dark roastery. A near-black canvas with warm, low-lit product photography and italic serif labels — the feeling of a specialty coffee menu printed in a midnight zine.",
+          "warum": "Assembly Coffee – „Embers in a dark roastery“: warm beleuchtetes Dunkel, kursive Serife.",
+          "uebernehmen": [
+            "Beinahe-Schwarz",
+            "warm beleuchtete Fotos",
+            "kursive Serife für Labels"
+          ],
+          "nichtUebernehmen": [
+            "Shop-Kacheln"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "vietnamesisch",
+      "stimmung": "strassenkueche",
+      "label": "Straßenküche",
+      "archetyp": "hell",
+      "richtung": "Straßenküche: Plastikhocker, Kräutergrün, Tageslicht – schnell und frisch.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Cây Tre",
+          "url": "https://www.caytre.co.uk",
+          "warum": "Vietnamesische Restaurants in London, bekannt für Phở – modern und hell.",
+          "uebernehmen": [
+            "helle Flächen",
+            "Kräutergrün"
+          ],
+          "nichtUebernehmen": [
+            "Gutschein-Banner"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Touchy Coffee",
+          "url": "https://styles.refero.design/style/6da76890-6e04-452a-834d-ff019e232c2b",
+          "originalUrl": "https://touchycoffee.com",
+          "leitsatz": "Hand-painted coffee zine — earthy paint bands, typewriter labels, and extreme pill buttons on warm matte surfaces.",
+          "warum": "Touchy Coffee – handgemaltes Zine, erdige Farbbänder, Schreibmaschinen-Labels.",
+          "uebernehmen": [
+            "handgemachte Anmutung",
+            "Mono-Labels für Preise/Zeiten"
+          ],
+          "nichtUebernehmen": [
+            "Pillen-Knöpfe in Extremform"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "japanisch",
+      "stimmung": "izakaya",
+      "label": "Izakaya",
+      "archetyp": "traditionell",
+      "richtung": "Izakaya: dunkles Holz, rote Laterne, Tresen – schmal, laut, warm.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Bar Goto",
+          "url": "https://www.bargoto.com",
+          "warum": "Japanische Cocktailbar/Izakaya in New York, dunkel und präzise.",
+          "uebernehmen": [
+            "dunkler Grund",
+            "Rot als Laterne"
+          ],
+          "nichtUebernehmen": [
+            "Altersabfrage"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Kanada-Ya",
+          "url": "https://www.kanada-ya.com",
+          "warum": "Ramen-Kette mit plakativer, starker Typo.",
+          "uebernehmen": [
+            "kräftige Rubriken",
+            "Gericht als Held"
+          ],
+          "nichtUebernehmen": [
+            "App-Download-Banner"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Impossible Foods",
+          "url": "https://styles.refero.design/style/04961c7d-8ca6-4e87-ba88-6ad7ffa3b245",
+          "originalUrl": "https://impossiblefoods.com",
+          "leitsatz": "Blood-red punk poster in velvet darkness. A custom condensed display face bleeds across a wine-dark canvas while single-color red CTAs punch through like a price tag on a butcher's chalkboard.",
+          "warum": "Impossible Foods – blutrotes Plakat auf Samt, schmale Display-Schrift.",
+          "uebernehmen": [
+            "Rot auf fast Schwarz",
+            "schmale, große Display-Schrift"
+          ],
+          "nichtUebernehmen": [
+            "Punk-Anmutung"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "japanisch",
+      "stimmung": "omakase",
+      "label": "Omakase",
+      "archetyp": "abend",
+      "richtung": "Omakase: Tresen aus Hinoki, Champagnerlicht, absolute Ruhe.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Sushi Nakazawa",
+          "url": "https://www.sushinakazawa.com",
+          "warum": "Omakase-Tresen in New York – reduziert, typografisch.",
+          "uebernehmen": [
+            "sehr wenig Inhalt",
+            "Reservierung als einzige Aktion"
+          ],
+          "nichtUebernehmen": [
+            "Presse-Zitate-Wand"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Masa",
+          "url": "https://www.masanyc.com",
+          "warum": "Eines der teuersten Omakase-Restaurants der Welt – fast leer.",
+          "uebernehmen": [
+            "Leere als Luxus",
+            "feine Serife"
+          ],
+          "nichtUebernehmen": [
+            "fehlende Informationen"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Atoms",
+          "url": "https://styles.refero.design/style/4433dfe7-315a-4459-bfd7-f59ccdc09bad",
+          "originalUrl": "https://atoms.co",
+          "leitsatz": "obsidian monolith in candlelight — a near-black canvas where a single warm champagne accent cuts like a blade through the darkness",
+          "warum": "Atoms – „obsidian monolith in candlelight“, Champagner-Akzent.",
+          "uebernehmen": [
+            "Obsidian-Grund",
+            "Champagner als einziger Akzent"
+          ],
+          "nichtUebernehmen": [
+            "Switzer/system-ui"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "japanisch",
+      "stimmung": "washitsu",
+      "label": "Washitsu",
+      "archetyp": "hell",
+      "richtung": "Washitsu: Tatami, Papierwand, Holz – hell, leise, viel Leere.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Koya",
+          "url": "https://www.koya.co.uk",
+          "warum": "Udon-Bar in London – ruhige, helle, sehr japanische Seite.",
+          "uebernehmen": [
+            "heller Papiergrund",
+            "zurückhaltende Typo"
+          ],
+          "nichtUebernehmen": [
+            "-"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "n/naka",
+          "url": "https://n-naka.com",
+          "warum": "Kaiseki in Los Angeles – Saisonalität, Weißraum.",
+          "uebernehmen": [
+            "Saison als Erzählung",
+            "Weißraum"
+          ],
+          "nichtUebernehmen": [
+            "Galerie-Lightbox"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Kinfolk",
+          "url": "https://styles.refero.design/style/ac9b040e-36aa-4881-ada5-72d4744947a4",
+          "originalUrl": "https://www.kinfolk.com",
+          "leitsatz": "Editorial broadsheet on bone-white linen — generous margins, ink-black serif, and a single warm-paper accent for section breaks.",
+          "warum": "Kinfolk – Broadsheet auf knochenweißem Leinen, großzügige Ränder.",
+          "uebernehmen": [
+            "großzügige Ränder",
+            "tintenschwarze Serife"
+          ],
+          "nichtUebernehmen": [
+            "Magazin-Paywall-Muster"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "indisch",
+      "stimmung": "gewuerzmarkt",
+      "label": "Gewürzmarkt",
+      "archetyp": "traditionell",
+      "richtung": "Gewürzmarkt: Kurkuma, Messing, Bombay-Café – schmal, warm, belebt.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Dishoom",
+          "url": "https://www.dishoom.com",
+          "warum": "Bombay-Café-Hommage – die Referenz für indische Gastro-Marken in Europa.",
+          "uebernehmen": [
+            "warmer Papiergrund",
+            "Serife + Versal-Rubriken",
+            "Geschichten neben der Karte"
+          ],
+          "nichtUebernehmen": [
+            "Illustrations-Overload"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Hoppers",
+          "url": "https://www.hopperslondon.com",
+          "warum": "Sri-lankisch/südindisch in London, bunt aber diszipliniert.",
+          "uebernehmen": [
+            "ein kräftiger Akzent",
+            "direkte Sprache"
+          ],
+          "nichtUebernehmen": [
+            "Mehrfarb-Illustration"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Hungry Tiger",
+          "url": "https://styles.refero.design/style/47f15da7-8905-45b3-bcab-06a4277c6168",
+          "originalUrl": "https://www.eathungrytiger.com",
+          "leitsatz": "Turmeric-bright graffiti on a tandoor wall. A single gold-on-rust palette with display type so large it reads as a spice market sign, not a webpage.",
+          "warum": "Hungry Tiger – „Turmeric-bright graffiti on a tandoor wall“ (indische Street-Food-Marke).",
+          "uebernehmen": [
+            "Gold-auf-Rost-Palette",
+            "Headline als Marktschild"
+          ],
+          "nichtUebernehmen": [
+            "Graffiti-Texturen"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "indisch",
+      "stimmung": "maharadscha",
+      "label": "Maharadscha",
+      "archetyp": "abend",
+      "richtung": "Maharadscha: Samt, Pflaume, Messing – festlicher Abend.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Tamasha",
+          "url": "https://www.tamasha.co.uk",
+          "warum": "Modern-indisches Restaurant mit Samt- und Gold-Interieur.",
+          "uebernehmen": [
+            "Pflaume/Samt",
+            "Gold als Detail"
+          ],
+          "nichtUebernehmen": [
+            "Ornamentrahmen"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Slab",
+          "url": "https://styles.refero.design/style/f240ed7d-d466-478e-bbce-6c93420dfd1c",
+          "originalUrl": "https://slab.com",
+          "leitsatz": "midnight-wine reading room",
+          "warum": "Slab – „midnight-wine reading room“: Pflaume bei Nacht.",
+          "uebernehmen": [
+            "tiefes Pflaumenrot",
+            "Serifen-Lesestimmung"
+          ],
+          "nichtUebernehmen": [
+            "Whitney als Text"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "indisch",
+      "stimmung": "suedindisch-hell",
+      "label": "Südindisch hell",
+      "archetyp": "hell",
+      "richtung": "Südindisch hell: Bananenblatt, Kalk, Kokos – frisch und hell.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Kricket",
+          "url": "https://www.kricket.co.uk",
+          "warum": "Modern-indische Small Plates in London, hell und reduziert.",
+          "uebernehmen": [
+            "heller Grund",
+            "kurze Karte",
+            "ein Grün"
+          ],
+          "nichtUebernehmen": [
+            "-"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Amrit Palace",
+          "url": "https://styles.refero.design/style/b753dfda-cbe1-41e4-b341-b98d69c8422f",
+          "originalUrl": "https://amritpalace.com",
+          "leitsatz": "spiced parchment gallery — a candlelit beige wall holding sparse saffron punctuation beneath breath-soft serif headlines.",
+          "warum": "Amrit Palace – „spiced parchment gallery“ (indisches Restaurant): Pergament + sparsamer Safran.",
+          "uebernehmen": [
+            "Pergament-Beige",
+            "hauchfeine Serifen-Headlines",
+            "Safran nur als Punkt"
+          ],
+          "nichtUebernehmen": [
+            "Satoshi"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "asiatisch",
+      "stimmung": "marktstand",
+      "label": "Marktstand",
+      "archetyp": "traditionell",
+      "richtung": "Marktstand: Nudelbar, Kraftpapier, gebranntes Orange – schnell und ehrlich.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Momofuku",
+          "url": "https://www.momofuku.com",
+          "warum": "Panasiatische Marke von David Chang – klar, plakativ.",
+          "uebernehmen": [
+            "Pfirsich/Orange als Signal",
+            "kräftige Rubriken"
+          ],
+          "nichtUebernehmen": [
+            "Shop im Vordergrund"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Little Amps",
+          "url": "https://styles.refero.design/style/ca522706-03ed-48cb-acb3-1bb2a22f2eda",
+          "originalUrl": "https://littleampscoffee.com",
+          "leitsatz": "vinyl record sleeve in afternoon sun. Cream paper, burnt-orange ink, a single dusty blue stamp, every label set in monospace — the interface behaves like a printed coffee zine: tactile, editorial, never sterile.",
+          "warum": "Little Amps – Schallplattenhülle: Cream, gebranntes Orange, Mono-Labels.",
+          "uebernehmen": [
+            "gebranntes Orange",
+            "Mono für Preise und Zeiten"
+          ],
+          "nichtUebernehmen": [
+            "Staubblau"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Lamanna",
+          "url": "https://styles.refero.design/style/057d7c66-76b7-4272-849c-4058543e6799",
+          "originalUrl": "https://lamannabakery.com",
+          "leitsatz": "Neon circus tent on a Naples sidewalk",
+          "warum": "Lamanna – Bäckerei in Neapel: Straßenschild-Typografie.",
+          "uebernehmen": [
+            "breite, laute Display-Rubriken"
+          ],
+          "nichtUebernehmen": [
+            "Mehrfarbigkeit"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "asiatisch",
+      "stimmung": "neon",
+      "label": "Neon",
+      "archetyp": "abend",
+      "richtung": "Neon: Nachtbar, ein Rot, Schwarz – kein Cyberpunk-Violett.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "BAO",
+          "url": "https://www.baolondon.com",
+          "warum": "Taiwanesische Bao-Bar mit eigener, grafischer Handschrift.",
+          "uebernehmen": [
+            "grafische Klarheit",
+            "ein Signalrot"
+          ],
+          "nichtUebernehmen": [
+            "Figuren-Illustrationen"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Lama Lama",
+          "url": "https://styles.refero.design/style/8e26bf8a-44b8-4fe1-9b4b-188dd5827c0f",
+          "originalUrl": "https://lamalama.nl",
+          "leitsatz": "midnight studio with a frozen-white spotlight",
+          "warum": "Lama Lama – „midnight studio with a frozen-white spotlight“.",
+          "uebernehmen": [
+            "Beinahe-Schwarz",
+            "ein kaltes Weiß als Licht"
+          ],
+          "nichtUebernehmen": [
+            "Eisblau"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "asiatisch",
+      "stimmung": "fusion-minimal",
+      "label": "Fusion Minimal",
+      "archetyp": "hell",
+      "richtung": "Fusion minimal: Schiefer, Porzellan, eine Linie – galerieartig.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Nobu",
+          "url": "https://www.noburestaurants.com",
+          "warum": "Japanisch-peruanische Fusion – die Referenz für minimale Fusion-Marken.",
+          "uebernehmen": [
+            "Schiefer/Schwarz-Weiß",
+            "große ruhige Bilder"
+          ],
+          "nichtUebernehmen": [
+            "Hotel-Buchung"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Bang & Olufsen",
+          "url": "https://styles.refero.design/style/27a4a4fa-4b1a-4e7e-b2c3-3e5bf57f00e5",
+          "originalUrl": "https://bang-olufsen.com",
+          "leitsatz": "Scandinavian gallery on porcelain. When a B&O page goes dark, the product is lit like a sculpture in a midnight alcove; when it goes light, the product floats on white silk with nothing else competing for attention.",
+          "warum": "Bang & Olufsen – skandinavische Galerie auf Porzellan.",
+          "uebernehmen": [
+            "Porzellan-Weiß",
+            "Objekt wie Skulptur freigestellt"
+          ],
+          "nichtUebernehmen": [
+            "Produkt-Kaufmechanik"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "cafe",
+      "stimmung": "wiener-kaffeehaus",
+      "label": "Wiener Kaffeehaus",
+      "archetyp": "traditionell",
+      "richtung": "Wiener Kaffeehaus: Marmor, Zeitung, Thonet – Broadsheet statt Barock.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Café Central",
+          "url": "https://www.cafecentral.wien",
+          "warum": "Das Wiener Kaffeehaus schlechthin.",
+          "uebernehmen": [
+            "Zeitungs-Hierarchie",
+            "tiefes Grün"
+          ],
+          "nichtUebernehmen": [
+            "Barock-Ornamente"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Demel",
+          "url": "https://www.demel.com",
+          "warum": "k.u.k. Hofzuckerbäcker – Tradition mit strenger Typo.",
+          "uebernehmen": [
+            "Serifen-Tradition",
+            "Cream-Grund"
+          ],
+          "nichtUebernehmen": [
+            "Shop-Mechanik"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Monocle",
+          "url": "https://styles.refero.design/style/9165ecb1-f068-4093-8783-1f3c98898b8a",
+          "originalUrl": "https://monocle.com",
+          "leitsatz": "Quality broadsheet on cream paper. A curated newsroom where every column earns its keep and the only color on the page is the one that matters.",
+          "warum": "Monocle – Qualitäts-Broadsheet auf Cream-Papier.",
+          "uebernehmen": [
+            "Plantin-artige Serife",
+            "Spalten-Disziplin"
+          ],
+          "nichtUebernehmen": [
+            "Gelb als Signal"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "cafe",
+      "stimmung": "konditorei",
+      "label": "Konditorei",
+      "archetyp": "abend",
+      "richtung": "Konditorei: Porzellan, Himbeere, Zuckerguss – festlich, aber nicht niedlich.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "Ladurée",
+          "url": "https://www.laduree.com",
+          "warum": "Pariser Patisserie – Pastell mit strenger Eleganz.",
+          "uebernehmen": [
+            "gedecktes Rosé",
+            "feine Serife"
+          ],
+          "nichtUebernehmen": [
+            "Pastell-Mehrfarbigkeit"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Dominique Ansel",
+          "url": "https://www.dominiqueansel.com",
+          "warum": "New Yorker Bäckerei – verspielt, aber aufgeräumt.",
+          "uebernehmen": [
+            "Produkt freigestellt",
+            "viel Weißraum"
+          ],
+          "nichtUebernehmen": [
+            "Aktionskacheln"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Mr. Pops",
+          "url": "https://styles.refero.design/style/ab7996ed-e0ed-40a0-81a5-d37f19ef35b0",
+          "originalUrl": "https://mrpops.ua/en",
+          "leitsatz": "retro ice cream parlor on cream paper. A bright white shopfront with cherry-red trim, stacked marquee letters, and warm cream cards beneath full-bleed food photography.",
+          "warum": "Mr. Pops – Retro-Eisdiele, Kirschrot auf Cream.",
+          "uebernehmen": [
+            "Kirschrot/Himbeer als Rahmenfarbe",
+            "Cream-Karten"
+          ],
+          "nichtUebernehmen": [
+            "gestapelte Marquee-Buchstaben"
+          ]
+        }
+      ]
+    },
+    {
+      "kueche": "cafe",
+      "stimmung": "third-wave",
+      "label": "Third Wave",
+      "archetyp": "hell",
+      "richtung": "Third Wave: Rösterei, Beton, Salbei – nüchtern, präzise, hell.",
+      "referenzen": [
+        {
+          "typ": "restaurant",
+          "name": "The Barn",
+          "url": "https://www.thebarn.de",
+          "warum": "Berliner Rösterei – europäischer Minimalismus.",
+          "uebernehmen": [
+            "fast monochrom",
+            "Produkt als Held"
+          ],
+          "nichtUebernehmen": [
+            "Shop als Startseite"
+          ]
+        },
+        {
+          "typ": "restaurant",
+          "name": "Five Elephant",
+          "url": "https://www.fiveelephant.com",
+          "warum": "Berliner Rösterei und Café mit ruhiger Typo.",
+          "uebernehmen": [
+            "ruhige, helle Flächen"
+          ],
+          "nichtUebernehmen": [
+            "-"
+          ]
+        },
+        {
+          "typ": "refero",
+          "name": "Escape Coffee Company",
+          "url": "https://styles.refero.design/style/b5532c58-620a-4d69-8861-35b2b6443956",
+          "originalUrl": "https://escape.cafe",
+          "leitsatz": "Frost-bleached editorial broadsheet — large display type cut into warm off-white, all atmosphere carried by raw photography.",
+          "warum": "Escape Coffee – frost-gebleichtes Broadsheet, rohe Fotografie.",
+          "uebernehmen": [
+            "warmes Off-White",
+            "große Display-Typo",
+            "rohe Fotos statt Deko"
+          ],
+          "nichtUebernehmen": [
+            "TWK Lausanne"
+          ]
+        }
+      ]
+    }
+  ]
+}

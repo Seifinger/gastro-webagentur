@@ -1,0 +1,89 @@
+{
+  "url": "https://www.malakeh.de",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:27:24.262Z",
+  "titel": "Malakeh | Authentic Syrian Cuisine - Crafted by Celebrity Chef Malakeh",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#fbf7f3",
+        "anzahl": 4320000
+      },
+      {
+        "hex": "#e8b0a8",
+        "anzahl": 1235520
+      },
+      {
+        "hex": "#5c0019",
+        "anzahl": 727965
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 19
+      },
+      {
+        "hex": "#8e0027",
+        "anzahl": 17
+      },
+      {
+        "hex": "#0000ee",
+        "anzahl": 7
+      },
+      {
+        "hex": "#222222",
+        "anzahl": 4
+      },
+      {
+        "hex": "#e8b0a8",
+        "anzahl": 2
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "kräftig",
+    "akzent": "#8e0027"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Eudoxussans",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "Cormorant",
+        "rolle": "h2",
+        "art": "serif"
+      }
+    ],
+    "charakter": "Grotesk führt, Serife als Gegenstimme, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 35,
+    "bodyPx": 18,
+    "kontrastVerhaeltnis": 1.94,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0.5,
+    "reihen": 6,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 200,
+    "charakter": "ruhig"
+  }
+}

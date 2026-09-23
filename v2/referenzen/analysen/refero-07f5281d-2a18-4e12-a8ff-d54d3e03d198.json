@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/07f5281d-2a18-4e12-a8ff-d54d3e03d198",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:28:49.394Z",
+  "name": "Essie Wine",
+  "originalUrl": "https://www.essiewine.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#062d32",
+        "name": "Ink Teal",
+        "anzahl": 8
+      },
+      {
+        "hex": "#c9a9b5",
+        "name": "Dusty Rose",
+        "anzahl": 7
+      },
+      {
+        "hex": "#e9e9e2",
+        "name": "Warm Bone",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#aa9e54",
+        "name": "Mustard Olive",
+        "anzahl": 6
+      },
+      {
+        "hex": "#344b52",
+        "name": "Slate Teal",
+        "anzahl": 5
+      },
+      {
+        "hex": "#767676",
+        "name": "Mid Gray",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "gedeckt",
+    "akzent": null,
+    "schema": "both"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "BasicCommercial LT Com Roman",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Adobe Caslon",
+        "anzahl": 4,
+        "art": "serif"
+      },
+      {
+        "name": "Elementa",
+        "anzahl": 3,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, Serife als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Dusty rose chapbook with mustard chapter breaks"
+}

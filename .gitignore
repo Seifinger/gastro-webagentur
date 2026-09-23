@@ -8,3 +8,10 @@ data/lead-edits/
 data/resonanz/
 public/uploads/
 .preview/
+
+# v2: Zwischenstände der Judge-Runden (Screenshots je Runde) und KI-Medien-Cache
+v2/output/judge/
+v2/output/medien/
+# v2: Entwürfe echter Leads (Kundendaten) und die lokale Engine-Wahl
+v2/output/leads/
+data/v2-engine.json

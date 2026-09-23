@@ -1,0 +1,85 @@
+{
+  "url": "https://styles.refero.design/style/b5532c58-620a-4d69-8861-35b2b6443956",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:31:53.976Z",
+  "name": "Escape Coffee Company",
+  "originalUrl": "https://escape.cafe",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#f5f4f2",
+        "name": "Bone",
+        "anzahl": 8
+      },
+      {
+        "hex": "#151515",
+        "name": "Ink",
+        "anzahl": 7
+      },
+      {
+        "hex": "#ebe9e6",
+        "name": "Ash",
+        "anzahl": 6
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Paper",
+        "anzahl": 5
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#8a8a8a",
+        "name": "Smoke",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "fast unbunt",
+    "akzent": null,
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "TWK Lausanne",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Molitor",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "Garaje",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "Arial",
+        "anzahl": 2,
+        "art": "grotesk"
+      },
+      {
+        "name": "GTStandard-M",
+        "anzahl": 1,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Frost-bleached editorial broadsheet — large display type cut into warm off-white, all atmosphere carried by raw photography."
+}

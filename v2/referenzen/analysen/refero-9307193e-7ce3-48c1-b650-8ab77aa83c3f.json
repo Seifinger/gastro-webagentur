@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/9307193e-7ce3-48c1-b650-8ab77aa83c3f",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:28:19.601Z",
+  "name": "Redbrick Coffee",
+  "originalUrl": "https://redbrick.coffee",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#212529",
+        "name": "Press Black",
+        "anzahl": 7
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Cream White",
+        "anzahl": 6
+      },
+      {
+        "hex": "#f2f2f2",
+        "name": "Soft Grey",
+        "anzahl": 5
+      },
+      {
+        "hex": "#121212",
+        "name": "Carbon",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#e82c2a",
+        "name": "Brick Red",
+        "anzahl": 8
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "gedeckt",
+    "akzent": "#e82c2a",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Surt",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Editorial Old",
+        "anzahl": 4,
+        "art": "serif"
+      },
+      {
+        "name": "GTStandard-M",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "system-ui",
+        "anzahl": 2,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, Serife als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Scarlet ink editorial on butcher paper"
+}

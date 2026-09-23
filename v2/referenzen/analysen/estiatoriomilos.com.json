@@ -1,0 +1,104 @@
+{
+  "url": "https://www.estiatoriomilos.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:33:46.225Z",
+  "titel": "Home - Estiatorio Milos",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 4812480
+      },
+      {
+        "hex": "#f8f4ec",
+        "anzahl": 1446705
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 404496
+      },
+      {
+        "hex": "#f4f6f5",
+        "anzahl": 241448
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 8
+      },
+      {
+        "hex": "#cba977",
+        "anzahl": 1
+      },
+      {
+        "hex": "#f3f4f5",
+        "anzahl": 1
+      },
+      {
+        "hex": "#033743",
+        "anzahl": 1
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 78
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 34
+      },
+      {
+        "hex": "#343a40",
+        "anzahl": 21
+      },
+      {
+        "hex": "#cba977",
+        "anzahl": 3
+      },
+      {
+        "hex": "#bd9252",
+        "anzahl": 1
+      },
+      {
+        "hex": "#2c324c",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#cba977"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "mrs-eaves",
+        "rolle": "h1",
+        "art": "serif"
+      }
+    ],
+    "charakter": "Serife führt, viel Versalsatz",
+    "displayArt": "serif",
+    "h1Px": 40,
+    "bodyPx": 20,
+    "kontrastVerhaeltnis": 2,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 1,
+    "median": 80,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.91,
+    "reihen": 22,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 2,
+    "medianDauerMs": 300,
+    "charakter": "ruhig"
+  }
+}

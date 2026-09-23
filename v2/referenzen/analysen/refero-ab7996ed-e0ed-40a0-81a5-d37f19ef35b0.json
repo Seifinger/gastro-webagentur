@@ -1,0 +1,70 @@
+{
+  "url": "https://styles.refero.design/style/ab7996ed-e0ed-40a0-81a5-d37f19ef35b0",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:31:40.534Z",
+  "name": "Mr. Pops",
+  "originalUrl": "https://mrpops.ua/en",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#fee5ca",
+        "name": "Cream Bisque",
+        "anzahl": 7
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Canvas White",
+        "anzahl": 6
+      },
+      {
+        "hex": "#000000",
+        "name": "Ink Black",
+        "anzahl": 5
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#b00e2f",
+        "name": "Cherry Marquee",
+        "anzahl": 8
+      },
+      {
+        "hex": "#aaaaaa",
+        "name": "Slate Mid",
+        "anzahl": 4
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#b00e2f",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Cervo",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "HelveticaNeueCyr",
+        "anzahl": 4,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "retro ice cream parlor on cream paper. A bright white shopfront with cherry-red trim, stacked marquee letters, and warm cream cards beneath full-bleed food photography."
+}

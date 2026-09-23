@@ -1,0 +1,98 @@
+{
+  "url": "https://www.tavernakyclades.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:26:10.179Z",
+  "titel": "Best Greek Restaurant Seafood Astoria Queens",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 7882702
+      },
+      {
+        "hex": "#f9f9f9",
+        "anzahl": 2725898
+      },
+      {
+        "hex": "#dddddd",
+        "anzahl": 522000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 2
+      },
+      {
+        "hex": "#524f4f",
+        "anzahl": 34
+      },
+      {
+        "hex": "#626262",
+        "anzahl": 10
+      },
+      {
+        "hex": "#c85f49",
+        "anzahl": 7
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 3
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 2
+      },
+      {
+        "hex": "#0078a8",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#c85f49"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Montserrat",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "Lato",
+        "rolle": "h2",
+        "art": "grotesk"
+      },
+      {
+        "name": "Roboto Mono",
+        "rolle": "body",
+        "art": "mono"
+      }
+    ],
+    "charakter": "Grotesk führt, Monospace als Gegenstimme, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 120,
+    "bodyPx": 14,
+    "kontrastVerhaeltnis": 8.57,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0.3,
+    "reihen": 10,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 20,
+    "medianDauerMs": 200,
+    "charakter": "lebendig"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/6da76890-6e04-452a-834d-ff019e232c2b",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:29:56.098Z",
+  "name": "Touchy Coffee",
+  "originalUrl": "https://touchycoffee.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "name": "Ink",
+        "anzahl": 8
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Cream",
+        "anzahl": 6
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#788c8c",
+        "name": "Sage",
+        "anzahl": 7
+      },
+      {
+        "hex": "#9f4920",
+        "name": "Terracotta",
+        "anzahl": 5
+      },
+      {
+        "hex": "#a697c6",
+        "name": "Lavender",
+        "anzahl": 4
+      },
+      {
+        "hex": "#5b9133",
+        "name": "Moss",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "gemischt",
+    "saettigung": "gedeckt",
+    "akzent": "#9f4920",
+    "schema": "both"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Apercu Mono",
+        "anzahl": 5,
+        "art": "mono"
+      },
+      {
+        "name": "Touchy Script (custom)",
+        "anzahl": 4,
+        "art": "skript"
+      },
+      {
+        "name": "Apercu Mono Bold",
+        "anzahl": 3,
+        "art": "mono"
+      }
+    ],
+    "charakter": "Monospace führt, Schreibschrift als Gegenstimme",
+    "displayArt": "skript"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Hand-painted coffee zine — earthy paint bands, typewriter labels, and extreme pill buttons on warm matte surfaces."
+}

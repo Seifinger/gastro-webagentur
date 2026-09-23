@@ -1,0 +1,69 @@
+{
+  "url": "https://www.somsaa.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:28:44.915Z",
+  "titel": "som saa | Spitalfields | E1 6BD | 020 7324 7790",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 3888000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#333333",
+        "anzahl": 50
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 6
+      },
+      {
+        "hex": "#1c5f90",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#1c5f90"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Abel",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "MadrasExtraLight",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 60,
+    "bodyPx": 18,
+    "kontrastVerhaeltnis": 3.33,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 1,
+    "median": 30,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "wert": 1,
+    "reihen": 1,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 5,
+    "medianDauerMs": 500,
+    "charakter": "ruhig"
+  }
+}

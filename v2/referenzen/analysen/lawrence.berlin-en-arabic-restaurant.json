@@ -1,0 +1,100 @@
+{
+  "url": "https://lawrence.berlin/en/arabic-restaurant/",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:27:32.474Z",
+  "titel": "LAWRENCE Berlin Mitte - Restaurant, Catering, Events - \"Berlin's best Arabic Restaurant\"",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 13761873
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 1296000
+      },
+      {
+        "hex": "#3c3d41",
+        "anzahl": 336960
+      },
+      {
+        "hex": "#eeeeee",
+        "anzahl": 161855
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 8
+      },
+      {
+        "hex": "#dedfe0",
+        "anzahl": 1
+      },
+      {
+        "hex": "#61a229",
+        "anzahl": 1
+      },
+      {
+        "hex": "#666666",
+        "anzahl": 21
+      },
+      {
+        "hex": "#cd5c5c",
+        "anzahl": 19
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 15
+      },
+      {
+        "hex": "#333333",
+        "anzahl": 6
+      },
+      {
+        "hex": "#444444",
+        "anzahl": 3
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#61a229"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Lato",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 48,
+    "bodyPx": 18,
+    "kontrastVerhaeltnis": 2.67,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 2,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 3,
+    "medianDauerMs": 300,
+    "charakter": "ruhig"
+  }
+}

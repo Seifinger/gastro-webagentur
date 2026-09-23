@@ -1,0 +1,65 @@
+{
+  "url": "https://styles.refero.design/style/3a331157-f5a5-4640-ada8-8a3ad262ee6a",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:29:42.721Z",
+  "name": "Aspelin Reitan",
+  "originalUrl": "https://www.aspelineiendom.no",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffebd0",
+        "name": "Warm Parchment",
+        "anzahl": 8
+      },
+      {
+        "hex": "#fff8e9",
+        "name": "Candlelight",
+        "anzahl": 7
+      },
+      {
+        "hex": "#000000",
+        "name": "Obsidian",
+        "anzahl": 6
+      },
+      {
+        "hex": "#2f2116",
+        "name": "Walnut Shell",
+        "anzahl": 5
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#4f3622",
+        "name": "Aged Bronze",
+        "anzahl": 4
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#4f3622",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "ModernEra",
+        "anzahl": 5,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Candlelit architectural archive — the page reads like a portfolio of built places pinned to a warm cream wall, with a single line of white type floating over each full-bleed image."
+}

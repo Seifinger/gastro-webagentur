@@ -1,0 +1,105 @@
+{
+  "url": "https://www.tamasha.co.uk",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:30:42.387Z",
+  "titel": "Tamasha Indian Restaurant | Bromley's Award-Winning Dining",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 4320000
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 1412055
+      },
+      {
+        "hex": "#383838",
+        "anzahl": 720000
+      },
+      {
+        "hex": "#464646",
+        "anzahl": 720000
+      },
+      {
+        "hex": "#2a2a2a",
+        "anzahl": 689715
+      },
+      {
+        "hex": "#444444",
+        "anzahl": 617850
+      },
+      {
+        "hex": "#1e2124",
+        "anzahl": 542565
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#cc3366",
+        "anzahl": 47
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 33
+      },
+      {
+        "hex": "#776757",
+        "anzahl": 33
+      },
+      {
+        "hex": "#333333",
+        "anzahl": 18
+      },
+      {
+        "hex": "#e4e4e4",
+        "anzahl": 9
+      },
+      {
+        "hex": "#d1a83b",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#cc3366"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Cormorant",
+        "rolle": "h2",
+        "art": "serif"
+      },
+      {
+        "name": "Jost",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Serife führt, Grotesk als Gegenstimme, viel Versalsatz",
+    "displayArt": "serif",
+    "h1Px": 19,
+    "bodyPx": 17,
+    "kontrastVerhaeltnis": 1.12,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 1,
+    "median": 50,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.33,
+    "reihen": 3,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 1,
+    "medianDauerMs": 300,
+    "charakter": "ruhig"
+  }
+}

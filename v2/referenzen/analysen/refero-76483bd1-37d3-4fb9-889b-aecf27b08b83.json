@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/76483bd1-37d3-4fb9-889b-aecf27b08b83",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:28:39.564Z",
+  "name": "Woven",
+  "originalUrl": "https://wovenwhisky.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#eeede5",
+        "name": "Parchment Cream",
+        "anzahl": 8
+      },
+      {
+        "hex": "#232323",
+        "name": "Ink Black",
+        "anzahl": 7
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Pure White",
+        "anzahl": 6
+      },
+      {
+        "hex": "#ddddda",
+        "name": "Soft Stone",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#4a4a4a",
+        "name": "Iron Gray",
+        "anzahl": 5
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": null,
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Spezia Semi-Mono",
+        "anzahl": 5,
+        "art": "mono"
+      },
+      {
+        "name": "Spezia Medium",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "Figtree",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "Spezia Semi-Mono Light",
+        "anzahl": 2,
+        "art": "mono"
+      }
+    ],
+    "charakter": "Monospace führt, Grotesk als Gegenstimme",
+    "displayArt": "mono"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Ink on cream parchment. A distiller's editorial spread where warm cream canvases, a single dark ink color, and wide-tracked uppercase type create the only visual structure; product photography provides all the color."
+}

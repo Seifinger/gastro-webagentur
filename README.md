@@ -493,6 +493,42 @@ Der Hinweis „Entwurfsansicht" verschwindet dann, weil die Anfrage wirklich bei
 
 **Wichtig:** Das braucht einen laufenden Server. GitHub Pages liefert nur statische Dateien aus – die dort veröffentlichten Entwürfe bleiben also ohne `--api` und damit in der Vorschau-Fassung. Für einen echten Kunden läuft der Wirt-Server auf seinem eigenen Hosting (oder deinem), und die Seite zeigt auf diese Adresse.
 
+## v2-Pipeline (parallel zu v1)
+
+Neben dem bewährten Generator (v1, `src/`) gibt es eine zweite Engine unter [`v2/`](v2/README.md). Jede v2-Seite durchläuft **Referenz → Designsystem → Build → Judge → Anbindung**: echte Restaurant- und Refero-Referenzen je Küche×Stimmung, daraus ein Designsystem-Dokument (Farben mit Aufgaben, Typo-Skala ohne Inter/Roboto, 8-px-Raster, verbotene Muster), ein Build mit harten Gates (WCAG AA, drei Hero-Aufbauten je Stimmung, Anti-Slop-Lint, Textregeln) und ein Design-Judge im Browser, der bis zu drei Korrekturrunden anstößt. Reservierung, Warenkorb und No-Show-Schutz sind dasselbe Skript wie in v1, deshalb funktionieren v2-Seiten mit dem Wirt-Server wie v1-Seiten.
+
+**v1 bleibt Standard.** Nichts ändert sich, solange niemand umschaltet.
+
+```bash
+npm run v2:build -- --kueche italienisch --stimmung trattoria --judge   # eine Kombination
+npm run v2:build:all -- --judge                                         # alle 36
+npm run v2:vergleich                                                    # Vorher/Nachher v1↔v2
+```
+
+### Zwischen v1 und v2 umschalten
+
+Im Lead-Dashboard (`npm run dashboard`) steht über den Kennzahlen **„Standard-Engine v1 | v2“**. Das gilt für alle Leads. In der Spalte **Engine** lässt sich jeder Lead einzeln übersteuern („Standard“, „v1“, „v2“). Dort gibt es auch **„v2 bauen“**, das die v2-Seite dieses Leads im vollen Zyklus mit Judge erzeugt. Sobald ein Lead auf v2 steht und gebaut ist, öffnet „ansehen“ die v2-Seite. Die Wahl liegt in `data/v2-engine.json`. Ohne Dashboard lässt sich der Standard mit `ENGINE_STANDARD=v2` in der `.env` setzen. Soll ein v2-Entwurf echte Anfragen annehmen, gehört `V2_API_URL=https://…` (Adresse des Wirt-Servers) in die `.env`.
+
+„Bilder“ (bearbeiten.html) zeigt zusätzlich das v2-Designsystem des Leads (Farben mit Aufgabe, Schriften, Hero-Aufbau, Foto-Anleitung) und für jeden Bildplatz die Herkunft: **eigenes Foto**, **KI-generiert** oder **Platzhalter**. Hochgeladene Fotos haben in v2 immer Vorrang.
+
+Veröffentlicht (`npm run publish-site`) wird weiterhin v1. Die Umstellung auf v2 ist bewusst ein eigener, späterer Schritt (siehe [`v2/ABSCHLUSSBERICHT.md`](v2/ABSCHLUSSBERICHT.md)).
+
+### Wirt-Dashboard im Stil des Hauses
+
+```bash
+npm run v2:wirt -- --betrieb gasthaus-zur-post --kueche bayerisch --stimmung wirtshaus
+```
+
+Das ist derselbe Wirt-Server mit allen Funktionen, aber in Farben und Schriften des Designsystems des Betriebs. Dazu kommen der Küchenstatus (Neu → In Zubereitung → Bereit → Abgeholt) und die Telegram-Anbindung. `npm run wirt` bleibt unverändert.
+
+### Telegram aktivieren
+
+1. Bei **@BotFather** in Telegram `/newbot` senden und den Token in die `.env` eintragen: `TELEGRAM_BOT_TOKEN=…` (optional `TELEGRAM_BOT_NAME=…` für einen Direktlink).
+2. Wirt-Server mit Bot starten: `npm run v2:wirt -- --betrieb <slug> --telegram`. Bei mehreren Betrieben stattdessen einmal `npm run v2:telegram`.
+3. Der Wirt klickt im Wirt-Dashboard unter „Telegram“ auf **„Verbindungs-Code erzeugen“** und sendet dem Bot `/start CODE`.
+
+Danach kommen neue Reservierungen, Bestellungen und Stornierungen mit Knöpfen (Bestätigen/Absagen, In Zubereitung → Bereit → Abgeholt) in den Chat, dazu morgens eine Tagesübersicht. Betriebe ohne Telegram arbeiten wie bisher nur über das Dashboard. Details: [`v2/integration/TELEGRAM-SETUP.md`](v2/integration/TELEGRAM-SETUP.md).
+
 ## Tests ausführen
 
 Es gibt Unit-Tests für die Filterlogik, den Landing-Page-Generator und den Speisekarten-Katalog, die **ohne** echten API-Key laufen:

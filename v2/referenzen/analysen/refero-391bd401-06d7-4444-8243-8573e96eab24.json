@@ -1,0 +1,54 @@
+{
+  "url": "https://styles.refero.design/style/391bd401-06d7-4444-8243-8573e96eab24",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:27:59.712Z",
+  "name": "D.S. & DURGA",
+  "originalUrl": "https://www.dsanddurga.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "name": "Ink Black",
+        "anzahl": 8
+      },
+      {
+        "hex": "#f2e9de",
+        "name": "Bone White",
+        "anzahl": 7
+      },
+      {
+        "hex": "#ddc9c0",
+        "name": "Dusty Rose",
+        "anzahl": 6
+      }
+    ],
+    "vordergrund": [],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "gedeckt",
+    "akzent": null,
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Sofia Pro",
+        "anzahl": 5,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "indie perfumery broadsheet on bone-white paper — a single warm cream canvas where black ink and oversized type do all the talking."
+}

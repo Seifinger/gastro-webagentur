@@ -1,0 +1,100 @@
+{
+  "url": "https://www.noburestaurants.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:31:05.137Z",
+  "titel": "Nobu Global » Nobu Restaurants",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#f4f4f4",
+        "anzahl": 4320000
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 1690608
+      },
+      {
+        "hex": "#886e42",
+        "anzahl": 1296000
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 153600
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#333333",
+        "anzahl": 14
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 7
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 3
+      },
+      {
+        "hex": "#886e42",
+        "anzahl": 1
+      },
+      {
+        "hex": "#333333",
+        "anzahl": 351
+      },
+      {
+        "hex": "#886e42",
+        "anzahl": 85
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 6
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 4
+      },
+      {
+        "hex": "#86754d",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#886e42"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Poppins",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 40,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 2.5,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 8,
+    "treffer": 1,
+    "median": 16,
+    "dichte": "dicht"
+  },
+  "layout": {
+    "wert": 0.2,
+    "reihen": 15,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 9,
+    "medianDauerMs": 300,
+    "charakter": "lebendig"
+  }
+}

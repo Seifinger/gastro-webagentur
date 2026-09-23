@@ -1,0 +1,65 @@
+{
+  "url": "https://styles.refero.design/style/12b20c12-27f8-4938-89ba-569404d36fe8",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:29:33.306Z",
+  "name": "Sing-sing",
+  "originalUrl": "https://sing-sing.co",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#fcd579",
+        "name": "Marigold",
+        "anzahl": 8
+      },
+      {
+        "hex": "#171717",
+        "name": "Inkstone",
+        "anzahl": 6
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#81d6b9",
+        "name": "Sea Glass",
+        "anzahl": 7
+      },
+      {
+        "hex": "#efcb75",
+        "name": "Marigold Gradient",
+        "anzahl": 5
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#fcd579",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "untitledsans",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "signifier",
+        "anzahl": 4,
+        "art": "serif"
+      }
+    ],
+    "charakter": "Grotesk führt, Serife als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "butter-paper broadsheet at golden hour — a warm saffron canvas with sea-glass ink."
+}

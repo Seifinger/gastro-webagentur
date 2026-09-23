@@ -1,0 +1,80 @@
+{
+  "url": "https://ottolenghi.co.uk",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:27:53.487Z",
+  "titel": "Ottolenghi | Recipes, Restaurants, Hampers & Gifts",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 7534553
+      },
+      {
+        "hex": "#fcf7f2",
+        "anzahl": 777594
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 1
+      },
+      {
+        "hex": "#1b1b1b",
+        "anzahl": 1
+      },
+      {
+        "hex": "#cd001a",
+        "anzahl": 1
+      },
+      {
+        "hex": "#1b1b1b",
+        "anzahl": 95
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 66
+      },
+      {
+        "hex": "#cd001a",
+        "anzahl": 16
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#cd001a"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Riforma",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 78,
+    "bodyPx": 11,
+    "kontrastVerhaeltnis": 7.09,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0.6,
+    "reihen": 15,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 2,
+    "medianDauerMs": 300,
+    "charakter": "ruhig"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "url": "https://styles.refero.design/style/8288950a-2731-44fd-85ef-211aecd8091d",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:29:49.603Z",
+  "name": "Assembly Coffee London",
+  "originalUrl": "https://assemblycoffee.co.uk",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#0e1311",
+        "name": "Obsidian",
+        "anzahl": 8
+      },
+      {
+        "hex": "#000000",
+        "name": "Pure Black",
+        "anzahl": 7
+      },
+      {
+        "hex": "#1a1a1a",
+        "name": "Ash Charcoal",
+        "anzahl": 6
+      },
+      {
+        "hex": "#b3b3b3",
+        "name": "Silver",
+        "anzahl": 3
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#333333",
+        "name": "Graphite",
+        "anzahl": 5
+      },
+      {
+        "hex": "#808080",
+        "name": "Stone Gray",
+        "anzahl": 4
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "dunkel",
+    "saettigung": "fast unbunt",
+    "akzent": null,
+    "schema": "dark"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "GT America Standard",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "ID00 Serif",
+        "anzahl": 4,
+        "art": "serif"
+      },
+      {
+        "name": "Helvetica",
+        "anzahl": 3,
+        "art": "grotesk"
+      },
+      {
+        "name": "reviewsio-font",
+        "anzahl": 2,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, Serife als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Embers in a dark roastery. A near-black canvas with warm, low-lit product photography and italic serif labels — the feeling of a specialty coffee menu printed in a midnight zine."
+}

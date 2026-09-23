@@ -1,0 +1,105 @@
+{
+  "url": "https://www.momofuku.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:30:55.999Z",
+  "titel": "Momofuku | Homepage",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#faf7ee",
+        "anzahl": 4816128
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 4799723
+      },
+      {
+        "hex": "#232323",
+        "anzahl": 2042376
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#faf7ee",
+        "anzahl": 11
+      },
+      {
+        "hex": "#232323",
+        "anzahl": 10
+      },
+      {
+        "hex": "#e7e5e4",
+        "anzahl": 3
+      },
+      {
+        "hex": "#346e4a",
+        "anzahl": 2
+      },
+      {
+        "hex": "#faf7ee",
+        "anzahl": 52
+      },
+      {
+        "hex": "#232323",
+        "anzahl": 46
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 30
+      },
+      {
+        "hex": "#397e3a",
+        "anzahl": 5
+      },
+      {
+        "hex": "#c0bcbc",
+        "anzahl": 4
+      },
+      {
+        "hex": "#0000ee",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "gedeckt",
+    "akzent": "#346e4a"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Graphik",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "Momo Sharpie",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 64,
+    "bodyPx": 24,
+    "kontrastVerhaeltnis": 2.67,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 8,
+    "treffer": 0.9,
+    "median": 8,
+    "dichte": "dicht"
+  },
+  "layout": {
+    "wert": 0.12,
+    "reihen": 33,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 250,
+    "charakter": "ruhig"
+  }
+}

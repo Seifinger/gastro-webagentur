@@ -1,0 +1,94 @@
+{
+  "engine": "v2",
+  "designsystem": "indisch--gewuerzmarkt",
+  "kueche": "indisch",
+  "stimmung": "gewuerzmarkt",
+  "archetyp": "traditionell",
+  "seed": 3812671615,
+  "heroVariante": "spalte-bild",
+  "heroVarianten": [
+    "spalte-bild",
+    "karte",
+    "passepartout",
+    "tafel"
+  ],
+  "highlights": [
+    "1-0",
+    "1-1",
+    "1-2"
+  ],
+  "kontrast": {
+    "geprueft": 23,
+    "fehler": 0
+  },
+  "lint": {
+    "fehler": 0,
+    "warnungen": []
+  },
+  "korrekturen": [],
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1603894584373-5ac82b2ae398",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1672756214803-61e605da34fc",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1603894584373-5ac82b2ae398",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1603894584373-5ac82b2ae398",
+      "typ": "bild"
+    },
+    "gericht:1-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1603496987351-f84a3ba5ec85",
+      "typ": "bild"
+    },
+    "gericht:1-2": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1631452180519-c014fe946bc7",
+      "typ": "bild"
+    }
+  },
+  "copy": {
+    "ersetzungen": [],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  },
+  "raster": {
+    "1": 8,
+    "2": 16,
+    "3": 24,
+    "4": 32,
+    "5": 40,
+    "6": 48,
+    "8": 64,
+    "10": 80,
+    "12": 96,
+    "16": 128,
+    "halb": 4
+  }
+}

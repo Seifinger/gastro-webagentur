@@ -1,0 +1,147 @@
+{
+  "url": "https://www.deltarestaurant.gr",
+  "quelle": "website",
+  "modus": "statisch",
+  "zeitpunkt": "2026-09-22T19:33:19.697Z",
+  "titel": "Delta Restaurant - (2) Michelin Star restaurant in Athens",
+  "cssBytes": 556408,
+  "stylesheets": {
+    "gefunden": 8,
+    "geladen": 8
+  },
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 70
+      },
+      {
+        "hex": "#dddddd",
+        "anzahl": 20
+      },
+      {
+        "hex": "#1e1e1e",
+        "anzahl": 16
+      },
+      {
+        "hex": "#ebe9eb",
+        "anzahl": 16
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 10
+      },
+      {
+        "hex": "#33517d",
+        "anzahl": 7
+      },
+      {
+        "hex": "#a46497",
+        "anzahl": 5
+      },
+      {
+        "hex": "#fcf0ef",
+        "anzahl": 5
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 132
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 51
+      },
+      {
+        "hex": "#757575",
+        "anzahl": 39
+      },
+      {
+        "hex": "#d3ced2",
+        "anzahl": 29
+      },
+      {
+        "hex": "#949494",
+        "anzahl": 26
+      },
+      {
+        "hex": "#1e1e1e",
+        "anzahl": 22
+      },
+      {
+        "hex": "#2b2d2f",
+        "anzahl": 22
+      },
+      {
+        "hex": "#515151",
+        "anzahl": 20
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#33517d"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "WooCommerce",
+        "anzahl": 15,
+        "art": "grotesk"
+      },
+      {
+        "name": "Roboto",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "helvetica",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "SF Pro Text",
+        "anzahl": 2,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "groessteSchrift": 59,
+    "kontrastVerhaeltnis": 4.92,
+    "versalienAnteil": 0.04,
+    "mittlereSperrungEm": 0.299,
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0.75,
+    "haeufigste": [
+      16,
+      8,
+      4,
+      12,
+      24,
+      32,
+      10,
+      2
+    ],
+    "median": 12,
+    "dichte": "dicht"
+  },
+  "layout": {
+    "wert": 0.2,
+    "ungleicheRaster": 0,
+    "gleicheRaster": 1,
+    "zentrierAnteil": 0.7,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "uebergaenge": 165,
+    "keyframes": 8,
+    "medianDauerMs": 500,
+    "haeufigsteKurve": "linear",
+    "respektiertReducedMotion": true,
+    "charakter": "ruhig"
+  }
+}

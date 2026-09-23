@@ -1,0 +1,104 @@
+{
+  "url": "https://www.laduree.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:31:30.315Z",
+  "titel": "Maison Ladurée Paris - Macarons, Pâtisseries & Coffrets Cadeaux",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#fefbf4",
+        "anzahl": 14075820
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 2592000
+      },
+      {
+        "hex": "#faf6ec",
+        "anzahl": 2375329
+      },
+      {
+        "hex": "#dce7c6",
+        "anzahl": 1812880
+      },
+      {
+        "hex": "#fcf4e2",
+        "anzahl": 1616670
+      },
+      {
+        "hex": "#1d1a17",
+        "anzahl": 888480
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 396010
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#fefbf4",
+        "anzahl": 2
+      },
+      {
+        "hex": "#2e2c2a",
+        "anzahl": 1
+      },
+      {
+        "hex": "#2e2c2a",
+        "anzahl": 135
+      },
+      {
+        "hex": "#46413d",
+        "anzahl": 85
+      },
+      {
+        "hex": "#1d1a17",
+        "anzahl": 50
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 2
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 2
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "kräftig",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Adobe Garamond Pro",
+        "rolle": "h1",
+        "art": "serif"
+      }
+    ],
+    "charakter": "Serife führt, viel Versalsatz",
+    "displayArt": "serif",
+    "h1Px": 74,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 4.63,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0.75,
+    "median": 15,
+    "dichte": "dicht"
+  },
+  "layout": {
+    "wert": 0.25,
+    "reihen": 20,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 5,
+    "medianDauerMs": 700,
+    "charakter": "ruhig"
+  }
+}

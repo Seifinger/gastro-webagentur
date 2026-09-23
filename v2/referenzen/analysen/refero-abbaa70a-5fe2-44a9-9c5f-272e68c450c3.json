@@ -1,0 +1,70 @@
+{
+  "url": "https://styles.refero.design/style/abbaa70a-5fe2-44a9-9c5f-272e68c450c3",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:27:15.544Z",
+  "name": "Customer.io",
+  "originalUrl": "https://customer.io",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#00191c",
+        "name": "Spruce Abyss",
+        "anzahl": 8
+      },
+      {
+        "hex": "#032125",
+        "name": "Spruce 900",
+        "anzahl": 7
+      },
+      {
+        "hex": "#0b363b",
+        "name": "Spruce 700",
+        "anzahl": 6
+      },
+      {
+        "hex": "#a1c2c6",
+        "name": "Spruce 200",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#437278",
+        "name": "Spruce 500",
+        "anzahl": 5
+      },
+      {
+        "hex": "#354d51",
+        "name": "Spruce Mist",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "dunkel",
+    "saettigung": "kräftig",
+    "akzent": null,
+    "schema": "both"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Saans",
+        "anzahl": 5,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "dark spruce forest meeting cream paper"
+}

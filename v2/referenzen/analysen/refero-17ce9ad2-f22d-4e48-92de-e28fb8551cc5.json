@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/17ce9ad2-f22d-4e48-92de-e28fb8551cc5",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:27:20.405Z",
+  "name": "Fallen Grape",
+  "originalUrl": "https://www.fallengrape.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ece0d2",
+        "name": "Vintage Cream",
+        "anzahl": 8
+      },
+      {
+        "hex": "#f3f3f3",
+        "name": "Bone White",
+        "anzahl": 7
+      },
+      {
+        "hex": "#e1c6ab",
+        "name": "Peach Sand",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#573d21",
+        "name": "Walnut Ink",
+        "anzahl": 6
+      },
+      {
+        "hex": "#7c664d",
+        "name": "Saddle Brown",
+        "anzahl": 5
+      },
+      {
+        "hex": "#e3a36e",
+        "name": "Terracotta Glow",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": "#e3a36e",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Romie",
+        "anzahl": 5,
+        "art": "serif"
+      },
+      {
+        "name": "Arial Narrow",
+        "anzahl": 4,
+        "art": "schmal"
+      },
+      {
+        "name": "GTStandard-M",
+        "anzahl": 3,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Serife führt, schmale Grotesk als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Sun-drenched vineyard at golden hour. Warm cream paper, walnut ink, terracotta warmth — a wine label breathed into a full interface."
+}

@@ -1,0 +1,81 @@
+{
+  "url": "https://www.kinkhao.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:28:49.394Z",
+  "titel": "Kin Khao Thai Eatery | Thai Style Thai",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 7248173
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#a8a6a1",
+        "anzahl": 1
+      },
+      {
+        "hex": "#38383b",
+        "anzahl": 14
+      },
+      {
+        "hex": "#b31313",
+        "anzahl": 9
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 7
+      },
+      {
+        "hex": "#991b1e",
+        "anzahl": 4
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": "#b31313"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "KK READ",
+        "rolle": "h2",
+        "art": "grotesk"
+      },
+      {
+        "name": "luna small",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 29,
+    "bodyPx": 24.64,
+    "kontrastVerhaeltnis": 1.18,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": 301,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.2,
+    "reihen": 5,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 400,
+    "charakter": "ruhig"
+  }
+}

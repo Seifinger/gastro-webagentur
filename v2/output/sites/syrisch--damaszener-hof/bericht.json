@@ -1,0 +1,94 @@
+{
+  "engine": "v2",
+  "designsystem": "syrisch--damaszener-hof",
+  "kueche": "syrisch",
+  "stimmung": "damaszener-hof",
+  "archetyp": "traditionell",
+  "seed": 4069560828,
+  "heroVariante": "tafel",
+  "heroVarianten": [
+    "spalte-bild",
+    "karte",
+    "passepartout",
+    "tafel"
+  ],
+  "highlights": [
+    "0-0",
+    "0-2",
+    "1-0"
+  ],
+  "kontrast": {
+    "geprueft": 23,
+    "fehler": 0
+  },
+  "lint": {
+    "fehler": 0,
+    "warnungen": []
+  },
+  "korrekturen": [],
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1583060095186-852adde6b819",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1554118811-1e0d58224f24",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1752795646140-eb70cf30640e",
+      "typ": "bild"
+    },
+    "gericht:0-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1752795646140-eb70cf30640e",
+      "typ": "bild"
+    },
+    "gericht:0-2": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1768812910769-d037b90aee77",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1699728088614-7d1d4277414b",
+      "typ": "bild"
+    }
+  },
+  "copy": {
+    "ersetzungen": [],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  },
+  "raster": {
+    "1": 8,
+    "2": 16,
+    "3": 24,
+    "4": 32,
+    "5": 40,
+    "6": 48,
+    "8": 64,
+    "10": 80,
+    "12": 96,
+    "16": 128,
+    "halb": 4
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "url": "https://www.kricket.co.uk",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:30:51.826Z",
+  "titel": "Kricket | Modern Indian Restaurant & Bar",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#a42900",
+        "anzahl": 10868940
+      },
+      {
+        "hex": "#fef6f4",
+        "anzahl": 8484075
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 1296000
+      },
+      {
+        "hex": "#2d1a10",
+        "anzahl": 1086806
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 1051425
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#a42900",
+        "anzahl": 15
+      },
+      {
+        "hex": "#fef6f4",
+        "anzahl": 14
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 3
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 3
+      },
+      {
+        "hex": "#fef6f4",
+        "anzahl": 60
+      },
+      {
+        "hex": "#a42900",
+        "anzahl": 45
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 38
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 23
+      },
+      {
+        "hex": "#141414",
+        "anzahl": 6
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#a42900"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "HalTimezoneItalic",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "HalTimezone",
+        "rolle": "h2",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 22,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 1.38,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 0.89,
+    "median": 60,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.29,
+    "reihen": 21,
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "animationen": 3,
+    "medianDauerMs": 300,
+    "charakter": "ruhig"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "url": "https://styles.refero.design/style/f2a84e0f-cf77-41fa-ade0-b062a3a42495",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:26:47.906Z",
+  "name": "GRAZA",
+  "originalUrl": "https://graza.co",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#fff4ec",
+        "name": "Linen Cream",
+        "anzahl": 7
+      },
+      {
+        "hex": "#f6e6d9",
+        "name": "Buttery Peach",
+        "anzahl": 6
+      },
+      {
+        "hex": "#9eef80",
+        "name": "Squeeze Bottle Green",
+        "anzahl": 5
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#3c422e",
+        "name": "Olive Ink",
+        "anzahl": 8
+      },
+      {
+        "hex": "#d1e030",
+        "name": "EVOO Yellow-Green",
+        "anzahl": 4
+      },
+      {
+        "hex": "#fbd535",
+        "name": "Mustard Sun",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "kräftig",
+    "akzent": "#9eef80",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "GT Alpina Typewriter",
+        "anzahl": 5,
+        "art": "serif"
+      },
+      {
+        "name": "ITC Garamond Condensed",
+        "anzahl": 4,
+        "art": "schmal"
+      },
+      {
+        "name": "Apercu",
+        "anzahl": 3,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Serife führt, schmale Grotesk als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Mediterranean deli counter, sunlit and hand-set"
+}

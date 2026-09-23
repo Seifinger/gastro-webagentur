@@ -1,0 +1,97 @@
+{
+  "url": "https://www.xianfoods.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:28:19.601Z",
+  "titel": "Xi'an Famous Foods: specialty Chinese restaurants serving Xi'an dishes based on family recipes",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#f1eee3",
+        "anzahl": 5394195
+      },
+      {
+        "hex": "#cf0909",
+        "anzahl": 2151360
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 1745618
+      },
+      {
+        "hex": "#231f20",
+        "anzahl": 1200960
+      },
+      {
+        "hex": "#e5e3df",
+        "anzahl": 734400
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 678581
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffcd15",
+        "anzahl": 5
+      },
+      {
+        "hex": "#000000",
+        "anzahl": 32
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 10
+      },
+      {
+        "hex": "#f1eee3",
+        "anzahl": 9
+      },
+      {
+        "hex": "#231f20",
+        "anzahl": 5
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "gedeckt",
+    "akzent": "#ffcd15"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "PP Supply Sans",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "Open Sans",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 64,
+    "bodyPx": 24,
+    "kontrastVerhaeltnis": 2.67,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 12,
+    "treffer": 1,
+    "median": 48,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0.5,
+    "reihen": 12,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 0,
+    "medianDauerMs": 100,
+    "charakter": "lebendig"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "url": "https://www.neolokal.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:27:15.544Z",
+  "titel": "Neolokal Istanbul: Bridging Past and Future",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 18238053
+      },
+      {
+        "hex": "#0b0b0c",
+        "anzahl": 6264000
+      },
+      {
+        "hex": "#e5e3df",
+        "anzahl": 540000
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#000000",
+        "anzahl": 19
+      },
+      {
+        "hex": "#333333",
+        "anzahl": 12
+      },
+      {
+        "hex": "#676767",
+        "anzahl": 6
+      },
+      {
+        "hex": "#444444",
+        "anzahl": 3
+      }
+    ],
+    "temperatur": "neutral",
+    "helligkeit": "hell",
+    "saettigung": "fast unbunt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "verlag_bold",
+        "rolle": "h1",
+        "art": "grotesk"
+      },
+      {
+        "name": "verlag-book",
+        "rolle": "body",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk",
+    "h1Px": 36,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 2.25,
+    "versalienUeberschrift": false
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": null,
+    "dichte": "unbekannt"
+  },
+  "layout": {
+    "wert": 0.6,
+    "reihen": 20,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 9,
+    "medianDauerMs": 300,
+    "charakter": "lebendig"
+  }
+}

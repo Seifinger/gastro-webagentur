@@ -14,7 +14,17 @@
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "preview": "node src/previewServer.js",
     "engine-status": "node scripts/engineStatus.mjs",
-    "build:motion": "node scripts/buildRemotionPlayer.mjs"
+    "build:motion": "node scripts/buildRemotionPlayer.mjs",
+    "v2:referenzen": "node v2/build/referenzAnalyse.js",
+    "v2:refero": "node v2/build/referoSuche.js",
+    "v2:designsysteme": "node v2/build/designsystemGenerator.js",
+    "v2:medien": "node v2/assets-pipeline/medienCli.js",
+    "v2:build": "node v2/build/cli.js",
+    "v2:build:all": "node v2/build/cli.js --alle",
+    "v2:wirt": "node v2/integration/wirtServerV2.js",
+    "v2:telegram": "node v2/integration/telegramBot.js",
+    "v2:dashboard-design": "node v2/build/dashboardDesignsystem.js",
+    "v2:vergleich": "node v2/build/vergleich.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",
@@ -28,6 +38,7 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
-    "esbuild": "0.28.2"
+    "esbuild": "0.28.2",
+    "playwright-core": "^1.56.1"
   }
 }

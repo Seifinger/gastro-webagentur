@@ -1,0 +1,61 @@
+{
+  "url": "https://www.boccadilupo.com",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:25:34.431Z",
+  "titel": "Bocca Di Lupo | Home",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#642a2f",
+        "anzahl": 8705886
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#e8e6df",
+        "anzahl": 99
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "dunkel",
+    "saettigung": "gedeckt",
+    "akzent": null
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Mostra N W00 Bold",
+        "rolle": "h2",
+        "art": "grotesk"
+      },
+      {
+        "name": "Century Gothic W05 Regular",
+        "rolle": "body",
+        "art": "serif"
+      }
+    ],
+    "charakter": "Grotesk führt, Serife als Gegenstimme, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 29.952,
+    "bodyPx": 18,
+    "kontrastVerhaeltnis": 1.66,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 4,
+    "treffer": 0,
+    "median": 57,
+    "dichte": "luftig"
+  },
+  "layout": {
+    "wert": 0,
+    "reihen": 1,
+    "beschreibung": "symmetrisch"
+  },
+  "motion": {
+    "animationen": 13,
+    "medianDauerMs": 200,
+    "charakter": "lebendig"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "url": "https://styles.refero.design/style/47f15da7-8905-45b3-bcab-06a4277c6168",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:30:33.700Z",
+  "name": "Hungry Tiger",
+  "originalUrl": "https://www.eathungrytiger.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#281006",
+        "name": "Charred Clove",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#faae33",
+        "name": "Tiger Gold",
+        "anzahl": 8
+      },
+      {
+        "hex": "#823513",
+        "name": "Ember Rust",
+        "anzahl": 7
+      },
+      {
+        "hex": "#9f531b",
+        "name": "Saffron Glow",
+        "anzahl": 6
+      },
+      {
+        "hex": "#402011",
+        "name": "Dark Spice",
+        "anzahl": 5
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#faae33",
+    "schema": "dark"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Salmond",
+        "anzahl": 5,
+        "art": "grotesk"
+      },
+      {
+        "name": "Graphikx",
+        "anzahl": 4,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt",
+    "displayArt": "grotesk"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "gemischt"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Turmeric-bright graffiti on a tandoor wall. A single gold-on-rust palette with display type so large it reads as a spice market sign, not a webpage."
+}

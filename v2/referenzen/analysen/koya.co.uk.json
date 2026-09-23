@@ -1,0 +1,76 @@
+{
+  "url": "https://www.koya.co.uk",
+  "quelle": "website",
+  "modus": "browser",
+  "zeitpunkt": "2026-09-22T19:30:17.840Z",
+  "titel": "Koya London | Japanese udon noodles",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#003b5c",
+        "anzahl": 3386250
+      },
+      {
+        "hex": "#f0ebdc",
+        "anzahl": 2579963
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffffff",
+        "anzahl": 6
+      },
+      {
+        "hex": "#003b5c",
+        "anzahl": 2
+      },
+      {
+        "hex": "#ffffff",
+        "anzahl": 39
+      },
+      {
+        "hex": "#003b5c",
+        "anzahl": 10
+      },
+      {
+        "hex": "#141414",
+        "anzahl": 1
+      }
+    ],
+    "temperatur": "kühl",
+    "helligkeit": "gemischt",
+    "saettigung": "kräftig",
+    "akzent": "#003b5c"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "__fontFamily_96dda5",
+        "rolle": "h1",
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Grotesk führt, viel Versalsatz",
+    "displayArt": "grotesk",
+    "h1Px": 39,
+    "bodyPx": 16,
+    "kontrastVerhaeltnis": 2.44,
+    "versalienUeberschrift": true
+  },
+  "spacing": {
+    "basis": 10,
+    "treffer": 0.67,
+    "median": 20,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "wert": 0.6,
+    "reihen": 5,
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "animationen": 3,
+    "medianDauerMs": 150,
+    "charakter": "lebendig"
+  }
+}

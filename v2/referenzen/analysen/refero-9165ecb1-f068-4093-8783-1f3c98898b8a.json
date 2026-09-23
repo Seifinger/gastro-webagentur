@@ -1,0 +1,75 @@
+{
+  "url": "https://styles.refero.design/style/9165ecb1-f068-4093-8783-1f3c98898b8a",
+  "quelle": "refero",
+  "zeitpunkt": "2026-09-22T19:31:21.042Z",
+  "name": "Monocle",
+  "originalUrl": "https://monocle.com",
+  "farben": {
+    "hintergrund": [
+      {
+        "hex": "#000000",
+        "name": "Folio Black",
+        "anzahl": 7
+      },
+      {
+        "hex": "#fdfcf3",
+        "name": "Newsprint Cream",
+        "anzahl": 6
+      },
+      {
+        "hex": "#ffffff",
+        "name": "Broadsheet White",
+        "anzahl": 5
+      },
+      {
+        "hex": "#fdfbe4",
+        "name": "Margin White",
+        "anzahl": 4
+      }
+    ],
+    "vordergrund": [
+      {
+        "hex": "#ffc500",
+        "name": "Signal Yellow",
+        "anzahl": 8
+      }
+    ],
+    "temperatur": "warm",
+    "helligkeit": "hell",
+    "saettigung": "kräftig",
+    "akzent": "#ffc500",
+    "schema": "light"
+  },
+  "typografie": {
+    "familien": [
+      {
+        "name": "Plantin",
+        "anzahl": 5,
+        "art": "serif"
+      },
+      {
+        "name": "Helvetica Neue",
+        "anzahl": 4,
+        "art": "grotesk"
+      },
+      {
+        "name": "Chanel",
+        "anzahl": 3,
+        "art": "grotesk"
+      }
+    ],
+    "charakter": "Serife führt, Grotesk als Gegenstimme",
+    "displayArt": "serif"
+  },
+  "spacing": {
+    "basis": null,
+    "dichte": "ausgewogen"
+  },
+  "layout": {
+    "beschreibung": "versetzt/asymmetrisch"
+  },
+  "motion": {
+    "charakter": "ruhig"
+  },
+  "leitsatz": "Quality broadsheet on cream paper. A curated newsroom where every column earns its keep and the only color on the page is the one that matters."
+}

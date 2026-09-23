@@ -1,0 +1,94 @@
+{
+  "engine": "v2",
+  "designsystem": "japanisch--izakaya",
+  "kueche": "japanisch",
+  "stimmung": "izakaya",
+  "archetyp": "traditionell",
+  "seed": 3024040044,
+  "heroVariante": "spalte-bild",
+  "heroVarianten": [
+    "spalte-bild",
+    "karte",
+    "tafel",
+    "passepartout"
+  ],
+  "highlights": [
+    "0-1",
+    "1-0",
+    "2-0"
+  ],
+  "kontrast": {
+    "geprueft": 23,
+    "fehler": 0
+  },
+  "lint": {
+    "fehler": 0,
+    "warnungen": []
+  },
+  "korrekturen": [],
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1569718212165-3a8278d5f624",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1693822998952-b8d18c61043b",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1588166524938-1ee110d7dcef",
+      "typ": "bild"
+    },
+    "gericht:0-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1588166524938-1ee110d7dcef",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1553621042-f6e147245754",
+      "typ": "bild"
+    },
+    "gericht:2-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1569718212165-3a8278d5f624",
+      "typ": "bild"
+    }
+  },
+  "copy": {
+    "ersetzungen": [],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  },
+  "raster": {
+    "1": 8,
+    "2": 16,
+    "3": 24,
+    "4": 32,
+    "5": 40,
+    "6": 48,
+    "8": 64,
+    "10": 80,
+    "12": 96,
+    "16": 128,
+    "halb": 4
+  }
+}
