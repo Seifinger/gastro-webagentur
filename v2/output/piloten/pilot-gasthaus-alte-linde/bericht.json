@@ -1,0 +1,169 @@
+{
+  "engine": "v2-komposition",
+  "slug": "pilot-gasthaus-alte-linde",
+  "designsystem": "bayerisch--wirtshaus",
+  "creativeDirection": {
+    "leitidee": "Solange das Haus nichts bestätigt hat, zeigt die Seite nur, was stimmt – gesetzt wie der Schriftzug über der Wirtshaustür.",
+    "bearbeitet": true
+  },
+  "hero": "aushang",
+  "abschnitte": [
+    "kontakt",
+    "karte",
+    "reservierung",
+    "offen"
+  ],
+  "gewichte": {
+    "kontakt": "gross",
+    "karte": "klein",
+    "reservierung": "klein",
+    "offen": "normal"
+  },
+  "belege": {
+    "signaturen": [
+      {
+        "typ": "hausschild",
+        "getragen": true,
+        "fehlend": []
+      }
+    ],
+    "abschnitte": [
+      {
+        "id": "kontakt",
+        "fehlend": []
+      },
+      {
+        "id": "karte",
+        "fehlend": []
+      },
+      {
+        "id": "reservierung",
+        "fehlend": []
+      },
+      {
+        "id": "offen",
+        "fehlend": []
+      }
+    ],
+    "getragen": 1,
+    "verworfen": []
+  },
+  "briefing": {
+    "status": {
+      "bestaetigt": 0,
+      "uebernommen": 6,
+      "vorschlag": 3,
+      "unbekannt": 21
+    },
+    "offen": 24,
+    "fiktiv": true,
+    "freigegeben": false
+  },
+  "bildplan": {
+    "plaetze": [
+      {
+        "slot": "hero",
+        "motiv": "Wirtshaus",
+        "rolle": "Eingang der Seite",
+        "gewaehlt": null,
+        "mobil": null,
+        "zuschnitt": {
+          "desktop": [
+            16,
+            9
+          ],
+          "mobil": [
+            4,
+            5
+          ]
+        },
+        "fokus": [
+          50,
+          50
+        ],
+        "overlay": "keins – Text steht nie auf dem Foto",
+        "alt": null,
+        "altMobil": null,
+        "abgelehnt": [
+          {
+            "quelle": "stock:photo-1528605248644-14dd04022da1",
+            "herkunft": "stock",
+            "zeigt": "Junge Leute mit Basecaps an einem Holztisch vor Bretterzaun, Getränke",
+            "grund": "kein Wirtshaus: wirkt wie ein US-Hinterhof; Gesichter – ohne Einwilligung als Werbung für ein echtes Haus heikel"
+          }
+        ]
+      },
+      {
+        "slot": "gericht",
+        "motiv": "Grillrippchen",
+        "rolle": "zeigt das Kartengericht „Grillrippchen“",
+        "gewaehlt": null,
+        "mobil": null,
+        "zuschnitt": {
+          "desktop": [
+            4,
+            3
+          ],
+          "mobil": [
+            1,
+            1
+          ]
+        },
+        "fokus": [
+          50,
+          50
+        ],
+        "overlay": "keins – Text steht nie auf dem Foto",
+        "alt": null,
+        "altMobil": null,
+        "abgelehnt": [
+          {
+            "quelle": "stock:photo-1544025162-d76694265947",
+            "herkunft": "stock",
+            "zeigt": "BBQ-Rippchen mit Wedges, Tomatenscheiben, Dip",
+            "grund": "Diner-Anmutung, nicht bayerisch"
+          }
+        ]
+      }
+    ],
+    "abgelehnt": [
+      {
+        "slot": "hero",
+        "quelle": "stock:photo-1528605248644-14dd04022da1",
+        "herkunft": "stock",
+        "zeigt": "Junge Leute mit Basecaps an einem Holztisch vor Bretterzaun, Getränke",
+        "grund": "kein Wirtshaus: wirkt wie ein US-Hinterhof; Gesichter – ohne Einwilligung als Werbung für ein echtes Haus heikel"
+      },
+      {
+        "slot": "gericht",
+        "quelle": "stock:photo-1544025162-d76694265947",
+        "herkunft": "stock",
+        "zeigt": "BBQ-Rippchen mit Wedges, Tomatenscheiben, Dip",
+        "grund": "Diner-Anmutung, nicht bayerisch"
+      }
+    ],
+    "fehlend": [
+      {
+        "slot": "hero",
+        "motiv": "Wirtshaus",
+        "grund": "alle Kandidaten ungeeignet"
+      },
+      {
+        "slot": "gericht",
+        "motiv": "Grillrippchen",
+        "grund": "alle Kandidaten ungeeignet"
+      }
+    ]
+  },
+  "lint": {
+    "warnungen": []
+  },
+  "copy": {
+    "ersetzungen": [],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  }
+}

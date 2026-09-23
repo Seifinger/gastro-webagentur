@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "slug": "pilot-roesterei-kornfeld",
+  "designsystem": "cafe--third-wave",
+  "erzeugt": "art-direction",
+  "bearbeitet": true,
+  "leitidee": "Kaffee zuerst, und zwar mit Datum: Die Seite ist der Wochenplan an der Tür der Rösterei.",
+  "wirkung": "Sachlich, hell, ein bisschen Werkstatt. Man sieht sofort, ob heute offen ist und wann geröstet wird – und bekommt Lust, donnerstags vorbeizukommen.",
+  "metapher": "Werkstattzettel: ein Wochenplan in Monospace wie ein Röstprotokoll, Kaffee als erste Kategorie, Uhrzeiten statt Adjektive.",
+  "bilder": {
+    "balance": "ausgewogen",
+    "auswahl": "Ein Kaffeefoto (Hände, Cappuccino) statt Feigen-Dessert und Pancake-Turm. Das wichtigste Motiv – die Röstmaschine im Raum – fehlt und steht im Qualitätsbericht als offener Fototermin.",
+    "zuschnitt": "Hero 4:5 hoch neben dem Plan; mobil 16:10 quer unter dem Kopf, Fokus auf den Tassen.",
+    "farbklima": "kühles Tageslicht, Salbeigrün, viel Weißraum",
+    "slots": [
+      {
+        "slot": "hero",
+        "motiv": "Kaffee",
+        "gericht": "Cappuccino",
+        "kandidaten": [
+          "photo-1544510808-91bcbee1df55",
+          "photo-1495474472287-4d71bcdd2085"
+        ],
+        "zuschnitt": {
+          "desktop": [
+            4,
+            5
+          ],
+          "mobil": [
+            16,
+            10
+          ]
+        }
+      },
+      {
+        "slot": "haus",
+        "motiv": "Röstmaschine im Gastraum",
+        "kandidaten": [
+          "photo-1554118811-1e0d58224f24"
+        ]
+      }
+    ]
+  },
+  "typografie": {
+    "rollen": [
+      {
+        "rolle": "Name und Titel",
+        "schrift": "Schibsted Grotesk",
+        "begruendung": "Nüchterne, kräftige Grotesk – Werkstattschild, nicht Konditorei."
+      },
+      {
+        "rolle": "Wochenplan, Uhrzeiten, Rösttag",
+        "schrift": "Courier Prime",
+        "begruendung": "Schreibmaschine wie ein Röstprotokoll – nur für Daten, nicht für Preise in der Karte (vorher schlecht lesbar)."
+      },
+      {
+        "rolle": "Karte, Fließtext",
+        "schrift": "Karla",
+        "begruendung": "Gut lesbar, neutral."
+      }
+    ],
+    "begruendung": "Drei Rollen, klar getrennt: Name, Daten, Lesen."
+  },
+  "hero": {
+    "typ": "werkbank",
+    "warum": "Name, „heute geöffnet bis …“ (live aus dem Wochenplan) und ein Kaffeefoto – die Antwort auf die erste Frage kommt vor allem anderen."
+  },
+  "seitenfolge": [
+    {
+      "id": "signatur",
+      "signatur": "wochenplan",
+      "gewicht": "gross",
+      "warum": "Öffnungszeiten und Rösttag sind hier der USP und die wichtigste Information zugleich."
+    },
+    {
+      "id": "karte",
+      "gewicht": "normal",
+      "warum": "Kaffee zuerst, dann Frühstück und Kuchen – in der Reihenfolge, in der am Tresen bestellt wird."
+    },
+    {
+      "id": "haus",
+      "gewicht": "klein",
+      "braucht": [
+        "konzept.kurz"
+      ],
+      "warum": "Ein Satz zur Röstmaschine im Raum – belegt im Briefing."
+    },
+    {
+      "id": "abholung",
+      "gewicht": "klein",
+      "warum": "Frühstück und Kuchen auch zum Mitnehmen – Nebenweg."
+    },
+    {
+      "id": "reservierung",
+      "gewicht": "klein",
+      "warum": "Nur für Gruppen ab sechs – deshalb ganz hinten und klein."
+    },
+    {
+      "id": "kontakt",
+      "gewicht": "normal",
+      "warum": "Marktplatz, Telefon."
+    }
+  ],
+  "signaturen": [
+    {
+      "typ": "wochenplan",
+      "titel": "Wochenplan mit Rösttag",
+      "braucht": [
+        "betrieb.oeffnungszeiten",
+        "konzept.belege"
+      ],
+      "beschreibung": "Sieben Zeilen Montag bis Sonntag in Courier Prime, der heutige Tag wird (per Skript, ohne Sprung) hervorgehoben, der Donnerstag trägt die Marke „Rösttag“."
+    }
+  ],
+  "verzicht": [
+    "Keine Kaffeebohnen-Clipart, keine braune Farbwelt (No-Gos)",
+    "Kein Reservierungsformular im ersten Drittel",
+    "Keine Gästestimmen",
+    "Keine Häkchen-Leiste",
+    "Keine Bildstrecke aus Desserts"
+  ],
+  "bewegung": {
+    "moment": "keiner",
+    "warum": "Der Wochenplan markiert den heutigen Tag statisch; Bewegung würde die Sachlichkeit brechen."
+  },
+  "ton": {
+    "register": "sachlich",
+    "anrede": "Sie",
+    "regeln": [
+      "Uhrzeiten und Wochentage statt Adjektive"
+    ]
+  },
+  "titel": "Rösterei Kornfeld",
+  "komposition": {
+    "karte": "tresen",
+    "abschnittsSchrift": "display",
+    "mobilLeiste": [
+      "karte",
+      "anrufen"
+    ]
+  },
+  "texte": {
+    "wochenplanTitel": "Wann offen ist – und wann geröstet wird",
+    "reservierungTitel": "Mit sechs oder mehr?",
+    "reservierungIntro": "Für kleinere Runden gibt es keine Reservierung – einfach vorbeikommen."
+  }
+}
