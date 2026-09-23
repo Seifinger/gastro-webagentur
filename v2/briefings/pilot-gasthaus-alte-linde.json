@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "slug": "pilot-gasthaus-alte-linde",
+  "placeId": "v2-test-bayerisch-wirtshaus",
+  "kueche": "bayerisch",
+  "stimmung": "wirtshaus",
+  "fiktiv": true,
+  "erstellt": "pilot",
+  "felder": {
+    "betrieb": {
+      "name": {
+        "wert": "Gasthaus Zur Alten Linde",
+        "status": "uebernommen",
+        "quelle": "Google Places / Lead-Liste"
+      },
+      "ort": {
+        "wert": "Mühldorf am Inn",
+        "status": "uebernommen",
+        "quelle": "Google Places / Lead-Liste"
+      },
+      "adresse": {
+        "wert": "Stadtplatz 3, 84453 Mühldorf am Inn",
+        "status": "uebernommen",
+        "quelle": "Google Places / Lead-Liste"
+      },
+      "telefon": {
+        "wert": "030 23125 100",
+        "status": "uebernommen",
+        "quelle": "Google Places / Lead-Liste"
+      },
+      "kueche": {
+        "wert": "Bayerische Wirtshausküche",
+        "status": "uebernommen",
+        "quelle": "Küchen-Zuordnung im Dashboard"
+      },
+      "oeffnungszeiten": {
+        "wert": null,
+        "status": "unbekannt",
+        "notiz": "Google-Öffnungszeiten werden nicht abgefragt"
+      }
+    },
+    "konzept": {
+      "kurz": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "geschichte": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "usp": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "belege": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "gaeste": {
+      "zielgruppen": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "anlaesse": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "positionierung": {
+      "preis": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "atmosphaere": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "karte": {
+      "signaturgerichte": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "besonderheiten": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "speisekarte": {
+        "wert": {
+          "katalog": "bayerisch"
+        },
+        "status": "vorschlag",
+        "quelle": "Musterkarte aus dem Küchenkatalog",
+        "notiz": "Gerichte und Preise sind nicht die des Hauses"
+      }
+    },
+    "aktion": {
+      "hinweise": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "haupt": {
+        "wert": "anrufen",
+        "status": "vorschlag",
+        "quelle": "Agentur",
+        "notiz": "Einziger belegter Kanal ist das Telefon"
+      }
+    },
+    "marke": {
+      "logo": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "farben": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "schriften": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "stil": {
+      "wuensche": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "noGos": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "referenzen": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "belege": {
+      "stimmen": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "auszeichnungen": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "googleBewertung": {
+        "wert": {
+          "note": 4.3,
+          "anzahl": 80
+        },
+        "status": "uebernommen",
+        "quelle": "Google Places / Lead-Liste"
+      }
+    },
+    "freigabe": {
+      "veroeffentlichung": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "medien": {
+      "fotos": {
+        "wert": [
+          {
+            "stock": "photo-1528605248644-14dd04022da1",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Junge Leute mit Basecaps an Holztisch vor Bretterzaun",
+            "rolle": "hero"
+          },
+          {
+            "stock": "photo-1544025162-d76694265947",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "BBQ-Rippchen mit Wedges und Tomaten",
+            "rolle": "gericht"
+          },
+          {
+            "stock": "photo-1599921841143-819065a55cc6",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Wiener Schnitzel mit Preiselbeeren und Kartoffeln",
+            "rolle": "gericht"
+          }
+        ],
+        "status": "vorschlag",
+        "quelle": "Agentur",
+        "notiz": "Nur Stock verfügbar"
+      }
+    }
+  },
+  "modus": "lead-simulation",
+  "lead": {
+    "name": "Gasthaus Zur Alten Linde",
+    "ort": "Mühldorf am Inn",
+    "adresse": "Stadtplatz 3, 84453 Mühldorf am Inn",
+    "telefon": "030 23125 100",
+    "rating": 4.3,
+    "anzahlBewertungen": 80
+  }
+}

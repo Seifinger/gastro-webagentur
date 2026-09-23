@@ -1,0 +1,292 @@
+{
+  "version": 1,
+  "slug": "pilot-roesterei-kornfeld",
+  "placeId": "v2-test-cafe-third-wave",
+  "kueche": "cafe",
+  "stimmung": "third-wave",
+  "fiktiv": true,
+  "erstellt": "pilot",
+  "lead": {
+    "name": "Rösterei Kornfeld",
+    "ort": "Kraiburg am Inn",
+    "adresse": "Marktplatz 4, 84559 Kraiburg am Inn",
+    "telefon": "030 23125 135",
+    "rating": 4.3,
+    "anzahlBewertungen": 315
+  },
+  "felder": {
+    "betrieb": {
+      "name": {
+        "wert": "Rösterei Kornfeld",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "ort": {
+        "wert": "Kraiburg am Inn",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "adresse": {
+        "wert": "Marktplatz 4, 84559 Kraiburg am Inn",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "telefon": {
+        "wert": "030 23125 135",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "kueche": {
+        "wert": "Café & Rösterei",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "oeffnungszeiten": {
+        "wert": [
+          {
+            "tage": "Montag",
+            "zeiten": "Ruhetag",
+            "tag": 1
+          },
+          {
+            "tage": "Dienstag",
+            "zeiten": "8:00 – 17:00",
+            "tag": 2
+          },
+          {
+            "tage": "Mittwoch",
+            "zeiten": "8:00 – 17:00",
+            "tag": 3
+          },
+          {
+            "tage": "Donnerstag",
+            "zeiten": "8:00 – 17:00",
+            "tag": 4,
+            "notiz": "Rösttag"
+          },
+          {
+            "tage": "Freitag",
+            "zeiten": "8:00 – 17:00",
+            "tag": 5
+          },
+          {
+            "tage": "Samstag",
+            "zeiten": "8:30 – 16:00",
+            "tag": 6
+          },
+          {
+            "tage": "Sonntag",
+            "zeiten": "9:00 – 14:00",
+            "tag": 0
+          }
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "konzept": {
+      "kurz": {
+        "wert": "Ein Café mit eigener Röstmaschine im Gastraum: Frühstück, Kuchen und Kaffee, den man auch als Bohne mitnehmen kann.",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "geschichte": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "usp": {
+        "wert": "Der Kaffee wird hier im Raum geröstet – donnerstags, während Sie frühstücken.",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "belege": {
+        "wert": [
+          "Röstmaschine steht sichtbar im Gastraum",
+          "Rösttag ist jeden Donnerstag",
+          "Bohnen in 250-g-Tüten am Tresen"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "gaeste": {
+      "zielgruppen": {
+        "wert": [
+          "Frühstücksgäste am Wochenende",
+          "Leute aus dem Ort, die Bohnen holen",
+          "Arbeiten mit Laptop unter der Woche"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "anlaesse": {
+        "wert": [
+          "Frühstück",
+          "Kaffee und Kuchen",
+          "Bohnen kaufen"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "positionierung": {
+      "preis": {
+        "wert": "mittel",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "atmosphaere": {
+        "wert": "Hell, sachlich, etwas Werkstatt – es riecht nach Röstung.",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "karte": {
+      "signaturgerichte": {
+        "wert": [
+          "Cappuccino",
+          "Frühstück Klassik",
+          "Käsesahnetorte"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "speisekarte": {
+        "wert": {
+          "katalog": "cafe",
+          "reihenfolge": [
+            "Kaffee & Getränke",
+            "Frühstück",
+            "Kuchen & Torten"
+          ]
+        },
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)",
+        "notiz": "Karte des Beispielbetriebs = Musterkatalog"
+      },
+      "besonderheiten": {
+        "wert": [
+          "Frühstück bis 14 Uhr"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "aktion": {
+      "haupt": {
+        "wert": "informieren",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "hinweise": {
+        "wert": [
+          "Keine Tischreservierung – außer für Gruppen ab 6 Personen",
+          "Frühstück und Kuchen auch zum Abholen"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "marke": {
+      "logo": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "farben": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "schriften": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "medien": {
+      "fotos": {
+        "wert": [
+          {
+            "stock": "photo-1495474472287-4d71bcdd2085",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Hände mit Cappuccino-Tassen, Latte Art, von oben",
+            "rolle": "hero"
+          },
+          {
+            "stock": "photo-1554118811-1e0d58224f24",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Heller Café-Gastraum mit Pflanzen und Tresen",
+            "rolle": "ambiente"
+          },
+          {
+            "stock": "photo-1567620905732-2d1ec7ab7445",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Pancake-Turm mit Banane und Sirup",
+            "rolle": "gericht"
+          },
+          {
+            "stock": "photo-1544510808-91bcbee1df55",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Feigen-Dessert mit Beeren",
+            "rolle": "hero"
+          }
+        ],
+        "status": "vorschlag",
+        "quelle": "Agentur",
+        "notiz": "Röstmaschine noch nicht fotografiert – wichtigstes fehlendes Motiv"
+      }
+    },
+    "stil": {
+      "wuensche": {
+        "wert": [
+          "sachlich wie ein Werkstattzettel",
+          "Kaffee zuerst"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "noGos": {
+        "wert": [
+          "Kaffeebohnen-Clipart",
+          "braune Farbwelt überall"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "referenzen": {
+        "wert": [
+          "fiveelephant.com (Berliner Rösterei)"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "belege": {
+      "googleBewertung": {
+        "wert": {
+          "note": 4.3,
+          "anzahl": 315
+        },
+        "status": "uebernommen",
+        "quelle": "Google Places / Lead-Liste"
+      },
+      "stimmen": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "auszeichnungen": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "freigabe": {
+      "veroeffentlichung": {
+        "wert": null,
+        "status": "unbekannt",
+        "notiz": "Beispielbetrieb"
+      }
+    }
+  }
+}
