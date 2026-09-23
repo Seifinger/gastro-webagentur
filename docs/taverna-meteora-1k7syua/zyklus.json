@@ -1,0 +1,77 @@
+{
+  "site": "taverna-meteora-1k7syua",
+  "designsystem": "griechisch--taverne-am-hafen",
+  "heroVariante": "karte",
+  "runden": [
+    {
+      "runde": 1,
+      "bestanden": null,
+      "korrekturen": []
+    }
+  ],
+  "ergebnis": "ohne-judge",
+  "stufen": [
+    {
+      "stufe": "referenz",
+      "neu": 0,
+      "gesamt": 3
+    },
+    {
+      "stufe": "designsystem",
+      "id": "griechisch--taverne-am-hafen"
+    },
+    {
+      "stufe": "copy",
+      "sprachmodell": false
+    }
+  ],
+  "copy": {
+    "ersetzungen": 1,
+    "verbleibend": 0
+  },
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1559339352-11d035aa65de",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1540189549336-e6e99c3679fe",
+      "typ": "bild"
+    },
+    "gericht:0-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1540189549336-e6e99c3679fe",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1529006557810-274b9b2fc783",
+      "typ": "bild"
+    },
+    "gericht:1-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+      "typ": "bild"
+    }
+  },
+  "zeitpunkt": "2026-09-23T05:39:28.014Z"
+}

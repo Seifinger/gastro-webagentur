@@ -1,0 +1,83 @@
+{
+  "site": "zuccalli-0bcpkt3",
+  "designsystem": "bayerisch--kellerstube",
+  "heroVariante": "spalte-bild",
+  "runden": [
+    {
+      "runde": 1,
+      "bestanden": null,
+      "korrekturen": []
+    }
+  ],
+  "ergebnis": "ohne-judge",
+  "stufen": [
+    {
+      "stufe": "referenz",
+      "neu": 0,
+      "gesamt": 3
+    },
+    {
+      "stufe": "designsystem",
+      "id": "bayerisch--kellerstube"
+    },
+    {
+      "stufe": "copy",
+      "sprachmodell": false
+    }
+  ],
+  "copy": {
+    "ersetzungen": 1,
+    "verbleibend": 0
+  },
+  "medien": {
+    "hero": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1599921841143-819065a55cc6",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1528605248644-14dd04022da1",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1544025162-d76694265947",
+      "typ": "bild"
+    },
+    "gericht:1-4": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1544025162-d76694265947",
+      "typ": "bild"
+    },
+    "gericht:1-5": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1476224203421-9ac39bcb3327",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1432139555190-58524dae6a55",
+      "typ": "bild"
+    },
+    "gericht:1-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1599921841143-819065a55cc6",
+      "typ": "bild"
+    }
+  },
+  "zeitpunkt": "2026-09-23T05:39:29.814Z"
+}
