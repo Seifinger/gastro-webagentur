@@ -1,0 +1,274 @@
+{
+  "version": 1,
+  "slug": "pilot-izakaya-kurenai",
+  "placeId": "v2-test-japanisch-izakaya",
+  "kueche": "japanisch",
+  "stimmung": "izakaya",
+  "fiktiv": true,
+  "erstellt": "pilot",
+  "lead": {
+    "name": "Izakaya Kurenai",
+    "ort": "Mühldorf am Inn",
+    "adresse": "Stadtplatz 10, 84453 Mühldorf am Inn",
+    "telefon": "030 23125 124",
+    "rating": 4.3,
+    "anzahlBewertungen": 272
+  },
+  "felder": {
+    "betrieb": {
+      "name": {
+        "wert": "Izakaya Kurenai",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "ort": {
+        "wert": "Mühldorf am Inn",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "adresse": {
+        "wert": "Stadtplatz 10, 84453 Mühldorf am Inn",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "telefon": {
+        "wert": "030 23125 124",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "kueche": {
+        "wert": "Japanisch – Izakaya",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "oeffnungszeiten": {
+        "wert": [
+          {
+            "tage": "Dienstag – Donnerstag",
+            "zeiten": "17:00 – 23:00"
+          },
+          {
+            "tage": "Freitag & Samstag",
+            "zeiten": "17:00 – 0:30"
+          },
+          {
+            "tage": "Sonntag & Montag",
+            "zeiten": "Ruhetag"
+          }
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "konzept": {
+      "kurz": {
+        "wert": "Eine Feierabend-Kneipe nach japanischer Art: kleine Teller zum Teilen, Bier und Sake, ein langer Tresen.",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "geschichte": {
+        "wert": null,
+        "status": "unbekannt",
+        "notiz": "Gründungsgeschichte noch nicht erzählt"
+      },
+      "usp": {
+        "wert": "Man bestellt nach und nach kleine Teller – wie in Tokio nach der Arbeit, nicht wie im Sushi-Restaurant.",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "belege": {
+        "wert": [
+          "Zwölf Plätze am Tresen ohne Reservierung",
+          "Die kleinen Gerichte hängen als Zettel an der Wand über dem Tresen"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "gaeste": {
+      "zielgruppen": {
+        "wert": [
+          "Kollegen nach der Arbeit",
+          "Freundesgruppen",
+          "Paare, die am Tresen sitzen wollen"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "anlaesse": {
+        "wert": [
+          "Feierabend",
+          "Geburtstag in der Gruppe",
+          "spontan auf ein Bier"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "positionierung": {
+      "preis": {
+        "wert": "günstig bis mittel",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "atmosphaere": {
+        "wert": "Laut, warm, rote Laternen über dem Eingang, Holztresen, man sitzt eng.",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "karte": {
+      "signaturgerichte": {
+        "wert": [
+          "Gyoza (5 Stück)",
+          "Edamame",
+          "Katsu Curry"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "speisekarte": {
+        "wert": {
+          "katalog": "japanisch"
+        },
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)",
+        "notiz": "Karte des Beispielbetriebs = Musterkatalog"
+      },
+      "besonderheiten": {
+        "wert": [
+          "Kleine Teller als Zettel an der Wand"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "aktion": {
+      "haupt": {
+        "wert": "reservieren",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "hinweise": {
+        "wert": [
+          "Tresen: keine Reservierung, einfach vorbeikommen",
+          "Tische ab 4 Personen reservierbar"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "marke": {
+      "logo": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "farben": {
+        "wert": [
+          "Laternenrot"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "schriften": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "medien": {
+      "fotos": {
+        "wert": [
+          {
+            "stock": "photo-1693822998952-b8d18c61043b",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Holztresen mit Stäbchenbecher, warmes Licht, Gäste unscharf",
+            "rolle": "hero"
+          },
+          {
+            "stock": "photo-1672756214803-61e605da34fc",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Rote und weiße Papierlaternen mit Schriftzeichen, Nacht",
+            "rolle": "hero-mobil"
+          },
+          {
+            "stock": "photo-1626322751504-930506dd41ca",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Gyoza auf Keramikteller mit Stäbchen",
+            "rolle": "gericht"
+          },
+          {
+            "stock": "photo-1553621042-f6e147245754",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Sushi-Auswahl im Holzboot",
+            "rolle": "gericht"
+          },
+          {
+            "stock": "photo-1569718212165-3a8278d5f624",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Ramen mit Garnelen, Ei, Zuckerschoten",
+            "rolle": "gericht"
+          }
+        ],
+        "status": "vorschlag",
+        "quelle": "Agentur",
+        "notiz": "Keine eigenen Fotos"
+      }
+    },
+    "stil": {
+      "wuensche": {
+        "wert": [
+          "abends, laut, gemütlich",
+          "nicht wie ein Sushi-Lieferdienst"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "noGos": {
+        "wert": [
+          "Kirschblüten",
+          "Pinselstrich-Schriften",
+          "Geisha-Motive"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "referenzen": {
+        "wert": [
+          "bargoto.com (Izakaya in New York)"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "belege": {
+      "googleBewertung": {
+        "wert": {
+          "note": 4.3,
+          "anzahl": 272
+        },
+        "status": "uebernommen",
+        "quelle": "Google Places / Lead-Liste"
+      },
+      "stimmen": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "auszeichnungen": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "freigabe": {
+      "veroeffentlichung": {
+        "wert": null,
+        "status": "unbekannt",
+        "notiz": "Beispielbetrieb"
+      }
+    }
+  }
+}

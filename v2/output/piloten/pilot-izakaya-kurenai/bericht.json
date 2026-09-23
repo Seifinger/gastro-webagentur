@@ -1,0 +1,210 @@
+{
+  "engine": "v2-komposition",
+  "slug": "pilot-izakaya-kurenai",
+  "designsystem": "japanisch--izakaya",
+  "creativeDirection": {
+    "leitidee": "Durch den Vorhang an den Tresen: Man bestellt diese Seite wie eine Izakaya – Zettel für Zettel.",
+    "bearbeitet": true
+  },
+  "hero": "noren",
+  "abschnitte": [
+    "signatur:zettelwand",
+    "ambiente",
+    "reservierung",
+    "karte",
+    "kontakt"
+  ],
+  "gewichte": {
+    "zettelwand": "gross",
+    "ambiente": "normal",
+    "reservierung": "normal",
+    "karte": "klein",
+    "kontakt": "normal"
+  },
+  "belege": {
+    "signaturen": [
+      {
+        "typ": "zettelwand",
+        "getragen": true,
+        "fehlend": []
+      }
+    ],
+    "abschnitte": [
+      {
+        "id": "signatur",
+        "signatur": "zettelwand",
+        "fehlend": []
+      },
+      {
+        "id": "ambiente",
+        "fehlend": []
+      },
+      {
+        "id": "reservierung",
+        "fehlend": []
+      },
+      {
+        "id": "karte",
+        "fehlend": []
+      },
+      {
+        "id": "kontakt",
+        "fehlend": []
+      }
+    ],
+    "getragen": 1,
+    "verworfen": []
+  },
+  "briefing": {
+    "status": {
+      "bestaetigt": 22,
+      "uebernommen": 1,
+      "vorschlag": 1,
+      "unbekannt": 6
+    },
+    "offen": 7,
+    "fiktiv": true,
+    "freigegeben": false
+  },
+  "bildplan": {
+    "plaetze": [
+      {
+        "slot": "hero",
+        "motiv": "Tresen am Abend",
+        "rolle": "Eingang der Seite",
+        "gewaehlt": {
+          "herkunft": "stock",
+          "id": "photo-1693822998952-b8d18c61043b",
+          "zeigt": "Holztresen einer japanischen Kneipe, Stäbchenbecher, Glühlampen, Gäste unscharf",
+          "fokus": [
+            62,
+            55
+          ],
+          "kennzeichnung": "Beispielfoto"
+        },
+        "mobil": {
+          "herkunft": "stock",
+          "id": "photo-1672756214803-61e605da34fc",
+          "zeigt": "Rote und weiße Papierlaternen mit Schriftzeichen bei Nacht",
+          "fokus": [
+            50,
+            40
+          ],
+          "kennzeichnung": "Beispielfoto",
+          "grund": "Laternen über dem Eingang"
+        },
+        "zuschnitt": {
+          "desktop": [
+            16,
+            9
+          ],
+          "mobil": [
+            4,
+            5
+          ]
+        },
+        "fokus": [
+          62,
+          55
+        ],
+        "overlay": "keins – Text steht nie auf dem Foto",
+        "alt": "Holztresen einer japanischen Kneipe, Stäbchenbecher, Glühlampen, Gäste unscharf",
+        "altMobil": "Rote und weiße Papierlaternen mit Schriftzeichen bei Nacht",
+        "abgelehnt": []
+      },
+      {
+        "slot": "zettel",
+        "motiv": "Gyoza",
+        "rolle": "zeigt das Kartengericht „Gyoza (5 Stück)“",
+        "gewaehlt": {
+          "herkunft": "stock",
+          "id": "photo-1626322751504-930506dd41ca",
+          "zeigt": "Gyoza auf Keramik mit Stäbchen und Dip",
+          "fokus": [
+            45,
+            60
+          ],
+          "kennzeichnung": "Beispielfoto"
+        },
+        "mobil": null,
+        "zuschnitt": {
+          "desktop": [
+            4,
+            3
+          ],
+          "mobil": [
+            1,
+            1
+          ]
+        },
+        "fokus": [
+          45,
+          60
+        ],
+        "overlay": "keins – Text steht nie auf dem Foto",
+        "alt": "Gyoza (5 Stück) (Beispielfoto)",
+        "altMobil": null,
+        "abgelehnt": []
+      },
+      {
+        "slot": "ramen",
+        "motiv": "Shoyu-Ramen",
+        "rolle": "zeigt das Kartengericht „Shoyu-Ramen“",
+        "gewaehlt": null,
+        "mobil": null,
+        "zuschnitt": {
+          "desktop": [
+            4,
+            3
+          ],
+          "mobil": [
+            1,
+            1
+          ]
+        },
+        "fokus": [
+          50,
+          50
+        ],
+        "overlay": "keins – Text steht nie auf dem Foto",
+        "alt": null,
+        "altMobil": null,
+        "abgelehnt": [
+          {
+            "quelle": "stock:photo-1569718212165-3a8278d5f624",
+            "herkunft": "stock",
+            "zeigt": "Ramen mit Garnelen, halbem Ei, Zuckerschoten, türkisen Stäbchen",
+            "grund": "Shoyu-Ramen der Karte hat Chashu-Schwein, das Foto zeigt Garnelen"
+          }
+        ]
+      }
+    ],
+    "abgelehnt": [
+      {
+        "slot": "ramen",
+        "quelle": "stock:photo-1569718212165-3a8278d5f624",
+        "herkunft": "stock",
+        "zeigt": "Ramen mit Garnelen, halbem Ei, Zuckerschoten, türkisen Stäbchen",
+        "grund": "Shoyu-Ramen der Karte hat Chashu-Schwein, das Foto zeigt Garnelen"
+      }
+    ],
+    "fehlend": [
+      {
+        "slot": "ramen",
+        "motiv": "Shoyu-Ramen",
+        "grund": "alle Kandidaten ungeeignet"
+      }
+    ]
+  },
+  "lint": {
+    "warnungen": []
+  },
+  "copy": {
+    "ersetzungen": [],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  }
+}

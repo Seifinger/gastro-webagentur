@@ -24,7 +24,12 @@
     "v2:wirt": "node v2/integration/wirtServerV2.js",
     "v2:telegram": "node v2/integration/telegramBot.js",
     "v2:dashboard-design": "node v2/build/dashboardDesignsystem.js",
-    "v2:vergleich": "node v2/build/vergleich.js"
+    "v2:vergleich": "node v2/build/vergleich.js",
+    "v2:briefing": "node v2/briefing/briefingCli.js",
+    "v2:pilot": "node v2/build/pilotCli.js",
+    "v2:tauschprobe": "node v2/build/tauschprobe.js",
+    "v2:art-review": "node v2/build/artDirectionScreenshots.js --piloten",
+    "v2:art-audit": "node v2/build/artDirectionAudit.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",

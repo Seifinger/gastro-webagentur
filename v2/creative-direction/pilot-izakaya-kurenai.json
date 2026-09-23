@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "slug": "pilot-izakaya-kurenai",
+  "designsystem": "japanisch--izakaya",
+  "erzeugt": "art-direction",
+  "bearbeitet": true,
+  "leitidee": "Durch den Vorhang an den Tresen: Man bestellt diese Seite wie eine Izakaya – Zettel für Zettel.",
+  "wirkung": "Feierabend, laut und warm. Nach drei Sekunden weiß man: ab 17 Uhr offen, am Tresen ohne Reservierung, Gruppen melden sich vorher.",
+  "metapher": "Noren und Zettelwand: Der Eingang ist ein geteilter Stoffvorhang vor dem Tresenfoto; die kleinen Teller hängen als schmale Papierzettel nebeneinander an einer Leiste.",
+  "bilder": {
+    "balance": "ausgewogen",
+    "auswahl": "Ein Raumfoto (Tresen, warmes Licht, Menschen unscharf) trägt den Eingang. Mobil ersetzt ein Laternenmotiv im Hochformat den Tresen, weil der Querschnitt des Tresens auf 390 px nur noch Holz zeigt. Abgelehnt: Ramen mit Garnelen (Karte sagt Chashu-Schwein).",
+    "zuschnitt": "Hero randabfallend 16:9, Fokus auf Stäbchenbecher und Lampen; mobil 4:5 Laternen, Fokus auf der mittleren Laterne.",
+    "farbklima": "Glühlampen-Warm, tiefe Schatten, Laternenrot als Akzent",
+    "slots": [
+      {
+        "slot": "hero",
+        "motiv": "Tresen am Abend",
+        "kandidaten": [
+          "photo-1693822998952-b8d18c61043b"
+        ],
+        "mobil": {
+          "motiv": "Laternen über dem Eingang",
+          "kandidaten": [
+            "photo-1672756214803-61e605da34fc"
+          ]
+        }
+      },
+      {
+        "slot": "zettel",
+        "motiv": "Gyoza",
+        "gericht": "Gyoza (5 Stück)",
+        "kandidaten": [
+          "photo-1626322751504-930506dd41ca"
+        ]
+      },
+      {
+        "slot": "ramen",
+        "motiv": "Shoyu-Ramen",
+        "gericht": "Shoyu-Ramen",
+        "kandidaten": [
+          "photo-1569718212165-3a8278d5f624"
+        ]
+      }
+    ]
+  },
+  "typografie": {
+    "rollen": [
+      {
+        "rolle": "Name im Vorhang, Preise auf den Zetteln",
+        "schrift": "Antonio",
+        "begruendung": "Schmale, hohe Versalien wie Pinselschrift auf Noren – aber nur für wenige Wörter. Ganze Sätze in Versalien (v2 vorher) wirkten wie ein Plakat."
+      },
+      {
+        "rolle": "Abschnittstitel, Karte, Formular",
+        "schrift": "Zen Kaku Gothic New",
+        "begruendung": "Japanische Grotesk mit lateinischem Satz; ruhig, gut lesbar auf Dunkel."
+      }
+    ],
+    "begruendung": "Lautstärke nur dort, wo sie auch in der Kneipe laut ist: am Eingang und am Preis."
+  },
+  "hero": {
+    "typ": "noren",
+    "warum": "Der erste Blick ist der Eingang: Tresenfoto hinter drei Stoffbahnen, darauf der Name und „heute ab 17 Uhr“."
+  },
+  "seitenfolge": [
+    {
+      "id": "signatur",
+      "signatur": "zettelwand",
+      "gewicht": "gross",
+      "warum": "Die kleinen Teller sind das Konzept – sie kommen zuerst, als Zettel, jeder direkt bestellbar."
+    },
+    {
+      "id": "ambiente",
+      "gewicht": "normal",
+      "braucht": [
+        "aktion.hinweise"
+      ],
+      "warum": "Tresen ohne Reservierung, Tische ab vier: die Hausregel, die Gäste am häufigsten fragen."
+    },
+    {
+      "id": "reservierung",
+      "gewicht": "normal",
+      "warum": "Für Gruppen – deshalb nach der Hausregel, nicht davor."
+    },
+    {
+      "id": "karte",
+      "gewicht": "klein",
+      "warum": "Die ganze Karte kompakt zum Nachschlagen."
+    },
+    {
+      "id": "kontakt",
+      "gewicht": "normal",
+      "warum": "Stadtplatz, Zeiten, Telefon."
+    }
+  ],
+  "signaturen": [
+    {
+      "typ": "zettelwand",
+      "titel": "Kleine Teller als Zettel an der Wand",
+      "braucht": [
+        "karte.besonderheiten",
+        "karte.speisekarte"
+      ],
+      "beschreibung": "Schmale Papierzettel an einer Leiste, Name oben, Preis groß in Antonio unten; leicht versetzte Höhen wie von Hand aufgehängt. Mobil zwei Spalten."
+    }
+  ],
+  "verzicht": [
+    "Keine Kirschblüten, keine Pinselschrift-Fonts, keine Geisha-Motive (No-Gos)",
+    "Keine Versal-Überschriften über ganze Sätze",
+    "Keine Gästestimmen",
+    "Keine Häkchen-Leiste",
+    "Kein Video – kein eigenes Material vorhanden"
+  ],
+  "bewegung": {
+    "moment": "keiner",
+    "warum": "Der Vorhang ist ein Bild, keine Animation. Eine wehende Noren wäre Dekoration."
+  },
+  "ton": {
+    "register": "direkt",
+    "anrede": "ihr/Sie gemischt vermeiden – durchgehend Sie, aber knapp",
+    "regeln": [
+      "Sätze unter 12 Wörtern",
+      "Uhrzeiten statt Adjektive"
+    ]
+  },
+  "titel": "Izakaya Kurenai",
+  "komposition": {
+    "karte": "kompakt",
+    "abschnittsSchrift": "text",
+    "mobilLeiste": [
+      "reservieren",
+      "anrufen"
+    ]
+  },
+  "texte": {
+    "zettelwandTitel": "Erst zwei bestellen, dann weitersehen",
+    "zettelwandIntro": "So isst man in einer Izakaya: nach und nach, zum Teilen. Jeder Zettel lässt sich direkt vorbestellen.",
+    "reservierungTitel": "Zu viert oder mehr?",
+    "ambienteRubrik": "Am Tresen",
+    "ambienteTitel": "Einfach reinkommen",
+    "reservierungIntro": "Tische gibt es ab vier Personen. Sagen Sie uns Tag, Uhrzeit und wie viele Sie sind."
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "engine": "v2-komposition",
+  "slug": "pilot-trattoria-nonna-lucia",
+  "designsystem": "italienisch--trattoria",
+  "creativeDirection": {
+    "leitidee": "Die Seite ist die Karte, die bei Lucia auf dem Tisch liegt – mit der Tageskarte eingelegt.",
+    "bearbeitet": true
+  },
+  "hero": "karte-titel",
+  "abschnitte": [
+    "signatur:tageskarte",
+    "reservierung",
+    "karte",
+    "haus",
+    "kontakt"
+  ],
+  "gewichte": {
+    "tageskarte": "gross",
+    "reservierung": "gross",
+    "karte": "normal",
+    "haus": "normal",
+    "kontakt": "normal"
+  },
+  "belege": {
+    "signaturen": [
+      {
+        "typ": "tageskarte",
+        "getragen": true,
+        "fehlend": []
+      }
+    ],
+    "abschnitte": [
+      {
+        "id": "signatur",
+        "signatur": "tageskarte",
+        "fehlend": []
+      },
+      {
+        "id": "reservierung",
+        "fehlend": []
+      },
+      {
+        "id": "karte",
+        "fehlend": []
+      },
+      {
+        "id": "haus",
+        "fehlend": []
+      },
+      {
+        "id": "kontakt",
+        "fehlend": []
+      }
+    ],
+    "getragen": 1,
+    "verworfen": []
+  },
+  "briefing": {
+    "status": {
+      "bestaetigt": 22,
+      "uebernommen": 1,
+      "vorschlag": 1,
+      "unbekannt": 6
+    },
+    "offen": 7,
+    "fiktiv": true,
+    "freigegeben": false
+  },
+  "bildplan": {
+    "plaetze": [
+      {
+        "slot": "hero",
+        "motiv": "Margherita aus dem Holzofen",
+        "rolle": "zeigt das Kartengericht „Margherita“",
+        "gewaehlt": {
+          "herkunft": "stock",
+          "id": "photo-1574071318508-1cdbab80d002",
+          "zeigt": "Neapolitanische Margherita mit Basilikum auf Marmor, von oben",
+          "fokus": [
+            50,
+            55
+          ],
+          "kennzeichnung": "Beispielfoto"
+        },
+        "mobil": null,
+        "zuschnitt": {
+          "desktop": [
+            4,
+            5
+          ],
+          "mobil": [
+            4,
+            3
+          ]
+        },
+        "fokus": [
+          50,
+          55
+        ],
+        "overlay": "keins – Text steht nie auf dem Foto",
+        "alt": "Margherita (Beispielfoto)",
+        "altMobil": null,
+        "abgelehnt": []
+      },
+      {
+        "slot": "tageskarte",
+        "motiv": "Tagliatelle al Ragù",
+        "rolle": "zeigt das Kartengericht „Tagliatelle al Ragù“",
+        "gewaehlt": {
+          "herkunft": "stock",
+          "id": "photo-1551183053-bf91a1d81141",
+          "zeigt": "Tagliatelle mit geschmortem Fleisch und Pilzen in der Pfanne",
+          "fokus": [
+            45,
+            50
+          ],
+          "kennzeichnung": "Beispielfoto"
+        },
+        "mobil": null,
+        "zuschnitt": {
+          "desktop": [
+            4,
+            3
+          ],
+          "mobil": [
+            1,
+            1
+          ]
+        },
+        "fokus": [
+          45,
+          50
+        ],
+        "overlay": "keins – Text steht nie auf dem Foto",
+        "alt": "Tagliatelle al Ragù (Beispielfoto)",
+        "altMobil": null,
+        "abgelehnt": []
+      }
+    ],
+    "abgelehnt": [],
+    "fehlend": []
+  },
+  "lint": {
+    "warnungen": []
+  },
+  "copy": {
+    "ersetzungen": [],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  }
+}

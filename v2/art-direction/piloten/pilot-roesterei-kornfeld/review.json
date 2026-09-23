@@ -1,0 +1,118 @@
+{
+  "url": "file:///home/user/gastro-webagentur/v2/output/piloten/pilot-roesterei-kornfeld/index.html",
+  "name": "pilot-roesterei-kornfeld",
+  "zeitpunkt": "2026-09-23T04:34:26.640Z",
+  "viewports": {
+    "desktop": {
+      "screenshot": "pilot-roesterei-kornfeld--desktop.jpg",
+      "befunde": [],
+      "fehlendeAssets": [],
+      "skriptFehler": [],
+      "tastatur": {
+        "erreicht": 18,
+        "ohneFokus": []
+      }
+    },
+    "tablet": {
+      "screenshot": "pilot-roesterei-kornfeld--tablet.jpg",
+      "befunde": [],
+      "fehlendeAssets": [],
+      "skriptFehler": [],
+      "tastatur": {
+        "erreicht": 18,
+        "ohneFokus": []
+      }
+    },
+    "mobil": {
+      "screenshot": "pilot-roesterei-kornfeld--mobil.jpg",
+      "befunde": [],
+      "fehlendeAssets": [],
+      "skriptFehler": [],
+      "tastatur": {
+        "erreicht": 18,
+        "ohneFokus": []
+      }
+    }
+  },
+  "zustaende": {
+    "desktop": [
+      {
+        "zustand": "formularfehler",
+        "ok": true,
+        "detail": "4 Felder als fehlerhaft markiert",
+        "screenshot": "pilot-roesterei-kornfeld--desktop--formularfehler.jpg"
+      },
+      {
+        "zustand": "reservierung-bestaetigt",
+        "ok": true,
+        "detail": "Tisch reserviert",
+        "screenshot": "pilot-roesterei-kornfeld--desktop--reservierung-bestaetigt.jpg"
+      },
+      {
+        "zustand": "warenkorb",
+        "ok": true,
+        "detail": "1 Positionen im Warenkorb",
+        "screenshot": "pilot-roesterei-kornfeld--desktop--warenkorb.jpg"
+      },
+      {
+        "zustand": "bestellung-bestaetigt",
+        "ok": true,
+        "detail": "Bestellung aufgenommen",
+        "screenshot": "pilot-roesterei-kornfeld--desktop--bestellung-bestaetigt.jpg"
+      }
+    ],
+    "mobil": [
+      {
+        "zustand": "mobile-navigation",
+        "ok": true,
+        "detail": "5 Einträge sichtbar",
+        "screenshot": "pilot-roesterei-kornfeld--mobil--mobile-navigation.jpg"
+      },
+      {
+        "zustand": "formularfehler",
+        "ok": true,
+        "detail": "4 Felder als fehlerhaft markiert",
+        "screenshot": "pilot-roesterei-kornfeld--mobil--formularfehler.jpg"
+      },
+      {
+        "zustand": "reservierung-bestaetigt",
+        "ok": true,
+        "detail": "Tisch reserviert",
+        "screenshot": "pilot-roesterei-kornfeld--mobil--reservierung-bestaetigt.jpg"
+      },
+      {
+        "zustand": "warenkorb",
+        "ok": true,
+        "detail": "1 Positionen im Warenkorb",
+        "screenshot": "pilot-roesterei-kornfeld--mobil--warenkorb.jpg"
+      },
+      {
+        "zustand": "bestellung-bestaetigt",
+        "ok": true,
+        "detail": "Bestellung aufgenommen",
+        "screenshot": "pilot-roesterei-kornfeld--mobil--bestellung-bestaetigt.jpg"
+      }
+    ]
+  },
+  "labor": {
+    "desktop": {
+      "lcpMs": 216,
+      "cls": 0,
+      "inpNaeherungMs": 24
+    },
+    "mobil": {
+      "lcpMs": 728,
+      "cls": 0.047,
+      "inpNaeherungMs": 24
+    }
+  },
+  "automatisch": {
+    "fehler": [],
+    "warnungen": []
+  },
+  "zusammenfassung": {
+    "fehler": 0,
+    "warnungen": 0,
+    "laborHinweis": "Laborwerte aus einem Headless-Lauf (Desktop ungedrosselt, Mobil mit Slow-4G- und 4×-CPU-Drosselung) über einen Proxy, Bilder von images.unsplash.com, Schriften lokal. Keine Felddaten – über echte Nutzer sagen sie nichts aus."
+  }
+}

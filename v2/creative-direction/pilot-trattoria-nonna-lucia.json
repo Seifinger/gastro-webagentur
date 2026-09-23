@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "slug": "pilot-trattoria-nonna-lucia",
+  "designsystem": "italienisch--trattoria",
+  "erzeugt": "art-direction",
+  "bearbeitet": true,
+  "leitidee": "Die Seite ist die Karte, die bei Lucia auf dem Tisch liegt – mit der Tageskarte eingelegt.",
+  "wirkung": "Man soll sich wie in einer kleinen, vollen Stube fühlen, in der jemand für einen kocht – und nebenbei begreifen, dass 32 Plätze abends schnell weg sind.",
+  "metapher": "Eine gedruckte Trattoria-Karte auf warmem Papier: Titelblatt mit dem Namen, ein schräg eingesteckter Tageszettel, Rubriken kursiv gesetzt, Preise rechtsbündig wie im Bleisatz.",
+  "bilder": {
+    "balance": "ausgewogen",
+    "auswahl": "Nur Gerichte, die genau so auf der Karte stehen (Margherita, Tagliatelle al Ragù, Penne all’Arrabbiata). Abgelehnt: Spaghetti mit Rioja-Korken (falsches Land, falsches Gericht), BBQ-Pizza (ist keine Quattro Stagioni). Kein Stockfoto als „Unser Haus“ – der Raum bleibt ungezeigt, bis es eigene Fotos gibt.",
+    "zuschnitt": "Teller angeschnitten, wie ein aufgelegtes Foto im Titelblatt (4:5); mobil flach 4:3, damit Name und „Tisch reservieren“ in den ersten Bildschirm passen.",
+    "farbklima": "warmes Tageslicht, cremiges Papier, Tomatenrot als einzige laute Farbe",
+    "slots": [
+      {
+        "slot": "hero",
+        "motiv": "Margherita aus dem Holzofen",
+        "gericht": "Margherita",
+        "kandidaten": [
+          "photo-1574071318508-1cdbab80d002",
+          "photo-1481931098730-318b6f776db0"
+        ],
+        "zuschnitt": {
+          "desktop": [
+            4,
+            5
+          ],
+          "mobil": [
+            4,
+            3
+          ]
+        }
+      },
+      {
+        "slot": "tageskarte",
+        "motiv": "Tagliatelle al Ragù",
+        "gericht": "Tagliatelle al Ragù",
+        "kandidaten": [
+          "photo-1551183053-bf91a1d81141"
+        ]
+      }
+    ]
+  },
+  "typografie": {
+    "rollen": [
+      {
+        "rolle": "Name, Rubriken der Karte (kursiv)",
+        "schrift": "EB Garamond",
+        "begruendung": "Klassische Buchschrift – so sind italienische Speisekarten seit Jahrzehnten gesetzt; die Kursive trägt die Rubriken wie auf Papier."
+      },
+      {
+        "rolle": "Gerichte, Beschreibungen, Formular",
+        "schrift": "Karla",
+        "begruendung": "Ruhige Grotesk mit offenen Formen, gut bei 18 px, damit die lange Karte lesbar bleibt."
+      }
+    ],
+    "begruendung": "Zwei Stimmen: die Karte (Garamond) und die Bedienung (Karla). Keine dritte Schrift."
+  },
+  "hero": {
+    "typ": "karte-titel",
+    "warum": "Die erste Ansicht ist das Titelblatt der Karte – Name groß, ein echtes Gericht als eingelegtes Foto, darunter sofort „Tisch reservieren“."
+  },
+  "seitenfolge": [
+    {
+      "id": "signatur",
+      "signatur": "tageskarte",
+      "gewicht": "gross",
+      "warum": "Der USP (Pasta jeden Morgen frisch) wird als Tageszettel gezeigt, nicht behauptet."
+    },
+    {
+      "id": "reservierung",
+      "gewicht": "gross",
+      "warum": "32 Plätze: Die Hauptaktion kommt vor der langen Karte, solange die Lust noch frisch ist."
+    },
+    {
+      "id": "karte",
+      "gewicht": "normal",
+      "warum": "Die ganze Karte als gedruckte Doppelseite – zum Nachschlagen, nicht zum Verkaufen."
+    },
+    {
+      "id": "haus",
+      "gewicht": "normal",
+      "braucht": [
+        "konzept.geschichte"
+      ],
+      "warum": "Lucia und Paolo – wer kocht und wer bedient, in zwei Sätzen, erst wenn man sich schon entschieden hat."
+    },
+    {
+      "id": "kontakt",
+      "gewicht": "normal",
+      "warum": "Marktplatz, Telefon, Ruhetag Montag."
+    }
+  ],
+  "signaturen": [
+    {
+      "typ": "tageskarte",
+      "titel": "Tageskarte als eingelegter Zettel",
+      "braucht": [
+        "karte.besonderheiten",
+        "karte.signaturgerichte"
+      ],
+      "beschreibung": "Drei Pasta-Gerichte auf einem leicht schräg eingesteckten Zettel, Nummern 1–3 in Garamond-Kursiv, jede Zeile direkt vorbestellbar."
+    }
+  ],
+  "verzicht": [
+    "Keine Italienflagge, kein Karomuster, keine Nonna-Illustration (No-Gos des Hauses)",
+    "Keine Gästestimmen – keine freigegebenen Zitate",
+    "Keine Häkchen-Leiste mit Versprechen",
+    "Kein „Unser Team“/„Unser Haus“ aus Stockfotos",
+    "Kein Parallax, kein Bildzoom beim Laden"
+  ],
+  "bewegung": {
+    "moment": "Der Tageszettel rutscht beim ersten Sichtkontakt einmal in seine Schräglage – wie eingesteckt.",
+    "warum": "Die einzige Bewegung verstärkt die Metapher; alles andere steht still. Bei reduzierter Bewegung liegt der Zettel sofort richtig."
+  },
+  "ton": {
+    "register": "herzlich",
+    "anrede": "Sie",
+    "regeln": [
+      "kurze Sätze",
+      "italienische Gerichtsnamen unübersetzt",
+      "keine Superlative"
+    ]
+  },
+  "titel": "Trattoria Da Nonna Lucia",
+  "komposition": {
+    "karte": "druckkarte",
+    "abschnittsSchrift": "display",
+    "mobilLeiste": [
+      "reservieren",
+      "bestellen"
+    ]
+  },
+  "texte": {
+    "tageskarteTitel": "Heute aus dem Fenster",
+    "tageskarteIntro": "Lucia macht die Nudeln morgens am Brett im Schaufenster. Diese Pasta-Gerichte stehen auf der Karte – der Zettel vor Ort kann abweichen.",
+    "reservierungTitel": "32 Plätze. Abends lieber vorher fragen.",
+    "reservierungIntro": "Datum, Uhrzeit, Personen. Die Bestätigung kommt vom Haus – Pasta und Pizza gibt es auch zum Abholen."
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "slug": "pilot-gasthaus-alte-linde",
+  "designsystem": "bayerisch--wirtshaus",
+  "erzeugt": "art-direction",
+  "bearbeitet": true,
+  "leitidee": "Solange das Haus nichts bestätigt hat, zeigt die Seite nur, was stimmt – gesetzt wie der Schriftzug über der Wirtshaustür.",
+  "wirkung": "Vertrauenswürdig und ehrlich: Der Wirt sieht beim Termin sofort, wie sein Haus aussehen könnte, und was wir dafür noch von ihm brauchen.",
+  "metapher": "Hausschild und Aushang: Der Name in großer Buchschrift mit einem einzigen gezeichneten Lindenblatt (aus dem Namen, nicht aus einem Stockfoto), darunter der Aushang mit Adresse und Telefon.",
+  "bilder": {
+    "balance": "text",
+    "auswahl": "Kein Foto. Das einzige Hero-Stockfoto zeigt junge Leute mit Basecaps vor einem Bretterzaun – das ist kein Wirtshaus am Stadtplatz. Die Rippchen mit BBQ-Soße wirken wie ein Diner. Beide abgelehnt.",
+    "zuschnitt": "entfällt",
+    "farbklima": "Papier, Tinte, Tannengrün aus dem Designsystem",
+    "slots": [
+      {
+        "slot": "hero",
+        "motiv": "Wirtshaus",
+        "kandidaten": [
+          "photo-1528605248644-14dd04022da1"
+        ]
+      },
+      {
+        "slot": "gericht",
+        "motiv": "Grillrippchen",
+        "gericht": "Grillrippchen",
+        "kandidaten": [
+          "photo-1544025162-d76694265947"
+        ]
+      }
+    ]
+  },
+  "typografie": {
+    "rollen": [
+      {
+        "rolle": "Name als Hausschild",
+        "schrift": "Vollkorn",
+        "begruendung": "Kräftige Buchschrift mit Wirtshaus-Schwere, ohne Fraktur-Klischee."
+      },
+      {
+        "rolle": "Aushang, Karte, Formular",
+        "schrift": "Alegreya Sans",
+        "begruendung": "Humanistische Grotesk, warm, gut lesbar – passt zum Aushang-Ton."
+      }
+    ],
+    "begruendung": "Die Typografie ersetzt das fehlende Bildmaterial; deshalb große Grade und viel Luft."
+  },
+  "hero": {
+    "typ": "aushang",
+    "warum": "Ohne Bildmaterial trägt die Schrift: Name als Hausschild, das Lindenblatt aus dem Namen, Adresse und „Anrufen“ als einzige sichere Aktion."
+  },
+  "seitenfolge": [
+    {
+      "id": "kontakt",
+      "gewicht": "gross",
+      "warum": "Das Einzige, was sicher stimmt: Adresse und Telefon. Es steht direkt unter dem Namen."
+    },
+    {
+      "id": "karte",
+      "gewicht": "klein",
+      "warum": "Die Karte ist nur ein Muster – sie bleibt klein und klar als Entwurf markiert."
+    },
+    {
+      "id": "reservierung",
+      "gewicht": "klein",
+      "warum": "Online-Reservierung ist technisch bereit, aber vom Haus nicht bestätigt – nachrangig."
+    },
+    {
+      "id": "offen",
+      "gewicht": "normal",
+      "warum": "Offene Punkte sichtbar machen, statt sie mit erfundenen Inhalten zu füllen."
+    }
+  ],
+  "signaturen": [
+    {
+      "typ": "hausschild",
+      "titel": "Der Name als Hausschild",
+      "braucht": [
+        "betrieb.name",
+        "betrieb.adresse"
+      ],
+      "beschreibung": "Der Name über zwei Zeilen wie gemalt an der Fassade, darüber ein einzelnes Lindenblatt als Linienzeichnung – das einzige Ornament, abgeleitet aus dem Namen des Hauses."
+    }
+  ],
+  "verzicht": [
+    "Keine Fotos – lieber keins als ein falsches",
+    "Keine Geschichte („seit Generationen“), keine USPs, keine Gästestimmen – alles unbekannt",
+    "Keine Öffnungszeiten erfinden – „bitte telefonisch erfragen“",
+    "Keine Fraktur, kein Rautenmuster, keine Brezel-Icons"
+  ],
+  "bewegung": {
+    "moment": "keiner",
+    "warum": "Ein Aushang bewegt sich nicht."
+  },
+  "ton": {
+    "register": "sachlich",
+    "anrede": "Sie",
+    "regeln": [
+      "nur belegte Aussagen",
+      "offene Punkte als Fragen formulieren"
+    ]
+  },
+  "titel": "Gasthaus Zur Alten Linde (dünnes Briefing)",
+  "komposition": {
+    "karte": "muster",
+    "abschnittsSchrift": "display",
+    "mobilLeiste": [
+      "anrufen",
+      "karte"
+    ]
+  },
+  "texte": {
+    "reservierungTitel": "Tisch online anfragen",
+    "reservierungIntro": "Technisch vorbereitet. Ob das Haus Online-Anfragen annimmt, klären wir beim Termin – bis dahin gilt das Telefon."
+  }
+}

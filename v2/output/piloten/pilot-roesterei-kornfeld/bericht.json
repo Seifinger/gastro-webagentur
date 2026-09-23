@@ -1,0 +1,186 @@
+{
+  "engine": "v2-komposition",
+  "slug": "pilot-roesterei-kornfeld",
+  "designsystem": "cafe--third-wave",
+  "creativeDirection": {
+    "leitidee": "Kaffee zuerst, und zwar mit Datum: Die Seite ist der Wochenplan an der Tür der Rösterei.",
+    "bearbeitet": true
+  },
+  "hero": "werkbank",
+  "abschnitte": [
+    "signatur:wochenplan",
+    "karte",
+    "haus",
+    "abholung",
+    "reservierung",
+    "kontakt"
+  ],
+  "gewichte": {
+    "wochenplan": "gross",
+    "karte": "normal",
+    "haus": "klein",
+    "abholung": "klein",
+    "reservierung": "klein",
+    "kontakt": "normal"
+  },
+  "belege": {
+    "signaturen": [
+      {
+        "typ": "wochenplan",
+        "getragen": true,
+        "fehlend": []
+      }
+    ],
+    "abschnitte": [
+      {
+        "id": "signatur",
+        "signatur": "wochenplan",
+        "fehlend": []
+      },
+      {
+        "id": "karte",
+        "fehlend": []
+      },
+      {
+        "id": "haus",
+        "fehlend": []
+      },
+      {
+        "id": "abholung",
+        "fehlend": []
+      },
+      {
+        "id": "reservierung",
+        "fehlend": []
+      },
+      {
+        "id": "kontakt",
+        "fehlend": []
+      }
+    ],
+    "getragen": 1,
+    "verworfen": []
+  },
+  "briefing": {
+    "status": {
+      "bestaetigt": 21,
+      "uebernommen": 1,
+      "vorschlag": 1,
+      "unbekannt": 7
+    },
+    "offen": 8,
+    "fiktiv": true,
+    "freigegeben": false
+  },
+  "bildplan": {
+    "plaetze": [
+      {
+        "slot": "hero",
+        "motiv": "Kaffee",
+        "rolle": "zeigt das Kartengericht „Cappuccino“",
+        "gewaehlt": {
+          "herkunft": "stock",
+          "id": "photo-1495474472287-4d71bcdd2085",
+          "zeigt": "Hände mit Cappuccino-Tassen und Latte Art, von oben",
+          "fokus": [
+            55,
+            50
+          ],
+          "kennzeichnung": "Beispielfoto"
+        },
+        "mobil": null,
+        "zuschnitt": {
+          "desktop": [
+            4,
+            5
+          ],
+          "mobil": [
+            16,
+            10
+          ]
+        },
+        "fokus": [
+          55,
+          50
+        ],
+        "overlay": "keins – Text steht nie auf dem Foto",
+        "alt": "Cappuccino (Beispielfoto)",
+        "altMobil": null,
+        "abgelehnt": [
+          {
+            "quelle": "stock:photo-1544510808-91bcbee1df55",
+            "herkunft": "stock",
+            "zeigt": "Feigen und Beeren auf Teller, Dessert, dunkler Grund",
+            "grund": "zeigt keine Panna cotta; als Café-Hero: kein Kaffee im Bild"
+          }
+        ]
+      },
+      {
+        "slot": "haus",
+        "motiv": "Röstmaschine im Gastraum",
+        "rolle": "Stimmung",
+        "gewaehlt": null,
+        "mobil": null,
+        "zuschnitt": {
+          "desktop": [
+            3,
+            2
+          ],
+          "mobil": [
+            4,
+            5
+          ]
+        },
+        "fokus": [
+          50,
+          50
+        ],
+        "overlay": "keins – Text steht nie auf dem Foto",
+        "alt": null,
+        "altMobil": null,
+        "abgelehnt": [
+          {
+            "quelle": "stock:photo-1554118811-1e0d58224f24",
+            "herkunft": "stock",
+            "zeigt": "Heller Café-Gastraum mit Pflanzen und Tresen",
+            "grund": "Stockfoto zeigt einen fremden Ort („Heller Café-Gastraum mit Pflanzen und Tresen“) – für „Röstmaschine im Gastraum“ nur eigene Fotos"
+          }
+        ]
+      }
+    ],
+    "abgelehnt": [
+      {
+        "slot": "hero",
+        "quelle": "stock:photo-1544510808-91bcbee1df55",
+        "herkunft": "stock",
+        "zeigt": "Feigen und Beeren auf Teller, Dessert, dunkler Grund",
+        "grund": "zeigt keine Panna cotta; als Café-Hero: kein Kaffee im Bild"
+      },
+      {
+        "slot": "haus",
+        "quelle": "stock:photo-1554118811-1e0d58224f24",
+        "herkunft": "stock",
+        "zeigt": "Heller Café-Gastraum mit Pflanzen und Tresen",
+        "grund": "Stockfoto zeigt einen fremden Ort („Heller Café-Gastraum mit Pflanzen und Tresen“) – für „Röstmaschine im Gastraum“ nur eigene Fotos"
+      }
+    ],
+    "fehlend": [
+      {
+        "slot": "haus",
+        "motiv": "Röstmaschine im Gastraum",
+        "grund": "alle Kandidaten ungeeignet"
+      }
+    ]
+  },
+  "lint": {
+    "warnungen": []
+  },
+  "copy": {
+    "ersetzungen": [],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "direkt und praktisch – beantwortet zuerst: was, wann, wie schnell"
+  }
+}

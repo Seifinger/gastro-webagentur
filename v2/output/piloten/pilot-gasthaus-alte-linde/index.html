@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gasthaus Zur Alten Linde – Bayerische Wirtshausküche · Mühldorf am Inn</title>
+<meta name="description" content="Gasthaus Zur Alten Linde: Bayerische Wirtshausküche in Mühldorf am Inn.">
+<meta name="engine" content="v2-komposition">
+<meta name="v2-designsystem" content="bayerisch--wirtshaus">
+<meta name="v2-creative-direction" content="pilot-gasthaus-alte-linde">
+<meta name="v2-hero" content="aushang">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#fbfaf7">
+<style>
+@font-face{font-family:'Vollkorn';font-style:normal;font-weight:700;font-display:swap;src:url('../../assets/fonts/vollkorn-700-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
+@font-face{font-family:'Vollkorn';font-style:normal;font-weight:700;font-display:swap;src:url('../../assets/fonts/vollkorn-700-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:'Alegreya Sans';font-style:normal;font-weight:400;font-display:swap;src:url('../../assets/fonts/alegreya-sans-400-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
+@font-face{font-family:'Alegreya Sans';font-style:normal;font-weight:400;font-display:swap;src:url('../../assets/fonts/alegreya-sans-400-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+@font-face{font-family:'Alegreya Sans';font-style:normal;font-weight:500;font-display:swap;src:url('../../assets/fonts/alegreya-sans-500-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;}
+@font-face{font-family:'Alegreya Sans';font-style:normal;font-weight:500;font-display:swap;src:url('../../assets/fonts/alegreya-sans-500-latin.woff2') format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;}
+:root {
+  --grund: #fbfaf7;
+  --flaeche: #ffffff;
+  --flaeche-tief: #f3efe9;
+  --text: #23241f;
+  --text-leise: #63665c;
+  --linie: #e7e1d8;
+  --linie-stark: #7b7972;
+  --akzent: #3f5d3a;
+  --akzent-tief: #344c30;
+  --auf-akzent: #ffffff;
+  --akzent-text: #3f5d3a;
+  --signal: #b8862f;
+  --signal-text: #8b6524;
+  --tint: #1e2a1c;
+  --auf-tint: #fdfdfb;
+  --auf-tint-leise: #bfc2bd;
+  --signal-auf-tint: #b8862f;
+  --fehler: #b3261e;
+  --tint-rgb: 30,42,28;
+  --f-display: 'Vollkorn', Georgia, 'Times New Roman', serif;
+  --f-display-gewicht: 700;
+  --f-display-transform: none;
+  --f-display-sperrung: -0.012em;
+  --f-display-zh: 1.1;
+  --f-text: 'Alegreya Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --f-text-stark: 500;
+  --f-text-zh: 1.6;
+  --f-label: 'Alegreya Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --t-klein: 14px;
+  --t-basis: 18px;
+  --t-gross: 23px;
+  --t-h3: 28px;
+  --t-h2: clamp(2.188rem, 3.44vw, 2.75rem);
+  --t-h1: clamp(3.063rem, 5.39vw, 4.313rem);
+  --t-display: clamp(3.438rem, 6.72vw, 5.375rem);
+  --s-1: 8px;
+  --s-2: 16px;
+  --s-3: 24px;
+  --s-4: 32px;
+  --s-5: 40px;
+  --s-6: 48px;
+  --s-8: 64px;
+  --s-10: 80px;
+  --s-12: 96px;
+  --s-16: 128px;
+  --s-halb: 4px;
+  --sektion: 96px;
+  --sektion-betont: 128px;
+  --sektion-eng: 48px;
+  --rinne: 32px;
+  --rand: 48px;
+  --r-klein: 4px;
+  --r-karte: 12px;
+  --r-knopf: 8px;
+  --r-bild: 12px;
+  --r-marke: 999px;
+  --schatten-karte: 0 1px 0 #e7e1d8, 0 16px 32px -24px rgba(30,42,28,.35);
+  --schatten-schwebend: 0 24px 56px -24px rgba(30,42,28,.45);
+  --m-kurve: cubic-bezier(.2,.72,.3,1);
+  --m-kurz: 160ms;
+  --m-mittel: 312ms;
+  --m-lang: 520ms;
+  --m-weg: 24px;
+  --m-versatz: 80ms;
+  --max-breite: 1200px;
+  --text-breite: 62ch;
+}
+@media (max-width: 767px) {
+:root {
+  --sektion: 64px;
+  --sektion-betont: 80px;
+  --sektion-eng: 32px;
+  --rand: 24px;
+}
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--grund); color: var(--text);
+  font-family: var(--f-text); font-size: var(--t-basis); line-height: var(--f-text-zh);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+h1, h2, h3 {
+  font-family: var(--f-display); font-weight: var(--f-display-gewicht);
+  text-transform: var(--f-display-transform); letter-spacing: var(--f-display-sperrung);
+  line-height: var(--f-display-zh); margin: 0; text-wrap: balance;
+  hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word;
+}
+h2 { font-size: var(--t-h2); }
+h3 { font-size: var(--t-h3); }
+p { margin: 0; text-wrap: pretty; }
+img { display: block; max-width: 100%; }
+a { color: inherit; text-underline-offset: .18em; }
+figure { margin: 0; }
+button { font: inherit; }
+:focus-visible { outline: 2px solid var(--akzent-text); outline-offset: 2px; }
+.auf-tint :focus-visible { outline-color: var(--auf-tint); }
+
+.rahmen { width: 100%; max-width: var(--max-breite); margin-inline: auto; padding-inline: var(--rand); }
+.sektion { padding-block: var(--sektion); }
+.sektion--tief { background: var(--flaeche-tief); }
+.sektion--betont { padding-block: var(--sektion-betont); }
+section[id] { scroll-margin-top: var(--s-10); }
+
+/* Rubriken – drei Stile, gewählt im Designsystem (typografie.rubrik) */
+.rubrik { display: flex; align-items: center; gap: var(--s-1); margin: 0 0 var(--s-2); color: var(--akzent-text);
+  font-family: var(--f-text); font-size: var(--t-klein); font-weight: var(--f-text-stark); }
+.rubrik-versal .rubrik { text-transform: uppercase; letter-spacing: .14em; }
+.rubrik-etikett .rubrik { font-family: var(--f-display); font-weight: var(--f-display-gewicht); font-size: var(--t-gross); text-transform: none; letter-spacing: 0; }
+.rubrik-mono .rubrik { font-family: var(--f-label); font-weight: 400; letter-spacing: .02em; }
+.auf-tint .rubrik { color: var(--signal-auf-tint); }
+
+.sektion-kopf { max-width: var(--text-breite); margin-bottom: var(--s-8); }
+.sektion-kopf .intro, .intro { margin-top: var(--s-3); font-size: var(--t-gross); color: var(--text-leise); }
+.sektion-kopf--seitlich { max-width: none; display: grid; grid-template-columns: 3fr 9fr; gap: var(--rinne); align-items: start; }
+.sektion-kopf--seitlich .rubrik { padding-top: var(--s-1); }
+.sektion-kopf--seitlich > div { max-width: var(--text-breite); }
+
+/* Kleine Marken: das einzige, was rund sein darf */
+.marke-klein { display: inline-block; vertical-align: middle; font-family: var(--f-text); font-size: var(--t-klein); font-weight: var(--f-text-stark);
+  line-height: 1.3; color: var(--text-leise); border: 1px solid var(--linie-stark); border-radius: var(--r-marke); padding: 0 var(--s-1); }
+.marke-klein--signal { color: var(--signal-text); border-color: var(--signal-text); }
+.marke { width: 1.6em; height: 1.6em; flex: none; vertical-align: -.4em; margin-right: var(--s-1); }
+.ikon { width: 1.25em; height: 1.25em; flex: none; }
+.ikon-stern { width: 1em; height: 1em; }
+.ikon-plus { width: 1em; height: 1em; }
+
+/* Knöpfe */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s-1); min-height: var(--s-6);
+  padding: var(--s-1) var(--s-3); border-radius: var(--r-knopf); border: 1px solid transparent;
+  font-family: var(--f-text); font-size: var(--t-basis); font-weight: var(--f-text-stark); line-height: 1.2; text-decoration: none; cursor: pointer;
+  transition: background-color var(--m-kurz) ease, color var(--m-kurz) ease, border-color var(--m-kurz) ease; }
+.btn-primary { background: var(--akzent); color: var(--auf-akzent); }
+.btn-primary:hover { background: var(--akzent-tief); }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--linie-stark); }
+.btn-ghost:hover { color: var(--akzent-text); border-color: var(--akzent-text); }
+.btn-ghost--tint { color: var(--auf-tint); border-color: var(--auf-tint-leise); }
+.btn-ghost--tint:hover { color: var(--auf-tint); border-color: var(--auf-tint); }
+.btn-klein { min-height: var(--s-5); padding: var(--s-halb) var(--s-2); font-size: var(--t-klein); }
+.btn-block { width: 100%; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.mini-add { display: inline-flex; align-items: center; justify-content: center; width: var(--s-5); height: var(--s-5); flex: none;
+  border: 1px solid var(--linie-stark); border-radius: var(--r-knopf); background: transparent; color: var(--akzent-text); cursor: pointer;
+  transition: background-color var(--m-kurz) ease, color var(--m-kurz) ease, border-color var(--m-kurz) ease; }
+.mini-add:hover { background: var(--akzent); color: var(--auf-akzent); border-color: var(--akzent); }
+
+/* Herkunft eines Bildes (eigenes Foto / KI-generiert / Platzhalter) */
+figure { position: relative; }
+.herkunft { position: absolute; left: var(--s-2); bottom: var(--s-2); font-size: var(--t-klein); font-weight: var(--f-text-stark);
+  line-height: 1.3; padding: 0 var(--s-1); border-radius: var(--r-klein); background: var(--tint); color: var(--auf-tint); }
+.herkunft--eigen { display: none; }
+
+/* Kopfzeile */
+.entwurf-hinweis { background: var(--tint); color: var(--auf-tint); font-size: var(--t-klein); text-align: center; padding: var(--s-1) var(--s-2); }
+.kopfzeile { position: relative; z-index: 40; background: var(--grund); border-bottom: 1px solid var(--linie); }
+.kopfzeile--fest { position: sticky; top: 0; }
+.kopfzeile-innen { display: flex; align-items: center; gap: var(--s-4); min-height: var(--s-10); }
+.marke-name { margin-right: auto; font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform);
+  letter-spacing: var(--f-display-sperrung); font-size: var(--t-gross); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kopf-nav { display: none; gap: var(--s-4); }
+.kopf-nav a { text-decoration: none; color: var(--text-leise); }
+.kopf-nav a:hover { color: var(--text); }
+.kopf-aktion { display: none; }
+@media (min-width: 1024px) { .kopf-nav { display: flex; } }
+@media (min-width: 768px) { .kopf-aktion { display: inline-flex; } }
+
+/* Hero – gemeinsame Teile */
+.hero { position: relative; }
+.hero-bild { overflow: hidden; background: var(--flaeche-tief); border-radius: var(--r-bild); }
+.hero-bild img, .hero-bild video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hero h1 { font-size: var(--t-h1); }
+.hero-claim { margin-top: var(--s-3); font-size: var(--t-gross); color: var(--text-leise); max-width: 44ch; }
+.hero-aktionen { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-5); }
+.bewertung { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s-1); margin-top: var(--s-3); font-size: var(--t-klein); color: var(--text-leise); }
+.bewertung strong { color: var(--text); }
+.sterne { display: inline-flex; gap: var(--s-halb); color: var(--signal); }
+.bewertung--tint { color: var(--auf-tint-leise); }
+.bewertung--tint strong { color: var(--auf-tint); }
+.bewertung--tint .sterne { color: var(--signal-auf-tint); }
+
+/* spalte-bild: Textspalte links auf dem Grund, Bild randabfallend rechts */
+.hero--spalte-bild { display: grid; grid-template-columns: 5fr 7fr; min-height: 80vh; }
+.hero--spalte-bild .hero-text { align-self: end; padding: var(--s-12) var(--s-8) var(--s-10) max(var(--rand), calc((100vw - var(--max-breite)) / 2 + var(--rand))); }
+.hero--spalte-bild .hero-bild { border-radius: 0; }
+
+/* tafel: Vollbild, deckende Tafel unten links */
+.hero--tafel { min-height: 88vh; display: grid; align-items: end; }
+.hero--tafel > .hero-bild { position: absolute; inset: 0; border-radius: 0; }
+.hero-tafel-rahmen { position: relative; padding-block: var(--s-8); }
+.hero-tafel { max-width: 36rem; background: var(--tint); color: var(--auf-tint); padding: var(--s-6); border-radius: var(--r-karte); }
+.hero-tafel h1 { color: var(--auf-tint); }
+.hero-tafel .hero-claim { color: var(--auf-tint-leise); }
+
+/* karte: Name links, Tagesempfehlung als Menütafel rechts */
+.hero-karte-raster { display: grid; grid-template-columns: 7fr 5fr; gap: var(--s-10); align-items: center; padding-block: var(--s-12); }
+.hero-menue { background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--r-karte); padding: var(--s-5); box-shadow: var(--schatten-karte); }
+.hero-menue ol { list-style: none; margin: 0; padding: 0; }
+.hero-menue li { display: flex; align-items: baseline; gap: var(--s-2); padding-block: var(--s-2); border-bottom: 1px solid var(--linie); }
+.hero-einschub { margin-top: var(--s-4); aspect-ratio: 16 / 9; }
+.menue-punkte { flex: 1; min-width: var(--s-2); border-bottom: 1px dotted var(--linie-stark); transform: translateY(-.3em); }
+.menue-preis, .preis { font-family: var(--f-label); font-weight: var(--f-text-stark); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* typo: übergroßer Name, darunter ein Bildband */
+.hero-kopf { padding-block: var(--s-12) var(--s-6); }
+.hero-name { font-size: var(--t-display); line-height: .95; max-width: 16ch; }
+.hero--typo .hero-name { font-size: var(--t-display); }
+.hero-zeile { display: grid; grid-template-columns: 5fr 4fr 3fr; gap: var(--s-4); align-items: end; margin-top: var(--s-6); padding-top: var(--s-3); border-top: 1px solid var(--linie); }
+.hero-zeile .hero-claim, .hero-zeile .bewertung, .hero-zeile .hero-aktionen { margin-top: 0; }
+.hero-zeile .hero-aktionen { justify-content: flex-end; }
+.hero-band { aspect-ratio: 21 / 9; border-radius: 0; }
+
+/* passepartout: Bild im Rahmen, Text überlappt versetzt */
+.hero--passepartout { background: var(--flaeche-tief); padding-block: var(--s-8) var(--s-12); }
+.hero-passepartout-raster { display: grid; grid-template-columns: repeat(12, 1fr); align-items: end; }
+.hero-rahmen { grid-column: 1 / 9; grid-row: 1; aspect-ratio: 4 / 3; }
+.hero-text--versetzt { grid-column: 7 / 13; grid-row: 1; position: relative; background: var(--grund); padding: var(--s-6); margin-bottom: calc(var(--s-8) * -1); border-radius: var(--r-karte); }
+
+/* streifen: Text oben, drei ungleiche Bilder */
+.hero--streifen { padding-block: var(--s-10) var(--s-6); }
+.hero-text--breit { display: grid; grid-template-columns: 7fr 5fr; column-gap: var(--s-6); align-items: end; margin-bottom: var(--s-6); }
+.hero-text--breit .rubrik, .hero-text--breit h1 { grid-column: 1; }
+.hero-text--breit .hero-claim, .hero-text--breit .bewertung, .hero-text--breit .hero-aktionen { grid-column: 2; }
+.hero-streifen { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--s-2); height: 48vh; }
+
+/* Leiste unter dem Hero */
+.leiste { border-block: 1px solid var(--linie); background: var(--grund); }
+.leiste-liste { list-style: none; margin-block: 0; display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); padding-block: var(--s-3); font-size: var(--t-klein); color: var(--text-leise); }
+.leiste-liste li { display: inline-flex; align-items: center; gap: var(--s-1); }
+.leiste-liste .ikon { color: var(--akzent-text); }
+.leiste-note { color: var(--text); }
+.leiste-note .ikon-stern { color: var(--signal); }
+.leiste-hinweis { margin-left: auto; }
+
+/* Highlights */
+.gericht { display: flex; flex-direction: column; background: var(--flaeche); border-radius: var(--r-karte); overflow: hidden; box-shadow: var(--schatten-karte); }
+.gericht-bild { aspect-ratio: 4 / 3; overflow: hidden; background: var(--flaeche-tief); }
+.gericht-bild img { width: 100%; height: 100%; object-fit: cover; }
+.gericht-text { display: flex; flex-direction: column; gap: var(--s-1); padding: var(--s-3); flex: 1; }
+.gericht-kat { font-size: var(--t-klein); color: var(--text-leise); }
+.gericht-desc { color: var(--text-leise); }
+.gericht-fuss { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s-2); margin-top: auto; padding-top: var(--s-2); }
+.gericht-fuss .preis { margin-right: auto; font-size: var(--t-gross); }
+.siegel { display: flex; align-items: center; font-size: var(--t-klein); font-weight: var(--f-text-stark); color: var(--signal-text); }
+.rang { font-family: var(--f-label); font-size: var(--t-klein); color: var(--akzent-text); }
+
+.treppe { display: grid; grid-template-columns: 7fr 5fr; gap: var(--rinne); align-items: start; }
+.gericht--haupt h3 { font-size: var(--t-h2); }
+.gericht--haupt .gericht-bild { aspect-ratio: 5 / 4; }
+.treppe-rest { display: grid; gap: var(--rinne); padding-top: var(--s-12); }
+.gericht--neben { flex-direction: row; }
+.gericht--neben .gericht-bild { width: 40%; aspect-ratio: auto; }
+
+.leseliste { display: grid; grid-template-columns: 5fr 7fr; gap: var(--s-8); align-items: start; }
+.leseliste-zeilen { list-style: none; margin: 0; padding: 0; }
+.leseliste-zeilen li { padding-block: var(--s-3); border-bottom: 1px solid var(--linie); }
+.leseliste-zeilen li:first-child { border-top: 1px solid var(--linie); }
+.zeile-kopf { display: flex; align-items: baseline; gap: var(--s-2); min-width: 0; }
+.zeile-kopf .karten-name, .zeile-kopf h3 { min-width: 0; overflow-wrap: anywhere; }
+.tafel-kategorie > *, .karte-liste > *, .karte-spalten > *, .leseliste > *, .treppe > *, .haus-raster > *, .stimmen > *, .reservierung-raster > *, .kontakt-raster > * { min-width: 0; }
+.zeile-kopf h3 { font-size: var(--t-gross); }
+
+.reihe { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-2); }
+.gericht--breit { grid-column: span 2; }
+.gericht--reihe .gericht-text { padding: var(--s-2); }
+.reihe--4 .gericht--breit { grid-column: span 1; }
+.reihe--4 { grid-template-columns: 3fr 2fr 4fr 3fr; }
+
+.ablauf { list-style: none; margin: var(--s-8) 0 0; padding: var(--s-3) 0 0; display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-6); border-top: 1px solid var(--linie); color: var(--text-leise); }
+.ablauf li { display: flex; gap: var(--s-1); align-items: baseline; }
+.ablauf strong { color: var(--text); font-weight: var(--f-text-stark); }
+.ablauf-n { font-family: var(--f-label); color: var(--akzent-text); }
+
+/* Speisekarte */
+.karten-liste { list-style: none; margin: 0; padding: 0; }
+.karten-zeile { padding-block: var(--s-2); border-bottom: 1px solid var(--linie); }
+.karten-name { font-weight: var(--f-text-stark); }
+.karten-zeile .gericht-desc { margin-top: var(--s-halb); padding-right: var(--s-6); }
+.karte-tafel { display: grid; gap: var(--s-8); }
+.tafel-kategorie { display: grid; grid-template-columns: 4fr 8fr; gap: var(--rinne); align-items: start; }
+.tafel-name { position: sticky; top: var(--s-12); font-size: var(--t-h3); }
+.karte-spalten { columns: 2; column-gap: var(--s-8); }
+.karten-kategorie { break-inside: avoid; margin-bottom: var(--s-6); }
+.karten-kategorie h3 { font-size: var(--t-h3); margin-bottom: var(--s-2); }
+.karten-kategorie .anzahl { font-family: var(--f-text); font-size: var(--t-klein); font-weight: 400; color: var(--text-leise); text-transform: none; letter-spacing: 0; }
+.karten-sprung { display: flex; flex-wrap: wrap; gap: var(--s-1); margin-bottom: var(--s-6); }
+.karten-sprung a { text-decoration: none; padding: var(--s-halb) var(--s-2); border: 1px solid var(--linie-stark); border-radius: var(--r-knopf); font-size: var(--t-klein); }
+.karten-sprung a:hover { border-color: var(--akzent-text); color: var(--akzent-text); }
+.karte-liste { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s-4) var(--s-8); }
+
+/* Haus */
+.haus-raster { display: grid; grid-template-columns: 4fr 8fr; gap: var(--s-8); align-items: start; }
+.haus-text { position: sticky; top: var(--s-12); }
+.haus-fotos { display: grid; grid-template-columns: 3fr 2fr; grid-template-rows: auto auto; gap: var(--s-2); }
+.haus-foto { display: flex; flex-direction: column; gap: var(--s-1); }
+.haus-foto img { width: 100%; object-fit: cover; border-radius: var(--r-bild); background: var(--flaeche-tief); }
+.haus-foto--hoch { grid-row: span 2; }
+.haus-foto--hoch img { aspect-ratio: 3 / 4; }
+.haus-foto--quer img, .haus-foto--klein img { aspect-ratio: 4 / 3; }
+.haus-foto figcaption { font-size: var(--t-klein); color: var(--text-leise); }
+.haus-foto figcaption strong { display: block; color: var(--text); font-family: var(--f-display); font-weight: var(--f-display-gewicht); font-size: var(--t-basis); }
+.haus-foto .herkunft { top: var(--s-2); bottom: auto; }
+.haus-foto--hoch img { height: 100%; }
+
+/* Stimmen */
+.stimmen { display: grid; grid-template-columns: 4fr 8fr; gap: var(--s-8); align-items: start; }
+.stimmen-note { display: flex; flex-direction: column; gap: var(--s-1); margin-top: var(--s-4); color: var(--text-leise); font-size: var(--t-klein); }
+.note-zahl { font-family: var(--f-display); font-size: var(--t-h1); line-height: 1; color: var(--text); }
+.stimmen-liste { list-style: none; margin: 0; padding: 0; }
+.stimme { padding-block: var(--s-4); border-bottom: 1px solid var(--linie); }
+.stimme blockquote { margin: 0; font-size: var(--t-gross); }
+.stimme--gross blockquote { font-family: var(--f-display); font-size: var(--t-h3); line-height: 1.3; }
+.stimme-quelle { margin-top: var(--s-1); font-size: var(--t-klein); color: var(--text-leise); }
+.stimme-titel { font-family: var(--f-display); font-size: var(--t-gross); }
+.stimme--platzhalter { color: var(--text-leise); }
+.stimmen--zeilen { grid-template-columns: 1fr; }
+
+/* Reservierung */
+.reservierung-raster { display: grid; grid-template-columns: 5fr 7fr; gap: var(--s-8); align-items: start; }
+.pluspunkte { list-style: none; margin: var(--s-4) 0 0; padding: 0; }
+.pluspunkte li { display: flex; gap: var(--s-2); padding-block: var(--s-1); color: var(--text-leise); }
+.pluspunkte .ikon { color: var(--akzent-text); }
+.formular { background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--r-karte); padding: var(--s-5); }
+.reservierung--betont .formular { box-shadow: var(--schatten-schwebend); }
+.formular-absenden { margin-top: var(--s-3); }
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3) var(--s-2); }
+.field-grid--eins { grid-template-columns: 1fr; }
+.field { display: flex; flex-direction: column; gap: var(--s-1); }
+.field-wide { grid-column: 1 / -1; }
+label { font-size: var(--t-klein); font-weight: var(--f-text-stark); color: var(--text); }
+.hint { font-size: var(--t-klein); font-weight: 400; color: var(--text-leise); }
+input, select, textarea { width: 100%; font-family: var(--f-text); font-size: var(--t-basis); color: var(--text); background: var(--grund);
+  border: 1px solid var(--linie-stark); border-radius: var(--r-knopf); padding: var(--s-1) var(--s-2); min-height: var(--s-6);
+  transition: border-color var(--m-kurz) ease; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--akzent-text); outline-offset: 0; border-color: var(--akzent-text); }
+textarea { min-height: var(--s-12); resize: vertical; }
+.error { display: none; font-size: var(--t-klein); color: var(--fehler); }
+.field.invalid .error { display: block; }
+.field.invalid input, .field.invalid select { border-color: var(--fehler); }
+#ord-noshow-feld { margin-top: var(--s-2); }
+.noshow-label { display: flex; gap: var(--s-1); align-items: flex-start; font-weight: 400; }
+.noshow-label input { width: auto; min-height: 0; margin-top: var(--s-halb); }
+
+/* Kontakt */
+.kontakt-raster { display: grid; grid-template-columns: 7fr 5fr; gap: var(--s-8); align-items: start; }
+.kontakt-titel { font-size: var(--t-h2); }
+.kontakt-ort { display: block; font-family: var(--f-text); font-size: var(--t-gross); font-weight: 400; color: var(--text-leise); text-transform: none; letter-spacing: 0; margin-top: var(--s-1); }
+.kontakt-liste { list-style: none; margin: var(--s-4) 0 0; padding: 0; }
+.kontakt-liste li { display: flex; gap: var(--s-2); padding-block: var(--s-2); border-bottom: 1px solid var(--linie); }
+.kontakt-liste .k { color: var(--akzent-text); }
+.kontakt-liste a { color: var(--akzent-text); }
+.zeiten h3 { font-size: var(--t-gross); margin-bottom: var(--s-2); }
+.zeiten-zeile { display: flex; justify-content: space-between; gap: var(--s-3); padding-block: var(--s-1); border-bottom: 1px solid var(--linie); }
+.zeiten-zeile span:first-child { color: var(--text-leise); }
+
+/* Fußzeile */
+.fuss { background: var(--tint); color: var(--auf-tint-leise); padding-block: var(--s-10) var(--s-6); font-size: var(--t-klein); }
+.fuss-raster { display: grid; grid-template-columns: 5fr 3fr 4fr; gap: var(--s-4); }
+.fuss strong { display: flex; align-items: center; color: var(--auf-tint); font-family: var(--f-display); font-weight: var(--f-display-gewicht); font-size: var(--t-gross); }
+.fuss-haus p { margin-top: var(--s-1); }
+.fuss-nav, .fuss-kontakt { display: flex; flex-direction: column; gap: var(--s-1); }
+.fuss a { color: var(--auf-tint-leise); text-decoration: none; }
+.fuss a:hover { color: var(--auf-tint); }
+.fuss-hinweis { grid-column: 1 / -1; margin-top: var(--s-4); padding-top: var(--s-3); border-top: 1px solid var(--auf-tint-leise); max-width: 72ch; }
+
+/* Bestellweg: Warenkorb-Knopf, Aktionsleiste, Drawer, Bestätigung */
+.cart-fab { position: fixed; right: var(--s-3); bottom: var(--s-3); z-index: 50; display: none; align-items: center; gap: var(--s-2);
+  padding: var(--s-2) var(--s-3); border: 0; border-radius: var(--r-knopf); background: var(--akzent); color: var(--auf-akzent);
+  font-family: var(--f-text); font-weight: var(--f-text-stark); cursor: pointer; box-shadow: var(--schatten-schwebend); }
+.cart-fab.visible { display: inline-flex; }
+.cart-count { font-variant-numeric: tabular-nums; }
+.mobilebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-1);
+  padding: var(--s-1) var(--s-2); background: var(--flaeche); border-top: 1px solid var(--linie); }
+@media (min-width: 1024px) { .mobilebar { display: none; } }
+@media (max-width: 1023px) { .cart-fab, .cart-fab.visible { display: none; } body { padding-bottom: var(--s-8); } }
+.overlay { position: fixed; inset: 0; z-index: 60; background: var(--tint); opacity: 0; pointer-events: none; transition: opacity var(--m-mittel) ease; }
+.overlay.open { opacity: .6; pointer-events: auto; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 70; width: min(30rem, 100%); background: var(--grund); display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform var(--m-mittel) var(--m-kurve); }
+.drawer.open { transform: none; }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; padding: var(--s-3); border-bottom: 1px solid var(--linie); }
+.drawer-head h3 { font-size: var(--t-h3); }
+.icon-btn { border: 0; background: transparent; color: var(--text-leise); font-size: var(--t-h3); line-height: 1; cursor: pointer; padding: var(--s-halb) var(--s-1); }
+.drawer-body { flex: 1; overflow-y: auto; padding: var(--s-3); }
+.drawer-foot { margin: var(--s-3) calc(var(--s-3) * -1) calc(var(--s-3) * -1); padding: var(--s-3); background: var(--flaeche); border-top: 1px solid var(--linie); }
+.drawer-hinweis { margin-top: var(--s-1); text-align: center; }
+.totals { display: flex; justify-content: space-between; margin-bottom: var(--s-2); font-family: var(--f-display); font-size: var(--t-h3); }
+.cart-line { display: flex; align-items: center; gap: var(--s-2); padding-block: var(--s-2); border-bottom: 1px solid var(--linie); }
+.cart-line-body { flex: 1; min-width: 0; }
+.cart-line-name { font-weight: var(--f-text-stark); }
+.cart-line-price { font-size: var(--t-klein); color: var(--text-leise); }
+.qty { display: flex; align-items: center; gap: var(--s-halb); }
+.qty button { width: var(--s-4); height: var(--s-4); border: 1px solid var(--linie-stark); border-radius: var(--r-klein); background: var(--flaeche); color: var(--akzent-text); cursor: pointer; }
+.qty span { min-width: var(--s-3); text-align: center; font-weight: var(--f-text-stark); }
+.cart-empty { text-align: center; color: var(--text-leise); padding: var(--s-5) var(--s-1); }
+.confirm-box { position: fixed; z-index: 80; left: 50%; top: 50%; width: min(30rem, calc(100% - var(--s-4))); max-height: 86vh; overflow-y: auto;
+  transform: translate(-50%, -46%); opacity: 0; pointer-events: none; background: var(--flaeche); border: 1px solid var(--linie);
+  border-radius: var(--r-karte); padding: var(--s-5) var(--s-4); text-align: center; transition: opacity var(--m-mittel) ease, transform var(--m-mittel) var(--m-kurve); }
+.confirm-box.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+.confirm-icon { display: grid; place-items: center; width: var(--s-8); height: var(--s-8); margin: 0 auto var(--s-2); border-radius: var(--r-marke); background: var(--akzent); color: var(--auf-akzent); }
+.confirm-icon svg { width: var(--s-4); height: var(--s-4); }
+.confirm-icon .ci-fehler { display: none; }
+.confirm-box.hat-fehler .confirm-icon { background: var(--fehler); color: var(--flaeche); }
+.confirm-box.hat-fehler .ci-ok { display: none; }
+.confirm-box.hat-fehler .ci-fehler { display: grid; }
+.confirm-box.hat-fehler .confirm-summary { display: none; }
+.confirm-box h3 { font-size: var(--t-h3); margin-bottom: var(--s-1); }
+.confirm-summary { margin: var(--s-3) 0; padding: var(--s-2); text-align: left; background: var(--flaeche-tief); border-radius: var(--r-klein); }
+.confirm-summary div { display: flex; justify-content: space-between; gap: var(--s-2); }
+.confirm-summary .label { color: var(--text-leise); }
+#confirm-close { margin-top: var(--s-2); }
+.demo-note { margin-top: var(--s-2); font-size: var(--t-klein); color: var(--text-leise); }
+
+/* Abend: die Reservierung ist der eine starke Moment */
+.a-abend .reservierung--betont { background: var(--flaeche); border-block: 1px solid var(--linie); }
+.a-abend .reservierung--betont h2 { font-size: var(--t-h1); }
+
+/* Mobil */
+@media (max-width: 1023px) {
+  .hero--spalte-bild, .hero-karte-raster, .treppe, .leseliste, .haus-raster, .stimmen, .reservierung-raster, .kontakt-raster, .tafel-kategorie { grid-template-columns: minmax(0, 1fr); }
+  .hero--spalte-bild .hero-bild { order: -1; aspect-ratio: 4 / 3; }
+  .hero--spalte-bild .hero-text { padding: var(--s-5) var(--rand) var(--s-8); }
+  .hero-zeile, .hero-text--breit { grid-template-columns: 1fr; row-gap: var(--s-2); }
+  .hero-text--breit .hero-claim, .hero-text--breit .bewertung, .hero-text--breit .hero-aktionen { grid-column: 1; }
+  .hero-zeile .hero-aktionen { justify-content: flex-start; }
+  .hero-passepartout-raster { display: block; }
+  .hero-text--versetzt { margin: calc(var(--s-5) * -1) var(--s-2) 0; }
+  .treppe-rest { padding-top: 0; }
+  .haus-text, .tafel-name { position: static; }
+  .reihe, .reihe--4 { grid-template-columns: 1fr 1fr; }
+  .gericht--breit { grid-column: span 2; }
+  .reihe--4 .gericht--breit { grid-column: span 2; }
+  .karte-spalten { columns: 1; }
+  .karte-liste { grid-template-columns: 1fr; }
+  .sektion-kopf--seitlich { grid-template-columns: 1fr; gap: 0; }
+  .fuss-raster { grid-template-columns: 1fr; }
+}
+@media (max-width: 767px) {
+  .hero--tafel { min-height: 0; display: block; }
+  .hero--tafel > .hero-bild { position: relative; aspect-ratio: 4 / 5; }
+  .hero-tafel-rahmen { padding: 0; }
+  .hero-tafel { max-width: none; border-radius: 0; }
+  .hero-streifen { grid-template-columns: 1fr 1fr; height: auto; }
+  .hero-streifen .s-gross { grid-column: 1 / -1; aspect-ratio: 4 / 3; }
+  .hero-streifen .s-mittel, .hero-streifen .s-klein { aspect-ratio: 1; }
+  .gericht--neben { flex-direction: column; }
+  .gericht--neben .gericht-bild { width: 100%; aspect-ratio: 4 / 3; }
+  .field-grid { grid-template-columns: 1fr; }
+  .haus-fotos { grid-template-columns: 1fr 1fr; }
+  .haus-foto--hoch { grid-column: 1 / -1; grid-row: auto; }
+  .haus-foto--hoch img { aspect-ratio: 4 / 3; }
+  .leiste-hinweis { margin-left: 0; }
+}
+
+
+@media (prefers-reduced-motion: no-preference) {
+  .bewegt .auftritt { opacity: 0; transform: translateY(var(--m-weg));
+    transition: opacity var(--m-lang) var(--m-kurve), transform var(--m-lang) var(--m-kurve);
+    transition-delay: calc(var(--takt, 0) * var(--m-versatz)); }
+  .bewegt .auftritt.da { opacity: 1; transform: none; }
+
+  /* Betonter Moment "hero": das Titelbild setzt sich einmal, langsam. */
+  .moment-hero .hero-bild img { animation: v2-setzen calc(var(--m-lang) * 3) var(--m-kurve) both; }
+  @keyframes v2-setzen { from { transform: scale(1.04); } to { transform: none; } }
+
+  /* Betonter Moment "reservierung": das Formular hebt sich als Letztes. */
+  .moment-reservierung.bewegt .reservierung--betont .formular.auftritt { transform: translateY(calc(var(--m-weg) * 3)); }
+  .moment-reservierung.bewegt .reservierung--betont .formular.auftritt.da { transform: none; }
+
+  /* Betonter Moment "highlights": die Reihe tritt schnell nacheinander auf. */
+  .moment-highlights.bewegt #highlights .auftritt { transition-delay: calc(var(--takt, 0) * var(--m-versatz) / 2); }
+
+  .gericht-bild img, .haus-foto img { transition: transform var(--m-lang) var(--m-kurve); }
+  @media (hover: hover) {
+    .gericht:hover .gericht-bild img { transform: scale(1.03); }
+  }
+}
+
+
+/* Bilder aus dem Bildplan: eigener Ausschnitt je Viewport, Fokuspunkt */
+.bp { display: block; aspect-ratio: var(--ar-d); overflow: hidden; background: var(--flaeche-tief); }
+.bp img { width: 100%; height: 100%; object-fit: cover; object-position: var(--fx) var(--fy); }
+@media (max-width: 767px) { .bp { aspect-ratio: var(--ar-m); } }
+
+.k-entwurf { display: inline-block; vertical-align: middle; font-family: var(--f-text); font-size: var(--t-klein); font-weight: var(--f-text-stark);
+  letter-spacing: .02em; line-height: 1.3; padding: 0 var(--s-1); border: 1px dashed var(--signal-text); color: var(--signal-text); border-radius: var(--r-klein); }
+.k-kopf { max-width: var(--text-breite); margin-bottom: var(--s-6); }
+.k-kopf .intro { margin-top: var(--s-2); }
+.abschnitt-text h2, .k-text-titel h2 { font-family: var(--f-text); font-weight: var(--f-text-stark); text-transform: none; letter-spacing: 0; }
+
+/* Datumsfeld: Fokus auf dem Kalender-Knopf im Feld sichtbar machen */
+input[type="date"]:focus-within { outline: 2px solid var(--akzent-text); outline-offset: 0; }
+
+/* Kopfzeile: mobile Navigation ohne Skript. Der Name bricht um statt abgeschnitten zu werden. */
+@media (max-width: 1023px) {
+  .k-fuss .fuss-nav a, .k-fuss .fuss-kontakt a { display: flex; align-items: center; min-height: var(--s-5); }
+  .k-kopfzeile .marke-name { display: inline-flex; align-items: center; min-height: var(--s-5); white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.15; font-size: var(--t-basis); }
+}
+.k-menue { display: none; position: relative; }
+.k-menue summary { list-style: none; cursor: pointer; min-height: var(--s-5); display: inline-flex; align-items: center; padding: var(--s-halb) var(--s-2);
+  border: 1px solid var(--linie-stark); border-radius: var(--r-knopf); font-weight: var(--f-text-stark); }
+.k-menue summary::-webkit-details-marker { display: none; }
+.k-menue[open] summary { border-color: var(--akzent-text); color: var(--akzent-text); }
+.k-menue-liste { position: absolute; right: 0; top: calc(100% + var(--s-1)); z-index: 45; display: flex; flex-direction: column; gap: var(--s-halb);
+  min-width: 16rem; padding: var(--s-2); background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--r-karte); box-shadow: var(--schatten-schwebend); }
+.k-menue-liste a:not(.btn) { display: flex; align-items: center; min-height: var(--s-6); padding-inline: var(--s-1); text-decoration: none; }
+.k-menue-liste .btn { margin-top: var(--s-1); }
+@media (max-width: 1023px) { .k-menue { display: block; } }
+
+/* Aktionsleiste mobil: erst sichtbar, wenn die Hero-Knöpfe aus dem Blick sind */
+.k-leiste { transition: transform var(--m-mittel) var(--m-kurve); }
+.k-leiste-bereit .k-leiste { transform: translateY(100%); }
+.k-leiste-bereit .k-leiste.k-leiste--da { transform: none; }
+.k-leiste:has(> :only-child) { grid-template-columns: 1fr; }
+@media (prefers-reduced-motion: reduce) { .k-leiste { transition: none; } }
+
+/* Hero: Titelblatt einer gedruckten Karte */
+.k-hero--karte { padding-block: var(--s-6) var(--s-10); }
+.k-titelblatt { display: grid; grid-template-columns: 7fr 5fr; gap: var(--s-8); align-items: center; padding: var(--s-8);
+  background: var(--flaeche); border: 1px solid var(--linie-stark); outline: 1px solid var(--linie); outline-offset: calc(var(--s-1) * -1); }
+.k-titel-text h1 { font-size: var(--t-display); line-height: .95; }
+.k-titel-foto { position: relative; transform: rotate(1deg); box-shadow: var(--schatten-karte); }
+.k-titel-foto .bp { --ar-d: 4 / 5; }
+.k-titel-foto .herkunft, .k-tages-foto .herkunft, .k-werkbank-foto .herkunft, .k-wand-foto .herkunft, .k-noren-bild .herkunft { top: var(--s-2); bottom: auto; }
+
+/* Signatur Tageskarte: eingesteckter Zettel */
+.k-sig--tageskarte { padding-top: 0; }
+.k-tageskarte { display: grid; grid-template-columns: 5fr 7fr; align-items: center; }
+.k-tages-foto { position: relative; grid-column: 1; grid-row: 1; }
+.k-zettel { grid-column: 1 / -1; grid-row: 1; justify-self: end; width: min(100%, 40rem); position: relative; z-index: 1;
+  background: var(--grund); border: 1px solid var(--linie-stark); padding: var(--s-6); box-shadow: var(--schatten-schwebend); transform: rotate(-1.5deg); }
+.k-zettel h2 { font-style: italic; }
+.k-zettel-liste { list-style: none; margin: var(--s-4) 0 0; padding: 0; }
+.k-zettel-liste li { display: grid; grid-template-columns: var(--s-5) 1fr auto auto; gap: var(--s-2); align-items: baseline; padding-block: var(--s-2); border-top: 1px solid var(--linie); }
+.k-nr { font-family: var(--f-display); font-style: italic; font-size: var(--t-h3); color: var(--akzent-text); line-height: 1; }
+.k-zettel-gericht { display: flex; flex-direction: column; }
+.k-zettel-gericht strong { font-family: var(--f-display); font-weight: var(--f-display-gewicht); font-size: var(--t-gross); }
+.k-zettel-gericht span { color: var(--text-leise); }
+.k-zettel-fuss { margin-top: var(--s-3); font-size: var(--t-klein); color: var(--text-leise); }
+@media (prefers-reduced-motion: no-preference) {
+  .bewegt .k-zettel.auftritt { transform: rotate(0deg) translateY(var(--m-weg)); }
+  .bewegt .k-zettel.auftritt.da { transform: rotate(-1.5deg); }
+}
+
+/* Hero: Noren – Vorhang vor dem Tresenfoto */
+.k-hero--noren { position: relative; background: var(--grund); }
+.k-noren-bild { position: relative; }
+.k-noren-bild .bp { max-height: 72vh; width: 100%; }
+.k-noren { position: absolute; left: 50%; top: 0; width: min(100% - var(--s-4), 56rem); transform: translateX(-50%); height: 34%; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-1); pointer-events: none; }
+.k-noren span { background: var(--akzent); border-radius: 0 0 var(--r-klein) var(--r-klein); }
+.k-noren-kopf { position: absolute; left: 0; right: 0; top: 0; height: 34%; display: grid; place-items: center; pointer-events: none; }
+.k-noren-bild .herkunft { top: auto; bottom: var(--s-2); }
+.k-noren-kopf h1 { color: var(--auf-akzent); font-size: var(--t-display); line-height: .9; text-align: center; }
+.k-noren-fuss { background: var(--flaeche); border-bottom: 1px solid var(--linie); }
+.k-noren-zeile { display: grid; grid-template-columns: 3fr 2fr 4fr auto; gap: var(--s-4); align-items: center; padding-block: var(--s-4); }
+.k-noren-zeile .rubrik, .k-noren-zeile .hero-claim, .k-noren-zeile .hero-aktionen { margin: 0; }
+.k-noren-ab { font-family: var(--f-display); font-size: var(--t-h2); line-height: 1; text-transform: var(--f-display-transform); color: var(--akzent-text); }
+
+/* Signatur Zettelwand */
+.k-sig--zettelwand { background: var(--flaeche-tief); }
+.k-sig--zettelwand h2, .k-karte--kompakt h2, .k-ambiente h2 { font-family: var(--f-text); font-weight: var(--f-text-stark); text-transform: none; letter-spacing: 0; }
+.k-wand { display: grid; grid-template-columns: 8fr 4fr; gap: var(--s-6); align-items: start; }
+.k-zettelreihe { list-style: none; margin: 0; padding: var(--s-3) 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-2); border-top: 2px solid var(--linie-stark); }
+.k-zettelchen { position: relative; display: flex; flex-direction: column; gap: var(--s-1); min-height: calc(var(--s-16) * 2); padding: var(--s-2);
+  background: var(--text); color: var(--grund); border-top: var(--s-1) solid var(--akzent); }
+.k-zettelchen:nth-child(3n+2) { transform: translateY(var(--s-2)); }
+.k-zettelchen:nth-child(3n) { transform: translateY(var(--s-1)); }
+.k-zettelchen h3 { font-family: var(--f-text); font-weight: var(--f-text-stark); font-size: var(--t-basis); text-transform: none; letter-spacing: 0; line-height: 1.25; }
+.k-zettelchen p { font-size: var(--t-klein); opacity: .85; }
+.k-zettelchen-fuss { margin-top: auto; display: flex; align-items: end; justify-content: space-between; gap: var(--s-1); }
+.k-zettel-preis { font-family: var(--f-display); font-size: var(--t-h3); line-height: 1; text-transform: var(--f-display-transform); white-space: nowrap; }
+.k-zettelchen .mini-add { color: var(--grund); border-color: var(--grund); }
+.k-zettelchen .mini-add:hover { background: var(--grund); color: var(--text); }
+.k-wand-foto { position: relative; }
+
+/* Hero: Aushang (typografisch) */
+.k-hero--aushang { background: var(--flaeche-tief); border-bottom: 1px solid var(--linie); }
+.k-aushang { display: flex; flex-direction: column; align-items: center; text-align: center; padding-block: var(--s-12) var(--s-10); }
+.k-blatt { width: var(--s-8); height: var(--s-8); color: var(--akzent-text); margin-bottom: var(--s-3); }
+.k-schild { font-size: var(--t-display); line-height: 1; max-width: 14ch; padding-block: var(--s-3); border-block: 2px solid var(--text); margin-top: var(--s-2); }
+.k-aushang-adresse { margin-top: var(--s-4); font-size: var(--t-gross); }
+.k-aushang-tel { margin-top: var(--s-1); font-family: var(--f-display); font-size: var(--t-h3); }
+.k-aushang-tel a { text-decoration: none; }
+.k-hero--aushang .hero-aktionen { justify-content: center; }
+
+/* Hero: Werkbank (Café) */
+.k-hero--werkbank { padding-block: var(--s-8) var(--s-10); }
+.k-werkbank { display: grid; grid-template-columns: 7fr 5fr; gap: var(--s-8); align-items: end; }
+.k-werkbank h1 { font-size: var(--t-display); line-height: .95; }
+.k-werkbank-foto { position: relative; }
+.k-werkbank-foto .bp { --ar-d: 4 / 5; }
+.k-status { margin-top: var(--s-3); font-family: var(--f-label); font-size: var(--t-gross); padding-left: var(--s-2); border-left: var(--s-halb) solid var(--akzent); }
+
+/* Signatur Wochenplan */
+.k-sig--wochenplan { background: var(--flaeche-tief); }
+.k-plan-liste { list-style: none; margin: 0; padding: 0; font-family: var(--f-label); border-top: 2px solid var(--text); }
+.k-plan-liste li { display: grid; grid-template-columns: 4fr 4fr 4fr; gap: var(--s-2); align-items: center; min-height: var(--s-8); padding-inline: var(--s-2); border-bottom: 1px solid var(--linie-stark); }
+.k-plan-tag { font-weight: 700; }
+.k-plan-marke { display: inline-block; padding: 0 var(--s-1); background: var(--akzent); color: var(--auf-akzent); font-family: var(--f-text); font-weight: var(--f-text-stark); font-size: var(--t-klein); }
+.k-plan-liste li.k-heute { background: var(--flaeche); box-shadow: inset var(--s-halb) 0 0 var(--akzent); }
+.k-plan-liste li.k-heute .k-plan-tag::after { content: " · heute"; font-weight: 400; color: var(--text-leise); }
+
+/* Hero: Bild voll (eigene starke Fotos) */
+.k-bild-voll .bp { max-height: 80vh; width: 100%; }
+.k-bild-text { padding-block: var(--s-6) var(--s-8); }
+
+/* Karte – vier Darstellungen */
+.k-karte-spalten { columns: 2; column-gap: var(--s-10); }
+.k-kategorie { break-inside: avoid; margin-bottom: var(--s-6); }
+.k-kategorie h3 { font-size: var(--t-h3); margin-bottom: var(--s-2); }
+.k-kategorie ul { list-style: none; margin: 0; padding: 0; }
+.k-zeile { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; column-gap: var(--s-2); align-items: baseline; padding-block: var(--s-1); border-bottom: 1px solid var(--linie); }
+.k-zeile-name { font-weight: var(--f-text-stark); min-width: 0; overflow-wrap: anywhere; }
+.k-zeile .preis { font-family: var(--f-text); }
+.k-zeile .mini-add { align-self: center; grid-row: 1 / span 2; grid-column: 3; }
+.k-zeile-desc { grid-column: 1 / 3; color: var(--text-leise); }
+.k-kat-hinweis { margin: calc(var(--s-1) * -1) 0 var(--s-1); font-size: var(--t-klein); color: var(--text-leise); }
+.k-karte--druckkarte .k-kategorie h3 { font-style: italic; text-align: center; padding-bottom: var(--s-1); border-bottom: 1px solid var(--linie-stark); }
+.k-karte--druckkarte .k-kopf { margin-inline: auto; text-align: center; }
+.k-karte--druckkarte .k-kopf .rubrik { justify-content: center; }
+.k-karte--kompakt .k-karte-spalten { columns: 3; column-gap: var(--s-6); }
+.k-karte--kompakt .k-kategorie h3 { font-family: var(--f-text); font-weight: var(--f-text-stark); font-size: var(--t-gross); text-transform: none; letter-spacing: 0; }
+.k-karte--kompakt .k-zeile-desc { font-size: var(--t-klein); }
+.k-karte--muster .k-karte-spalten { columns: 3; column-gap: var(--s-6); }
+.k-muster-hinweis { max-width: var(--text-breite); margin-bottom: var(--s-4); padding: var(--s-2); border: 1px dashed var(--signal-text); color: var(--text); }
+.k-karte--tresen .k-karte-spalten { columns: 3; column-gap: var(--s-6); }
+.k-karte--tresen .k-kategorie:first-child { column-span: all; margin-bottom: var(--s-8); }
+.k-karte--tresen .k-kategorie:first-child ul { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: var(--s-6); }
+.k-gewicht--klein { padding-block: var(--sektion-eng); }
+.k-gewicht--klein h2 { font-size: var(--t-h3); }
+
+/* Haus, Regeln, Abholung, Offene Punkte */
+.k-haus-raster { max-width: calc(var(--text-breite) + var(--s-16)); }
+.k-haus-zitat { font-family: var(--f-display); font-size: var(--t-h2); line-height: 1.15; margin-bottom: var(--s-4); }
+.k-haus-text { font-size: var(--t-gross); color: var(--text-leise); max-width: var(--text-breite); }
+.k-regeln { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+.k-regeln li { font-family: var(--f-display); font-size: var(--t-h3); line-height: 1.2; padding-top: var(--s-2); border-top: 2px solid var(--akzent); text-transform: none; }
+.k-titel-text h2, .k-titel-text .k-regeln li { font-family: var(--f-text); font-weight: var(--f-text-stark); text-transform: none; letter-spacing: 0; }
+.k-abholung-zeile { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s-3); }
+.k-aufklapper > summary { list-style: none; cursor: pointer; }
+.k-aufklapper > summary::-webkit-details-marker { display: none; }
+.k-aufklapper[open] > summary { margin-bottom: var(--s-3); }
+.k-offen { background: var(--flaeche-tief); }
+.k-offen-liste { margin: 0; padding-left: var(--s-3); display: grid; gap: var(--s-1); max-width: var(--text-breite); }
+.k-unbekannt { color: var(--text-leise); }
+.k-kontakt-raster { display: grid; grid-template-columns: 7fr 5fr; gap: var(--s-8); align-items: start; }
+.k-kontakt-raster > * { min-width: 0; }
+
+@media (max-width: 1023px) {
+  .k-titelblatt, .k-werkbank, .k-wand, .k-kontakt-raster { grid-template-columns: minmax(0, 1fr); }
+  .k-titelblatt { padding: var(--s-4); gap: var(--s-4); }
+  .k-titel-foto { order: -1; transform: none; }
+  .k-werkbank-foto { order: -1; }
+  .k-noren-zeile { grid-template-columns: 1fr; gap: var(--s-2); }
+  .k-karte-spalten, .k-karte--kompakt .k-karte-spalten, .k-karte--muster .k-karte-spalten, .k-karte--tresen .k-karte-spalten { columns: 1; }
+  .k-karte--tresen .k-kategorie:first-child ul { grid-template-columns: 1fr; }
+  .k-zettelreihe { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 767px) {
+  .k-tageskarte { grid-template-columns: 1fr; }
+  .k-tages-foto { grid-row: 1; }
+  .k-zettel { grid-row: 2; margin-top: calc(var(--s-6) * -1); width: calc(100% - var(--s-2)); padding: var(--s-4) var(--s-3); }
+  .k-zettel-liste li { grid-template-columns: var(--s-3) 1fr auto; }
+  .k-zettel-liste .mini-add { grid-column: 3; justify-self: end; }
+  .k-noren { height: 30%; }
+  .k-noren-kopf { height: 30%; }
+  .k-noren-bild .bp { max-height: none; }
+  .k-zettelreihe { grid-template-columns: repeat(2, 1fr); }
+  .k-zettelchen:nth-child(3n+2), .k-zettelchen:nth-child(3n) { transform: none; }
+  .k-regeln { grid-template-columns: 1fr; }
+  .k-plan-liste li { grid-template-columns: 5fr 7fr; padding-block: var(--s-1); }
+  .k-plan-notiz { grid-column: 1 / -1; }
+  .k-plan-notiz:empty { display: none; }
+  .k-schild { font-size: var(--t-h1); }
+  .k-titel-text h1, .k-werkbank h1 { font-size: var(--t-h1); }
+}
+
+</style>
+</head>
+<body class="a-traditionell schema-hell rubrik-versal k-hero-aushang k-pilot-gasthaus-alte-linde">
+<div class="entwurf-hinweis"><span>Beispielseite – Gasthaus Zur Alten Linde ist frei erfunden.</span></div>
+<header class="kopfzeile k-kopfzeile" id="topbar">
+  <div class="rahmen kopfzeile-innen">
+    <a class="marke-name" href="#">Gasthaus Zur Alten Linde</a>
+    <nav class="kopf-nav" aria-label="Hauptnavigation"><a href="#kontakt">Anfahrt</a><a href="#karte">Karte</a><a href="#reservierung">Reservieren</a><a href="#offen">Offene Punkte</a></nav>
+    <a class="btn btn-primary kopf-aktion" href="tel:03023125100">Anrufen</a>
+    <details class="k-menue">
+      <summary>Menü</summary>
+      <nav class="k-menue-liste" aria-label="Hauptnavigation mobil"><a href="#kontakt">Anfahrt</a><a href="#karte">Karte</a><a href="#reservierung">Reservieren</a><a href="#offen">Offene Punkte</a><a class="btn btn-primary" href="tel:03023125100">Anrufen</a></nav>
+    </details>
+  </div>
+</header>
+<main>
+<section class="k-hero k-hero--aushang" data-hero="aushang">
+  <div class="rahmen k-aushang">
+    <svg class="k-blatt" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M32 58 V30 M32 30 C20 30 10 22 12 12 C18 16 26 12 32 6 C38 12 46 16 52 12 C54 22 44 30 32 30 Z M32 30 L22 20 M32 30 L42 20 M32 22 V10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+    <p class="rubrik">Bayerische Wirtshausküche · Mühldorf am Inn</p>
+    <h1 class="k-schild">Gasthaus Zur Alten Linde</h1>
+    <p class="k-aushang-adresse">Stadtplatz 3, 84453 Mühldorf am Inn</p>
+    <p class="k-aushang-tel"><a href="tel:03023125100">030 23125 100</a></p>
+    <div class="hero-aktionen"><a class="btn btn-primary" href="tel:03023125100">Anrufen</a><a class="btn btn-ghost" href="#offen">Offene Punkte</a></div>
+  </div>
+</section>
+<section class="sektion k-kontakt k-gewicht--gross" id="kontakt">
+  <div class="rahmen k-kontakt-raster">
+    <div>
+      <p class="rubrik">Anfahrt</p>
+      <h2>Stadtplatz 3</h2>
+      <ul class="kontakt-liste">
+        <li><span class="k"><svg class="ikon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11.4 20.6V4.3"/><path d="M11.4 5.4h7.9l-1.9 2.7 1.9 2.7h-7.9"/><path d="M8.6 20.8h5.6"/></svg></span><span>Stadtplatz 3, 84453 Mühldorf am Inn<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Stadtplatz%203%2C%2084453%20M%C3%BChldorf%20am%20Inn" target="_blank" rel="noopener">Route planen</a></span></li>
+        <li><span class="k"><svg class="ikon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.9 5.4c1.3-1.2 2.5-1 3.2.1.5.8.9 1.6 1.3 2.4.3.6.1 1.1-.5 1.5l-.9.7c-.3.2-.4.6-.2.9 1 1.9 2.5 3.4 4.4 4.3.3.2.7.1.9-.2l.7-.9c.4-.6 1-.8 1.5-.5.9.4 1.7.9 2.5 1.4 1.1.7 1.2 1.9 0 3.2"/></svg></span><span><a href="tel:03023125100">030 23125 100</a></span></li>
+        <li><span class="k"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span><span>4,3 von 5 bei Google · 80 Bewertungen</span></li>
+      </ul>
+    </div>
+    <div class="zeiten">
+      <h3>Öffnungszeiten</h3>
+      <p class="k-unbekannt">Öffnungszeiten sind noch nicht bestätigt – bitte telefonisch erfragen.</p>
+    </div>
+  </div>
+</section>
+<section class="sektion k-karte k-karte--muster k-gewicht--klein" id="karte">
+  <div class="rahmen">
+    <header class="k-kopf ">
+      <p class="rubrik">Speisekarte</p>
+      <h2>So könnte Ihre Karte aussehen</h2>
+      
+    </header>
+    <p class="k-muster-hinweis"><span class="k-entwurf">Entwurf</span> Musterkarte aus unserem Katalog – Gerichte und Preise sind nicht die des Hauses. Wir setzen hier Ihre echte Karte ein.</p>
+    <div class="k-karte-spalten"><section class="k-kategorie" id="karte-0"><h3>Zum Anfangen</h3><ul><li class="k-zeile"><span class="k-zeile-name">Obatzda mit Brezn <span class="marke-klein">vegetarisch</span></span><span class="preis">8,50 €</span><button class="mini-add" type="button" data-add="0-0" data-name="Obatzda mit Brezn" data-preis="8.5" aria-label="Obatzda mit Brezn vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Hausgemacht, mit roten Zwiebeln und frischer Laugenbrezn</span></li><li class="k-zeile"><span class="k-zeile-name">Leberknödelsuppe</span><span class="preis">6,90 €</span><button class="mini-add" type="button" data-add="0-1" data-name="Leberknödelsuppe" data-preis="6.9" aria-label="Leberknödelsuppe vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Kräftige Rinderbrühe, Schnittlauch</span></li><li class="k-zeile"><span class="k-zeile-name">Bayerischer Wurstsalat</span><span class="preis">9,50 €</span><button class="mini-add" type="button" data-add="0-2" data-name="Bayerischer Wurstsalat" data-preis="9.5" aria-label="Bayerischer Wurstsalat vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Mit Essiggurken, Zwiebeln und Bauernbrot</span></li></ul></section><section class="k-kategorie" id="karte-1"><h3>Hauptgerichte</h3><ul><li class="k-zeile"><span class="k-zeile-name">Schweinsbraten mit Knödel</span><span class="preis">16,90 €</span><button class="mini-add" type="button" data-add="1-0" data-name="Schweinsbraten mit Knödel" data-preis="16.9" aria-label="Schweinsbraten mit Knödel vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Dunkle Biersoße, Semmelknödel, Krautsalat</span></li><li class="k-zeile"><span class="k-zeile-name">Wiener Schnitzel vom Kalb</span><span class="preis">22,50 €</span><button class="mini-add" type="button" data-add="1-1" data-name="Wiener Schnitzel vom Kalb" data-preis="22.5" aria-label="Wiener Schnitzel vom Kalb vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Mit Preiselbeeren, Petersilienkartoffeln</span></li><li class="k-zeile"><span class="k-zeile-name">Krustenbraten vom Schwein</span><span class="preis">18,90 €</span><button class="mini-add" type="button" data-add="1-2" data-name="Krustenbraten vom Schwein" data-preis="18.9" aria-label="Krustenbraten vom Schwein vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Knusprige Kruste, dunkle Biersoße, Kartoffelknödel</span></li><li class="k-zeile"><span class="k-zeile-name">Käsespätzle <span class="marke-klein">vegetarisch</span></span><span class="preis">13,50 €</span><button class="mini-add" type="button" data-add="1-3" data-name="Käsespätzle" data-preis="13.5" aria-label="Käsespätzle vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Mit Bergkäse und Röstzwiebeln</span></li><li class="k-zeile"><span class="k-zeile-name">Grillrippchen</span><span class="preis">16,50 €</span><button class="mini-add" type="button" data-add="1-4" data-name="Grillrippchen" data-preis="16.5" aria-label="Grillrippchen vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Mit Barbecuesoße, Kartoffelwedges und Krautsalat</span></li><li class="k-zeile"><span class="k-zeile-name">Forelle Müllerin</span><span class="preis">19,50 €</span><button class="mini-add" type="button" data-add="1-5" data-name="Forelle Müllerin" data-preis="19.5" aria-label="Forelle Müllerin vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Aus heimischer Zucht, Butter, Mandeln, Salzkartoffeln</span></li></ul></section><section class="k-kategorie" id="karte-2"><h3>Nachspeisen</h3><p class="k-kat-hinweis">Alles in dieser Rubrik ist vegetarisch.</p><ul><li class="k-zeile"><span class="k-zeile-name">Kaiserschmarrn</span><span class="preis">9,50 €</span><button class="mini-add" type="button" data-add="2-0" data-name="Kaiserschmarrn" data-preis="9.5" aria-label="Kaiserschmarrn vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Mit Apfelmus und Puderzucker</span></li><li class="k-zeile"><span class="k-zeile-name">Apfelstrudel</span><span class="preis">7,50 €</span><button class="mini-add" type="button" data-add="2-1" data-name="Apfelstrudel" data-preis="7.5" aria-label="Apfelstrudel vormerken"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button><span class="k-zeile-desc">Warm, mit Vanillesoße</span></li></ul></section></div>
+  </div>
+</section>
+<section class="sektion k-reservierung k-gewicht--klein reservierung" id="reservierung">
+  <div class="rahmen reservierung-raster">
+    <div class="reservierung-text auftritt">
+      <p class="rubrik">Reservierung</p>
+      <h2>Tisch online anfragen</h2>
+      <p class="intro">Technisch vorbereitet. Ob das Haus Online-Anfragen annimmt, klären wir beim Termin – bis dahin gilt das Telefon.</p>
+      <ul class="pluspunkte"></ul>
+    </div>
+    <details class="k-aufklapper"><summary class="btn btn-ghost">Tisch für eine Gruppe anfragen</summary><form class="formular auftritt" id="reservation-form" novalidate>
+      <div class="field-grid">
+          <div class="field">
+            <label for="res-datum">Datum</label>
+            <input type="date" id="res-datum" name="datum" required>
+            <span class="error">Bitte wählen Sie ein Datum.</span>
+          </div>
+          <div class="field">
+            <label for="res-uhrzeit">Uhrzeit</label>
+            <select id="res-uhrzeit" name="uhrzeit" required><option value="">Bitte wählen</option><option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option><option>14:00</option><option>17:00</option><option>17:30</option><option>18:00</option><option>18:30</option><option>19:00</option><option>19:30</option><option>20:00</option><option>20:30</option><option>21:00</option><option>21:30</option></select>
+            <span class="error">Bitte wählen Sie eine Uhrzeit.</span>
+          </div>
+          <div class="field">
+            <label for="res-personen">Personen</label>
+            <select id="res-personen" name="personen" required><option value="">Bitte wählen</option><option>1 Person</option><option>2 Personen</option><option>3 Personen</option><option>4 Personen</option><option>5 Personen</option><option>6 Personen</option><option>7 Personen</option><option>8 Personen</option><option>Mehr als 8 Personen</option></select>
+            <span class="error">Bitte wählen Sie die Personenzahl.</span>
+          </div>
+          <div class="field">
+            <label for="res-name">Name</label>
+            <input type="text" id="res-name" name="name" required autocomplete="name">
+            <span class="error">Bitte geben Sie Ihren Namen an.</span>
+          </div>
+          <div class="field">
+            <label for="res-telefon">Telefon</label>
+            <input type="tel" id="res-telefon" name="telefon" required autocomplete="tel">
+            <span class="error">Bitte geben Sie eine Telefonnummer an.</span>
+          </div>
+          <div class="field">
+            <label for="res-email">E-Mail <span class="hint">(optional)</span></label>
+            <input type="email" id="res-email" name="email" autocomplete="email">
+            
+          </div>
+          <div class="field field-wide">
+            <label for="res-wunsch">Anmerkungen <span class="hint">(optional)</span></label>
+            <textarea id="res-wunsch" name="wunsch" placeholder="Kinderstuhl, Allergien, Tisch am Fenster …"></textarea>
+            
+          </div>
+      </div>
+      <button class="btn btn-primary btn-block formular-absenden" type="submit">Reservierung anfragen</button>
+    </form></details>
+  </div>
+</section>
+<section class="sektion k-offen k-gewicht--normal" id="offen">
+  <div class="rahmen">
+    <header class="k-kopf ">
+      <p class="rubrik">Entwurf</p>
+      <h2>Was wir vom Haus noch brauchen</h2>
+      <p class="intro">Diese Seite zeigt nur, was feststeht. Alles andere fragen wir beim Termin – und setzen es dann hier ein.</p>
+    </header>
+    <ol class="k-offen-liste"><li>Wann haben Sie geöffnet (auch Ruhetage, Küchenschluss)?</li><li>Seit wann gibt es das Haus, wer steht in der Küche, was ist die Geschichte?</li><li>Was machen Sie, das die anderen im Ort nicht machen?</li><li>Bitte die aktuelle Speisekarte mit Preisen (Foto oder PDF reicht).</li><li>Was sollen Gäste auf der Website vor allem tun: reservieren, bestellen, anrufen oder sich informieren?</li><li>Eigene Fotos/Videos – wer hat sie gemacht, dürfen wir sie verwenden?</li><li>Dürfen wir einzelne Gästestimmen zitieren (mit Quelle)?</li><li>Ist die Seite als offizieller Auftritt beauftragt und freigegeben?</li></ol>
+  </div>
+</section>
+</main>
+<button class="cart-fab" id="cart-fab" type="button">
+  <span>Warenkorb</span>
+  <span class="cart-count" id="fab-count">0</span>
+  <span id="fab-total">0,00 €</span>
+</button>
+
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Ihre Abholbestellung">
+  <div class="drawer-head">
+    <h3>Ihre Abholbestellung</h3>
+    <button class="icon-btn" id="drawer-close" type="button" aria-label="Schließen">×</button>
+  </div>
+  <div class="drawer-body">
+    <div id="cart-lines"></div>
+    <form id="order-form" novalidate>
+      <div class="field-grid field-grid--eins">
+        <div class="field">
+            <label for="ord-abholzeit">Abholzeit</label>
+            <select id="ord-abholzeit" name="abholzeit" required><option value="">Bitte wählen</option><option>So schnell wie möglich (ca. 20 Min.)</option><option>11:30</option><option>11:45</option><option>12:00</option><option>12:15</option><option>12:30</option><option>12:45</option><option>13:00</option><option>13:15</option><option>13:30</option><option>13:45</option><option>14:00</option><option>17:00</option><option>17:15</option><option>17:30</option><option>17:45</option><option>18:00</option><option>18:15</option><option>18:30</option><option>18:45</option><option>19:00</option><option>19:15</option><option>19:30</option><option>19:45</option><option>20:00</option><option>20:15</option><option>20:30</option><option>20:45</option><option>21:00</option><option>21:15</option><option>21:30</option></select>
+            <span class="error">Bitte wählen Sie eine Abholzeit.</span>
+          </div>
+        <div class="field">
+            <label for="ord-name">Name</label>
+            <input type="text" id="ord-name" name="name" required autocomplete="name">
+            <span class="error">Bitte geben Sie Ihren Namen an.</span>
+          </div>
+        <div class="field">
+            <label for="ord-telefon">Telefon</label>
+            <input type="tel" id="ord-telefon" name="telefon" required autocomplete="tel">
+            <span class="error">Bitte geben Sie eine Telefonnummer an.</span>
+          </div>
+        <div class="field">
+            <label for="ord-hinweis">Hinweis <span class="hint">(optional)</span></label>
+            <textarea id="ord-hinweis" name="hinweis" placeholder="Allergien, Sonderwünsche …"></textarea>
+            
+          </div>
+      </div>
+      <div class="field noshow" id="ord-noshow-feld" style="display:none">
+        <label class="noshow-label"><input type="checkbox" id="ord-noshow" name="noShowZustimmung"><span id="ord-noshow-text"></span></label>
+        <span class="error">Bitte stimmen Sie zu, um die Bestellung abzuschicken.</span>
+      </div>
+      <div class="drawer-foot">
+        <div class="totals"><span>Gesamt</span><span id="cart-total">0,00 €</span></div>
+        <button class="btn btn-primary btn-block" id="order-submit" type="submit">Abholung verbindlich bestellen</button>
+        <p class="hint drawer-hinweis">Bezahlung bei Abholung, bar oder mit Karte.</p>
+      </div>
+    </form>
+  </div>
+</aside>
+<div class="confirm-box" id="confirm" role="dialog" aria-modal="true">
+  <div class="confirm-icon" id="confirm-icon" aria-hidden="true">
+    <span class="ci-ok"><svg class="ikon ikon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9.3"/><path d="M7.8 12.5 10.4 15.2 16.4 8.7"/></svg></span>
+    <span class="ci-fehler"><svg class="ikon ikon-warnung" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9.3"/><path d="M12 7.6v5.6"/><path d="M12 16.6v.15"/></svg></span>
+  </div>
+  <h3 id="confirm-title"></h3>
+  <p id="confirm-text"></p>
+  <div class="confirm-summary" id="confirm-summary"></div>
+  <a class="btn btn-ghost" id="confirm-mail" style="display:none" href="#">Bestätigung per E-Mail senden</a>
+  <button class="btn btn-primary btn-block" id="confirm-close" type="button">Schließen</button>
+  <p class="demo-note">Entwurfsansicht: In der fertigen Version geht diese Anfrage direkt an das Restaurant.</p>
+</div>
+<div class="mobilebar k-leiste" id="mobilebar"><a class="btn btn-primary" href="tel:03023125100">Anrufen</a><a class="btn btn-ghost" href="#karte">Karte</a><button id="bar-order" type="button" hidden>Bestellen</button></div>
+<footer class="fuss auf-tint k-fuss">
+  <div class="rahmen fuss-raster">
+    <div class="fuss-haus"><strong>Gasthaus Zur Alten Linde</strong><p>Stadtplatz 3, 84453 Mühldorf am Inn</p></div>
+    <nav class="fuss-nav" aria-label="Seitennavigation"><a href="#kontakt">Anfahrt</a><a href="#karte">Karte</a><a href="#reservierung">Reservieren</a><a href="#offen">Offene Punkte</a></nav>
+    <div class="fuss-kontakt"><a href="tel:03023125100">030 23125 100</a></div>
+    <p class="fuss-hinweis">Beispielseite der Agentur – dieses Lokal ist frei erfunden. Fotos sind Beispielfotos aus einer Bilddatenbank und als solche markiert.</p>
+  </div>
+</footer>
+<script>window.PAGE_DATA = {"name":"Gasthaus Zur Alten Linde","kontaktEmail":"","apiUrl":""};</script>
+<script>
+(function () {
+  var data = window.PAGE_DATA;
+  var cart = {};
+  var noShowEinstellungen = null;
+
+  function euro(value) { return value.toFixed(2).replace(".", ",") + " \u20AC"; }
+  function byId(id) { return document.getElementById(id); }
+  function lines() {
+    return Object.keys(cart).map(function (id) { return cart[id]; })
+      .filter(function (line) { return line.menge > 0; });
+  }
+  function total() {
+    return lines().reduce(function (sum, line) { return sum + line.preis * line.menge; }, 0);
+  }
+  function anzahl() {
+    return lines().reduce(function (sum, line) { return sum + line.menge; }, 0);
+  }
+
+  function renderCart() {
+    var list = byId("cart-lines");
+    var current = lines();
+    list.innerHTML = "";
+
+    if (current.length === 0) {
+      var empty = document.createElement("p");
+      empty.className = "cart-empty";
+      empty.textContent = "Noch nichts ausgew\u00E4hlt. St\u00F6bern Sie in unserer Karte.";
+      list.appendChild(empty);
+    } else {
+      current.forEach(function (line) {
+        var row = document.createElement("div");
+        row.className = "cart-line";
+
+        var body = document.createElement("div");
+        body.className = "cart-line-body";
+        var nameEl = document.createElement("div");
+        nameEl.className = "cart-line-name";
+        nameEl.textContent = line.name;
+        var priceEl = document.createElement("div");
+        priceEl.className = "cart-line-price";
+        priceEl.textContent = line.menge + " \u00D7 " + euro(line.preis);
+        body.appendChild(nameEl);
+        body.appendChild(priceEl);
+
+        var qty = document.createElement("div");
+        qty.className = "qty";
+        var minus = document.createElement("button");
+        minus.type = "button";
+        minus.textContent = "\u2212";
+        minus.setAttribute("aria-label", "Weniger " + line.name);
+        minus.onclick = function () { changeQty(line.id, -1); };
+        var count = document.createElement("span");
+        count.textContent = String(line.menge);
+        var plus = document.createElement("button");
+        plus.type = "button";
+        plus.textContent = "+";
+        plus.setAttribute("aria-label", "Mehr " + line.name);
+        plus.onclick = function () { changeQty(line.id, 1); };
+        qty.appendChild(minus);
+        qty.appendChild(count);
+        qty.appendChild(plus);
+
+        row.appendChild(body);
+        row.appendChild(qty);
+        list.appendChild(row);
+      });
+    }
+
+    byId("cart-total").textContent = euro(total());
+    byId("fab-total").textContent = euro(total());
+    byId("fab-count").textContent = String(anzahl());
+    byId("order-submit").disabled = current.length === 0;
+    byId("cart-fab").className = current.length === 0 ? "cart-fab" : "cart-fab visible";
+    byId("bar-order").textContent = current.length === 0 ? "Bestellen" : "Bestellen \u00B7 " + euro(total());
+  }
+
+  function changeQty(id, delta) {
+    var line = cart[id];
+    if (!line) return;
+    line.menge += delta;
+    if (line.menge <= 0) delete cart[id];
+    renderCart();
+  }
+
+  function addToCart(id, name, preis) {
+    if (!cart[id]) cart[id] = { id: id, name: name, preis: preis, menge: 0 };
+    cart[id].menge += 1;
+    renderCart();
+    openDrawer();
+  }
+
+  function openDrawer() {
+    byId("drawer").classList.add("open");
+    byId("overlay").classList.add("open");
+  }
+  function closeDrawer() {
+    byId("drawer").classList.remove("open");
+    if (!byId("confirm").classList.contains("open")) byId("overlay").classList.remove("open");
+  }
+
+  function showConfirm(title, text, rows, mailto, fehler) {
+    byId("confirm-title").textContent = title;
+    byId("confirm-text").textContent = text;
+    byId("confirm").className = fehler ? "confirm-box hat-fehler" : "confirm-box";
+
+    var box = byId("confirm-summary");
+    box.innerHTML = "";
+    rows.forEach(function (row) {
+      var line = document.createElement("div");
+      var label = document.createElement("span");
+      label.className = "label";
+      label.textContent = row[0];
+      var value = document.createElement("span");
+      value.textContent = row[1];
+      line.appendChild(label);
+      line.appendChild(value);
+      box.appendChild(line);
+    });
+
+    var link = byId("confirm-mail");
+    if (mailto) {
+      link.href = mailto;
+      link.style.display = "inline-flex";
+    } else {
+      link.style.display = "none";
+    }
+
+    byId("confirm").classList.add("open");
+    byId("overlay").classList.add("open");
+  }
+
+  function closeConfirm() {
+    byId("confirm").classList.remove("open");
+    byId("overlay").classList.remove("open");
+  }
+
+  function validate(form, names) {
+    var ok = true;
+    names.forEach(function (name) {
+      var input = form.elements[name];
+      var field = input.closest(".field");
+      var valid = String(input.value).trim().length > 0;
+      if (field) {
+        var wide = field.classList.contains("field-wide") ? " field-wide" : "";
+        field.className = (valid ? "field" : "field invalid") + wide;
+      }
+      if (!valid && ok) { input.focus(); ok = false; }
+    });
+    return ok;
+  }
+
+  function mailtoLink(subject, body) {
+    if (!data.kontaktEmail) return "";
+    return "mailto:" + data.kontaktEmail +
+      "?subject=" + encodeURIComponent(subject) +
+      "&body=" + encodeURIComponent(body);
+  }
+
+  function referenz(prefix) {
+    return prefix + "-" + String(Math.floor(1000 + Math.random() * 9000));
+  }
+
+  /**
+   * Schickt die Anfrage an das Lokal. Ohne hinterlegte Adresse bleibt es beim
+   * Entwurf – dann wird nichts übertragen und die Bestätigung ist nur Ansicht.
+   */
+  function sende(pfad, nutzlast, knopf) {
+    if (!data.apiUrl) return Promise.resolve({ demo: true });
+
+    knopf.disabled = true;
+    var alterText = knopf.textContent;
+    knopf.textContent = "Wird gesendet \u2026";
+
+    return fetch(data.apiUrl + pfad, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nutzlast)
+    })
+      .then(function (antwort) {
+        return antwort.json().then(function (ergebnis) {
+          if (!antwort.ok || ergebnis.ok === false) {
+            throw new Error(ergebnis.fehler || "Die Anfrage konnte nicht angenommen werden.");
+          }
+          return ergebnis;
+        });
+      })
+      .catch(function (fehler) {
+        // Auch ein Netzwerkabbruch darf nicht als Erfolg durchgehen.
+        throw new Error(fehler.message === "Failed to fetch"
+          ? "Wir konnten das Lokal gerade nicht erreichen. Bitte rufen Sie kurz an."
+          : fehler.message);
+      })
+      .then(function (ergebnis) {
+        knopf.disabled = false;
+        knopf.textContent = alterText;
+        return ergebnis;
+      }, function (fehler) {
+        knopf.disabled = false;
+        knopf.textContent = alterText;
+        throw fehler;
+      });
+  }
+
+  function zeigeFehler(text) {
+    showConfirm("Das hat nicht geklappt", text, [], "", true);
+  }
+
+  /**
+   * Holt beim Laden der Seite die aktuellen No-Show-Einstellungen des
+   * Betriebs (falls das Lokal die Funktion eingeschaltet hat) und zeigt bei
+   * Bedarf die Zustimmungs-Checkbox mit dem exakten, serverseitig
+   * mitgeführten Text an. Ohne apiUrl (Vorschau) oder ohne aktivierten
+   * Schutz bleibt das Formular unverändert wie zuvor.
+   */
+  function ladeNoShowEinstellungen() {
+    if (!data.apiUrl) return;
+
+    fetch(data.apiUrl + "/oeffentlich/no-show-einstellungen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    })
+      .then(function (antwort) { return antwort.json(); })
+      .then(function (ergebnis) {
+        if (!ergebnis || !ergebnis.aktiv) return;
+        noShowEinstellungen = ergebnis;
+
+        var betrag = Number(ergebnis.gebuehrBetrag || 0).toFixed(2).replace(".", ",");
+        byId("ord-noshow-text").textContent =
+          "Ich stimme zu: Bei Nichtabholung ohne Stornierung bis " + ergebnis.stornofensterMinuten +
+          " Minuten vor der Abholzeit wird eine Ausfallpauschale von " + betrag + " \u20AC in Rechnung gestellt.";
+        byId("ord-noshow-feld").style.display = "block";
+      })
+      .catch(function () {
+        // Ohne Antwort bleibt die Checkbox einfach aus - keine Bestellung
+        // darf an einem nicht erreichbaren Einstellungs-Abruf scheitern.
+      });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    ladeNoShowEinstellungen();
+    Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function (button) {
+      button.addEventListener("click", function () {
+        addToCart(button.getAttribute("data-add"), button.getAttribute("data-name"), Number(button.getAttribute("data-preis")));
+      });
+    });
+
+    var topbar = byId("topbar");
+    function onScroll() {
+      if (window.scrollY > 40) topbar.classList.add("scrolled");
+      else topbar.classList.remove("scrolled");
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    byId("cart-fab").addEventListener("click", openDrawer);
+    // "bar-order" fehlt, wenn das Design-Preset die mobile Aktionsleiste
+    // abschaltet (mobile.stickyActionBar: false) - dann bleibt es beim
+    // Warenkorb-Symbol als Bestellweg auf dem Handy.
+    var barOrder = byId("bar-order");
+    if (barOrder) {
+      barOrder.addEventListener("click", function () {
+        if (lines().length === 0) byId("karte").scrollIntoView({ behavior: "smooth" });
+        else openDrawer();
+      });
+    }
+    byId("drawer-close").addEventListener("click", closeDrawer);
+    byId("overlay").addEventListener("click", function () { closeDrawer(); closeConfirm(); });
+    byId("confirm-close").addEventListener("click", closeConfirm);
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") { closeDrawer(); closeConfirm(); }
+    });
+
+    var dateInput = byId("res-datum");
+    var today = new Date();
+    var iso = today.getFullYear() + "-" +
+      String(today.getMonth() + 1).padStart(2, "0") + "-" +
+      String(today.getDate()).padStart(2, "0");
+    dateInput.min = iso;
+    dateInput.value = iso;
+
+    byId("order-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      var form = event.target;
+      if (lines().length === 0) return;
+      if (!validate(form, ["name", "telefon", "abholzeit"])) return;
+
+      var noShowFeld = byId("ord-noshow-feld");
+      var noShowAktiv = noShowEinstellungen && noShowEinstellungen.aktiv;
+      if (noShowAktiv) {
+        var angehakt = byId("ord-noshow").checked;
+        noShowFeld.className = angehakt ? "field" : "field invalid";
+        if (!angehakt) return;
+      }
+
+      var nummer = referenz("AB");
+      var zeit = form.elements.abholzeit.value;
+      var summary = lines().map(function (line) {
+        return line.menge + " \u00D7 " + line.name + " (" + euro(line.preis * line.menge) + ")";
+      }).join("\n");
+
+      var body = "Abholbestellung " + nummer + "\n\n" + summary +
+        "\n\nGesamt: " + euro(total()) +
+        "\nAbholung: " + zeit +
+        "\nName: " + form.elements.name.value +
+        "\nTelefon: " + form.elements.telefon.value +
+        (form.elements.hinweis.value ? "\nHinweis: " + form.elements.hinweis.value : "");
+
+      var positionen = lines().map(function (line) {
+        return { name: line.name, menge: line.menge, preis: line.preis };
+      });
+      var summe = euro(total());
+      var stueck = String(anzahl());
+
+      sende("/oeffentlich/bestellung", {
+        positionen: positionen,
+        abholzeit: zeit,
+        name: form.elements.name.value,
+        telefon: form.elements.telefon.value,
+        hinweis: form.elements.hinweis.value,
+        noShowZustimmung: noShowAktiv ? true : false
+      }, byId("order-submit")).then(function (ergebnis) {
+        // Die Abholzeit ist zun\u00E4chst nur ein Wunsch: ob sie machbar ist,
+        // best\u00E4tigt die K\u00FCche.
+        var echteNummer = ergebnis.demo ? nummer : ergebnis.bestellung.nummer;
+        var text = ergebnis.demo
+          ? "Wir bereiten Ihr Essen frisch zu. Bitte holen Sie es zur gew\u00E4hlten Zeit bei uns ab."
+          : "Ihre Bestellung liegt in der K\u00FCche. Die Abholzeit best\u00E4tigen wir Ihnen gleich \u2013 falls es knapp wird, melden wir uns telefonisch.";
+
+        showConfirm(
+          ergebnis.demo ? "Bestellung aufgenommen" : "Bestellung eingegangen",
+          text,
+          [
+            ["Bestellnummer", echteNummer],
+            [ergebnis.demo ? "Abholung" : "Abholung (gew\u00FCnscht)", zeit],
+            ["Positionen", stueck],
+            ["Gesamt", summe],
+          ],
+          mailtoLink("Abholbestellung " + echteNummer + " \u2013 " + data.name, body)
+        );
+
+        cart = {};
+        renderCart();
+        form.reset();
+        closeDrawer();
+      }).catch(function (fehler) {
+        zeigeFehler(fehler.message);
+      });
+    });
+
+    byId("reservation-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      var form = event.target;
+      if (!validate(form, ["datum", "uhrzeit", "personen", "name", "telefon"])) return;
+
+      var nummer = referenz("RES");
+      var datum = form.elements.datum.value.split("-").reverse().join(".");
+      var body = "Tischreservierung " + nummer + "\n\n" +
+        "Datum: " + datum +
+        "\nUhrzeit: " + form.elements.uhrzeit.value +
+        "\nPersonen: " + form.elements.personen.value +
+        "\nName: " + form.elements.name.value +
+        "\nTelefon: " + form.elements.telefon.value +
+        (form.elements.email.value ? "\nE-Mail: " + form.elements.email.value : "") +
+        (form.elements.wunsch.value ? "\nWunsch: " + form.elements.wunsch.value : "");
+
+      var uhrzeit = form.elements.uhrzeit.value;
+      var personenText = form.elements.personen.value;
+      // "4 Personen" -> 4, damit das Lokal eine Zahl bekommt.
+      var personenZahl = parseInt(personenText, 10) || 1;
+
+      sende("/oeffentlich/reservierung", {
+        datum: form.elements.datum.value,
+        uhrzeit: uhrzeit,
+        personen: personenZahl,
+        name: form.elements.name.value,
+        telefon: form.elements.telefon.value,
+        email: form.elements.email.value,
+        wunsch: form.elements.wunsch.value
+      }, form.querySelector("button[type=submit]")).then(function (ergebnis) {
+        showConfirm(
+          ergebnis.demo ? "Tisch reserviert" : "Anfrage eingegangen",
+          ergebnis.demo
+            ? "Vielen Dank! Ihre Reservierung liegt uns vor \u2013 wir freuen uns auf Ihren Besuch."
+            : "Vielen Dank! Wir haben Ihren Tisch vorgemerkt und best\u00E4tigen Ihnen die Reservierung in K\u00FCrze.",
+          [
+            ["Reservierungsnr.", nummer],
+            ["Datum", datum],
+            ["Uhrzeit", uhrzeit],
+            ["Personen", personenText],
+          ],
+          mailtoLink("Tischreservierung " + nummer + " \u2013 " + data.name, body)
+        );
+
+        form.reset();
+        dateInput.value = iso;
+      }).catch(function (fehler) {
+        zeigeFehler(fehler.message);
+      });
+    });
+
+    renderCart();
+  });
+})();
+</script>
+<script>
+(function () {
+  var reduziert = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduziert) {
+    // Bewegung abgestellt: Videos bleiben auf ihrem Poster stehen.
+    Array.prototype.forEach.call(document.querySelectorAll("video[autoplay]"), function (v) { v.removeAttribute("autoplay"); v.pause(); });
+    return;
+  }
+  if (!("IntersectionObserver" in window)) return;
+  var wurzel = document.body;
+  var elemente = document.querySelectorAll(".auftritt");
+  Array.prototype.forEach.call(elemente, function (el) {
+    var geschwister = el.parentNode ? Array.prototype.filter.call(el.parentNode.children, function (k) { return k.classList.contains("auftritt"); }) : [];
+    el.style.setProperty("--takt", String(Math.max(0, geschwister.indexOf(el))));
+  });
+  wurzel.classList.add("bewegt");
+  var beobachter = new IntersectionObserver(function (eintraege) {
+    eintraege.forEach(function (eintrag) {
+      if (eintrag.isIntersecting) { eintrag.target.classList.add("da"); beobachter.unobserve(eintrag.target); }
+    });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  Array.prototype.forEach.call(elemente, function (el) { beobachter.observe(el); });
+})();
+</script>
+<script>
+(function () {
+  // Beobachtet werden die Knöpfe im Hero, nicht der ganze Hero: Liegen sie
+  // unter dem ersten Bildschirm, ist die Leiste sofort da.
+  var hero = document.querySelector("[data-hero] .hero-aktionen");
+  var leiste = document.getElementById("mobilebar");
+  if (!hero || !leiste || !("IntersectionObserver" in window)) return;
+  document.body.classList.add("k-leiste-bereit");
+  new IntersectionObserver(function (e) {
+    leiste.classList.toggle("k-leiste--da", !e[0].isIntersecting);
+  }, { threshold: 0.5 }).observe(hero);
+})();
+</script>
+</body>
+</html>

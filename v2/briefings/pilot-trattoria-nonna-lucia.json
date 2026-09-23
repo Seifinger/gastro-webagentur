@@ -1,0 +1,274 @@
+{
+  "version": 1,
+  "slug": "pilot-trattoria-nonna-lucia",
+  "placeId": "v2-test-italienisch-trattoria",
+  "kueche": "italienisch",
+  "stimmung": "trattoria",
+  "fiktiv": true,
+  "erstellt": "pilot",
+  "lead": {
+    "name": "Trattoria Da Nonna Lucia",
+    "ort": "Kraiburg am Inn",
+    "adresse": "Marktplatz 6, 84559 Kraiburg am Inn",
+    "telefon": "030 23125 103",
+    "rating": 4.3,
+    "anzahlBewertungen": 239
+  },
+  "felder": {
+    "betrieb": {
+      "name": {
+        "wert": "Trattoria Da Nonna Lucia",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "ort": {
+        "wert": "Kraiburg am Inn",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "adresse": {
+        "wert": "Marktplatz 6, 84559 Kraiburg am Inn",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "telefon": {
+        "wert": "030 23125 103",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "kueche": {
+        "wert": "Italienisch – Trattoria",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "oeffnungszeiten": {
+        "wert": [
+          {
+            "tage": "Dienstag – Samstag",
+            "zeiten": "11:30 – 14:00 & 17:30 – 22:00"
+          },
+          {
+            "tage": "Sonntag",
+            "zeiten": "11:30 – 21:00"
+          },
+          {
+            "tage": "Montag",
+            "zeiten": "Ruhetag"
+          }
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "konzept": {
+      "kurz": {
+        "wert": "Eine Familien-Trattoria mit 32 Plätzen, in der die Pasta morgens im Fenster zur Straße gemacht wird.",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "geschichte": {
+        "wert": "Lucia Ferraro kocht, ihr Sohn Paolo steht im Service. Die Nudeln macht Lucia jeden Morgen selbst – man sieht ihr dabei vom Marktplatz aus zu.",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "usp": {
+        "wert": "Frische Pasta, jeden Morgen von Hand im Fenster gemacht.",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "belege": {
+        "wert": [
+          "Pastabrett im Schaufenster, vormittags besetzt",
+          "Tageskarte mit drei Pasta-Gerichten, mit Kreide ans Fenster geschrieben"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "gaeste": {
+      "zielgruppen": {
+        "wert": [
+          "Familien aus dem Ort",
+          "Paare am Abend",
+          "Mittagsgäste aus den Geschäften am Marktplatz"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "anlaesse": {
+        "wert": [
+          "Abendessen zu zweit",
+          "Sonntagsessen mit der Familie",
+          "Mittagspause"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "positionierung": {
+      "preis": {
+        "wert": "mittel",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "atmosphaere": {
+        "wert": "Warm, eng, laut genug zum Reden – Papiertischsets, Kreidetafel, kein Kitsch.",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "karte": {
+      "signaturgerichte": {
+        "wert": [
+          "Tagliatelle al Ragù",
+          "Penne all'Arrabbiata",
+          "Margherita"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "speisekarte": {
+        "wert": {
+          "katalog": "italienisch"
+        },
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)",
+        "notiz": "Karte des Beispielbetriebs = Musterkatalog, keine erfundenen Gerichte"
+      },
+      "besonderheiten": {
+        "wert": [
+          "Tageskarte mit drei Pasta-Gerichten",
+          "Pizza aus dem Holzofen nur abends"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "aktion": {
+      "haupt": {
+        "wert": "reservieren",
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "hinweise": {
+        "wert": [
+          "Nur 32 Plätze – abends besser reservieren",
+          "Abholung für Pasta und Pizza möglich"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "marke": {
+      "logo": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "farben": {
+        "wert": null,
+        "status": "unbekannt"
+      },
+      "schriften": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "medien": {
+      "fotos": {
+        "wert": [
+          {
+            "stock": "photo-1574071318508-1cdbab80d002",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Neapolitanische Margherita auf Marmor",
+            "rolle": "gericht"
+          },
+          {
+            "stock": "photo-1551183053-bf91a1d81141",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Tagliatelle mit Fleischsoße in der Pfanne",
+            "rolle": "gericht"
+          },
+          {
+            "stock": "photo-1621996346565-e3dbc646d9a9",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Penne in Tomatensoße",
+            "rolle": "gericht"
+          },
+          {
+            "stock": "photo-1481931098730-318b6f776db0",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Spaghetti-Teller von oben, Rotwein, Rioja-Korken",
+            "rolle": "hero"
+          },
+          {
+            "stock": "photo-1565299624946-b28f40a0ae38",
+            "herkunft": "stock",
+            "freigabe": "Unsplash-Lizenz",
+            "motiv": "Pizza mit Hähnchen, Ananas, BBQ-Soße",
+            "rolle": "gericht"
+          }
+        ],
+        "status": "vorschlag",
+        "quelle": "Agentur",
+        "notiz": "Keine eigenen Fotos; Stock als Platzhalter bis zum Fototermin"
+      }
+    },
+    "stil": {
+      "wuensche": {
+        "wert": [
+          "wie die Karte, die auf dem Tisch liegt",
+          "hell, papieren, nicht rot-weiß kariert"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "noGos": {
+        "wert": [
+          "Italien-Flagge",
+          "rot-weiß karierte Tischdecke als Muster",
+          "Nonna-Kitsch mit Clipart"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      },
+      "referenzen": {
+        "wert": [
+          "padella.co (wenige klare Wege)",
+          "boccadilupo.com (Karte als lange Liste)"
+        ],
+        "status": "bestaetigt",
+        "quelle": "Beispielbetrieb (fiktiv)"
+      }
+    },
+    "belege": {
+      "googleBewertung": {
+        "wert": {
+          "note": 4.3,
+          "anzahl": 239
+        },
+        "status": "uebernommen",
+        "quelle": "Google Places / Lead-Liste"
+      },
+      "stimmen": {
+        "wert": null,
+        "status": "unbekannt",
+        "notiz": "keine freigegebenen Zitate"
+      },
+      "auszeichnungen": {
+        "wert": null,
+        "status": "unbekannt"
+      }
+    },
+    "freigabe": {
+      "veroeffentlichung": {
+        "wert": null,
+        "status": "unbekannt",
+        "notiz": "Beispielbetrieb"
+      }
+    }
+  }
+}
