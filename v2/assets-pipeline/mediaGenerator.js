@@ -34,7 +34,7 @@ export const UPLOADS_DIR = path.join(REPO, "public", "uploads");
 export const ROLLEN = ["hero", "haus", "team", "bestseller"];
 export const KENNZEICHNUNG = { eigen: "eigenes Foto", ki: "KI-generiert", platzhalter: "Platzhalter" };
 
-const FORMATE = { hero: "16:9", haus: "4:3", team: "4:3", bestseller: "4:3", gericht: "4:3", heroVideo: "16:9" };
+const FORMATE = { hero: "16:9", heroMobil: "4:5", haus: "4:3", team: "4:3", bestseller: "4:3", gericht: "4:3", heroVideo: "16:9", heroVideoMobil: "9:16" };
 
 /* ------------------------------------------------------------------ */
 /* Prompts aus dem Bild-Kanon                                          */
@@ -184,7 +184,7 @@ export function ladeEigeneMedien(manifest = EIGENE_MANIFEST) {
  * "ki" (vom Inhaber geliefertes KI-Material).
  */
 export function registriereEigenesMedium({ slug, rolle, datei, herkunft = "eigen", quelle = "", manifest = EIGENE_MANIFEST, zielDir = EIGENE_DIR }) {
-  if (![...ROLLEN, "heroVideo"].includes(rolle) && !/^gericht:/.test(rolle)) throw new Error(`Unbekannte Rolle "${rolle}"`);
+  if (![...ROLLEN, "heroVideo", "heroMobil", "heroVideoMobil"].includes(rolle) && !/^gericht:/.test(rolle)) throw new Error(`Unbekannte Rolle "${rolle}"`);
   if (!["eigen", "ki"].includes(herkunft)) throw new Error('herkunft muss "eigen" oder "ki" sein');
   if (!existsSync(datei)) throw new Error(`Datei nicht gefunden: ${datei}`);
   const ordner = path.join(zielDir, slug);
@@ -304,6 +304,9 @@ export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remote
     team: loese("team", { stock: stockId.team }),
     bestseller: eigeneSeite.bestseller || uploads.bestseller || ki.bestseller ? loese("bestseller") : null,
     heroVideo: eigeneSeite.heroVideo || uploads.heroVideo || ki.heroVideo ? loese("heroVideo") : null,
+    // Eigene Ausschnitte fürs Handy (Bühne der Seiten mit Ausdruck) – nur, wenn wirklich geliefert.
+    heroMobil: eigeneSeite.heroMobil || uploads.heroMobil || ki.heroMobil ? loese("heroMobil") : null,
+    heroVideoMobil: eigeneSeite.heroVideoMobil || uploads.heroVideoMobil || ki.heroVideoMobil ? loese("heroVideoMobil") : null,
     gericht: (g) => (g ? loese(`gericht:${g.id}`, { stock: g.bild ? [g.bild, "gericht"] : null }) : null),
   };
   return medien;

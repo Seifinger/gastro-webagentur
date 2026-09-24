@@ -26,7 +26,7 @@ export const REGELN = {
   "drei-gleiche-karten": "Mindestens drei gleich gebaute Karten mit Bild und Überschrift nebeneinander",
   "kleine-textschrift": "Fließtext unter 16px oder Text unter 12px",
   "raster-bruch": "Abstand außerhalb des 8px-Rasters (4px als einziger Halbschritt)",
-  "text-auf-foto-mit-verlauf": "Verlaufsschleier im Hero",
+  "text-auf-foto-mit-verlauf": "Verlaufsschleier im Hero (außer dem geprüften Schleier-Token --schleier der Bühne)",
   glasmorphismus: "Milchglas (backdrop-filter)",
   "leucht-schatten": "Leuchtender Textschatten",
   "emoji-icons": "Emoji als Zeichen",
@@ -144,7 +144,10 @@ export function lint(html) {
       // Verläufe
       for (const verlauf of verlaeufe(aufgeloest)) {
         if (farbtoene(verlauf) > 1) fund("mehrfarb-verlauf", "fehler", `${verlauf.slice(0, 80)} in ${r.selektor}`, r.selektor);
-        if (/hero/.test(r.selektor)) fund("text-auf-foto-mit-verlauf", "fehler", `Verlauf im Hero (${r.selektor})`, r.selektor);
+        // Einzige Ausnahme: der Schleier-Token der Bühne (ausdruck.js) – ein
+        // Ton, Deckkraft gegen reines Weiß auf Kontrast nachgewiesen.
+        const schleierToken = wert.trim() === "var(--schleier)";
+        if (/hero|buehne/.test(r.selektor) && !schleierToken) fund("text-auf-foto-mit-verlauf", "fehler", `Verlauf im Hero (${r.selektor})`, r.selektor);
       }
 
       // Abstände

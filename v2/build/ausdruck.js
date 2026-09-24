@@ -16,6 +16,8 @@
 // Referenz-Prinzipien, keine Vorlagen: übernommen wird die Haltung, nie Layout,
 // Farben, Texte oder Medien der Referenzseiten.
 
+import { contrastRatio, mixColors } from "../../src/colorMath.js";
+
 export const AUSDRUECKE = {
   kino: {
     id: "kino",
@@ -97,14 +99,47 @@ export function ausdruckFuer(id) {
   return profil;
 }
 
+/**
+ * Schleier über dem Bühnen-Medium – mit Kontrastnachweis für den schlimmsten Fall.
+ *
+ * Ein Foto kann unter dem Text beliebig hell sein. Geprüft wird deshalb nicht
+ * gegen das Bild, sondern gegen reines Weiß unter dem Schleier: Die Deckkraft
+ * wird so lange erhöht, bis die Schrift auf (Tint × Deckkraft über Weiß)
+ * besteht. Kopfzeilen-Links sind normale Schrift (4,5:1), der Slogan ist
+ * große Schrift (3:1). Ein Ton, kein Farbverlauf zwischen Farben.
+ */
+export const SCHLEIER_ZIELE = { kopf: 4.5, slogan: 3 };
+
+function mindestDeckkraft(tint, schrift, ziel) {
+  for (let a = 0; a <= 1.0001; a += 0.01) {
+    const deckkraft = Math.round(a * 100) / 100;
+    if (contrastRatio(schrift, mixColors(tint, "#ffffff", deckkraft)) >= ziel) return deckkraft;
+  }
+  return null;
+}
+
+export function buehnenSchleier(ds) {
+  const r = ds.farben.rollen;
+  const kopf = mindestDeckkraft(r.tint.hex, r.aufTint.hex, SCHLEIER_ZIELE.kopf);
+  const slogan = mindestDeckkraft(r.tint.hex, r.aufTint.hex, SCHLEIER_ZIELE.slogan);
+  if (kopf === null || slogan === null) return { ok: false, kopf, slogan };
+  const kontrast = (a) => Math.round(contrastRatio(r.aufTint.hex, mixColors(r.tint.hex, "#ffffff", a)) * 100) / 100;
+  // Oben (Kopfzeile, 0–14 %) und in der Slogan-Zone (28–62 %) mindestens die
+  // nachgewiesene Deckkraft; unten, wo kein Text steht, lichter.
+  const unten = Math.min(slogan, 0.24);
+  const verlauf = `linear-gradient(180deg, rgba(var(--tint-rgb), ${kopf}) 0%, rgba(var(--tint-rgb), ${kopf}) 14%, rgba(var(--tint-rgb), ${slogan}) 28%, rgba(var(--tint-rgb), ${slogan}) 62%, rgba(var(--tint-rgb), ${unten}) 100%)`;
+  return { ok: true, kopf, slogan, unten, verlauf, kontrast: { kopf: kontrast(kopf), slogan: kontrast(slogan) } };
+}
+
 /** CSS-Variablen des Ausdrucks – nur auf Seiten mit Ausdruck. */
-export function ausdruckVariablen(profil) {
+export function ausdruckVariablen(profil, ds = null) {
   if (!profil) return "";
   const h = profil.hero.hoehe;
+  const schleier = ds ? buehnenSchleier(ds) : null;
   return `:root {
   --hero-hoehe: ${Math.round(h.desktop * 100)}svh;
   --hero-hoehe-mobil: ${Math.round(h.mobil * 100)}svh;
   --kopf-hoehe: 72px;
-  --kopf-hoehe-mobil: 56px;
+  --kopf-hoehe-mobil: 56px;${schleier?.ok ? `\n  --schleier: ${schleier.verlauf};` : ""}
 }`;
 }

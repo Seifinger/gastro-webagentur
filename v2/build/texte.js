@@ -10,6 +10,16 @@
 
 import { ortsbezug, strasseAusAdresse } from "./v1Funktionen.js";
 
+// Slogan der Bühne (nur Seiten mit Ausdruck): höchstens sechs Wörter, keine
+// Behauptung über das Haus (kein "seit 1890", kein "bestes"), nur eine
+// Einladung mit Ortsbezug. Eigener Slogan aus dem Dashboard hat Vorrang.
+const SLOGAN = {
+  bayerisch: (ort) => (ort ? `Einkehren in ${ort}` : "Einkehren und bleiben"),
+  italienisch: (ort) => (ort ? `Zu Tisch in ${ort}` : "Zu Tisch, bitte"),
+  griechisch: (ort) => (ort ? `Zu Gast in ${ort}` : "Zu Gast am Tisch"),
+};
+const sloganFuer = (kueche, ort) => (SLOGAN[kueche] ?? ((o) => (o ? `Zu Gast in ${o}` : "Zu Gast bei uns")))(ort);
+
 export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
   const ort = lead.ort || "";
   const lage = ortsbezug(lead.adresse, ort);
@@ -25,6 +35,8 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
     kicker: `${konzept}${ort ? ` · ${ort}` : ""}`,
     headline: eigeneTexte.headline ?? (lead.name || "Ihr Restaurant"),
     claim: eigeneTexte.schlagzeile ?? (lage ? `${menu.tagline} – ${lage}.` : `${menu.tagline}.`),
+    slogan: eigeneTexte.slogan ?? sloganFuer(ds.kueche, ort),
+    buehne: { bereich: "Willkommen", alt: `${lead.name || "Restaurant"} – Stimmungsbild` },
     ctaBestellen: direkt ? "Jetzt vorbestellen" : "Zur Abholung bestellen",
     ctaReservieren: kurz ? "Tisch anfragen" : "Tisch reservieren",
     nav: { highlights: "Empfehlungen", karte: "Karte", reservierung: "Reservieren", kontakt: "Anfahrt" },

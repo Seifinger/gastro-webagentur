@@ -41,7 +41,9 @@ import {
 import { renderKopfzeile, renderHero, renderLeiste, HERO_AUFBAUTEN } from "./sektionen/kopf.js";
 import { renderHighlights, renderKarte, renderAmbiente, renderStimmen } from "./sektionen/inhalt.js";
 import { aktionsziele } from "./aktionsziele.js";
-import { ausdruckFuer, ausdruckVariablen } from "./ausdruck.js";
+import { ausdruckFuer, ausdruckVariablen, buehnenSchleier } from "./ausdruck.js";
+import { renderKopfAusdruck, renderBuehne, renderEinladung } from "./sektionen/buehne.js";
+import { BUEHNE_CSS, BUEHNE_SKRIPT } from "./buehneStil.js";
 import { renderReservierung, renderKontakt, renderBestellweg, renderFuss, renderEntwurfsleiste } from "./sektionen/service.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -209,7 +211,12 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   // Gate 2: Hero-Varianten
   const heroFehler = pruefeHeroVarianten(ds);
   if (heroFehler.length) throw new BuildAbbruch("hero-varianten", heroFehler);
-  const heroVariante = waehleHeroVariante(ds, gestaltung.seed, ds.darstellung.heroVariante);
+  const heroVariante = ausdruck ? ausdruck.hero.typ : waehleHeroVariante(ds, gestaltung.seed, ds.darstellung.heroVariante);
+  // Gate (nur mit Ausdruck): Der Schleier der Bühne muss die Schrift auch über
+  // einem rein weißen Bild tragen (ausdruck.js, buehnenSchleier).
+  if (ausdruck && !buehnenSchleier(ds).ok) {
+    throw new BuildAbbruch("buehne-kontrast", [`Kein Schleier erreicht den Kontrast für Kopfzeile/Slogan auf ${ds.farben.rollen.tint.hex}`]);
+  }
 
   const menu = optionen.menu ?? menuForCuisine(gestaltung.cuisine);
   const fiktiv = Boolean(optionen.fiktiv);
@@ -243,7 +250,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   const betont = ds.layout.betonterMoment;
   const apiUrl = String(optionen.apiUrl ?? "").replace(/\/+$/, "");
   const aktionen = aktionsziele({ lead, apiUrl, fiktiv });
-  const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv, aktionen };
+  const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv, aktionen, ausdruck };
 
   const sektionen = {
     highlights: (tief) => renderHighlights({ ...ctx, betont: betont === "highlights", tief }),
@@ -304,23 +311,23 @@ ${fontCss}
 ${cssVariablen(ds)}
 ${STIL}
 ${BEWEGUNG_CSS}
-${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck)}` : ""}
+${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}` : ""}
 </style>
 </head>
 <body class="${bodyKlassen}">
-${optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : ""}
-${renderKopfzeile(ctx)}
+${ausdruck ? "" : optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : ""}
+${ausdruck ? renderKopfAusdruck({ ...ctx, hinweis: optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : "" }) : renderKopfzeile(ctx)}
 <main>
-${renderHero(heroVariante, ctx)}
-${renderLeiste(ctx)}
+${ausdruck ? `${renderBuehne(ctx)}\n${renderEinladung(ctx)}` : renderHero(heroVariante, ctx)}
+${ausdruck ? "" : renderLeiste(ctx)}
 ${hauptteil}
 </main>
-${renderBestellweg(ctx)}
+${renderBestellweg(ausdruck ? { ...ctx, ds: { ...ds, layout: { ...ds.layout, primaerAktion: ausdruck.hauptaktion === "reservieren" ? "reservation" : "order" } } } : ctx)}
 ${renderFuss(ctx)}
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${seitenSkript()}</script>
 <script>${BEWEGUNG_SKRIPT}</script>
-</body>
+${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n` : ""}</body>
 </html>
 `;
 
