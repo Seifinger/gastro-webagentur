@@ -23,5 +23,30 @@
       "webm": "v2/medien/eigene/beispiel-bayerisch/heroVideo.webm",
       "eingetragen": "2026-09-24T10:50:34.808Z"
     }
+  },
+  "beispiel-cafe": {
+    "hero": {
+      "datei": "v2/medien/eigene/beispiel-cafe/hero.jpg",
+      "herkunft": "ki",
+      "quelle": "P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "fokus": "50% 60%",
+      "eingetragen": "2026-09-24T14:32:19.656Z"
+    },
+    "heroMobil": {
+      "datei": "v2/medien/eigene/beispiel-cafe/heroMobil.jpg",
+      "herkunft": "ki",
+      "quelle": "P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "fokus": "50% 70%",
+      "eingetragen": "2026-09-24T14:32:19.668Z"
+    },
+    "heroVideo": {
+      "datei": "v2/medien/eigene/beispiel-cafe/heroVideo.mp4",
+      "herkunft": "ki",
+      "quelle": "Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "fokus": "50% 55%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-cafe/heroVideo.webm",
+      "eingetragen": "2026-09-24T14:32:19.676Z"
+    }
   }
 }

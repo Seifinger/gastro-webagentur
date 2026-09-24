@@ -67,6 +67,24 @@ function posterBild(medium, mobil, alt) {
   return `<picture>${quelle}<img class="buehne-poster" src="${e(medium.src)}" alt="${e(alt)}" fetchpriority="high" decoding="async"></picture>`;
 }
 
+/**
+ * Video über dem Poster – erst per Skript geladen (preload="none", data-src).
+ * Wiedergabe "einmal": keine Schleife, bleibt auf dem letzten Bild stehen.
+ * Hochformat-Poster ohne Hochformat-Video: nur auf breiten Bildschirmen.
+ */
+function videoFuer(medien) {
+  const video = medien.heroVideo;
+  const videoMobil = medien.heroVideoMobil;
+  if (!video?.src) return "";
+  const einmal = video.wiedergabe === "einmal";
+  const nurBreit = !videoMobil?.src && Boolean(medien.heroMobil?.src);
+  return `<video class="buehne-video" muted${einmal ? "" : " loop"} playsinline preload="none" aria-hidden="true" data-src="${e(video.src)}"${video.webm?.src ? ` data-src-webm="${e(video.webm.src)}"` : ""}${videoMobil?.src ? ` data-src-mobil="${e(videoMobil.src)}"` : ""}${einmal ? " data-einmal" : ""}${nurBreit ? " data-nur-breit" : ""}></video>`;
+}
+
+function fokusStil(medien, hero) {
+  return [hero?.fokus ? `--fokus: ${hero.fokus}` : "", medien.heroMobil?.fokus ? `--fokus-mobil: ${medien.heroMobil.fokus}` : "", medien.heroVideo?.fokus ? `--fokus-video: ${medien.heroVideo.fokus}` : ""].filter(Boolean).join("; ");
+}
+
 export function renderBuehne(ctx) {
   const { medien, texte } = ctx;
   const hero = medien.hero?.quelle === "platzhalter:svg" ? { ...medien.hero, src: buehnenPlatzhalter(ctx.ds) } : medien.hero;
@@ -75,17 +93,10 @@ export function renderBuehne(ctx) {
   // Das Poster ist immer ein echtes <img>: sichtbar vor dem ersten Frame, bei
   // reduzierter Bewegung, bei langsamem Netz, ohne Video und ohne Skript.
   const poster = hero?.src ? posterBild(hero, medien.heroMobil, texte.buehne.alt) : "";
-  // Wiedergabe "einmal": keine Schleife, das Video bleibt auf dem letzten Bild
-  // stehen. Gibt es ein Hochformat-Poster, aber kein Hochformat-Video, läuft
-  // das Querformat-Video nur auf breiten Bildschirmen (data-nur-breit).
-  const einmal = video?.wiedergabe === "einmal";
-  const nurBreit = !videoMobil?.src && Boolean(medien.heroMobil?.src);
-  const videoTag = video?.src
-    ? `<video class="buehne-video" muted${einmal ? "" : " loop"} playsinline preload="none" aria-hidden="true" data-src="${e(video.src)}"${video.webm?.src ? ` data-src-webm="${e(video.webm.src)}"` : ""}${videoMobil?.src ? ` data-src-mobil="${e(videoMobil.src)}"` : ""}${einmal ? " data-einmal" : ""}${nurBreit ? " data-nur-breit" : ""}></video>`
-    : "";
+  const videoTag = videoFuer(medien);
   const kennzeichnung = hero && hero.herkunft !== "eigen" ? `<span class="buehne-herkunft">${e(hero.kennzeichnung ?? texte.platzhalter)}</span>` : "";
   // Bildausschnitt je Medium (eigene.json → fokus), getrennt für Quer- und Hochformat.
-  const fokus = [hero?.fokus ? `--fokus: ${hero.fokus}` : "", medien.heroMobil?.fokus ? `--fokus-mobil: ${medien.heroMobil.fokus}` : "", medien.heroVideo?.fokus ? `--fokus-video: ${medien.heroVideo.fokus}` : ""].filter(Boolean).join("; ");
+  const fokus = fokusStil(medien, hero);
   // Slogan über dem Medium (kino, gesellig) oder darunter auf dem Grund (handwerk); Rückzug nur, wo das Profil ihn will.
   const profil = ctx.ausdruck?.hero ?? { slogan: "ueber-medium", sloganRueckzug: true };
   return `<section class="buehne" data-hero="buehne" data-slogan="${e(profil.slogan)}"${profil.sloganRueckzug ? " data-rueckzug" : ""} aria-label="${e(texte.buehne.bereich)}"${fokus ? ` style="${e(fokus)}"` : ""}>
@@ -97,21 +108,22 @@ export function renderBuehne(ctx) {
 }
 
 /**
- * Titelblatt (editorial): Typografie auf ruhigem Grund, das Bild im Rahmen
- * daneben – kein Schleier, kein Vollbild-Video. Hochformat-Poster bevorzugt.
+ * Titelblatt (editorial): ruhige Typografie auf dem Grund, darunter das Medium
+ * breit im Rahmen (kein Vollbild, kein Schleier). Auf dem Handy das
+ * Hochformat-Poster im Rahmen; ein Video läuft im Rahmen wie auf der Bühne.
  */
 export function renderTitelblatt(ctx) {
   const { medien, texte } = ctx;
-  const basis = medien.heroMobil?.src ? medien.heroMobil : medien.hero?.quelle === "platzhalter:svg" ? { ...medien.hero, src: buehnenPlatzhalter(ctx.ds) } : medien.hero;
-  const fokus = basis?.fokus ? ` style="${e(`--fokus: ${basis.fokus}`)}"` : "";
-  const kennzeichnung = basis && basis.herkunft !== "eigen" ? `<span class="buehne-herkunft">${e(basis.kennzeichnung ?? texte.platzhalter)}</span>` : "";
+  const hero = medien.hero?.quelle === "platzhalter:svg" ? { ...medien.hero, src: buehnenPlatzhalter(ctx.ds) } : medien.hero;
+  const fokus = fokusStil(medien, hero);
+  const kennzeichnung = hero && hero.herkunft !== "eigen" ? `<span class="buehne-herkunft">${e(hero.kennzeichnung ?? texte.platzhalter)}</span>` : "";
   return `<section class="titelblatt" data-hero="titelblatt" aria-label="${e(texte.buehne.bereich)}">
   <div class="rahmen titelblatt-raster">
     <div class="titelblatt-text">
       <p class="rubrik">${e(texte.kicker)}</p>
       <p class="titelblatt-slogan">${e(texte.slogan)}</p>
     </div>
-    <figure class="titelblatt-bild"${fokus}>${basis?.src ? `<img class="buehne-poster" src="${e(basis.src)}" alt="${e(texte.buehne.alt)}" fetchpriority="high" decoding="async">` : ""}${kennzeichnung}</figure>
+    <figure class="titelblatt-bild"${fokus ? ` style="${e(fokus)}"` : ""}>${hero?.src ? posterBild(hero, medien.heroMobil, texte.buehne.alt) : ""}${videoFuer(medien)}${kennzeichnung}</figure>
   </div>
 </section>
 <div class="buehne-ende" id="buehne-ende" aria-hidden="true"></div>`;

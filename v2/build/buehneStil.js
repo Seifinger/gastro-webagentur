@@ -92,12 +92,18 @@ section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 
 /* Titelblatt (editorial): Satz auf dem Grund, Bild im Rahmen. */
 .titelblatt { padding-block: var(--sektion) 0; }
-.titelblatt-raster { display: grid; gap: var(--s-5); align-items: end; }
+.titelblatt-raster { display: grid; gap: var(--s-5); }
 .titelblatt-slogan { font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform);
   letter-spacing: var(--f-display-sperrung); font-size: var(--t-display); line-height: 1.05; max-width: 14ch; text-wrap: balance; }
 .titelblatt-bild { position: relative; aspect-ratio: 4 / 5; max-height: 72svh; overflow: hidden; border-radius: var(--r-bild); background: var(--flaeche-tief); }
-.titelblatt-bild img { width: 100%; height: 100%; object-fit: cover; object-position: var(--fokus, 50% 50%); }
-@media (min-width: 1024px) { .titelblatt-raster { grid-template-columns: 7fr 5fr; column-gap: calc(var(--rinne) * 2); } }
+.titelblatt-bild picture { position: absolute; inset: 0; }
+.titelblatt-bild .buehne-poster, .titelblatt-bild .buehne-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+@media (min-width: 768px) {
+  .titelblatt-bild { aspect-ratio: 16 / 9; max-height: 68svh; }
+  .titelblatt-text { display: grid; grid-template-columns: 5fr 7fr; column-gap: var(--rinne); align-items: end; }
+  .titelblatt-text .rubrik { grid-column: 1; grid-row: 1; align-self: end; margin-bottom: var(--s-1); }
+  .titelblatt-slogan { grid-column: 2; grid-row: 1; }
+}
 @media (min-width: 768px) { .buehne { height: var(--hero-hoehe); } }
 
 /* Einladung: Name und Haus links, Besuch rechts (Details in abfolge.js). */

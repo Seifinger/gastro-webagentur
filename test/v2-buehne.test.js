@@ -114,7 +114,7 @@ test("handwerk: Kopfzeile immer fest, Slogan unter dem Medium, kein Rückzug", (
   assert.match(html, /var transparent = kopf.getAttribute\("data-ueber"\) !== "flaeche";/);
 });
 
-test("editorial: Titelblatt mit Bild im Rahmen, kein Schleier-Medium, Hochformat bevorzugt", () => {
+test("editorial: Titelblatt mit Medium im Rahmen (quer, auf dem Handy hoch), kein Schleier", () => {
   const medien = {
     hero: { src: "medien/hero.jpg", herkunft: "ki", kennzeichnung: "KI-generiert" },
     heroMobil: { src: "medien/heroMobil.jpg", herkunft: "ki", kennzeichnung: "KI-generiert", fokus: "50% 40%" },
@@ -123,7 +123,7 @@ test("editorial: Titelblatt mit Bild im Rahmen, kein Schleier-Medium, Hochformat
   const { html, bericht } = bau({ ausdruck: "editorial", medien });
   assert.equal(bericht.heroVariante, "titelblatt");
   assert.match(html, /<section class="titelblatt" data-hero="titelblatt"/);
-  assert.match(html, /<figure class="titelblatt-bild" style="--fokus: 50% 40%"><img class="buehne-poster" src="medien\/heroMobil.jpg"/);
+  assert.match(html, /<figure class="titelblatt-bild" style="--fokus-mobil: 50% 40%"><picture><source media="\(max-width: 767px\)" srcset="medien\/heroMobil.jpg"><img class="buehne-poster" src="medien\/hero.jpg"/);
   assert.ok(!html.includes('<section class="buehne"'));
   assert.equal(lint(html).ok, true);
   assert.deepEqual(pruefeFunktionsVertrag(html), []);
