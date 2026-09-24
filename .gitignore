@@ -15,3 +15,6 @@ v2/output/medien/
 # v2: Entwürfe echter Leads (Kundendaten) und die lokale Engine-Wahl
 v2/output/leads/
 data/v2-engine.json
+
+# Referenz-Frames fremder Websites (nur lokal, nicht veröffentlichen – Repo ist für GitHub Pages öffentlich)
+.referenzen/

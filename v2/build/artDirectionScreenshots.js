@@ -6,6 +6,10 @@
 //   node v2/build/artDirectionScreenshots.js --piloten [--slug s] [--runde n]
 //       volles Review (screenshotReview.js) jeder Pilotseite
 //       → v2/art-direction/piloten/<slug>/ (+ runde-<n>/ ganze Seiten)
+//   node v2/build/artDirectionScreenshots.js --docs [slug]
+//       Baseline der veröffentlichten Seiten unter docs/ (ohne slug: alle
+//       beispiel-*), erster Bildschirm + ganze Seite, Desktop / Mobil
+//       → v2/art-direction/baseline/ (Gestaltungs-Umbau, AP0)
 
 import { copyFileSync, mkdirSync, readdirSync, writeFileSync, existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -29,6 +33,39 @@ async function vorher(browser) {
       console.log(`✓ vorher ${s} ${ansicht}`);
     }
   }
+}
+
+const DOCS = path.join(V2, "..", "docs");
+
+async function baseline(browser, { slug, ganz }) {
+  const ziel = path.join(V2, "art-direction", "baseline");
+  mkdirSync(ziel, { recursive: true });
+  const slugs = typeof slug === "string" ? [slug] : readdirSync(DOCS).filter((d) => d.startsWith("beispiel-") && existsSync(path.join(DOCS, d, "index.html")));
+  const zeilen = [];
+  for (const s of slugs) {
+    for (const ansicht of ["desktop", "mobil"]) {
+      const { kontext, seite } = await oeffneSeite(browser, pathToFileURL(path.join(DOCS, s, "index.html")).href, { ansicht });
+      // Leere Bildflächen dokumentieren statt verschweigen (z. B. gesperrtes Unsplash).
+      const bilder = await seite.evaluate(() => {
+        const alle = [...document.images];
+        return { gesamt: alle.length, fehlend: alle.filter((i) => !i.naturalWidth).length };
+      });
+      await seite.screenshot({ path: path.join(ziel, `${s}--${ansicht}.jpg`), type: "jpeg", quality: 60 });
+      if (ganz) await seite.screenshot({ path: path.join(ziel, `${s}--${ansicht}--ganz.jpg`), fullPage: true, type: "jpeg", quality: 40 });
+      await kontext.close();
+      zeilen.push(`| ${s} | ${ansicht} | ${bilder.gesamt - bilder.fehlend} / ${bilder.gesamt} |`);
+      console.log(`✓ baseline ${s} ${ansicht} (Bilder geladen: ${bilder.gesamt - bilder.fehlend}/${bilder.gesamt})`);
+    }
+  }
+  // Einzelne Seite nachfotografieren: die Übersicht aller Beispielseiten bleibt.
+  if (typeof slug === "string") return;
+  writeFileSync(
+    path.join(ziel, "README.md"),
+    `# Baseline vor dem Gestaltungs-Umbau\n\nAufgenommen ${new Date().toISOString().slice(0, 10)} aus \`docs/\` mit \`npm run v2:baseline\`.\n` +
+      `Erster Bildschirm (\`--desktop.jpg\`, \`--mobil.jpg\`), reduzierte Bewegung. Ganze Seiten (\`--ganz.jpg\`) nur mit \`--ganz\`,\n` +
+      `für den Piloten: \`npm run v2:baseline -- beispiel-bayerisch --ganz\`.\n\n` +
+      `| Seite | Ansicht | Bilder geladen |\n|---|---|---|\n${zeilen.join("\n")}\n`,
+  );
 }
 
 async function piloten(browser, { slug, runde }) {
@@ -57,6 +94,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   }
   try {
     if (process.argv.includes("--vorher")) await vorher(browser);
+    if (process.argv.includes("--docs")) await baseline(browser, { slug: arg("docs"), ganz: process.argv.includes("--ganz") });
     if (process.argv.includes("--piloten")) await piloten(browser, { slug: arg("slug"), runde: arg("runde") });
   } finally {
     await browser.close();
