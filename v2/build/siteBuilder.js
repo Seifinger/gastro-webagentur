@@ -41,6 +41,7 @@ import {
 import { renderKopfzeile, renderHero, renderLeiste, HERO_AUFBAUTEN } from "./sektionen/kopf.js";
 import { renderHighlights, renderKarte, renderAmbiente, renderStimmen } from "./sektionen/inhalt.js";
 import { aktionsziele } from "./aktionsziele.js";
+import { ausdruckFuer, ausdruckVariablen } from "./ausdruck.js";
 import { renderReservierung, renderKontakt, renderBestellweg, renderFuss, renderEntwurfsleiste } from "./sektionen/service.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -197,6 +198,8 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   const gestaltung = themeForLead(lead, kueche, stimmung);
   const dsDatei = optionen.designsystem ?? ladeDesignsystem(gestaltung.cuisine, gestaltung.stimmung);
   const { ds, protokoll: korrekturProtokoll } = wendeKorrekturenAn(dsDatei, optionen.korrekturen);
+  // Opt-in (Gestaltungs-Umbau): ohne Ausdruck bleibt die Ausgabe Byte für Byte wie bisher.
+  const ausdruck = ausdruckFuer(optionen.ausdruck);
 
   // Gate 1: Kontraste
   const kontrastFehler = pruefeKontraste(ds);
@@ -275,6 +278,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
     `schema-${ds.farben.schema}`,
     `rubrik-${ds.typografie.rubrik.stil}`,
     `moment-${betont}`,
+    ausdruck ? `ausdruck-${ausdruck.id}` : "",
     optionen.veroeffentlicht ? "veroeffentlicht" : "",
     ...darstellungsKlassen,
   ].filter(Boolean).join(" ");
@@ -293,14 +297,14 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
 <meta name="engine" content="${ENGINE_KENNUNG}">
 <meta name="v2-designsystem" content="${escapeHtml(ds.id)}">
 <meta name="v2-hero" content="${heroVariante}">
-<meta name="theme-color" content="${ds.farben.rollen.grund.hex}">
+${ausdruck ? `<meta name="v2-ausdruck" content="${ausdruck.id}">\n` : ""}<meta name="theme-color" content="${ds.farben.rollen.grund.hex}">
 ${optionen.veroeffentlicht ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<link rel="icon" href="${favicon(ds)}">
 <style>
 ${fontCss}
 ${cssVariablen(ds)}
 ${STIL}
 ${BEWEGUNG_CSS}
-${darstellungsCss}
+${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck)}` : ""}
 </style>
 </head>
 <body class="${bodyKlassen}">
@@ -340,6 +344,7 @@ ${renderFuss(ctx)}
       seed: gestaltung.seed,
       heroVariante,
       heroVarianten: ds.layout.heroVarianten,
+      ...(ausdruck ? { ausdruck: ausdruck.id } : {}),
       highlights: highlights.map((h) => h.id),
       kontrast: { geprueft: ds.kontrastPaare.length, fehler: 0 },
       lint: { fehler: 0, warnungen: lintErgebnis.warnungen },

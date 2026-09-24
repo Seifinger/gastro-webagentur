@@ -9,6 +9,21 @@ deren Layouts, Texte, Medien oder Markenzeichen zu übernehmen und **ohne** eine
 Wirtshaus einen falschen Premium-Charakter aufzuzwingen. Umgebaut wird die Pipeline, die heute
 tatsächlich veröffentlicht, nicht ein neues System daneben.
 
+
+## Fortschritt
+
+| Paket | Stand | Commit |
+|---|---|---|
+| Freigaben (24.09.) | Pilot `beispiel-bayerisch`/`gesellig` bestätigt, Namen bestätigt, Vorschau auf Beispielseiten behalten, AP1 freigegeben | – |
+| AP0 Sicherung | ✅ Snapshot (94 Seiten, `npm run v2:snapshot`), Baseline `v2/art-direction/baseline/` (Bilder hier gesperrt, siehe README dort), CLAUDE.md | `08dfcc0` |
+| AP1 Ehrliche Aktionen | ✅ „Vorschau – nichts gesendet/bestellt“, keine erfundenen Nummern, Hinweis am Formular, `v2/build/aktionsziele.js` | `b7bd7f5` |
+| AP2 Ausdruck-Gerüst | ✅ `v2/build/ausdruck.js`, Option `ausdruck` in `baueSite`, `npm run v2:build -- --demo beispiel-bayerisch --ausdruck gesellig --ziel v2/output/piloten-ausdruck` | (dieser Stand) |
+| AP3 Erster Bildschirm | offen – braucht Medien (J.3) oder startet mit Standbild-Platzhalter | – |
+
+**Abweichung in AP2:** Der Ausdruck ist eine **Build-Option** (später je Lead im Dashboard),
+kein Feld der 36 Designsystem-Dokumente. Er hängt am Haus, nicht an der Stimmung, und so
+bleiben die Designsystem-Dateien unverändert.
+
 ---
 
 ## 0. Kurzfassung
