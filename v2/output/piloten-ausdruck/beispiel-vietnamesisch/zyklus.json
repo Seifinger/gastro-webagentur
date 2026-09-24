@@ -1,0 +1,95 @@
+{
+  "site": "beispiel-vietnamesisch",
+  "designsystem": "vietnamesisch--hanoi-nacht",
+  "heroVariante": "buehne",
+  "runden": [
+    {
+      "runde": 1,
+      "bestanden": null,
+      "korrekturen": []
+    }
+  ],
+  "ergebnis": "ohne-judge",
+  "stufen": [
+    {
+      "stufe": "referenz",
+      "neu": 0,
+      "gesamt": 2
+    },
+    {
+      "stufe": "designsystem",
+      "id": "vietnamesisch--hanoi-nacht"
+    },
+    {
+      "stufe": "copy",
+      "sprachmodell": false
+    }
+  ],
+  "copy": {
+    "ersetzungen": 0,
+    "verbleibend": 0
+  },
+  "medien": {
+    "hero": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1562560471-cb5b5f96c1ab",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1597345637412-9fd611e758f3",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1597345637412-9fd611e758f3",
+      "typ": "bild"
+    },
+    "gericht:1-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1589570658214-002314b1520f",
+      "typ": "bild"
+    },
+    "gericht:1-2": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1582878826629-29b7ad1cdc43",
+      "typ": "bild"
+    },
+    "gericht:2-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1710532774170-9844f837ae54",
+      "typ": "bild"
+    }
+  },
+  "zeitpunkt": "2026-09-24T19:16:56.319Z"
+}

@@ -8,7 +8,7 @@
 <meta name="engine" content="v2">
 <meta name="v2-designsystem" content="thailaendisch--streetfood-nacht">
 <meta name="v2-hero" content="buehne">
-<meta name="v2-ausdruck" content="handwerk">
+<meta name="v2-ausdruck" content="kino">
 <meta name="theme-color" content="#13110e">
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2064%2064'%3E%3Crect%20width%3D'64'%20height%3D'64'%20rx%3D'4'%20fill%3D'%23f58628'%2F%3E%3Ccircle%20cx%3D'32'%20cy%3D'32'%20r%3D'12'%20fill%3D'%23141013'%2F%3E%3C%2Fsvg%3E">
@@ -500,8 +500,8 @@ textarea { min-height: var(--s-12); resize: vertical; }
 
 
 :root {
-  --hero-hoehe: 60svh;
-  --hero-hoehe-mobil: 62svh;
+  --hero-hoehe: 85svh;
+  --hero-hoehe-mobil: 82svh;
   --kopf-hoehe: 72px;
   --kopf-hoehe-mobil: 56px;
   --schleier: linear-gradient(180deg, rgba(var(--tint-rgb), 0.59) 0%, rgba(var(--tint-rgb), 0.59) 14%, rgba(var(--tint-rgb), 0.47) 28%, rgba(var(--tint-rgb), 0.47) 62%, rgba(var(--tint-rgb), 0.24) 100%);
@@ -742,25 +742,25 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 
 </style>
 </head>
-<body class="a-abend schema-dunkel rubrik-versal moment-reservierung ausdruck-handwerk veroeffentlicht">
+<body class="a-abend schema-dunkel rubrik-versal moment-reservierung ausdruck-kino veroeffentlicht">
 
-<header class="kopf" id="topbar" data-zustand="fest" data-ueber="flaeche">
+<header class="kopf" id="topbar" data-zustand="fest" data-ueber="transparent">
   <div class="entwurf-hinweis"><span>Beispielseite – dieses Lokal ist frei erfunden.</span></div>
   <div class="kopf-innen">
     <a class="kopf-marke" href="#">Baan Nam Thai</a>
     <nav class="kopf-nav" aria-label="Hauptnavigation"><a href="#karte">Karte</a><a href="#highlights">Empfehlungen</a><a href="#reservierung">Reservieren</a><a href="#kontakt">Anfahrt</a></nav>
-    <div class="kopf-aktionen"><a class="btn btn-ghost kopf-zweit" href="#reservierung" data-aktion="reservieren">Reservieren</a><a class="btn btn-primary kopf-erst" href="#karte" data-aktion="bestellen">Bestellen</a></div>
+    <div class="kopf-aktionen"><a class="btn btn-ghost kopf-zweit" href="#karte" data-aktion="bestellen">Bestellen</a><a class="btn btn-primary kopf-erst" href="#reservierung" data-aktion="reservieren">Reservieren</a></div>
     <a class="kopf-menue-knopf" href="#kopf-menue" aria-controls="kopf-menue" aria-expanded="false"><span class="kopf-menue-linien" aria-hidden="true"></span><span class="nur-vorleser">Menü</span></a>
   </div>
   <nav class="kopf-menue" id="kopf-menue" aria-label="Menü">
     <a class="kopf-menue-zu" href="#" aria-label="Menü schließen">×</a>
     <a href="#karte">Karte</a><a href="#highlights">Empfehlungen</a><a href="#reservierung">Reservieren</a><a href="#kontakt">Anfahrt</a>
-    <a class="btn btn-primary" href="#karte" data-aktion="bestellen">Bestellen</a><a class="btn btn-ghost" href="#reservierung" data-aktion="reservieren">Reservieren</a>
+    <a class="btn btn-primary" href="#reservierung" data-aktion="reservieren">Reservieren</a><a class="btn btn-ghost" href="#karte" data-aktion="bestellen">Bestellen</a>
   </nav>
 </header>
-
+<div class="atmosphaere" aria-hidden="true" style="--atmo-deckkraft: 0.12"><svg class="atmosphaere-marke" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><g transform="translate(14 14)"><path d="M0,0 C-4.5,-2.8 -5.6,-8.4 -2.2,-11.8 C0,-12.9 0,-12.9 2.2,-11.8 C5.6,-8.4 4.5,-2.8 0,0 Z" transform="rotate(0)"/><path d="M0,0 C-4.5,-2.8 -5.6,-8.4 -2.2,-11.8 C0,-12.9 0,-12.9 2.2,-11.8 C5.6,-8.4 4.5,-2.8 0,0 Z" transform="rotate(72)"/><path d="M0,0 C-4.5,-2.8 -5.6,-8.4 -2.2,-11.8 C0,-12.9 0,-12.9 2.2,-11.8 C5.6,-8.4 4.5,-2.8 0,0 Z" transform="rotate(144)"/><path d="M0,0 C-4.5,-2.8 -5.6,-8.4 -2.2,-11.8 C0,-12.9 0,-12.9 2.2,-11.8 C5.6,-8.4 4.5,-2.8 0,0 Z" transform="rotate(216)"/><path d="M0,0 C-4.5,-2.8 -5.6,-8.4 -2.2,-11.8 C0,-12.9 0,-12.9 2.2,-11.8 C5.6,-8.4 4.5,-2.8 0,0 Z" transform="rotate(288)"/><circle r="1.7"/></g></svg></div>
 <main>
-<section class="buehne" data-hero="buehne" data-slogan="unter-medium" aria-label="Willkommen" style="--fokus: 65% 70%; --fokus-mobil: 55% 70%; --fokus-video: 50% 65%">
+<section class="buehne" data-hero="buehne" data-slogan="ueber-medium" data-rueckzug aria-label="Willkommen" style="--fokus: 50% 65%; --fokus-mobil: 55% 70%; --fokus-video: 50% 65%">
   <div class="buehne-medium"><picture><source media="(max-width: 767px)" srcset="medien/heroMobil.jpg"><img class="buehne-poster" src="medien/hero.jpg" alt="Baan Nam Thai – Stimmungsbild" fetchpriority="high" decoding="async"></picture><video class="buehne-video" muted playsinline preload="none" aria-hidden="true" data-src="medien/heroVideo.mp4" data-src-webm="medien/heroVideo.webm" data-einmal data-nur-breit></video><div class="buehne-schleier"></div><span class="buehne-herkunft">KI-generiert</span></div>
   <div class="buehne-text"><p class="buehne-slogan">Zu Gast in Mühldorf am Inn</p></div>
   <span class="buehne-pfeil" aria-hidden="true"></span>
@@ -777,8 +777,19 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       <h2>Besuch</h2>
       <address class="einladung-adresse">Musterweg 12, 84453 Mühldorf am Inn<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Musterweg%2012%2C%2084453%20M%C3%BChldorf%20am%20Inn" target="_blank" rel="noopener">Route planen</a></address>
       <p class="bewertung"><span class="sterne" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span><span><strong>4,7</strong> von 5 auf Google · 201 Bewertungen</span></p>
-      <div class="einladung-aktionen"><a class="btn btn-primary" href="#karte">Zur Abholung bestellen</a><a class="btn btn-ghost" href="#reservierung">Tisch anfragen</a></div>
+      <div class="einladung-aktionen"><a class="btn btn-primary" href="#reservierung">Tisch anfragen</a><a class="btn btn-ghost" href="#karte">Zur Abholung bestellen</a></div>
     </aside>
+  </div>
+</section>
+
+<section class="haus-band" id="ambiente" data-atmosphaere="an">
+  <figure class="haus-band-bild"><img src="https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=900&amp;h=700&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Unser Haus" loading="lazy" data-herkunft="platzhalter"></figure>
+  <div class="rahmen">
+    <div class="haus-band-text auftritt">
+      <p class="rubrik">Der Raum</p>
+      <h2>Curry, Wok &amp; Street Food in Mühldorf am Inn</h2>
+      <p class="intro">Unsere Currypasten stampfen wir selbst im Mörser – Zitronengras, Galgant, Kaffirlimette. Sagen Sie uns einfach, wie scharf Sie es mögen; wir kochen von mild bis thailändisch-scharf.</p>
+    </div>
   </div>
 </section>
 
@@ -823,32 +834,6 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
           <div class="zeile-kopf"><span class="karten-name">Mango mit Klebreis</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">7,50 €</span><button class="mini-add" type="button" data-add="2-2" data-name="Mango mit Klebreis" data-preis="7.5" aria-label="Mango mit Klebreis vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
           <p class="gericht-desc">Mit Kokossoße und Sesam</p>
         </li></ul></section></div>
-  </div>
-</section>
-
-<section class="sektion anfahrt" id="kontakt">
-  <div class="rahmen anfahrt-raster">
-    <div class="anfahrt-ort">
-      <p class="rubrik">Anfahrt</p>
-      <h2 class="anfahrt-adresse">Musterweg 12<span>84453 Mühldorf am Inn</span></h2>
-      <p class="anfahrt-wege"><a class="btn btn-primary" href="https://www.google.com/maps/search/?api=1&amp;query=Musterweg%2012%2C%2084453%20M%C3%BChldorf%20am%20Inn" target="_blank" rel="noopener">Route planen</a></p>
-      <p class="anfahrt-hinweis">Abholung vorbestellen – Ihr Essen steht pünktlich bereit</p>
-    </div>
-    <div class="anfahrt-zeiten auftritt">
-      <h3>Öffnungszeiten</h3>
-      <div><span class="tage">Montag – Donnerstag</span><span class="fenster"><span>11:30 – 14:00</span><span>17:00 – 22:00</span></span></div><div><span class="tage">Freitag – Samstag</span><span class="fenster"><span>11:30 – 14:00</span><span>17:00 – 23:00</span></span></div><div><span class="tage">Sonntag &amp; Feiertage</span><span class="fenster"><span>11:30 – 21:00</span></span></div>
-    </div>
-  </div>
-</section>
-
-<section class="haus-band" id="ambiente" data-atmosphaere="an">
-  <figure class="haus-band-bild"><img src="https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=900&amp;h=700&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Unser Haus" loading="lazy" data-herkunft="platzhalter"></figure>
-  <div class="rahmen">
-    <div class="haus-band-text auftritt">
-      <p class="rubrik">Der Raum</p>
-      <h2>Curry, Wok &amp; Street Food in Mühldorf am Inn</h2>
-      <p class="intro">Unsere Currypasten stampfen wir selbst im Mörser – Zitronengras, Galgant, Kaffirlimette. Sagen Sie uns einfach, wie scharf Sie es mögen; wir kochen von mild bis thailändisch-scharf.</p>
-    </div>
   </div>
 </section>
 
@@ -903,13 +888,28 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     </form>
   </div>
 </section>
+
+<section class="sektion anfahrt" id="kontakt">
+  <div class="rahmen anfahrt-raster">
+    <div class="anfahrt-ort">
+      <p class="rubrik">Anfahrt</p>
+      <h2 class="anfahrt-adresse">Musterweg 12<span>84453 Mühldorf am Inn</span></h2>
+      <p class="anfahrt-wege"><a class="btn btn-primary" href="https://www.google.com/maps/search/?api=1&amp;query=Musterweg%2012%2C%2084453%20M%C3%BChldorf%20am%20Inn" target="_blank" rel="noopener">Route planen</a></p>
+      <p class="anfahrt-hinweis">Abholung vorbestellen – Ihr Essen steht pünktlich bereit</p>
+    </div>
+    <div class="anfahrt-zeiten auftritt">
+      <h3>Öffnungszeiten</h3>
+      <div><span class="tage">Montag – Donnerstag</span><span class="fenster"><span>11:30 – 14:00</span><span>17:00 – 22:00</span></span></div><div><span class="tage">Freitag – Samstag</span><span class="fenster"><span>11:30 – 14:00</span><span>17:00 – 23:00</span></span></div><div><span class="tage">Sonntag &amp; Feiertage</span><span class="fenster"><span>11:30 – 21:00</span></span></div>
+    </div>
+  </div>
+</section>
 </main>
 <button class="cart-fab" id="cart-fab" type="button">
   <span>Warenkorb</span>
   <span class="cart-count" id="fab-count">0</span>
   <span id="fab-total">0,00 €</span>
 </button>
-<div class="mobilebar" id="mobilebar"><button class="btn btn-primary" id="bar-order" type="button">Bestellen</button><a class="btn btn-ghost" href="#reservierung">Reservieren</a></div>
+<div class="mobilebar" id="mobilebar"><a class="btn btn-primary" href="#reservierung">Reservieren</a><button class="btn btn-ghost" id="bar-order" type="button">Bestellen</button></div>
 <div class="overlay" id="overlay"></div>
 <aside class="drawer" id="drawer" aria-label="Ihre Abholbestellung">
   <div class="drawer-head">

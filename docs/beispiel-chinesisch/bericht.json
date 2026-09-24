@@ -5,13 +5,14 @@
   "stimmung": "teehaus",
   "archetyp": "hell",
   "seed": 3266011751,
-  "heroVariante": "typo",
+  "heroVariante": "buehne",
   "heroVarianten": [
     "typo",
     "karte",
     "streifen",
     "spalte-bild"
   ],
+  "ausdruck": "gesellig",
   "highlights": [
     "0-1",
     "1-0",
@@ -29,9 +30,21 @@
   "korrekturen": [],
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1512058564366-18510be2db19",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Querbild vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {

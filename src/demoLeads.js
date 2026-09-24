@@ -105,4 +105,13 @@ export const DEMO_LEADS = [
     rating: 4.9,
     anzahlBewertungen: 341,
   },
+  {
+    placeId: "demo-wokmarkt",
+    kueche: "asiatisch",
+    name: "Wok & Markt",
+    ort: "Neuötting",
+    adresse: "Musterstraße 9, 84524 Neuötting",
+    rating: 4.5,
+    anzahlBewertungen: 164,
+  },
 ];

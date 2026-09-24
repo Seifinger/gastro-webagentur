@@ -1,7 +1,7 @@
 {
   "site": "beispiel-griechisch",
-  "designsystem": "griechisch--taverne-am-hafen",
-  "heroVariante": "tafel",
+  "designsystem": "griechisch--olivenhain",
+  "heroVariante": "buehne",
   "runden": [
     {
       "runde": 1,
@@ -18,7 +18,7 @@
     },
     {
       "stufe": "designsystem",
-      "id": "griechisch--taverne-am-hafen"
+      "id": "griechisch--olivenhain"
     },
     {
       "stufe": "copy",
@@ -26,20 +26,32 @@
     }
   ],
   "copy": {
-    "ersetzungen": 1,
+    "ersetzungen": 2,
     "verbleibend": 0
   },
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1540189549336-e6e99c3679fe",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Erstes Bild des vom Inhaber gelieferten Videos (KI-generiert), damit Standbild und Video nahtlos ineinander übergehen, 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {
       "herkunft": "platzhalter",
       "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1559339352-11d035aa65de",
+      "quelle": "stock:photo-1554118811-1e0d58224f24",
       "typ": "bild"
     },
     "team": {
@@ -71,7 +83,13 @@
       "kennzeichnung": "Platzhalter",
       "quelle": "stock:photo-1529006557810-274b9b2fc783",
       "typ": "bild"
+    },
+    "gericht:1-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1599487488170-d11ec9c172f0",
+      "typ": "bild"
     }
   },
-  "zeitpunkt": "2026-09-23T05:39:30.999Z"
+  "zeitpunkt": "2026-09-24T19:18:15.929Z"
 }

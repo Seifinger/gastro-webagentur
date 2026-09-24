@@ -103,8 +103,8 @@
     "hero": {
       "datei": "v2/medien/eigene/beispiel-italienisch/hero.jpg",
       "herkunft": "ki",
-      "quelle": "Querbild vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
-      "fokus": "62% 60%",
+      "quelle": "Erstes Bild des vom Inhaber gelieferten Videos (KI-generiert), damit Standbild und Video nahtlos ineinander übergehen, 24.09.2026",
+      "fokus": "35% 60%",
       "eingetragen": "2026-09-24T18:18:17.131Z"
     },
     "heroMobil": {
@@ -128,8 +128,8 @@
     "hero": {
       "datei": "v2/medien/eigene/beispiel-griechisch/hero.jpg",
       "herkunft": "ki",
-      "quelle": "Querbild vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
-      "fokus": "62% 60%",
+      "quelle": "Erstes Bild des vom Inhaber gelieferten Videos (KI-generiert), damit Standbild und Video nahtlos ineinander übergehen, 24.09.2026",
+      "fokus": "45% 60%",
       "eingetragen": "2026-09-24T18:23:43.834Z"
     },
     "heroMobil": {
@@ -153,8 +153,8 @@
     "hero": {
       "datei": "v2/medien/eigene/beispiel-syrisch/hero.jpg",
       "herkunft": "ki",
-      "quelle": "Querbild vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
-      "fokus": "62% 65%",
+      "quelle": "Erstes Bild des vom Inhaber gelieferten Videos (KI-generiert), damit Standbild und Video nahtlos ineinander übergehen, 24.09.2026",
+      "fokus": "50% 65%",
       "eingetragen": "2026-09-24T18:50:21.761Z"
     },
     "heroMobil": {
@@ -178,8 +178,8 @@
     "hero": {
       "datei": "v2/medien/eigene/beispiel-thailaendisch/hero.jpg",
       "herkunft": "ki",
-      "quelle": "Querbild vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
-      "fokus": "65% 70%",
+      "quelle": "Erstes Bild des vom Inhaber gelieferten Videos (KI-generiert), damit Standbild und Video nahtlos ineinander übergehen, 24.09.2026",
+      "fokus": "50% 65%",
       "eingetragen": "2026-09-24T18:53:05.327Z"
     },
     "heroMobil": {
@@ -247,6 +247,56 @@
       "wiedergabe": "einmal",
       "webm": "v2/medien/eigene/beispiel-chinesisch/heroVideo.webm",
       "eingetragen": "2026-09-24T19:08:20.343Z"
+    }
+  },
+  "beispiel-vietnamesisch": {
+    "hero": {
+      "datei": "v2/medien/eigene/beispiel-vietnamesisch/hero.jpg",
+      "herkunft": "ki",
+      "quelle": "Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026",
+      "fokus": "65% 65%",
+      "eingetragen": "2026-09-24T19:16:45.929Z"
+    },
+    "heroMobil": {
+      "datei": "v2/medien/eigene/beispiel-vietnamesisch/heroMobil.jpg",
+      "herkunft": "ki",
+      "quelle": "Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026",
+      "fokus": "55% 70%",
+      "eingetragen": "2026-09-24T19:16:45.933Z"
+    },
+    "heroVideo": {
+      "datei": "v2/medien/eigene/beispiel-vietnamesisch/heroVideo.mp4",
+      "herkunft": "ki",
+      "quelle": "Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026 – einmalige Wiedergabe",
+      "fokus": "65% 65%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-vietnamesisch/heroVideo.webm",
+      "eingetragen": "2026-09-24T19:16:45.940Z"
+    }
+  },
+  "beispiel-asiatisch": {
+    "hero": {
+      "datei": "v2/medien/eigene/beispiel-asiatisch/hero.jpg",
+      "herkunft": "ki",
+      "quelle": "Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026",
+      "fokus": "65% 65%",
+      "eingetragen": "2026-09-24T19:16:45.940Z"
+    },
+    "heroMobil": {
+      "datei": "v2/medien/eigene/beispiel-asiatisch/heroMobil.jpg",
+      "herkunft": "ki",
+      "quelle": "Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026",
+      "fokus": "55% 70%",
+      "eingetragen": "2026-09-24T19:16:45.941Z"
+    },
+    "heroVideo": {
+      "datei": "v2/medien/eigene/beispiel-asiatisch/heroVideo.mp4",
+      "herkunft": "ki",
+      "quelle": "Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026 – einmalige Wiedergabe",
+      "fokus": "65% 65%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-asiatisch/heroVideo.webm",
+      "eingetragen": "2026-09-24T19:16:45.943Z"
     }
   }
 }

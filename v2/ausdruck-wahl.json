@@ -26,7 +26,7 @@
     "stimmung": "levante-modern"
   },
   "beispiel-thailaendisch": {
-    "ausdruck": "handwerk",
+    "ausdruck": "kino",
     "stimmung": "streetfood-nacht"
   },
   "beispiel-indisch": {
@@ -36,5 +36,13 @@
   "beispiel-chinesisch": {
     "ausdruck": "gesellig",
     "stimmung": "teehaus"
+  },
+  "beispiel-vietnamesisch": {
+    "ausdruck": "handwerk",
+    "stimmung": "hanoi-nacht"
+  },
+  "beispiel-asiatisch": {
+    "ausdruck": "handwerk",
+    "stimmung": "marktstand"
   }
 }

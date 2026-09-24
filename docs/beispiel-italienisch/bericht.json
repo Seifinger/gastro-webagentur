@@ -5,13 +5,14 @@
   "stimmung": "trattoria",
   "archetyp": "traditionell",
   "seed": 1679284404,
-  "heroVariante": "karte",
+  "heroVariante": "buehne",
   "heroVarianten": [
     "spalte-bild",
     "karte",
     "tafel",
     "passepartout"
   ],
+  "ausdruck": "gesellig",
   "highlights": [
     "2-0",
     "2-1",
@@ -28,9 +29,21 @@
   "korrekturen": [],
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1481931098730-318b6f776db0",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Erstes Bild des vom Inhaber gelieferten Videos (KI-generiert), damit Standbild und Video nahtlos ineinander übergehen, 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {
@@ -79,6 +92,14 @@
         ],
         "vorher": "Frische Pasta, Holzofenpizza und echtes Dolce Vita – direkt am Musterplatz in Altötting.",
         "nachher": "Frische Pasta und Holzofenpizza – direkt am Musterplatz in Altötting."
+      },
+      {
+        "pfad": "einladungText",
+        "regeln": [
+          "klischee-dolce-vita"
+        ],
+        "vorher": "Frische Pasta, Holzofenpizza und echtes Dolce Vita.",
+        "nachher": "Frische Pasta, Holzofenpizza."
       }
     ],
     "hinweise": [],

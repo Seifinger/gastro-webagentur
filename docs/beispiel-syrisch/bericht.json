@@ -1,17 +1,18 @@
 {
   "engine": "v2",
-  "designsystem": "syrisch--gewuerzbasar",
+  "designsystem": "syrisch--levante-modern",
   "kueche": "syrisch",
-  "stimmung": "gewuerzbasar",
-  "archetyp": "abend",
+  "stimmung": "levante-modern",
+  "archetyp": "hell",
   "seed": 4098062833,
-  "heroVariante": "spalte-bild",
+  "heroVariante": "buehne",
   "heroVarianten": [
-    "tafel",
-    "passepartout",
     "typo",
+    "karte",
+    "streifen",
     "spalte-bild"
   ],
+  "ausdruck": "gesellig",
   "highlights": [
     "0-2",
     "1-0",
@@ -29,15 +30,27 @@
   "korrekturen": [],
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1752795646140-eb70cf30640e",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Erstes Bild des vom Inhaber gelieferten Videos (KI-generiert), damit Standbild und Video nahtlos ineinander übergehen, 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {
       "herkunft": "platzhalter",
       "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1562560471-cb5b5f96c1ab",
+      "quelle": "stock:photo-1555396273-367ea4eb4db5",
       "typ": "bild"
     },
     "team": {
@@ -83,7 +96,7 @@
     "verbleibend": [],
     "llm": [],
     "ausrufezeichen": 0,
-    "kanon": "ruhig und knapp – wenige Worte, eher Einladung als Werbung"
+    "kanon": "direkt und praktisch – beantwortet zuerst: was, wann, wie schnell"
   },
   "raster": {
     "1": 8,
