@@ -12,5 +12,37 @@
   "beispiel-japanisch": {
     "ausdruck": "kino",
     "stimmung": "omakase"
+  },
+  "beispiel-italienisch": {
+    "ausdruck": "gesellig",
+    "stimmung": "trattoria"
+  },
+  "beispiel-griechisch": {
+    "ausdruck": "gesellig",
+    "stimmung": "olivenhain"
+  },
+  "beispiel-syrisch": {
+    "ausdruck": "gesellig",
+    "stimmung": "levante-modern"
+  },
+  "beispiel-thailaendisch": {
+    "ausdruck": "kino",
+    "stimmung": "streetfood-nacht"
+  },
+  "beispiel-indisch": {
+    "ausdruck": "gesellig",
+    "stimmung": "gewuerzmarkt"
+  },
+  "beispiel-chinesisch": {
+    "ausdruck": "gesellig",
+    "stimmung": "teehaus"
+  },
+  "beispiel-vietnamesisch": {
+    "ausdruck": "handwerk",
+    "stimmung": "hanoi-nacht"
+  },
+  "beispiel-asiatisch": {
+    "ausdruck": "handwerk",
+    "stimmung": "marktstand"
   }
 }

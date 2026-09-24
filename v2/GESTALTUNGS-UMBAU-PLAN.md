@@ -603,6 +603,19 @@ Aufwand in Sitzungen (≈ eine konzentrierte Claude-Code-Sitzung):
 - **Veröffentlichung:** nur nach deiner Freigabe und nur je Seite
   (`npm run publish-site -- --only <slug>`).
 
+**Stand AP11 (24.09.2026):**
+- Standard-Zuordnung B.3 ist aktiv: `ausdruckZumBauen(slug, kueche)` in `v2/build/ausdruck.js`
+  liefert die Wahl aus `v2/ausdruck-wahl.json`, sonst den Standard der Küche; `"aus"` heißt
+  bewusst ohne Ausdruck. `publishSite.js` und der Einzelbau im Dashboard nutzen dieselbe Funktion.
+- Ausdruck-Wahl je Lead in `bearbeiten.html` (Auswahl im v2-Panel, Route
+  `POST /intern/v2/lead/:slug/ausdruck`, am Dashboard-Token). Gespeichert wird versioniert in
+  `v2/ausdruck-wahl.json`, nicht im gitignorierten `data/`.
+- Standard-Engine ist v2, auch ohne `data/v2-engine.json` (A.4.1 behoben); v1 bleibt je Lead
+  oder global wählbar.
+- Die Vorschau der Textvorschläge rendert für v2-Leads die v2-Seite mit Ausdruck (A.4.2 behoben).
+- v1-Gestaltung: noch nicht stillgelegt. Sie wird nur noch gebraucht, wenn ein Lead ausdrücklich
+  auf v1 steht, einen Ausdruck „aus“ hat und die Küche keinen Standard hat.
+
 ---
 
 ## E. Funktionsschutz

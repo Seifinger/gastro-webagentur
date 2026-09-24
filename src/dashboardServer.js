@@ -47,7 +47,7 @@ import { ladeStimmungsWahl, speichereStimmung, stimmungFuerLead } from "./stimmu
 import { stimmungenFuer } from "./stimmungen.js";
 import { ladeManifest, slugFuerPlaceId, placeIdFuerSlug } from "./entwurfsManifest.js";
 // v2-Engine (Stage 7b): einziger Eingriff in v1 – eigene Routen, Engine-Spalte, Design-Tokens.
-import { v2Handler, ergaenzeLeadsV2, v2HtmlInjektion } from "../v2/integration/dashboardV2.js";
+import { v2Handler, ergaenzeLeadsV2, v2HtmlInjektion, textVorschauV2 } from "../v2/integration/dashboardV2.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -449,7 +449,21 @@ export const handler = async (req, res) => {
 
     // Nicht gespeichert: gerendert wird direkt aus dem In-Memory-Vorschlag,
     // über die schon aktiven lead-edits gelegt. Erst /prompt/uebernehmen
-    // schreibt etwas auf die Platte.
+    // schreibt etwas auf die Platte. Läuft der Lead über v2, zeigt auch die
+    // Vorschau die v2-Seite – sonst sähe der Wirt hier eine andere Welt als
+    // im späteren Entwurf.
+    try {
+      const v2Html = await textVorschauV2(slug, eintrag.vorschlag);
+      if (v2Html) {
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+        res.end(v2Html);
+        return;
+      }
+    } catch (fehler) {
+      res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end(`Vorschau nicht möglich: ${fehler.message}`);
+      return;
+    }
     const vorhandeneEdits = loadLeadEdits(slug);
     const html = buildLandingPage(kontext.lead, {
       menu: kontext.menu,

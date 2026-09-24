@@ -6,10 +6,13 @@
 //   v2HtmlInjektion(html, seite)   – bindet Stil und Skript in dashboard.html /
 //                                    bearbeiten.html ein, ohne die Dateien zu ändern
 //
-// Engine-Wahl: global (Standard "v1", änderbar im Dashboard oder per
-// ENGINE_STANDARD=v2) und je Lead übersteuerbar. Gespeichert in
-// data/v2-engine.json. Ohne Datei und ohne Variable ist alles v1 – das
-// Dashboard verhält sich dann exakt wie vorher, nur mit neuem Stil.
+// Engine-Wahl: global (Standard "v2" seit AP11, änderbar im Dashboard oder
+// per ENGINE_STANDARD=v1) und je Lead übersteuerbar. Gespeichert in
+// data/v2-engine.json. Fehlt die Datei (neuer Checkout, anderer Rechner),
+// gilt v2 – kein stiller Rückfall auf die alte Optik (Plan A.4.1).
+//
+// Ausdruck je Lead (AP11): gespeichert im versionierten v2/ausdruck-wahl.json;
+// ohne Wahl gilt die Standard-Zuordnung der Küche (ausdruck.js).
 
 import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync, readdirSync } from "node:fs";
 import path from "node:path";
@@ -25,6 +28,7 @@ import { OUTPUT_DIR, FONTS_DIR } from "../build/siteBuilder.js";
 import { schriftCss } from "../build/schriften.js";
 import { loeseMedien, medienUebersicht } from "../assets-pipeline/mediaGenerator.js";
 import { creativeHandler } from "./creativeDashboard.js";
+import { AUSDRUECKE, AUSDRUCK_AUS, ausdruckZumBauen, speichereAusdruckWahl } from "../build/ausdruck.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.join(__dirname, "..", "..");
@@ -46,7 +50,7 @@ export function ladeEngineWahl(datei = engineDatei()) {
   } catch {
     gespeichert = {};
   }
-  const standard = ENGINES.includes(process.env.ENGINE_STANDARD) ? process.env.ENGINE_STANDARD : gespeichert.standard ?? "v1";
+  const standard = ENGINES.includes(process.env.ENGINE_STANDARD) ? process.env.ENGINE_STANDARD : gespeichert.standard ?? "v2";
   return { standard, leads: gespeichert.leads ?? {} };
 }
 
@@ -119,6 +123,15 @@ export function ergaenzeLeadsV2(leads) {
   });
 }
 
+/** Ausdruck eines Leads mit Herkunft und Auswahl fürs Dashboard. */
+function ausdruckInfo(slug, kueche) {
+  const stand = ausdruckZumBauen(slug, kueche);
+  return {
+    ...stand,
+    optionen: Object.values(AUSDRUECKE).map((a) => ({ id: a.id, label: a.label, prinzip: a.prinzip, passtZu: a.passtZu })),
+  };
+}
+
 /** Alles, was die Bearbeiten-Ansicht über den v2-Stand eines Leads wissen muss. */
 export function leadDetailV2(slug) {
   const k = leadKontext(slug);
@@ -131,6 +144,7 @@ export function leadDetailV2(slug) {
     slug,
     name: lead.name,
     engine: engineFuerLead(lead.placeId),
+    ausdruck: ausdruckInfo(slug, k.kueche),
     v2Entwurf: bericht ? `/v2/leads/${encodeURIComponent(slug)}/` : "",
     designsystem: {
       id: ds.id,
@@ -163,9 +177,38 @@ export async function baueLeadV2(slug, { judge = false, apiUrl = process.env.V2_
     judge,
     zielDir: LEADS_DIR,
     slug,
-    optionen: { editUebersteuerung: loadLeadEdits(slug), apiUrl, fiktiv: false },
+    optionen: { editUebersteuerung: loadLeadEdits(slug), apiUrl, fiktiv: false, ...ausdruckOption(slug, k.kueche) },
   });
   return protokoll;
+}
+
+function ausdruckOption(slug, kueche) {
+  const { ausdruck } = ausdruckZumBauen(slug, kueche);
+  return ausdruck ? { ausdruck } : {};
+}
+
+/**
+ * Vorschau der Textvorschläge über dieselbe Engine wie der spätere Entwurf
+ * (Plan A.4.2). Liefert null, wenn der Lead über v1 läuft – dann rendert
+ * dashboardServer.js wie bisher mit v1.
+ */
+export async function textVorschauV2(slug, texte) {
+  const k = leadKontext(slug);
+  if (!k || engineFuerLead(k.lead.placeId) !== "v2") return null;
+  const { baueSite } = await import("../build/siteBuilder.js");
+  const edits = loadLeadEdits(slug);
+  const { html } = baueSite({
+    lead: k.lead,
+    kueche: k.gestaltung.cuisine,
+    stimmung: k.gestaltung.stimmung,
+    optionen: {
+      editUebersteuerung: { bilder: edits.bilder, texte: { ...edits.texte, ...texte } },
+      fiktiv: false,
+      fontsPfad: "/v2/assets/fonts",
+      ...ausdruckOption(slug, k.kueche),
+    },
+  });
+  return html;
 }
 
 /* ------------------------------------------------------------------ */
@@ -306,6 +349,22 @@ const DASHBOARD_SKRIPT = `
 
 const BEARBEITEN_SKRIPT = `
 (function () {
+  function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  /** Ausdruck je Lead: Standard der K\u00FCche, eine der vier Richtungen oder bewusst ohne. */
+  function ausdruckWahl(a) {
+    if (!a) return "";
+    var vorschlag = a.optionen.filter(function (o) { return o.id === a.vorschlag; })[0];
+    var gewaehlt = a.quelle === "gewaehlt" ? a.ausdruck : a.quelle === "aus" ? "${AUSDRUCK_AUS}" : "";
+    var optionen = '<option value=""' + (gewaehlt ? "" : " selected") + '>Standard der K\u00FCche' + (vorschlag ? ": " + esc(vorschlag.label) : " (keiner)") + '</option>' +
+      a.optionen.map(function (o) {
+        return '<option value="' + esc(o.id) + '"' + (gewaehlt === o.id ? " selected" : "") + '>' + esc(o.label) + ' \u2013 ' + esc(o.passtZu) + '</option>';
+      }).join("") +
+      '<option value="${AUSDRUCK_AUS}"' + (gewaehlt === "${AUSDRUCK_AUS}" ? " selected" : "") + '>Ohne Ausdruck (bisherige v2-Seite)</option>';
+    return '<p class="v2-ausdruck"><label for="v2-ausdruck"><b>Ausdruck (Gestaltung):</b></label> ' +
+      '<select id="v2-ausdruck">' + optionen + '</select> <span id="v2-ausdruck-hinweis"></span><br>' +
+      '<small>Aktuell: ' + esc(a.ausdruck ? a.optionen.filter(function (o) { return o.id === a.ausdruck; })[0].label : "ohne") +
+      ' (' + ({ gewaehlt: "gew\u00E4hlt", standard: "Standard der K\u00FCche", aus: "bewusst ohne", keiner: "kein Standard" })[a.quelle] + ')</small></p>';
+  }
   var slug = new URLSearchParams(location.search).get("lead");
   if (!slug) return;
   fetch("/api/v2/lead/" + encodeURIComponent(slug)).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
@@ -329,9 +388,20 @@ const BEARBEITEN_SKRIPT = `
       (d.v2Entwurf ? ' · <a href="' + d.v2Entwurf + '" target="_blank" rel="noopener">v2-Entwurf ansehen</a>' : ' · noch kein v2-Entwurf gebaut') +
       ' · <a href="' + ds.dokument + '" target="_blank" rel="noopener">Designsystem-Dokument</a>' +
       (d.judge ? ' · Judge: ' + d.judge.ergebnis : '') + '</p>' +
-      '<p><b>Foto-Anleitung (Bild-Kanon):</b> ' + ds.bildKanon.licht + '; ' + ds.bildKanon.perspektive + '.</p>';
+      '<p><b>Foto-Anleitung (Bild-Kanon):</b> ' + ds.bildKanon.licht + '; ' + ds.bildKanon.perspektive + '.</p>' +
+      ausdruckWahl(d.ausdruck);
     var raster = document.getElementById("raster");
     raster.parentNode.insertBefore(panel, raster);
+    var wahl = panel.querySelector("#v2-ausdruck");
+    if (wahl) wahl.addEventListener("change", function () {
+      var hinweis = panel.querySelector("#v2-ausdruck-hinweis");
+      hinweis.textContent = "speichert \u2026";
+      fetch("/intern/v2/lead/" + encodeURIComponent(slug) + "/ausdruck", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ausdruck: wahl.value })
+      }).then(function (r) { return r.json(); }).then(function (r) {
+        hinweis.textContent = r.ok === false ? r.fehler : "gespeichert \u2013 wirkt beim n\u00E4chsten Bau (\u201Ev2 bauen\u201C) und beim Ver\u00F6ffentlichen";
+      });
+    });
     function badges() {
       d.medien.forEach(function (m) {
         var marke = document.querySelector('.platz[data-rolle="' + m.rolle + '"] .marke');
@@ -388,6 +458,7 @@ function sicherInnerhalb(basis, relativ) {
 }
 
 const BAUEN = /^\/intern\/v2\/lead\/([^/]+)\/bauen$/;
+const AUSDRUCK = /^\/intern\/v2\/lead\/([^/]+)\/ausdruck$/;
 const LEAD_DETAIL = /^\/api\/v2\/lead\/([^/]+)$/;
 
 /** Liefert true, wenn die Anfrage eine v2-Route war (dann ist sie beantwortet). */
@@ -411,6 +482,19 @@ export async function v2Handler(req, res, pathname) {
   if (pathname === "/intern/v2/engine" && req.method === "POST") {
     try {
       return sende(res, 200, { ok: true, ...speichereEngineWahl(await lies(req)) }), true;
+    } catch (e) {
+      return sende(res, 400, { ok: false, fehler: e.message }), true;
+    }
+  }
+  const ausdruck = AUSDRUCK.exec(pathname);
+  if (ausdruck && req.method === "POST") {
+    try {
+      const slug = decodeURIComponent(ausdruck[1]);
+      const k = leadKontext(slug);
+      if (!k) throw new Error("Zu diesem Entwurf gibt es keinen Lead.");
+      const { ausdruck: wert = "" } = await lies(req);
+      speichereAusdruckWahl(slug, wert);
+      return sende(res, 200, { ok: true, ausdruck: ausdruckInfo(slug, k.kueche) }), true;
     } catch (e) {
       return sende(res, 400, { ok: false, fehler: e.message }), true;
     }

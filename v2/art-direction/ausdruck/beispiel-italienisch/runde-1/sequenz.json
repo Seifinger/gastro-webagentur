@@ -1,0 +1,161 @@
+{
+  "desktop": {
+    "sequenz": [
+      {
+        "anteil": 0,
+        "datei": "desktop--scroll-000.jpg",
+        "kopf": "ueber-buehne",
+        "sloganDeckkraft": 1,
+        "aktionsleiste": 0,
+        "horizontalScroll": false,
+        "kaputteBilder": 2
+      },
+      {
+        "anteil": 0.25,
+        "datei": "desktop--scroll-025.jpg",
+        "kopf": "ueber-buehne",
+        "sloganDeckkraft": 0.17,
+        "aktionsleiste": 0,
+        "horizontalScroll": false,
+        "kaputteBilder": 3
+      },
+      {
+        "anteil": 0.5,
+        "datei": "desktop--scroll-050.jpg",
+        "kopf": "ueber-buehne",
+        "sloganDeckkraft": 0,
+        "aktionsleiste": 0,
+        "horizontalScroll": false,
+        "kaputteBilder": 3
+      },
+      {
+        "anteil": 0.75,
+        "datei": "desktop--scroll-075.jpg",
+        "kopf": "ueber-buehne",
+        "sloganDeckkraft": 0,
+        "aktionsleiste": 0,
+        "horizontalScroll": false,
+        "kaputteBilder": 3
+      },
+      {
+        "anteil": 1,
+        "datei": "desktop--scroll-100.jpg",
+        "kopf": "fest",
+        "sloganDeckkraft": 0,
+        "aktionsleiste": 1,
+        "horizontalScroll": false,
+        "kaputteBilder": 3
+      }
+    ],
+    "skriptfehler": [],
+    "reduziert": {
+      "kopf": "ueber-buehne",
+      "sloganDeckkraft": 1,
+      "aktionsleiste": 0,
+      "horizontalScroll": false,
+      "kaputteBilder": 0
+    },
+    "reduziertNachScroll": {
+      "kopf": "ueber-buehne",
+      "sloganDeckkraft": 1,
+      "aktionsleiste": 0,
+      "horizontalScroll": false,
+      "kaputteBilder": 2
+    },
+    "ohneJs": {
+      "kopf": "fest",
+      "sloganDeckkraft": 1,
+      "aktionsleiste": 1,
+      "horizontalScroll": false,
+      "kaputteBilder": 4
+    }
+  },
+  "mobil": {
+    "sequenz": [
+      {
+        "anteil": 0,
+        "datei": "mobil--scroll-000.jpg",
+        "kopf": "ueber-buehne",
+        "sloganDeckkraft": 1,
+        "aktionsleiste": 0,
+        "horizontalScroll": false,
+        "kaputteBilder": 1
+      },
+      {
+        "anteil": 0.25,
+        "datei": "mobil--scroll-025.jpg",
+        "kopf": "ueber-buehne",
+        "sloganDeckkraft": 0.16,
+        "aktionsleiste": 0,
+        "horizontalScroll": false,
+        "kaputteBilder": 1
+      },
+      {
+        "anteil": 0.5,
+        "datei": "mobil--scroll-050.jpg",
+        "kopf": "ueber-buehne",
+        "sloganDeckkraft": 0,
+        "aktionsleiste": 0,
+        "horizontalScroll": false,
+        "kaputteBilder": 1
+      },
+      {
+        "anteil": 0.75,
+        "datei": "mobil--scroll-075.jpg",
+        "kopf": "ueber-buehne",
+        "sloganDeckkraft": 0,
+        "aktionsleiste": 0,
+        "horizontalScroll": false,
+        "kaputteBilder": 2
+      },
+      {
+        "anteil": 1,
+        "datei": "mobil--scroll-100.jpg",
+        "kopf": "fest",
+        "sloganDeckkraft": 0,
+        "aktionsleiste": 1,
+        "horizontalScroll": false,
+        "kaputteBilder": 2
+      }
+    ],
+    "menue": {
+      "offen": true,
+      "fokusImMenue": true,
+      "schliesstMitEsc": true
+    },
+    "skriptfehler": [],
+    "reduziert": {
+      "kopf": "ueber-buehne",
+      "sloganDeckkraft": 1,
+      "aktionsleiste": 0,
+      "horizontalScroll": false,
+      "kaputteBilder": 0
+    },
+    "reduziertNachScroll": {
+      "kopf": "ueber-buehne",
+      "sloganDeckkraft": 1,
+      "aktionsleiste": 0,
+      "horizontalScroll": false,
+      "kaputteBilder": 1
+    },
+    "ohneJs": {
+      "kopf": "fest",
+      "sloganDeckkraft": 1,
+      "aktionsleiste": 1,
+      "horizontalScroll": false,
+      "kaputteBilder": 4
+    }
+  },
+  "robustheit": {
+    "langsam": {
+      "lcpMs": 1804,
+      "posterGeladen": true,
+      "videoLaeuft": true
+    },
+    "ohneVideo": {
+      "posterGeladen": true,
+      "videoSichtbar": false,
+      "skriptfehler": []
+    }
+  }
+}

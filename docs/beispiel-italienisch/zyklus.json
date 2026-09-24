@@ -1,7 +1,7 @@
 {
   "site": "beispiel-italienisch",
   "designsystem": "italienisch--trattoria",
-  "heroVariante": "karte",
+  "heroVariante": "buehne",
   "runden": [
     {
       "runde": 1,
@@ -26,14 +26,26 @@
     }
   ],
   "copy": {
-    "ersetzungen": 1,
+    "ersetzungen": 2,
     "verbleibend": 0
   },
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1481931098730-318b6f776db0",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Erstes Bild des vom Inhaber gelieferten Videos (KI-generiert), damit Standbild und Video nahtlos ineinander übergehen, 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {
@@ -73,5 +85,5 @@
       "typ": "bild"
     }
   },
-  "zeitpunkt": "2026-09-23T05:39:30.532Z"
+  "zeitpunkt": "2026-09-24T19:18:15.527Z"
 }
