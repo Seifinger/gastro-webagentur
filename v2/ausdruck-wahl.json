@@ -32,5 +32,9 @@
   "beispiel-indisch": {
     "ausdruck": "gesellig",
     "stimmung": "gewuerzmarkt"
+  },
+  "beispiel-chinesisch": {
+    "ausdruck": "gesellig",
+    "stimmung": "teehaus"
   }
 }
