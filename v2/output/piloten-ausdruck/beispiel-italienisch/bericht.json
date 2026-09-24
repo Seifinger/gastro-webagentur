@@ -1,0 +1,124 @@
+{
+  "engine": "v2",
+  "designsystem": "italienisch--trattoria",
+  "kueche": "italienisch",
+  "stimmung": "trattoria",
+  "archetyp": "traditionell",
+  "seed": 1679284404,
+  "heroVariante": "buehne",
+  "heroVarianten": [
+    "spalte-bild",
+    "karte",
+    "tafel",
+    "passepartout"
+  ],
+  "ausdruck": "gesellig",
+  "highlights": [
+    "2-0",
+    "2-1",
+    "2-2"
+  ],
+  "kontrast": {
+    "geprueft": 23,
+    "fehler": 0
+  },
+  "lint": {
+    "fehler": 0,
+    "warnungen": []
+  },
+  "korrekturen": [],
+  "medien": {
+    "hero": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Querbild vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "typ": "bild"
+    },
+    "haus": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1517248135467-4c7edcad34c4",
+      "typ": "bild"
+    },
+    "team": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1428515613728-6b4607e44363",
+      "typ": "bild"
+    },
+    "bestseller": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1551183053-bf91a1d81141",
+      "typ": "bild"
+    },
+    "gericht:2-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1551183053-bf91a1d81141",
+      "typ": "bild"
+    },
+    "gericht:2-1": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1473093295043-cdd812d0e601",
+      "typ": "bild"
+    },
+    "gericht:2-2": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1621996346565-e3dbc646d9a9",
+      "typ": "bild"
+    }
+  },
+  "copy": {
+    "ersetzungen": [
+      {
+        "pfad": "claim",
+        "regeln": [
+          "klischee-dolce-vita"
+        ],
+        "vorher": "Frische Pasta, Holzofenpizza und echtes Dolce Vita – direkt am Musterplatz in Altötting.",
+        "nachher": "Frische Pasta und Holzofenpizza – direkt am Musterplatz in Altötting."
+      },
+      {
+        "pfad": "einladungText",
+        "regeln": [
+          "klischee-dolce-vita"
+        ],
+        "vorher": "Frische Pasta, Holzofenpizza und echtes Dolce Vita.",
+        "nachher": "Frische Pasta, Holzofenpizza."
+      }
+    ],
+    "hinweise": [],
+    "verbleibend": [],
+    "llm": [],
+    "ausrufezeichen": 0,
+    "kanon": "bodenständig und konkret – sagt, was es gibt und wie es gemacht wird, ohne zu schwärmen"
+  },
+  "raster": {
+    "1": 8,
+    "2": 16,
+    "3": 24,
+    "4": 32,
+    "5": 40,
+    "6": 48,
+    "8": 64,
+    "10": 80,
+    "12": 96,
+    "16": 128,
+    "halb": 4
+  }
+}

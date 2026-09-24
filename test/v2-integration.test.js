@@ -15,7 +15,12 @@ process.env.BETRIEB = SLUG;
 const ENGINE_TMP = mkdtempSync(path.join(tmpdir(), "v2-engine-"));
 process.env.V2_ENGINE_DATEI = path.join(ENGINE_TMP, "engine.json");
 
-const { speichereBetrieb, legeTischAn, legeReservierungAn, legeBestellungAn, ladeBetrieb } = await import("../src/betriebStore.js");
+const { speichereBetrieb, legeTischAn, legeReservierungAn, legeBestellungAn, ladeBetrieb, uhrHook } = await import("../src/betriebStore.js");
+
+// Feste Uhr (Donnerstag, 24.09.2026, 17:00 Berlin): Die Bestellungen hier
+// wünschen 18:00/18:30 – das muss unabhängig von der Tageszeit des Testlaufs
+// eine angebotene Abholzeit sein (Prüfung in legeBestellungAn).
+uhrHook.jetzt = () => new Date("2026-09-24T17:00:00+02:00");
 const adapter = await import("../v2/integration/wirtAdapter.js");
 const bot = await import("../v2/integration/telegramBot.js");
 const { erzeugeHandlerV2, wirtThemeCss, themeWirtHtml } = await import("../v2/integration/wirtServerV2.js");

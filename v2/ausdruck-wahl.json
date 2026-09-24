@@ -12,5 +12,9 @@
   "beispiel-japanisch": {
     "ausdruck": "kino",
     "stimmung": "omakase"
+  },
+  "beispiel-italienisch": {
+    "ausdruck": "gesellig",
+    "stimmung": "trattoria"
   }
 }
