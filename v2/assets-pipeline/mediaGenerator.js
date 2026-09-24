@@ -314,7 +314,7 @@ export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remote
 
 function platzhalterSvgSync(ds, rolle) {
   const r = ds.farben.rollen;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="${r.flaecheTief.hex}"/><text x="200" y="160" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="${r.textLeise.hex}">Foto folgt (${rolle})</text></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect width="400" height="300" fill="${r.flaecheTief.hex}"/><text x="200" y="160" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="${r.textLeise.hex}">Foto folgt</text></svg>`;
 }
 
 /** Übersicht je Rolle für das Dashboard (Stage 7b). */

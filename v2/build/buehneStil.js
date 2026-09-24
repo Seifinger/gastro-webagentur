@@ -74,13 +74,14 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
 .buehne-ende { height: 0; }
 @media (min-width: 768px) { .buehne { height: var(--hero-hoehe); } }
 
-/* Einladung: Name, Einordnung und die zwei Wege direkt unter der Bühne. */
+/* Einladung: Name und Haus links, Besuch rechts (Details in abfolge.js). */
 .einladung { padding-block: var(--sektion-betont) var(--sektion); }
-.einladung-innen { display: grid; justify-items: center; gap: var(--s-2); text-align: center; }
+.einladung-innen { display: grid; gap: var(--s-4); }
+.einladung-haus { display: grid; gap: var(--s-2); }
 .einladung-name { font-size: var(--t-h1); }
-.einladung-text { max-width: 52ch; color: var(--text-leise); font-size: var(--t-gross); }
-.einladung .bewertung { justify-content: center; margin-top: 0; }
-.einladung-aktionen { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-2); margin-top: var(--s-2); }
+.einladung-text { max-width: 44ch; color: var(--text-leise); font-size: var(--t-gross); }
+.einladung .bewertung { margin-top: 0; }
+.einladung-aktionen { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-1); }
 
 /* Aktionsleiste unten erst nach der Bühne – die Knöpfe stehen oben schon. */
 .buehne-sichtbar .mobilebar { opacity: 0; transform: translateY(100%); pointer-events: none; }

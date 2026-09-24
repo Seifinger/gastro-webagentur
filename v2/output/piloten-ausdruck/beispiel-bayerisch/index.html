@@ -572,13 +572,14 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
 .buehne-ende { height: 0; }
 @media (min-width: 768px) { .buehne { height: var(--hero-hoehe); } }
 
-/* Einladung: Name, Einordnung und die zwei Wege direkt unter der Bühne. */
+/* Einladung: Name und Haus links, Besuch rechts (Details in abfolge.js). */
 .einladung { padding-block: var(--sektion-betont) var(--sektion); }
-.einladung-innen { display: grid; justify-items: center; gap: var(--s-2); text-align: center; }
+.einladung-innen { display: grid; gap: var(--s-4); }
+.einladung-haus { display: grid; gap: var(--s-2); }
 .einladung-name { font-size: var(--t-h1); }
-.einladung-text { max-width: 52ch; color: var(--text-leise); font-size: var(--t-gross); }
-.einladung .bewertung { justify-content: center; margin-top: 0; }
-.einladung-aktionen { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-2); margin-top: var(--s-2); }
+.einladung-text { max-width: 44ch; color: var(--text-leise); font-size: var(--t-gross); }
+.einladung .bewertung { margin-top: 0; }
+.einladung-aktionen { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-1); }
 
 /* Aktionsleiste unten erst nach der Bühne – die Knöpfe stehen oben schon. */
 .buehne-sichtbar .mobilebar { opacity: 0; transform: translateY(100%); pointer-events: none; }
@@ -606,6 +607,66 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
   @keyframes buehne-rueckzug { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(calc(var(--hero-hoehe) * .15)); } }
 }
 
+
+/* Einladung zweispaltig: links das Haus, rechts der Besuch (nur echte Angaben). */
+.einladung-innen { justify-items: start; text-align: left; }
+.einladung .bewertung { justify-content: flex-start; }
+.einladung-aktionen { justify-content: flex-start; }
+.einladung-besuch { display: grid; gap: var(--s-2); width: 100%; padding-top: var(--s-3); border-top: 1px solid var(--linie); }
+.einladung-besuch h2 { font-size: var(--t-h3); }
+.einladung-adresse { font-style: normal; color: var(--text-leise); }
+.einladung-adresse a { color: var(--akzent-text); }
+@media (min-width: 1024px) {
+  .einladung-innen { grid-template-columns: 7fr 4fr; column-gap: calc(var(--rinne) * 2); align-items: end; }
+  .einladung-haus { display: grid; gap: var(--s-2); }
+  .einladung-besuch { padding-top: 0; padding-left: var(--s-4); border-top: 0; border-left: 1px solid var(--linie); }
+}
+
+/* Tisch: Collage statt Kartenraster – ungleiche Größen, versetzte Kanten. */
+.tisch-kopf { max-width: var(--text-breite); margin-bottom: var(--s-6); }
+.tisch-collage { display: grid; gap: var(--s-6); }
+.teller { display: grid; gap: var(--s-2); }
+.teller-bild { position: relative; overflow: hidden; border-radius: var(--r-bild); background: var(--flaeche-tief); aspect-ratio: 4 / 5; }
+.teller-bild img { width: 100%; height: 100%; object-fit: cover; }
+.teller--2 .teller-bild { aspect-ratio: 4 / 3; }
+.teller--3 .teller-bild { aspect-ratio: 1 / 1; }
+.teller h3 { font-size: var(--t-h3); }
+.teller--1 h3 { font-size: var(--t-h2); }
+.teller-desc { color: var(--text-leise); max-width: 46ch; }
+.teller-fuss { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; }
+.teller-fuss .preis { margin-right: auto; font-family: var(--f-display); font-size: var(--t-gross); font-variant-numeric: tabular-nums; }
+@media (max-width: 767px) {
+  .teller--2 { width: 88%; margin-left: auto; }
+  .teller--3 { width: 72%; }
+}
+@media (min-width: 768px) {
+  .tisch-collage { grid-template-columns: repeat(12, 1fr); column-gap: var(--rinne); row-gap: var(--s-8); align-items: start; }
+  .teller--1 { grid-column: 1 / span 7; grid-row: 1 / span 2; }
+  .teller--2 { grid-column: 8 / span 5; }
+  .teller--3 { grid-column: 9 / span 4; }
+}
+
+/* Haus als Raum-Band: breites Bild, der Text schiebt sich versetzt darüber. */
+.haus-band { position: relative; padding-bottom: var(--sektion); }
+.haus-band-bild { position: relative; height: 56svh; overflow: hidden; background: var(--flaeche-tief); }
+.haus-band-bild img { width: 100%; height: 100%; object-fit: cover; }
+.haus-band-text { position: relative; max-width: 40rem; margin-top: calc(var(--s-12) * -1); padding: var(--s-5) var(--s-4); background: var(--grund); }
+.haus-band--ohne-bild { padding-top: var(--sektion); }
+.haus-band--ohne-bild .haus-band-text { margin-top: 0; padding-inline: 0; }
+@media (min-width: 1024px) { .haus-band-text { margin-left: calc(100% / 12); } }
+
+
+.atmosphaere { position: fixed; right: -6vmin; bottom: 6vh; z-index: -1; width: 46vmin; max-width: 520px; color: var(--akzent);
+  opacity: 0; pointer-events: none; transform: rotate(-14deg); }
+.atmosphaere svg { display: block; width: 100%; height: auto; }
+.atmo-an .atmosphaere { opacity: var(--atmo-deckkraft); }
+@media (prefers-reduced-motion: no-preference) {
+  .atmosphaere { transition: opacity var(--m-lang) var(--m-kurve); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atmosphaere { display: none; }
+}
+
 </style>
 </head>
 <body class="a-traditionell schema-hell rubrik-versal moment-hero ausdruck-gesellig veroeffentlicht">
@@ -624,6 +685,14 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
     <a class="btn btn-primary" href="#reservierung" data-aktion="reservieren">Reservieren</a><a class="btn btn-ghost" href="#karte" data-aktion="bestellen">Bestellen</a>
   </nav>
 </header>
+<div class="atmosphaere" aria-hidden="true" style="--atmo-deckkraft: 0.08"><svg viewBox="0 0 240 260" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M110 206 C 70 222, 24 190, 26 138 C 28 88, 74 44, 110 14 C 146 44, 192 88, 194 138 C 196 190, 150 222, 110 206 Z"/>
+<path d="M110 206 L110 24"/>
+<path d="M110 168 C 90 160, 66 150, 44 128 M110 168 C 130 160, 154 150, 176 128"/>
+<path d="M110 128 C 94 118, 78 104, 64 84 M110 128 C 126 118, 142 104, 156 84"/>
+<path d="M110 88 C 100 78, 92 66, 86 52 M110 88 C 120 78, 128 66, 134 52"/>
+<path d="M110 206 C 112 222, 118 238, 128 252"/>
+</svg></div>
 <main>
 <section class="buehne" data-hero="buehne" aria-label="Willkommen">
   <div class="buehne-medium"><picture><img class="buehne-poster" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%20900%22%20preserveAspectRatio%3D%22xMidYMid%20slice%22%3E%3Cdefs%3E%3CradialGradient%20id%3D%22l%22%20cx%3D%2272%25%22%20cy%3D%2258%25%22%20r%3D%2255%25%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23b8862f%22%20stop-opacity%3D%22.42%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23b8862f%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%221600%22%20height%3D%22900%22%20fill%3D%22%231e2a1c%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%2270%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22140%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22210%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22280%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22350%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22420%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22490%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22560%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22630%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22700%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22770%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22840%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22910%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%22980%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%221050%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%221120%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%221190%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%221260%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%221330%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%221400%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%221470%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20x%3D%221540%22%20y%3D%220%22%20width%3D%221%22%20height%3D%22900%22%20fill%3D%22%23fdfdfb%22%20opacity%3D%22.05%22%2F%3E%3Crect%20width%3D%221600%22%20height%3D%22900%22%20fill%3D%22url(%23l)%22%2F%3E%3C%2Fsvg%3E" alt="Wirtshaus zur Alten Linde – Stimmungsbild" fetchpriority="high" decoding="async"></picture><div class="buehne-schleier"></div></div>
@@ -632,54 +701,51 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
   <span class="buehne-herkunft">Platzhalter</span>
 </section>
 <div class="buehne-ende" id="buehne-ende" aria-hidden="true"></div>
-<section class="einladung" id="willkommen">
+<section class="einladung" id="willkommen" data-atmosphaere="an">
   <div class="rahmen einladung-innen">
-    <p class="rubrik">Wirtshausküche &amp; Biergarten · Mühldorf am Inn</p>
-    <h1 class="einladung-name">Wirtshaus zur Alten Linde</h1>
-    <p class="einladung-text">Frisch aus der Region – in der Musterstraße in Mühldorf am Inn.</p>
-    <p class="bewertung"><span class="sterne" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span><span><strong>4,7</strong> von 5 auf Google · 428 Bewertungen</span></p>
-    <div class="einladung-aktionen"><a class="btn btn-primary" href="#reservierung">Tisch reservieren</a><a class="btn btn-ghost" href="#karte">Zur Abholung bestellen</a></div>
+    <div class="einladung-haus">
+      <p class="rubrik">Wirtshausküche &amp; Biergarten · Mühldorf am Inn</p>
+      <h1 class="einladung-name">Wirtshaus zur Alten Linde</h1>
+      <p class="einladung-text">Frisch aus der Region.</p>
+    </div>
+    <aside class="einladung-besuch" aria-label="Besuch">
+      <h2>Besuch</h2>
+      <address class="einladung-adresse">Musterstraße 1, 84453 Mühldorf am Inn<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Musterstra%C3%9Fe%201%2C%2084453%20M%C3%BChldorf%20am%20Inn" target="_blank" rel="noopener">Route planen</a></address>
+      <p class="bewertung"><span class="sterne" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span><span><strong>4,7</strong> von 5 auf Google · 428 Bewertungen</span></p>
+      <div class="einladung-aktionen"><a class="btn btn-primary" href="#reservierung">Tisch reservieren</a><a class="btn btn-ghost" href="#karte">Zur Abholung bestellen</a></div>
+    </aside>
   </div>
 </section>
 
-<section class="sektion" id="highlights">
+<section class="sektion tisch" id="highlights" data-atmosphaere="an">
   <div class="rahmen">
-    <header class="sektion-kopf">
-      <p class="rubrik">Hausempfehlungen</p>
-      <div>
-        <h2>Was unsere Gäste am liebsten bestellen</h2>
-        <p class="intro">Frisch zubereitet. Vorbestellen und zur gewählten Zeit abholen.</p>
-      </div>
+    <header class="tisch-kopf">
+      <p class="rubrik">Auf dem Tisch</p>
+      <h2>Was hier auf den Tisch kommt</h2>
+      <p class="intro">Drei Gerichte aus der Karte – alle auch zum Abholen.</p>
     </header>
-    <div class="treppe treppe--3">
-      <article class="gericht gericht--haupt auftritt">
-        <figure class="gericht-bild"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23f3efe9%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22160%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2218%22%20fill%3D%22%2363665c%22%3EFoto%20folgt%20(gericht%3A1-5)%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Forelle Müllerin" loading="lazy" data-herkunft="platzhalter"></figure>
-        <div class="gericht-text">
-          <p class="siegel"><svg class="marke" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 3v3.6"/><path d="M14 6.6c-5 .7-7.6 3.5-7.8 8.4 5-.7 7.6-3.5 7.8-8.4Z"/><path d="M14 6.6c5 .7 7.6 3.5 7.8 8.4-5-.7-7.6-3.5-7.8-8.4Z"/><path d="M14 14c-4.4.6-6.7 3.2-6.9 7.6 4.4-.6 6.7-3.2 6.9-7.6Z"/><path d="M14 14c4.4.6 6.7 3.2 6.9 7.6-4.4-.6-6.7-3.2-6.9-7.6Z"/></svg>Hausempfehlung</p><p class="gericht-kat">Hauptgerichte</p>
-          <h3>Forelle Müllerin</h3>
-          <p class="gericht-desc">Aus heimischer Zucht, Butter, Mandeln, Salzkartoffeln</p>
-          <div class="gericht-fuss"><span class="preis">19,50 €</span><button class="btn btn-ghost btn-klein" type="button" data-add="1-5" data-name="Forelle Müllerin" data-preis="19.5"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</button></div>
-        </div>
-      </article>
-      <div class="treppe-rest"><article class="gericht gericht--neben auftritt">
-        <figure class="gericht-bild"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23f3efe9%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22160%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2218%22%20fill%3D%22%2363665c%22%3EFoto%20folgt%20(gericht%3A1-0)%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Schweinsbraten mit Knödel" loading="lazy" data-herkunft="platzhalter"></figure>
-        <div class="gericht-text">
-          <p class="gericht-kat">Hauptgerichte</p>
-          <h3>Schweinsbraten mit Knödel</h3>
-          <p class="gericht-desc">Dunkle Biersoße, Semmelknödel, Krautsalat</p>
-          <div class="gericht-fuss"><span class="preis">16,90 €</span><button class="btn btn-ghost btn-klein" type="button" data-add="1-0" data-name="Schweinsbraten mit Knödel" data-preis="16.9"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</button></div>
-        </div>
-      </article><article class="gericht gericht--neben auftritt">
-        <figure class="gericht-bild"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23f3efe9%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22160%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2218%22%20fill%3D%22%2363665c%22%3EFoto%20folgt%20(gericht%3A1-1)%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Wiener Schnitzel vom Kalb" loading="lazy" data-herkunft="platzhalter"></figure>
-        <div class="gericht-text">
-          <p class="gericht-kat">Hauptgerichte</p>
-          <h3>Wiener Schnitzel vom Kalb</h3>
-          <p class="gericht-desc">Mit Preiselbeeren, Petersilienkartoffeln</p>
-          <div class="gericht-fuss"><span class="preis">22,50 €</span><button class="btn btn-ghost btn-klein" type="button" data-add="1-1" data-name="Wiener Schnitzel vom Kalb" data-preis="22.5"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</button></div>
-        </div>
-      </article></div>
-    </div>
-    <ol class="ablauf"><li><span class="ablauf-n">1</span><span><strong>Aussuchen</strong> Gerichte in den Warenkorb legen.</span></li><li><span class="ablauf-n">2</span><span><strong>Abholzeit wählen</strong> Sie sagen, wann es fertig sein soll.</span></li><li><span class="ablauf-n">3</span><span><strong>Abholen</strong> Bezahlt wird bei uns, bar oder mit Karte.</span></li></ol>
+    <div class="tisch-collage"><article class="teller teller--1 auftritt">
+      <figure class="teller-bild"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23f3efe9%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22160%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2218%22%20fill%3D%22%2363665c%22%3EFoto%20folgt%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Forelle Müllerin" loading="lazy" data-herkunft="platzhalter"></figure>
+      <div class="teller-text">
+        <h3>Forelle Müllerin</h3>
+        <p class="teller-desc">Aus heimischer Zucht, Butter, Mandeln, Salzkartoffeln</p>
+        <div class="teller-fuss"><span class="preis">19,50 €</span><button class="btn btn-ghost btn-klein" type="button" data-add="1-5" data-name="Forelle Müllerin" data-preis="19.5"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</button></div>
+      </div>
+    </article><article class="teller teller--2 auftritt">
+      <figure class="teller-bild"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23f3efe9%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22160%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2218%22%20fill%3D%22%2363665c%22%3EFoto%20folgt%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Schweinsbraten mit Knödel" loading="lazy" data-herkunft="platzhalter"></figure>
+      <div class="teller-text">
+        <h3>Schweinsbraten mit Knödel</h3>
+        <p class="teller-desc">Dunkle Biersoße, Semmelknödel, Krautsalat</p>
+        <div class="teller-fuss"><span class="preis">16,90 €</span><button class="btn btn-ghost btn-klein" type="button" data-add="1-0" data-name="Schweinsbraten mit Knödel" data-preis="16.9"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</button></div>
+      </div>
+    </article><article class="teller teller--3 auftritt">
+      <figure class="teller-bild"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23f3efe9%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22160%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2218%22%20fill%3D%22%2363665c%22%3EFoto%20folgt%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Wiener Schnitzel vom Kalb" loading="lazy" data-herkunft="platzhalter"></figure>
+      <div class="teller-text">
+        <h3>Wiener Schnitzel vom Kalb</h3>
+        <p class="teller-desc">Mit Preiselbeeren, Petersilienkartoffeln</p>
+        <div class="teller-fuss"><span class="preis">22,50 €</span><button class="btn btn-ghost btn-klein" type="button" data-add="1-1" data-name="Wiener Schnitzel vom Kalb" data-preis="22.5"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</button></div>
+      </div>
+    </article></div>
   </div>
 </section>
 
@@ -729,48 +795,24 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
   </div>
 </section>
 
-<section class="sektion" id="ambiente">
-  <div class="rahmen haus-raster">
-    <div class="haus-text">
+<section class="haus-band haus-band--ohne-bild" id="ambiente" data-atmosphaere="an">
+  
+  <div class="rahmen">
+    <div class="haus-band-text auftritt">
       <p class="rubrik">Das Haus</p>
       <h2>Wirtshausküche &amp; Biergarten in Mühldorf am Inn</h2>
       <p class="intro">Seit Generationen kochen wir, was hier wächst: Fleisch vom Metzger im Ort, Fisch aus heimischer Zucht und Bier aus der Region. Kein Schnickschnack – dafür Portionen, die satt machen.</p>
     </div>
-    <div class="haus-fotos">
-      <figure class="haus-foto haus-foto--hoch auftritt">
-        <img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23f3efe9%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22160%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2218%22%20fill%3D%22%2363665c%22%3EFoto%20folgt%20(haus)%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Unser Haus" loading="lazy" data-herkunft="platzhalter">
-        <figcaption><strong>Unser Haus</strong><span>Außenansicht – so erkennen Gäste Sie von der Straße</span></figcaption>
-      </figure>
-      <figure class="haus-foto haus-foto--quer auftritt">
-        <img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23f3efe9%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22160%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2218%22%20fill%3D%22%2363665c%22%3EFoto%20folgt%20(team)%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Unser Team" loading="lazy" data-herkunft="platzhalter">
-        <figcaption><strong>Unser Team</strong><span>Hände bei der Arbeit statt Gruppenfoto</span></figcaption>
-      </figure>
-      <figure class="haus-foto haus-foto--klein auftritt">
-        <img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23f3efe9%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22160%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2C%20serif%22%20font-size%3D%2218%22%20fill%3D%22%2363665c%22%3EFoto%20folgt%20(gericht%3A1-5)%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Unser Bestseller" loading="lazy" data-herkunft="platzhalter">
-        <figcaption><strong>Unser Bestseller</strong><span>Das meistbestellte Gericht, ehrlich fotografiert</span></figcaption>
-      </figure>
-    </div>
   </div>
 </section>
 
-<section class="sektion sektion--tief" id="stimmen">
-  <div class="rahmen stimmen stimmen--blatt">
-    <div class="stimmen-kopf">
-      <p class="rubrik">Gäste</p>
-      <h2>Was Gäste über uns schreiben</h2>
-      <div class="stimmen-note"><span class="note-zahl">4,7</span><span class="sterne" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span><span>auf Google · 428 Bewertungen</span></div>
-    </div>
-    <ul class="stimmen-liste"><li class="stimme"><blockquote><p>Schweinsbraten wie bei der Oma, nur ist die Portion deutlich größer. Die Kruste war genau richtig.</p></blockquote><p class="stimme-quelle">Andreas K. · vor 2 Wochen</p></li><li class="stimme"><blockquote><p>Wollten eigentlich nur schnell eine Brotzeit. Sind dann drei Stunden geblieben, weil der Wirt so gut erzählt.</p></blockquote><p class="stimme-quelle">Bettina R. · vor 1 Monat</p></li><li class="stimme"><blockquote><p>Im Sommer ist der Biergarten Gold wert. Trotz vollem Haus war die Bedienung flott und freundlich.</p></blockquote><p class="stimme-quelle">Thomas H. · vor 3 Wochen</p></li></ul>
-  </div>
-</section>
-
-<section class="sektion reservierung" id="reservierung">
+<section class="sektion reservierung sektion--tief" id="reservierung">
   <div class="rahmen reservierung-raster">
     <div class="reservierung-text auftritt">
       <p class="rubrik">Reservierung</p>
       <h2>Tisch reservieren</h2>
       <p class="intro">Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
-      <ul class="pluspunkte"><li><svg class="ikon ikon-haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12.4c2.1 1 3.8 2.5 5.1 4.4C12 11.6 15.8 7.4 21 4.6"/></svg><span>Rund um die Uhr buchbar, auch nach Küchenschluss</span></li><li><svg class="ikon ikon-haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12.4c2.1 1 3.8 2.5 5.1 4.4C12 11.6 15.8 7.4 21 4.6"/></svg><span>Bestätigung ohne Anruf</span></li><li><svg class="ikon ikon-haken" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12.4c2.1 1 3.8 2.5 5.1 4.4C12 11.6 15.8 7.4 21 4.6"/></svg><span>Kinderstuhl oder Allergien gleich mit angeben</span></li></ul>
+      
     </div>
     <form class="formular auftritt" id="reservation-form" novalidate>
       <div class="field-grid">
@@ -816,7 +858,7 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
   </div>
 </section>
 
-<section class="sektion sektion--tief" id="kontakt">
+<section class="sektion" id="kontakt">
   <div class="rahmen kontakt-raster">
     <div>
       <p class="rubrik">Anfahrt</p>
@@ -1444,6 +1486,19 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
     };
     if (document.readyState === "complete") starte(); else window.addEventListener("load", starte);
   }
+})();
+</script>
+<script>
+(function () {
+  var ebene = document.querySelector(".atmosphaere");
+  if (!ebene || !("IntersectionObserver" in window)) return;
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var sichtbar = new Set();
+  var beobachter = new IntersectionObserver(function (eintraege) {
+    eintraege.forEach(function (e) { if (e.isIntersecting) sichtbar.add(e.target); else sichtbar.delete(e.target); });
+    document.body.classList.toggle("atmo-an", sichtbar.size > 0);
+  }, { rootMargin: "-30% 0px -30% 0px" });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-atmosphaere="an"]'), function (el) { beobachter.observe(el); });
 })();
 </script>
 </body>

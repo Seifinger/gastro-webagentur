@@ -80,6 +80,14 @@
         ],
         "vorher": "Bodenständig, ehrlich und frisch aus der Region – in der Musterstraße in Mühldorf am Inn.",
         "nachher": "Frisch aus der Region – in der Musterstraße in Mühldorf am Inn."
+      },
+      {
+        "pfad": "einladungText",
+        "regeln": [
+          "adjektiv-kette"
+        ],
+        "vorher": "Bodenständig, ehrlich und frisch aus der Region.",
+        "nachher": "Frisch aus der Region."
       }
     ],
     "hinweise": [],

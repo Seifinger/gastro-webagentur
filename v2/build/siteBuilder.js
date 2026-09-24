@@ -44,6 +44,8 @@ import { aktionsziele } from "./aktionsziele.js";
 import { ausdruckFuer, ausdruckVariablen, buehnenSchleier } from "./ausdruck.js";
 import { renderKopfAusdruck, renderBuehne, renderEinladung } from "./sektionen/buehne.js";
 import { BUEHNE_CSS, BUEHNE_SKRIPT } from "./buehneStil.js";
+import { renderTisch, renderHausBand, ABFOLGE_CSS } from "./sektionen/abfolge.js";
+import { renderAtmosphaere, ATMOSPHAERE_CSS, ATMOSPHAERE_SKRIPT } from "./atmosphaere.js";
 import { renderReservierung, renderKontakt, renderBestellweg, renderFuss, renderEntwurfsleiste } from "./sektionen/service.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -262,7 +264,21 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   };
   const reihenfolge = [...ds.layout.sektionsReihenfolge.filter((id) => sektionen[id]), ...Object.keys(sektionen).filter((id) => !ds.layout.sektionsReihenfolge.includes(id))];
   // Sektionswechsel über Flächen statt Linien: jede zweite auf flaecheTief.
-  const hauptteil = reihenfolge.map((id, i) => sektionen[id](i % 2 === 1)).join("\n\n");
+  // Mit Ausdruck: Abfolge und Flächen aus dem Profil (ausdruck.js), die Einladung
+  // steht schon unter der Bühne. "raum" (kino) und "herkunft" (editorial) nutzen
+  // bis zu ihren eigenen Formen das Raum-Band.
+  const ausdruckSektionen = {
+    tisch: () => renderTisch(ctx),
+    karte: () => sektionen.karte(true),
+    haus: () => renderHausBand(ctx),
+    raum: () => renderHausBand(ctx),
+    herkunft: () => renderHausBand(ctx),
+    reservierung: () => sektionen.reservierung(true),
+    kontakt: () => sektionen.kontakt(false),
+  };
+  const hauptteil = ausdruck
+    ? ausdruck.abfolge.filter((id) => ausdruckSektionen[id]).map((id) => ausdruckSektionen[id]()).join("\n\n")
+    : reihenfolge.map((id, i) => sektionen[id](i % 2 === 1)).join("\n\n");
 
   // telefon nur mit echter Nummer: Die Vorschau-Bestätigung nennt sie als echten Weg zum Lokal.
   const pageData = jsonForScript({ name: texte.name, kontaktEmail: optionen.kontaktEmail ?? "", apiUrl, ...(aktionen.anrufen ? { telefon: aktionen.anrufen.text } : {}) });
@@ -311,12 +327,12 @@ ${fontCss}
 ${cssVariablen(ds)}
 ${STIL}
 ${BEWEGUNG_CSS}
-${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}` : ""}
+${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}\n${ABFOLGE_CSS}\n${ATMOSPHAERE_CSS}` : ""}
 </style>
 </head>
 <body class="${bodyKlassen}">
 ${ausdruck ? "" : optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : ""}
-${ausdruck ? renderKopfAusdruck({ ...ctx, hinweis: optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : "" }) : renderKopfzeile(ctx)}
+${ausdruck ? renderKopfAusdruck({ ...ctx, hinweis: optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : "" }) : renderKopfzeile(ctx)}${ausdruck ? `\n${renderAtmosphaere(ctx)}` : ""}
 <main>
 ${ausdruck ? `${renderBuehne(ctx)}\n${renderEinladung(ctx)}` : renderHero(heroVariante, ctx)}
 ${ausdruck ? "" : renderLeiste(ctx)}
@@ -327,7 +343,7 @@ ${renderFuss(ctx)}
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${seitenSkript()}</script>
 <script>${BEWEGUNG_SKRIPT}</script>
-${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n` : ""}</body>
+${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</script>\n` : ""}</body>
 </html>
 `;
 

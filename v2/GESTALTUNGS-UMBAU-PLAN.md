@@ -19,6 +19,8 @@ tatsächlich veröffentlicht, nicht ein neues System daneben.
 | AP1 Ehrliche Aktionen | ✅ „Vorschau – nichts gesendet/bestellt“, keine erfundenen Nummern, Hinweis am Formular, `v2/build/aktionsziele.js` | `b7bd7f5` |
 | AP2 Ausdruck-Gerüst | ✅ `v2/build/ausdruck.js`, Option `ausdruck` in `baueSite`, `npm run v2:build -- --demo beispiel-bayerisch --ausdruck gesellig --ziel v2/output/piloten-ausdruck` | (dieser Stand) |
 | AP3 Erster Bildschirm | ✅ mit neutralem Platzhalter (freigegeben): Kopfzeile mit Zuständen + Menü, Bühne mit Poster/Video-Steuerung, Schleier mit Kontrastnachweis, Slogan-Rückzug, Einladung. Runde 1: `v2/art-direction/ausdruck/beispiel-bayerisch/runde-1/` (review.md) – **wartet auf Zwischenfreigabe** | (dieser Stand) |
+| AP5 Atmosphäre | ✅ `v2/build/atmosphaere.js`: Lindenblatt (Haus) bzw. Küchenmarke, hinter dem Inhalt, nur Deckkraft, aus bei reduzierter Bewegung/ohne JS | (dieser Stand) |
+| AP6 Abfolge `gesellig` | ✅ `v2/build/sektionen/abfolge.js`: Einladung zweispaltig mit „Besuch“, Tisch-Collage, Haus-Band; keine Stimmen, keine Häkchen. Runde 2: `v2/art-direction/ausdruck/beispiel-bayerisch/runde-2/` | (dieser Stand) |
 | AP4 Prüfwerkzeuge | teilweise: `npm run v2:sequenz -- --seite … --runde n` (Scroll-Sequenz, reduzierte Bewegung, ohne JS, Menü). Offen: Slow 4G, ohne Video (sobald Video da ist) | (dieser Stand) |
 
 **Abweichung in AP2:** Der Ausdruck ist eine **Build-Option** (später je Lead im Dashboard),

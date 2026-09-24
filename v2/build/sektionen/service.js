@@ -42,7 +42,7 @@ function vorschauHinweis(aktionen, texte) {
   return aktionen?.modus === "live" ? "" : `<p class="hint vorschau-hinweis">${e(texte.bestellung.vorschauHinweis)}</p>`;
 }
 
-export function renderReservierung({ ds, texte, betont, tief, aktionen }) {
+export function renderReservierung({ ds, texte, betont, tief, aktionen, ausdruck }) {
   const t = texte.reservierung;
   const f = t.felder;
   const zeichen = ds.archetyp === "abend" ? `${gedeck()} ` : "";
@@ -52,7 +52,7 @@ export function renderReservierung({ ds, texte, betont, tief, aktionen }) {
       <p class="rubrik">${zeichen}${e(t.rubrik)}</p>
       <h2>${e(t.titel)}</h2>
       <p class="intro">${e(t.intro)}</p>
-      <ul class="pluspunkte">${t.punkte.map((p) => `<li>${haken()}<span>${e(p)}</span></li>`).join("")}</ul>
+      ${ausdruck ? "" : `<ul class="pluspunkte">${t.punkte.map((p) => `<li>${haken()}<span>${e(p)}</span></li>`).join("")}</ul>`}
     </div>
     <form class="formular auftritt" id="reservation-form" novalidate>
       <div class="field-grid">

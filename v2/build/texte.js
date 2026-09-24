@@ -37,6 +37,14 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
     claim: eigeneTexte.schlagzeile ?? (lage ? `${menu.tagline} – ${lage}.` : `${menu.tagline}.`),
     slogan: eigeneTexte.slogan ?? sloganFuer(ds.kueche, ort),
     buehne: { bereich: "Willkommen", alt: `${lead.name || "Restaurant"} – Stimmungsbild` },
+    // Seiten mit Ausdruck: Die Adresse steht rechts in "Besuch", der Satz links bleibt ohne sie.
+    einladungText: eigeneTexte.schlagzeile ?? `${menu.tagline}.`,
+    besuch: { titel: "Besuch" },
+    tisch: {
+      rubrik: kurz ? "Aus der Küche" : "Auf dem Tisch",
+      titel: kurz ? "Was wir heute empfehlen" : "Was hier auf den Tisch kommt",
+      intro: "Drei Gerichte aus der Karte – alle auch zum Abholen.",
+    },
     ctaBestellen: direkt ? "Jetzt vorbestellen" : "Zur Abholung bestellen",
     ctaReservieren: kurz ? "Tisch anfragen" : "Tisch reservieren",
     nav: { highlights: "Empfehlungen", karte: "Karte", reservierung: "Reservieren", kontakt: "Anfahrt" },

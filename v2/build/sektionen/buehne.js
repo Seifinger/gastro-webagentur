@@ -88,16 +88,26 @@ export function renderBuehne(ctx) {
 }
 
 export function renderEinladung(ctx) {
-  const { texte, lead } = ctx;
+  const { texte, lead, aktionen } = ctx;
   const [erste, zweite] = aktionsListe(ctx);
   const knopf = (a, klasse) => (a ? `<a class="btn ${klasse}" href="${e(a.href)}">${e(a.text)}</a>` : "");
-  return `<section class="einladung" id="willkommen">
+  // Rechts nur, was für dieses Haus stimmt: Adresse, Weg dorthin, Google-Note.
+  const adresse = lead.adresse
+    ? `<address class="einladung-adresse">${e(lead.adresse)}${aktionen?.route ? `<br><a href="${e(aktionen.route.href)}" target="_blank" rel="noopener">${e(texte.kontakt.route)}</a>` : ""}</address>`
+    : "";
+  return `<section class="einladung" id="willkommen" data-atmosphaere="an">
   <div class="rahmen einladung-innen">
-    <p class="rubrik">${e(texte.kicker)}</p>
-    <h1 class="einladung-name">${e(texte.headline)}</h1>
-    <p class="einladung-text">${e(texte.claim)}</p>
-    ${bewertung(lead, texte)}
-    <div class="einladung-aktionen">${knopf(erste, "btn-primary")}${knopf(zweite, "btn-ghost")}</div>
+    <div class="einladung-haus">
+      <p class="rubrik">${e(texte.kicker)}</p>
+      <h1 class="einladung-name">${e(texte.headline)}</h1>
+      <p class="einladung-text">${e(texte.einladungText)}</p>
+    </div>
+    <aside class="einladung-besuch" aria-label="${e(texte.besuch.titel)}">
+      <h2>${e(texte.besuch.titel)}</h2>
+      ${adresse}
+      ${bewertung(lead, texte)}
+      <div class="einladung-aktionen">${knopf(erste, "btn-primary")}${knopf(zweite, "btn-ghost")}</div>
+    </aside>
   </div>
 </section>`;
 }

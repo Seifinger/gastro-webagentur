@@ -26,7 +26,7 @@
     }
   ],
   "copy": {
-    "ersetzungen": 1,
+    "ersetzungen": 2,
     "verbleibend": 0
   },
   "medien": {
@@ -73,5 +73,5 @@
       "typ": "bild"
     }
   },
-  "zeitpunkt": "2026-09-24T09:32:45.212Z"
+  "zeitpunkt": "2026-09-24T09:42:13.696Z"
 }
