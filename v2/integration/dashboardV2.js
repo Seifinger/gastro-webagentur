@@ -30,6 +30,7 @@ import { loeseMedien, medienUebersicht } from "../assets-pipeline/mediaGenerator
 import { creativeHandler } from "./creativeDashboard.js";
 import { AUSDRUECKE, AUSDRUCK_AUS } from "../build/ausdruck.js";
 import { demoEinstellungen, speichereDemoEinstellungen } from "../../src/demoEinstellungen.js";
+import { baueDemo, bauParameter } from "./demoBau.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.join(__dirname, "..", "..");
@@ -167,48 +168,30 @@ export function leadDetailV2(slug) {
   };
 }
 
-/** Baut die v2-Seite eines echten Leads (voller Zyklus, Judge optional). */
+/**
+ * Baut die Vorschau-Demo eines echten Leads aus der neuen Vorlage
+ * (demoBau.js, Konzept-Modus) nach v2/output/leads/<slug>/ – derselbe Weg wie
+ * beim Veröffentlichen, nur in den lokalen Vorschau-Ordner.
+ */
 export async function baueLeadV2(slug, { judge = false, apiUrl = process.env.V2_API_URL ?? "" } = {}) {
-  const k = leadKontext(slug);
-  if (!k) throw new Error("Zu diesem Entwurf gibt es keinen Lead.");
-  const { baueImZyklus } = await import("../build/zyklus.js");
-  const { protokoll } = await baueImZyklus({
-    lead: k.lead,
-    kueche: k.gestaltung.cuisine,
-    stimmung: k.gestaltung.stimmung,
-    judge,
-    zielDir: LEADS_DIR,
-    slug,
-    optionen: { editUebersteuerung: loadLeadEdits(slug), apiUrl, fiktiv: false, ...ausdruckOption(slug) },
-  });
+  const { protokoll } = await baueDemo(slug, { zielDir: LEADS_DIR, judge, apiUrl });
   return protokoll;
 }
 
-function ausdruckOption(slug) {
-  const ausdruck = demoEinstellungen(slug)?.vorlage.ausdruck;
-  return ausdruck ? { ausdruck } : {};
-}
-
 /**
- * Vorschau der Textvorschläge über dieselbe Engine wie der spätere Entwurf
- * (Plan A.4.2). Liefert null, wenn der Lead über v1 läuft – dann rendert
- * dashboardServer.js wie bisher mit v1.
+ * Vorschau der Textvorschläge über dieselbe Vorlage wie die spätere Demo
+ * (Plan A.4.2): Konzept-Modus, gewähltes Farbschema und Vorlage, darüber der
+ * noch nicht gespeicherte Vorschlag.
  */
 export async function textVorschauV2(slug, texte) {
-  const k = leadKontext(slug);
-  if (!k || engineFuerLead(k.lead.placeId) !== "v2") return null;
+  const e = demoEinstellungen(slug);
+  if (!e) return null;
   const { baueSite } = await import("../build/siteBuilder.js");
-  const edits = loadLeadEdits(slug);
+  const p = bauParameter(e);
+  const edits = p.optionen.editUebersteuerung;
   const { html } = baueSite({
-    lead: k.lead,
-    kueche: k.gestaltung.cuisine,
-    stimmung: k.gestaltung.stimmung,
-    optionen: {
-      editUebersteuerung: { bilder: edits.bilder, texte: { ...edits.texte, ...texte } },
-      fiktiv: false,
-      fontsPfad: "/v2/assets/fonts",
-      ...ausdruckOption(slug),
-    },
+    ...p,
+    optionen: { ...p.optionen, editUebersteuerung: { ...edits, texte: { ...edits.texte, ...texte } }, fontsPfad: "/v2/assets/fonts" },
   });
   return html;
 }

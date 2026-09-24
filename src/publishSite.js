@@ -1,7 +1,7 @@
-import { mkdirSync, writeFileSync, rmSync, existsSync, copyFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, rmSync, existsSync, mkdtempSync, renameSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { docsDir, resonanzUrl } from "./config.js";
+import { docsDir } from "./config.js";
 import { escapeHtml } from "./landingPageGenerator.js";
 import { remoteImageUrl } from "./imageLibrary.js";
 import { menuForCuisine } from "./menuCatalog.js";
@@ -9,19 +9,17 @@ import { themeForLead } from "./landingPageGenerator.js";
 import { DEMO_LEADS } from "./demoLeads.js";
 import { loadLeadEdits } from "./leadEdits.js";
 import { merkeVeroeffentlichung } from "./entwurfsManifest.js";
-import { uploadsDir } from "./bildUpload.js";
 import {
   parseArgs,
   pruefeKueche,
-  waehleLeads,
-  baueEintraege,
-  leadFuerSlug,
   ladeSchriften,
   schreibeSeiten,
 } from "./buildSite.js";
 import { ladeEngineWahl, engineFuerLead as engineAusWahl } from "../v2/integration/dashboardV2.js";
 import { ausdruckZumBauen, stimmungFuerSlug } from "../v2/build/ausdruck.js";
 import { ladeEigeneMedien } from "../v2/assets-pipeline/mediaGenerator.js";
+import { demoEinstellungen } from "./demoEinstellungen.js";
+import { baueDemo, veroeffentlichungsHindernisse } from "../v2/integration/demoBau.js";
 
 /** Vorschaubild der Übersicht: das eigene Titelbild der Seite, sonst das Stockfoto. */
 function vorschauBild(slug, gestaltung) {
@@ -156,114 +154,58 @@ function buildShowcasePage(entries, kontakt) {
 }
 
 /**
- * Eigene Fotos liegen lokal unter public/uploads/<slug>/<rolle>.jpg und
- * werden dort nur vom Dashboard-Server ausgeliefert (siehe bildUpload.js) –
- * auf GitHub Pages gibt es diesen Server nicht, ein referenzierter
- * "/uploads/..."-Pfad wäre dort ein totes Bild. Für die Veröffentlichung wird
- * die Datei deshalb mit in den Entwurfsordner kopiert und die Referenz auf
- * einen relativen Pfad umgeschrieben – die veröffentlichte Seite bleibt
- * damit in sich geschlossen, wie schon die Stock-Bilder unter docs/assets/.
+ * Baut genau eine Lead-Demo aus der neuen Vorlage (v2/integration/demoBau.js)
+ * und schreibt sie nach zielordner/<slug>/ – ohne den Rest anzufassen.
+ * Grundlage für "npm run publish-site -- --only <slug>", den
+ * Veröffentlichen-Knopf (src/veroeffentlichung.js) und die Migration.
+ *
+ * - Der Slug kommt aus dem Manifest und wird nie neu berechnet: Auch wenn sich
+ *   der Name ändert, bleiben URL und QR-Code gleich.
+ * - Gebaut wird in einen Temp-Ordner daneben; erst ein vollständiger Bau
+ *   ersetzt zielordner/<slug>. Ein Abbruch lässt die bisherige Fassung stehen.
+ * - Nach docs/ (öffentlich) nur mit bestätigtem Namen (Teil 4).
  */
-function lokalisiereEigeneBilder(editUebersteuerung, slug, zielordner) {
-  const bilder = editUebersteuerung?.bilder;
-  if (!bilder) return editUebersteuerung;
-
-  const erwarteterPrefix = `/uploads/${slug}/`;
-  const uebersetzt = {};
-  let veraendert = false;
-
-  for (const [rolle, pfad] of Object.entries(bilder)) {
-    if (typeof pfad !== "string" || !pfad.startsWith(erwarteterPrefix)) {
-      uebersetzt[rolle] = pfad;
-      continue;
-    }
-
-    const dateiname = path.basename(pfad);
-    const quelle = path.join(uploadsDir, slug, dateiname);
-    if (!existsSync(quelle)) {
-      // Datei lokal nicht (mehr) vorhanden – lieber der alte Pfad als ein
-      // abgebrochener Build; das eine Bild bliebe dann zwar tot, der Rest
-      // der Seite aber nicht.
-      uebersetzt[rolle] = pfad;
-      continue;
-    }
-
-    const zielDatei = path.join(zielordner, slug, "bilder", dateiname);
-    mkdirSync(path.dirname(zielDatei), { recursive: true });
-    copyFileSync(quelle, zielDatei);
-
-    uebersetzt[rolle] = `./bilder/${dateiname}`;
-    veraendert = true;
-  }
-
-  return veraendert ? { ...editUebersteuerung, bilder: uebersetzt } : editUebersteuerung;
-}
-
-/**
- * Baut genau einen Entwurf und schreibt ihn nach zielordner/<slug>/ – ohne
- * den Rest von zielordner anzufassen. Grundlage für "npm run publish-site --
- * --only <slug>" (unten) und für den Veröffentlichen-Knopf im
- * Bearbeiten-Dashboard (siehe src/veroeffentlichung.js). zielordner ist
- * überschreibbar, damit Tests gegen ein leeres Verzeichnis prüfen können,
- * ohne das echte docs/ anzufassen – im Betrieb ist es immer docsDir.
- */
-// resonanz kommt per Default aus der .env, damit der Einzel-Publish aus dem
-// Dashboard (veroeffentlichung.js) das Beacon nicht stillschweigend abschaltet.
-export async function baueUndSchreibeEinzelnenEntwurf(
-  slug,
-  { cuisine, email = "", api = "", resonanz = resonanzUrl, zielordner = docsDir } = {},
-) {
-  const lead = leadFuerSlug(slug);
-  if (!lead) throw new Error(`Kein Lead für Slug "${slug}" gefunden.`);
-
-  const [entry] = baueEintraege([lead], cuisine).map((entry) => ({
-    ...entry,
-    editUebersteuerung: loadLeadEdits(entry.slug),
-  }));
-
-  if (entry.slug !== slug) {
-    throw new Error(`Der errechnete Slug ("${entry.slug}") weicht von "${slug}" ab.`);
+export async function baueUndSchreibeEinzelnenEntwurf(slug, { email = "", api = "", zielordner = docsDir, buildId = "" } = {}) {
+  const einstellungen = demoEinstellungen(slug);
+  if (!einstellungen) throw new Error(`Kein Lead für Slug "${slug}" gefunden.`);
+  if (zielordner === docsDir) {
+    const hindernisse = veroeffentlichungsHindernisse(einstellungen);
+    if (hindernisse.length) throw new Error(`Nicht veröffentlicht: ${hindernisse.join(" ")}`);
   }
 
   mkdirSync(zielordner, { recursive: true });
-
-  if (engineFuerLead(lead.placeId, undefined, entry.slug, entry.cuisine) === "v2") {
-    const { ordner } = await baueUndSchreibeV2Entwurf(lead, entry.slug, entry.cuisine, entry.gestaltung?.stimmung, { email, api, zielordner });
-    if (zielordner === docsDir) {
-      merkeVeroeffentlichung({ placeId: lead.placeId, slug: entry.slug, archetyp: entry.gestaltung?.archetyp ?? "" });
-    }
-    return { slug: entry.slug, ordner };
-  }
-
-  const fontCss = await ladeSchriften(path.join(zielordner, "assets", "fonts"));
-
-  schreibeSeiten(
-    [{ ...entry, editUebersteuerung: lokalisiereEigeneBilder(entry.editUebersteuerung, entry.slug, zielordner) }],
-    zielordner,
-    {
-      kontaktEmail: email,
-      fontCss,
-      veroeffentlicht: true,
+  const temp = mkdtempSync(path.join(zielordner, `.bau-${slug.slice(0, 40)}-`));
+  try {
+    await baueDemo(slug, {
+      zielDir: temp,
       apiUrl: api,
-      resonanzUrl: resonanz,
-      // Wie beim vollständigen Lauf: Bilder kommen im Netz direkt von Unsplash.
-      bildUrl: remoteImageUrl,
-    },
-  );
+      buildId,
+      kontaktEmail: email,
+      fontsDir: path.join(zielordner, "assets", "fonts"),
+      fontsPfad: "../assets/fonts",
+    });
+    const neu = path.join(temp, slug);
+    if (!existsSync(path.join(neu, "index.html"))) throw new Error("Der Bau hat keine index.html erzeugt.");
+    const ziel = path.join(zielordner, slug);
+    const alt = path.join(temp, ".vorher");
+    if (existsSync(ziel)) renameSync(ziel, alt);
+    try {
+      renameSync(neu, ziel);
+    } catch (fehler) {
+      if (existsSync(alt)) renameSync(alt, ziel);
+      throw fehler;
+    }
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
 
   // Nur ein echter Lauf nach docs/ ist eine Veröffentlichung. Ein Bau in ein
   // anderes Verzeichnis (Vorschau, Tests) darf den festgehaltenen Stand des
-  // Kunden nicht verschieben – sonst sähe eine Seite "frisch" aus, die online
-  // unverändert alt ist.
+  // Kunden nicht verschieben.
   if (zielordner === docsDir) {
-    merkeVeroeffentlichung({
-      placeId: lead.placeId,
-      slug: entry.slug,
-      archetyp: entry.gestaltung?.archetyp ?? "",
-    });
+    merkeVeroeffentlichung({ placeId: einstellungen.placeId, slug, archetyp: einstellungen.farbschema.archetyp });
   }
-
-  return { slug: entry.slug, ordner: path.join(zielordner, entry.slug) };
+  return { slug, ordner: path.join(zielordner, slug), einstellungen };
 }
 
 async function run() {
@@ -322,75 +264,13 @@ async function run() {
     return;
   }
 
-  const leads = waehleLeads(args);
-  if (leads.length === 0) {
-    console.log("\nKeine passenden Leads gefunden. Erst 'npm start' ausführen.\n");
-    return;
-  }
-
-  // Komplett neu aufbauen: Ein abgewählter Entwurf muss auch wirklich
-  // verschwinden und nicht als Altlast online bleiben.
-  rmSync(docsDir, { recursive: true, force: true });
+  // Gesamtlauf: nur die erfundenen Beispielseiten und die Übersicht. Lead-
+  // Demos werden nie mehr gesammelt überschrieben (v2/DEMO-UMBAU.md, Teil 3):
+  // einzeln per --only <slug>, aus dem Dashboard oder über die Migration mit
+  // Vorschau und Freigabe (npm run demo:migration). docs/ wird dabei nicht
+  // mehr gelöscht – bestehende Lead-Seiten und ihre QR-Ziele bleiben stehen.
   mkdirSync(docsDir, { recursive: true });
-
-  const entries = baueEintraege(leads, args.cuisine).map((entry) => {
-    const editUebersteuerung = loadLeadEdits(entry.slug);
-    return { ...entry, editUebersteuerung: lokalisiereEigeneBilder(editUebersteuerung, entry.slug, docsDir) };
-  });
-
-  console.log("\n🔤 Prüfe Schriften ...");
-  const fontCss = await ladeSchriften(path.join(docsDir, "assets", "fonts"));
-
-  const gemeinsam = {
-    kontaktEmail: args.email,
-    fontCss,
-    veroeffentlicht: true,
-    apiUrl: args.api,
-    resonanzUrl: args.resonanz,
-    // Bilder kommen im Netz direkt von Unsplash, damit das Repository nicht
-    // um mehrere Megabyte Stockfotos wächst.
-    bildUrl: remoteImageUrl,
-  };
-
-  // Echte Leads: veröffentlicht, aber von nirgendwo verlinkt. Nur wer den
-  // QR-Code oder Link bekommen hat, findet den Entwurf. Die Engine-Wahl
-  // (Dashboard-Toggle bzw. ENGINE_STANDARD) entscheidet pro Lead, welche
-  // der beiden Engines tatsächlich schreibt.
   const wahl = ladeEngineWahl();
-  const v1Entries = entries.filter((e) => engineFuerLead(e.lead.placeId, wahl, e.slug, e.cuisine) !== "v2");
-  const v2Entries = entries.filter((e) => engineFuerLead(e.lead.placeId, wahl, e.slug, e.cuisine) === "v2");
-
-  if (v1Entries.length) schreibeSeiten(v1Entries, docsDir, gemeinsam);
-
-  if (v2Entries.length) {
-    console.log(`\n🧬 Baue ${v2Entries.length} Entwurf/Entwürfe über die v2-Engine ...`);
-    for (const entry of v2Entries) {
-      console.log(`  ▶ ${entry.slug}`);
-      await baueUndSchreibeV2Entwurf(entry.lead, entry.slug, entry.cuisine, entry.gestaltung?.stimmung, {
-        email: args.email,
-        api: args.api,
-        zielordner: docsDir,
-      });
-    }
-  }
-
-  // Jede Seite, die dieser Lauf wirklich nach docs/ geschrieben hat, bekommt
-  // den aktuellen Engine-Stand ins Manifest. Der Archetyp bleibt dabei der,
-  // der dem Lead schon zugeordnet war (stimmungsWahl.js bzw. der Seed über
-  // die drei Grund-Archetypen) – ein Sammel-Lauf stellt niemanden um.
-  const jetzt = new Date().toISOString();
-  for (const entry of entries) {
-    merkeVeroeffentlichung({
-      placeId: entry.lead.placeId,
-      slug: entry.slug,
-      archetyp: entry.gestaltung?.archetyp ?? "",
-      zeitpunkt: jetzt,
-    });
-  }
-
-  // Erfundene Lokale: das, was auf der Startseite steht. Nutzen dieselbe
-  // Engine-Wahl wie die echten Leads (Standard, keine Einzelübersteuerung
-  // in data/v2-engine.json vorgesehen).
   const demoEntries = DEMO_LEADS.map((lead) => ({
     lead,
     cuisine: lead.kueche,
@@ -401,10 +281,12 @@ async function run() {
   const demoV1 = demoEntries.filter((e) => engineFuerLead(e.lead.placeId, wahl, e.slug, e.cuisine) !== "v2");
   const demoV2 = demoEntries.filter((e) => engineFuerLead(e.lead.placeId, wahl, e.slug, e.cuisine) === "v2");
 
-  if (demoV1.length) schreibeSeiten(demoV1, docsDir, { ...gemeinsam, fiktiv: true });
-
+  if (demoV1.length) {
+    const fontCss = await ladeSchriften(path.join(docsDir, "assets", "fonts"));
+    schreibeSeiten(demoV1, docsDir, { kontaktEmail: args.email, fontCss, veroeffentlicht: true, apiUrl: args.api, bildUrl: remoteImageUrl, fiktiv: true });
+  }
   if (demoV2.length) {
-    console.log(`\n🧬 Baue ${demoV2.length} Beispiel-Entwurf/Entwürfe über die v2-Engine ...`);
+    console.log(`\n🧬 Baue ${demoV2.length} Beispielseite(n) über die v2-Engine ...`);
     for (const entry of demoV2) {
       console.log(`  ▶ ${entry.slug}`);
       await baueUndSchreibeV2Entwurf(entry.lead, entry.slug, entry.cuisine, entry.gestaltung?.stimmung, {
@@ -418,18 +300,10 @@ async function run() {
 
   writeFileSync(path.join(docsDir, "index.html"), buildShowcasePage(demoEntries, args.kontakt), "utf-8");
   writeFileSync(path.join(docsDir, ".nojekyll"), "", "utf-8");
-  writeFileSync(
-    path.join(docsDir, "robots.txt"),
-    "User-agent: *\nDisallow: /\n",
-    "utf-8",
-  );
+  writeFileSync(path.join(docsDir, "robots.txt"), "User-agent: *\nDisallow: /\n", "utf-8");
 
-  console.log(`\n✅ ${entries.length} Entwürfe für die Veröffentlichung vorbereitet.`);
-  console.log(`   Ordner: ${docsDir}`);
-  console.log("\n   Nächster Schritt:");
-  console.log("     git add docs && git commit -m \"Entwürfe veröffentlichen\" && git push");
-  console.log("\n   Danach unter GitHub → Settings → Pages als Quelle");
-  console.log("   \"Deploy from a branch\", Branch: main, Ordner: /docs auswählen.\n");
+  console.log(`\n✅ ${demoEntries.length} Beispielseiten und die Übersicht gebaut. Lead-Demos: einzeln mit --only <slug> oder über npm run demo:migration.`);
+  console.log(`   Ordner: ${docsDir}\n`);
 }
 
 // Nur beim direkten Start läuft der volle Publish-Lauf. dashboardServer.js

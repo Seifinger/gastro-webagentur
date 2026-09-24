@@ -7,7 +7,7 @@
 //   Farbschema ......... data/stimmungen.json (stimmungsWahl.js) – genau drei je Küche
 //   Vorlage ............ Standard der Küche (v2/build/ausdruck.js), Abweichung in lead-edits.demo.vorlage
 //   Slogan ............. lead-edits.texte.slogan
-//   Name, Adresse ...... lead-edits.demo.name / demo.adresse { wert, quelle, bestaetigtAm }
+//   Name, Adresse, Tel.  lead-edits.demo.name / .adresse / .telefon { wert, quelle, bestaetigtAm }
 //   Status/Build/Online  Manifest-Eintrag (demoStatus)
 //   Verlauf ............ lead-edits.verlauf (leadEdits.js)
 //
@@ -104,6 +104,7 @@ export function demoEinstellungen(slug, optionen = {}) {
     slogan: { wert: sloganEigen, manuell: Boolean(sloganEigen), standard: sloganFuer(kueche, lead.ort || "") },
     name: angabe(demo.name, lead.name),
     adresse: angabe(demo.adresse, lead.adresse),
+    telefon: angabe(demo.telefon, lead.telefon),
     googleMapsUrl: googleMapsUrl(lead),
     status: manifestEintrag?.demoStatus ?? { zustand: "neu" },
     veroeffentlichtAm: manifestEintrag?.veroeffentlichtAm ?? "",
@@ -129,6 +130,7 @@ function pruefeText(wert, feld, max) {
  * @param {string} [aenderung.slogan]      "" = Vorlagenstandard
  * @param {{wert: string, notiz?: string}|null} [aenderung.name]    null = Bestätigung zurücknehmen
  * @param {{wert: string, notiz?: string}|null} [aenderung.adresse]
+ * @param {{wert: string, notiz?: string}|null} [aenderung.telefon]
  */
 export function speichereDemoEinstellungen(slug, aenderung = {}, { jetzt = new Date() } = {}) {
   const vorher = demoEinstellungen(slug);
@@ -153,6 +155,7 @@ export function speichereDemoEinstellungen(slug, aenderung = {}, { jetzt = new D
   };
   const name = bestaetigung("Der Name", aenderung.name);
   const adresse = bestaetigung("Die Adresse", aenderung.adresse);
+  const telefon = bestaetigung("Die Telefonnummer", aenderung.telefon);
 
   // 2. Schreiben – bestehende Speicher
   if (aenderung.kueche !== undefined && aenderung.kueche !== (vorher.kuecheManuell ? vorher.kueche : "")) {
@@ -170,7 +173,7 @@ export function speichereDemoEinstellungen(slug, aenderung = {}, { jetzt = new D
     if (aenderung.vorlage) neu.demo.vorlage = aenderung.vorlage;
     else delete neu.demo.vorlage;
   }
-  for (const [feld, wert] of [["name", name], ["adresse", adresse]]) {
+  for (const [feld, wert] of [["name", name], ["adresse", adresse], ["telefon", telefon]]) {
     if (wert === undefined) continue;
     if (wert === null) delete neu.demo[feld];
     else neu.demo[feld] = wert;
