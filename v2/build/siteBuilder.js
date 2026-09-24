@@ -44,7 +44,7 @@ import { aktionsziele } from "./aktionsziele.js";
 import { ausdruckFuer, ausdruckVariablen, buehnenSchleier } from "./ausdruck.js";
 import { renderKopfAusdruck, renderBuehne, renderEinladung } from "./sektionen/buehne.js";
 import { BUEHNE_CSS, BUEHNE_SKRIPT } from "./buehneStil.js";
-import { renderTisch, renderHausBand, ABFOLGE_CSS } from "./sektionen/abfolge.js";
+import { renderTisch, renderHausBand, renderAnfahrt, renderFussAusdruck, ABFOLGE_CSS, ABFOLGE_SKRIPT } from "./sektionen/abfolge.js";
 import { renderAtmosphaere, ATMOSPHAERE_CSS, ATMOSPHAERE_SKRIPT } from "./atmosphaere.js";
 import { renderReservierung, renderKontakt, renderBestellweg, renderFuss, renderEntwurfsleiste } from "./sektionen/service.js";
 
@@ -256,7 +256,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
 
   const sektionen = {
     highlights: (tief) => renderHighlights({ ...ctx, betont: betont === "highlights", tief }),
-    karte: (tief) => renderKarte({ ...ctx, menu: { ...menu, kategorien: menu.kategorien.map((k, ki) => ({ ...k, gerichte: k.gerichte.map((g, gi) => ({ ...g, beschreibung: eigeneBeschreibungen[`${ki}-${gi}`] ?? g.beschreibung })) })) }, tief }),
+    karte: (tief, extra = {}) => renderKarte({ ...ctx, ...extra, menu: { ...menu, kategorien: menu.kategorien.map((k, ki) => ({ ...k, gerichte: k.gerichte.map((g, gi) => ({ ...g, beschreibung: eigeneBeschreibungen[`${ki}-${gi}`] ?? g.beschreibung })) })) }, tief }),
     ambiente: (tief) => renderAmbiente({ ...ctx, tief }),
     stimmen: (tief) => renderStimmen({ ...ctx, tief }),
     reservierung: (tief) => renderReservierung({ ...ctx, betont: betont === "reservierung", tief }),
@@ -269,12 +269,12 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   // bis zu ihren eigenen Formen das Raum-Band.
   const ausdruckSektionen = {
     tisch: () => renderTisch(ctx),
-    karte: () => sektionen.karte(true),
+    karte: () => sektionen.karte(true, { sprung: true }),
     haus: () => renderHausBand(ctx),
     raum: () => renderHausBand(ctx),
     herkunft: () => renderHausBand(ctx),
     reservierung: () => sektionen.reservierung(true),
-    kontakt: () => sektionen.kontakt(false),
+    kontakt: () => renderAnfahrt({ ...ctx, oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS }),
   };
   const hauptteil = ausdruck
     ? ausdruck.abfolge.filter((id) => ausdruckSektionen[id]).map((id) => ausdruckSektionen[id]()).join("\n\n")
@@ -339,11 +339,11 @@ ${ausdruck ? "" : renderLeiste(ctx)}
 ${hauptteil}
 </main>
 ${renderBestellweg(ausdruck ? { ...ctx, ds: { ...ds, layout: { ...ds.layout, primaerAktion: ausdruck.hauptaktion === "reservieren" ? "reservation" : "order" } } } : ctx)}
-${renderFuss(ctx)}
+${ausdruck ? renderFussAusdruck(ctx) : renderFuss(ctx)}
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${seitenSkript()}</script>
 <script>${BEWEGUNG_SKRIPT}</script>
-${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</script>\n` : ""}</body>
+${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</script>\n<script>${ABFOLGE_SKRIPT}</script>\n` : ""}</body>
 </html>
 `;
 

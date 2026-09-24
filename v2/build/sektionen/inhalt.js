@@ -90,7 +90,7 @@ function kartenZeile(g, texte) {
         </li>`;
 }
 
-export function renderKarte({ ds, texte, menu, tief }) {
+export function renderKarte({ ds, texte, menu, tief, sprung = false }) {
   const art = ds.layout.karte;
   const kategorien = menu.kategorien.map((k, ki) => ({
     ...k,
@@ -115,6 +115,12 @@ export function renderKarte({ ds, texte, menu, tief }) {
     inhalt = `<div class="karte-tafel">${kategorien
       .map((k) => `<section class="tafel-kategorie" id="${k.anker}"><h3 class="tafel-name">${e(k.name)}</h3>${liste(k)}</section>`)
       .join("")}</div>`;
+  }
+  // Seiten mit Ausdruck: Sprungleiste der Kategorien (läuft auf dem Handy unter
+  // der Kopfzeile mit). Die Anordnung "liste" hat schon eine eigene.
+  if (sprung && art !== "liste") {
+    inhalt = `<nav class="karten-sprung karten-sprung--fest" aria-label="Kategorien">${kategorien.map((k) => `<a href="#${k.anker}">${e(k.name)}</a>`).join("")}</nav>
+    ${inhalt}`;
   }
   return `<section class="sektion${tief ? " sektion--tief" : ""}" id="karte">
   <div class="rahmen">

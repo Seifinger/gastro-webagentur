@@ -508,7 +508,7 @@ textarea { min-height: var(--s-12); resize: vertical; }
 }
 
 .nur-vorleser { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-section[id] { scroll-margin-top: var(--kopf-hoehe); }
+section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 
 /* Kopfzeile: fest über allem; Fläche als Pseudo-Element, damit der Wechsel nur Deckkraft ist. */
 .kopf { position: fixed; top: 0; left: 0; right: 0; z-index: 40; color: var(--text); }
@@ -658,6 +658,47 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
 .haus-band--ohne-bild .haus-band-text { margin-top: 0; padding-inline: 0; }
 @media (min-width: 1024px) { .haus-band-text { margin-left: calc(100% / 12); } }
 
+/* Karte (AP7): Sprungleiste läuft auf dem Handy unter der Kopfzeile mit. */
+.karten-sprung--fest { position: sticky; top: var(--kopf-ist, var(--kopf-hoehe-mobil)); z-index: 30; flex-wrap: nowrap; overflow-x: auto;
+  margin: 0 calc(var(--rand) * -1) var(--s-6); padding: var(--s-1) var(--rand); background: var(--flaeche-tief); scrollbar-width: none; }
+.karten-sprung--fest a { display: inline-flex; align-items: center; min-height: var(--s-5); white-space: nowrap; color: var(--text); }
+.karten-sprung--fest a[aria-current="true"] { background: var(--akzent); border-color: var(--akzent); color: var(--auf-akzent); }
+section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe)) + var(--s-8)); }
+.tafel-name { top: calc(var(--kopf-ist, var(--kopf-hoehe)) + var(--s-3)); }
+.mini-add { position: relative; }
+.mini-add::after { content: ""; position: absolute; inset: -4px; }
+.tippt .mobilebar { opacity: 0; transform: translateY(100%); pointer-events: none; }
+@media (min-width: 1024px) {
+  .karten-sprung--fest { position: static; margin-inline: 0; padding-inline: 0; background: transparent; }
+}
+
+/* Reservierung (AP8): der direkte Weg, wenn es eine echte Nummer gibt. */
+.reservierung-telefon { margin-top: var(--s-3); color: var(--text-leise); }
+.reservierung-telefon a { color: var(--akzent-text); font-weight: var(--f-text-stark); }
+
+/* Anfahrt (AP8) */
+.anfahrt-raster { display: grid; gap: var(--s-8); }
+.anfahrt-adresse { font-size: var(--t-h1); }
+.anfahrt-adresse span { display: block; margin-top: var(--s-1); color: var(--text-leise); font-size: var(--t-h3); }
+.anfahrt-wege { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-4); }
+.anfahrt-hinweis { margin-top: var(--s-3); color: var(--text-leise); }
+.anfahrt-zeiten { padding: var(--s-4); background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--r-karte); }
+.anfahrt-zeiten h3 { margin-bottom: var(--s-2); font-size: var(--t-h3); }
+.anfahrt-zeiten > div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-2); padding-block: var(--s-1); border-bottom: 1px solid var(--linie); font-variant-numeric: tabular-nums; }
+.anfahrt-zeiten .fenster { display: flex; flex-direction: column; align-items: flex-end; white-space: nowrap; }
+@media (min-width: 1024px) { .anfahrt-raster { grid-template-columns: 7fr 5fr; align-items: end; } }
+
+/* Fußzeile (AP8) */
+.fuss-haus { padding-block: var(--sektion) var(--s-6); background: var(--tint); color: var(--auf-tint); }
+.fuss-haus-raster { display: grid; gap: var(--s-4); }
+.fuss-marke { font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform); font-size: var(--t-h1); line-height: 1.05; }
+.fuss-spalten { display: grid; gap: var(--s-3); color: var(--auf-tint-leise); }
+.fuss-spalten address { font-style: normal; }
+.fuss-haus a { color: var(--auf-tint); }
+.fuss-haus nav { display: flex; flex-direction: column; gap: var(--s-1); }
+.fuss-haus .fuss-hinweis { max-width: 72ch; padding-top: var(--s-3); border-top: 1px solid var(--auf-tint-leise); color: var(--auf-tint-leise); font-size: var(--t-klein); }
+@media (min-width: 768px) { .fuss-spalten { grid-template-columns: repeat(3, 1fr); } }
+
 
 .atmosphaere { position: fixed; right: -6vmin; bottom: 6vh; z-index: -1; width: 46vmin; max-width: 520px; color: var(--akzent);
   opacity: 0; pointer-events: none; transform: rotate(-14deg); }
@@ -761,6 +802,7 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
         <p class="intro">Jedes Gericht können Sie direkt zur Abholung vorbestellen.</p>
       </div>
     </header>
+    <nav class="karten-sprung karten-sprung--fest" aria-label="Kategorien"><a href="#karte-0">Zum Anfangen</a><a href="#karte-1">Hauptgerichte</a><a href="#karte-2">Nachspeisen</a></nav>
     <div class="karte-tafel"><section class="tafel-kategorie" id="karte-0"><h3 class="tafel-name">Zum Anfangen</h3><ul class="karten-liste"><li class="karten-zeile">
           <div class="zeile-kopf"><span class="karten-name">Obatzda mit Brezn</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">8,50 €</span><button class="mini-add" type="button" data-add="0-0" data-name="Obatzda mit Brezn" data-preis="8.5" aria-label="Obatzda mit Brezn vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
           <p class="gericht-desc">Hausgemacht, mit roten Zwiebeln und frischer Laugenbrezn</p>
@@ -861,16 +903,17 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
   </div>
 </section>
 
-<section class="sektion" id="kontakt">
-  <div class="rahmen kontakt-raster">
-    <div>
+<section class="sektion anfahrt" id="kontakt">
+  <div class="rahmen anfahrt-raster">
+    <div class="anfahrt-ort">
       <p class="rubrik">Anfahrt</p>
-      <h2 class="kontakt-titel">Musterstraße<span class="kontakt-ort">Mühldorf am Inn</span></h2>
-      <ul class="kontakt-liste"><li><span class="k"><svg class="ikon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11.4 20.6V4.3"/><path d="M11.4 5.4h7.9l-1.9 2.7 1.9 2.7h-7.9"/><path d="M8.6 20.8h5.6"/></svg></span><span>Musterstraße 1, 84453 Mühldorf am Inn<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Musterstra%C3%9Fe%201%2C%2084453%20M%C3%BChldorf%20am%20Inn" target="_blank" rel="noopener">Route planen</a></span></li><li><span class="k"><svg class="ikon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6.3 8.5h11.4l-.9 10.9c0 .7-.6 1.2-1.3 1.2H8.5c-.7 0-1.2-.5-1.3-1.2Z"/><path d="M9.3 8.5c-.1-2.4 1-3.9 2.7-3.9 1.8 0 2.9 1.5 2.8 3.9"/><path d="M6.6 11.7h10.8"/></svg></span><span>Abholung vorbestellen – Ihr Essen steht pünktlich bereit</span></li></ul>
+      <h2 class="anfahrt-adresse">Musterstraße 1<span>84453 Mühldorf am Inn</span></h2>
+      <p class="anfahrt-wege"><a class="btn btn-primary" href="https://www.google.com/maps/search/?api=1&amp;query=Musterstra%C3%9Fe%201%2C%2084453%20M%C3%BChldorf%20am%20Inn" target="_blank" rel="noopener">Route planen</a></p>
+      <p class="anfahrt-hinweis">Abholung vorbestellen – Ihr Essen steht pünktlich bereit</p>
     </div>
-    <div class="zeiten auftritt">
-      <h3>Öffnungszeiten <span class="marke-klein marke-klein--signal">Platzhalter</span></h3>
-      <div class="zeiten-zeile"><span>Montag – Donnerstag</span><span>11:30 – 14:00 &amp; 17:00 – 22:00</span></div><div class="zeiten-zeile"><span>Freitag – Samstag</span><span>11:30 – 14:00 &amp; 17:00 – 23:00</span></div><div class="zeiten-zeile"><span>Sonntag &amp; Feiertage</span><span>11:30 – 21:00</span></div>
+    <div class="anfahrt-zeiten auftritt">
+      <h3>Öffnungszeiten</h3>
+      <div><span class="tage">Montag – Donnerstag</span><span class="fenster"><span>11:30 – 14:00</span><span>17:00 – 22:00</span></span></div><div><span class="tage">Freitag – Samstag</span><span class="fenster"><span>11:30 – 14:00</span><span>17:00 – 23:00</span></span></div><div><span class="tage">Sonntag &amp; Feiertage</span><span class="fenster"><span>11:30 – 21:00</span></span></div>
     </div>
   </div>
 </section>
@@ -936,18 +979,18 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
   <a class="btn btn-ghost" id="confirm-mail" style="display:none" href="#">Bestätigung per E-Mail senden</a>
   <button class="btn btn-primary btn-block" id="confirm-close" type="button">Schließen</button>
 </div>
-<footer class="fuss auf-tint">
-  <div class="rahmen fuss-raster">
-    <div class="fuss-haus">
-      <strong><svg class="marke" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 3v3.6"/><path d="M14 6.6c-5 .7-7.6 3.5-7.8 8.4 5-.7 7.6-3.5 7.8-8.4Z"/><path d="M14 6.6c5 .7 7.6 3.5 7.8 8.4-5-.7-7.6-3.5-7.8-8.4Z"/><path d="M14 14c-4.4.6-6.7 3.2-6.9 7.6 4.4-.6 6.7-3.2 6.9-7.6Z"/><path d="M14 14c4.4.6 6.7 3.2 6.9 7.6-4.4-.6-6.7-3.2-6.9-7.6Z"/></svg>Wirtshaus zur Alten Linde</strong>
-      <p>Musterstraße 1, 84453 Mühldorf am Inn</p>
+<footer class="fuss-haus auf-tint">
+  <div class="rahmen fuss-haus-raster">
+    <p class="fuss-marke">Wirtshaus zur Alten Linde</p>
+    <div class="fuss-spalten">
+      <address>Musterstraße 1, 84453 Mühldorf am Inn<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Musterstra%C3%9Fe%201%2C%2084453%20M%C3%BChldorf%20am%20Inn" target="_blank" rel="noopener">Route planen</a></address>
+      <div></div>
+      <nav aria-label="Seitennavigation">
+        <a href="#karte">Karte</a>
+        <a href="#reservierung">Reservieren</a>
+        <a href="#kontakt">Anfahrt</a>
+      </nav>
     </div>
-    <nav class="fuss-nav" aria-label="Seitennavigation">
-      <a href="#karte">Karte</a>
-      <a href="#reservierung">Reservieren</a>
-      <a href="#kontakt">Anfahrt</a>
-    </nav>
-    <div class="fuss-kontakt"></div>
     <p class="fuss-hinweis">Unverbindlicher Gestaltungsentwurf. Was als Platzhalter gekennzeichnet ist – Gerichte, Preise, Öffnungszeiten, Angaben zu Herkunft und Geschichte des Hauses –, ist ein Vorschlag und noch nicht vom Haus bestätigt. Fotos stammen aus einer Bilddatenbank oder sind KI-generiert und entsprechend markiert.</p>
   </div>
 </footer>
@@ -1406,6 +1449,10 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
       body.classList.toggle("buehne-sichtbar", ueber);
     };
     var hoehe = kopf.offsetHeight;
+    // Tatsächliche Kopfzeilenhöhe (mit Beispiel-Leiste) für mitlaufende Leisten und Sprungziele.
+    var merkeHoehe = function () { document.documentElement.style.setProperty("--kopf-ist", kopf.offsetHeight + "px"); };
+    merkeHoehe();
+    window.addEventListener("resize", merkeHoehe);
     setze(ende.getBoundingClientRect().top > hoehe);
     new IntersectionObserver(function (eintraege) {
       setze(eintraege[0].boundingClientRect.top > hoehe);
@@ -1510,6 +1557,28 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
     document.body.classList.toggle("atmo-an", sichtbar.size > 0);
   }, { rootMargin: "-30% 0px -30% 0px" });
   Array.prototype.forEach.call(document.querySelectorAll('[data-atmosphaere="an"]'), function (el) { beobachter.observe(el); });
+})();
+</script>
+<script>
+(function () {
+  var leiste = document.querySelector(".karten-sprung--fest");
+  if (leiste && "IntersectionObserver" in window) {
+    var links = {};
+    Array.prototype.forEach.call(leiste.querySelectorAll("a"), function (a) { links[a.getAttribute("href").slice(1)] = a; });
+    var markiere = function (id) {
+      Object.keys(links).forEach(function (k) { if (k === id) links[k].setAttribute("aria-current", "true"); else links[k].removeAttribute("aria-current"); });
+      var a = links[id];
+      if (a && leiste.scrollWidth > leiste.clientWidth) leiste.scrollLeft = a.offsetLeft - leiste.clientWidth / 2 + a.offsetWidth / 2;
+    };
+    var beobachter = new IntersectionObserver(function (eintraege) {
+      eintraege.forEach(function (e) { if (e.isIntersecting) markiere(e.target.id); });
+    }, { rootMargin: "-35% 0px -60% 0px" });
+    Object.keys(links).forEach(function (id) { var el = document.getElementById(id); if (el) beobachter.observe(el); });
+  }
+  document.addEventListener("focusin", function (e) {
+    if (e.target.matches && e.target.matches("input, select, textarea") && !e.target.closest("#drawer")) document.body.classList.add("tippt");
+  });
+  document.addEventListener("focusout", function () { document.body.classList.remove("tippt"); });
 })();
 </script>
 </body>

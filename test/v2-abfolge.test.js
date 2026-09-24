@@ -63,3 +63,27 @@ test("alle vier Ausdrucksweisen bauen quer durch die Archetypen durch alle Gates
     }
   }
 });
+
+test("AP7 Karte: Sprungleiste nur mit Ausdruck, Plus-Knöpfe mit vergrößerter Tippfläche", () => {
+  const { html } = bau();
+  assert.match(html, /<nav class="karten-sprung karten-sprung--fest" aria-label="Kategorien"><a href="#karte-0">/);
+  assert.match(html, /section\[id\^="karte-"\] \{ scroll-margin-top: calc\(var\(--kopf-ist/);
+  assert.match(html, /\.mini-add::after \{ content: ""; position: absolute; inset: -4px; \}/);
+  assert.match(html, /\.tippt \.mobilebar \{ opacity: 0;/);
+  const ohne = baueSite({ lead: demo, kueche: "bayerisch", optionen: { fiktiv: true, fontCss: "" } }).html;
+  assert.ok(!ohne.includes("karten-sprung--fest"));
+});
+
+test("AP8 Anfahrt und Fuß: Adresse als Schild, Zeitfenster untereinander, nur echte Kontaktwege", () => {
+  const { html } = bau();
+  const anfahrt = html.slice(html.indexOf('id="kontakt"'));
+  assert.match(anfahrt, /<h2 class="anfahrt-adresse">Musterstraße 1<span>84453 Mühldorf am Inn<\/span><\/h2>/);
+  assert.match(anfahrt, /<span class="fenster"><span>11:30 – 14:00<\/span><span>17:00 – 22:00<\/span><\/span>/);
+  assert.ok(!/href="tel:/.test(anfahrt), "keine Filmnummer auf erfundenen Seiten");
+  assert.match(html, /<footer class="fuss-haus auf-tint">/);
+  const echt = testLeadFuer("bayerisch", "wirtshaus");
+  const echtHtml = bau({ fiktiv: false }, { ...echt, telefon: "08631 12345" }).html;
+  assert.match(echtHtml, /<p class="reservierung-telefon">Lieber anrufen\? <a href="tel:0863112345">08631 12345<\/a><\/p>/);
+  assert.match(echtHtml.slice(echtHtml.indexOf('id="kontakt"')), /href="tel:0863112345"/);
+  assert.match(echtHtml.slice(echtHtml.indexOf('id="kontakt"')), /Öffnungszeiten <span class="marke-klein marke-klein--signal">Platzhalter/);
+});

@@ -52,7 +52,7 @@ export function renderReservierung({ ds, texte, betont, tief, aktionen, ausdruck
       <p class="rubrik">${zeichen}${e(t.rubrik)}</p>
       <h2>${e(t.titel)}</h2>
       <p class="intro">${e(t.intro)}</p>
-      ${ausdruck ? "" : `<ul class="pluspunkte">${t.punkte.map((p) => `<li>${haken()}<span>${e(p)}</span></li>`).join("")}</ul>`}
+      ${ausdruck ? (aktionen?.anrufen ? `<p class="reservierung-telefon">${e(texte.besuch.lieberAnrufen)} <a href="${e(aktionen.anrufen.href)}">${e(aktionen.anrufen.text)}</a></p>` : "") : `<ul class="pluspunkte">${t.punkte.map((p) => `<li>${haken()}<span>${e(p)}</span></li>`).join("")}</ul>`}
     </div>
     <form class="formular auftritt" id="reservation-form" novalidate>
       <div class="field-grid">

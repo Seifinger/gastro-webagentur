@@ -10,7 +10,7 @@
 
 export const BUEHNE_CSS = `
 .nur-vorleser { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-section[id] { scroll-margin-top: var(--kopf-hoehe); }
+section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 
 /* Kopfzeile: fest über allem; Fläche als Pseudo-Element, damit der Wechsel nur Deckkraft ist. */
 .kopf { position: fixed; top: 0; left: 0; right: 0; z-index: 40; color: var(--text); }
@@ -128,6 +128,10 @@ export const BUEHNE_SKRIPT = `
       body.classList.toggle("buehne-sichtbar", ueber);
     };
     var hoehe = kopf.offsetHeight;
+    // Tatsächliche Kopfzeilenhöhe (mit Beispiel-Leiste) für mitlaufende Leisten und Sprungziele.
+    var merkeHoehe = function () { document.documentElement.style.setProperty("--kopf-ist", kopf.offsetHeight + "px"); };
+    merkeHoehe();
+    window.addEventListener("resize", merkeHoehe);
     setze(ende.getBoundingClientRect().top > hoehe);
     new IntersectionObserver(function (eintraege) {
       setze(eintraege[0].boundingClientRect.top > hoehe);

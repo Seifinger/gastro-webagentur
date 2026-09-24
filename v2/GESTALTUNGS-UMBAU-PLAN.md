@@ -22,6 +22,9 @@ tatsächlich veröffentlicht, nicht ein neues System daneben.
 | AP3 mit echten Postern (P3) | ✅ quer + hoch vom Inhaber (KI, gekennzeichnet), Bildausschnitt je Medium (`fokus`), Runde 3: `v2/art-direction/ausdruck/beispiel-bayerisch/runde-3/`. Video noch nicht eingesetzt (andere Szene, keine Schleife) – Bühne ist vorbereitet | (dieser Stand) |
 | AP5 Atmosphäre | ✅ `v2/build/atmosphaere.js`: Lindenblatt (Haus) bzw. Küchenmarke, hinter dem Inhalt, nur Deckkraft, aus bei reduzierter Bewegung/ohne JS | (dieser Stand) |
 | AP6 Abfolge `gesellig` | ✅ `v2/build/sektionen/abfolge.js`: Einladung zweispaltig mit „Besuch“, Tisch-Collage, Haus-Band; keine Stimmen, keine Häkchen. Runde 2: `v2/art-direction/ausdruck/beispiel-bayerisch/runde-2/` | (dieser Stand) |
+| Video (Pilot) | ✅ einmalige Wiedergabe, MP4 + WebM, auf dem Handy nur Poster (kein Hochformat-Video) | (dieser Stand) |
+| AP7 Karte/Bestellen mobil | ✅ mitlaufende Sprungleiste mit aktiver Kategorie, 48-px-Tippflächen, Aktionsleiste weicht der Tastatur | (dieser Stand) |
+| AP8 Reservierung/Anfahrt/Fuß | ✅ „Lieber anrufen?“ nur mit echter Nummer, Anfahrt als Hausschild + Öffnungstafel, Fuß mit Wortmarke. Runde 4: `v2/art-direction/ausdruck/beispiel-bayerisch/runde-4/` | (dieser Stand) |
 | AP4 Prüfwerkzeuge | teilweise: `npm run v2:sequenz -- --seite … --runde n` (Scroll-Sequenz, reduzierte Bewegung, ohne JS, Menü). Offen: Slow 4G, ohne Video (sobald Video da ist) | (dieser Stand) |
 
 **Abweichung in AP2:** Der Ausdruck ist eine **Build-Option** (später je Lead im Dashboard),
