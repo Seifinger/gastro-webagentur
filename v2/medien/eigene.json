@@ -1,1 +1,18 @@
-{}
+{
+  "beispiel-bayerisch": {
+    "hero": {
+      "datei": "v2/medien/eigene/beispiel-bayerisch/hero.jpg",
+      "herkunft": "ki",
+      "quelle": "P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "fokus": "50% 82%",
+      "eingetragen": "2026-09-24T10:12:51.716Z"
+    },
+    "heroMobil": {
+      "datei": "v2/medien/eigene/beispiel-bayerisch/heroMobil.jpg",
+      "herkunft": "ki",
+      "quelle": "P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "fokus": "50% 55%",
+      "eingetragen": "2026-09-24T10:12:51.717Z"
+    }
+  }
+}

@@ -61,6 +61,8 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
 .buehne-medium { position: absolute; inset: 0; z-index: -1; }
 .buehne-medium picture { position: absolute; inset: 0; }
 .buehne-poster, .buehne-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.buehne-poster, .buehne-video { object-position: var(--fokus, 50% 50%); }
+@media (max-width: 767px) { .buehne-poster, .buehne-video { object-position: var(--fokus-mobil, var(--fokus, 50% 50%)); } }
 .buehne-video { opacity: 0; }
 .buehne-video.laeuft { opacity: 1; }
 .buehne-schleier { position: absolute; inset: 0; background: var(--schleier); }
@@ -68,7 +70,8 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
   padding-inline: var(--rand); text-align: center; }
 .buehne-slogan { max-width: 16ch; font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform);
   letter-spacing: var(--f-display-sperrung); font-size: var(--t-display); line-height: 1.05; text-wrap: balance; }
-.buehne-pfeil { position: absolute; left: 50%; bottom: var(--s-3); width: 1px; height: var(--s-8); background: var(--auf-tint-leise); transform: translateX(-50%); }
+/* Scroll-Hinweis am linken Rand (Achse der Wortmarke), damit er nie über dem Motiv liegt. */
+.buehne-pfeil { position: absolute; left: var(--rand); bottom: var(--s-3); width: 1px; height: var(--s-8); background: var(--auf-tint-leise); }
 .buehne-herkunft { position: absolute; right: var(--s-2); bottom: var(--s-2); padding: var(--s-halb) var(--s-1); background: var(--tint);
   color: var(--auf-tint-leise); font-size: var(--t-klein); }
 .buehne-ende { height: 0; }

@@ -245,7 +245,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   // Welche Medien diese Seite wirklich benutzt – für den Bericht (Dashboard-
   // Badges) und damit schreibeSite() lokale Dateien mitkopieren kann.
   const genutzt = [
-    ...["hero", "heroVideo", "haus", "team", "bestseller"].map((rolle) => [rolle, medien[rolle]]),
+    ...["hero", "heroVideo", "heroMobil", "heroVideoMobil", "haus", "team", "bestseller"].map((rolle) => [rolle, medien[rolle]]),
     ...highlights.map((g) => [`gericht:${g.id}`, medien.gericht(g)]),
   ].filter(([, m]) => m);
 

@@ -72,3 +72,18 @@ test("Lint: Verlauf in der Bühne nur als geprüfter Schleier-Token", () => {
   assert.notEqual(manipuliert, html);
   assert.ok(lint(manipuliert).fehler.some((f) => f.regel === "text-auf-foto-mit-verlauf"));
 });
+
+test("Poster quer + hoch mit eigenem Bildausschnitt; beide Dateien werden mitkopiert", () => {
+  const medien = {
+    hero: { src: "medien/hero.jpg", datei: "/x/hero.jpg", herkunft: "ki", kennzeichnung: "KI-generiert", fokus: "50% 82%" },
+    heroMobil: { src: "medien/heroMobil.jpg", datei: "/x/heroMobil.jpg", herkunft: "ki", kennzeichnung: "KI-generiert", fokus: "50% 55%" },
+    haus: null,
+    team: null,
+    bestseller: null,
+    gericht: () => null,
+  };
+  const { html, dateien } = bau({ medien });
+  assert.match(html, /<section class="buehne" data-hero="buehne" aria-label="Willkommen" style="--fokus: 50% 82%; --fokus-mobil: 50% 55%">/);
+  assert.match(html, /<picture><source media="\(max-width: 767px\)" srcset="medien\/heroMobil.jpg"><img class="buehne-poster" src="medien\/hero.jpg"/);
+  assert.deepEqual(dateien.map((d) => d.src).sort(), ["medien/hero.jpg", "medien/heroMobil.jpg"]);
+});

@@ -31,9 +31,15 @@
   },
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "platzhalter:svg",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "typ": "bild"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {
@@ -73,5 +79,5 @@
       "typ": "bild"
     }
   },
-  "zeitpunkt": "2026-09-24T09:42:13.696Z"
+  "zeitpunkt": "2026-09-24T10:13:31.357Z"
 }

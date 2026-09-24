@@ -29,9 +29,15 @@
   "korrekturen": [],
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "platzhalter:svg",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "typ": "bild"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {

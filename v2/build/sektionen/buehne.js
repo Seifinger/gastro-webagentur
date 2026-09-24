@@ -78,7 +78,9 @@ export function renderBuehne(ctx) {
     ? `<video class="buehne-video" muted loop playsinline preload="none" aria-hidden="true" data-src="${e(video.src)}"${videoMobil?.src ? ` data-src-mobil="${e(videoMobil.src)}"` : ""}></video>`
     : "";
   const kennzeichnung = hero && hero.herkunft !== "eigen" ? `<span class="buehne-herkunft">${e(hero.kennzeichnung ?? texte.platzhalter)}</span>` : "";
-  return `<section class="buehne" data-hero="buehne" aria-label="${e(texte.buehne.bereich)}">
+  // Bildausschnitt je Medium (eigene.json → fokus), getrennt für Quer- und Hochformat.
+  const fokus = [hero?.fokus ? `--fokus: ${hero.fokus}` : "", medien.heroMobil?.fokus ? `--fokus-mobil: ${medien.heroMobil.fokus}` : ""].filter(Boolean).join("; ");
+  return `<section class="buehne" data-hero="buehne" aria-label="${e(texte.buehne.bereich)}"${fokus ? ` style="${e(fokus)}"` : ""}>
   <div class="buehne-medium">${poster}${videoTag}<div class="buehne-schleier"></div></div>
   <div class="buehne-text"><p class="buehne-slogan">${e(texte.slogan)}</p></div>
   <span class="buehne-pfeil" aria-hidden="true"></span>

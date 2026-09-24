@@ -183,7 +183,7 @@ export function ladeEigeneMedien(manifest = EIGENE_MANIFEST) {
  * ist) und im Manifest eingetragen. herkunft: "eigen" (echtes Foto) oder
  * "ki" (vom Inhaber geliefertes KI-Material).
  */
-export function registriereEigenesMedium({ slug, rolle, datei, herkunft = "eigen", quelle = "", manifest = EIGENE_MANIFEST, zielDir = EIGENE_DIR }) {
+export function registriereEigenesMedium({ slug, rolle, datei, herkunft = "eigen", quelle = "", fokus = "", manifest = EIGENE_MANIFEST, zielDir = EIGENE_DIR }) {
   if (![...ROLLEN, "heroVideo", "heroMobil", "heroVideoMobil"].includes(rolle) && !/^gericht:/.test(rolle)) throw new Error(`Unbekannte Rolle "${rolle}"`);
   if (!["eigen", "ki"].includes(herkunft)) throw new Error('herkunft muss "eigen" oder "ki" sein');
   if (!existsSync(datei)) throw new Error(`Datei nicht gefunden: ${datei}`);
@@ -192,7 +192,9 @@ export function registriereEigenesMedium({ slug, rolle, datei, herkunft = "eigen
   const ziel = path.join(ordner, `${rolle.replace(":", "-")}${path.extname(datei).toLowerCase()}`);
   copyFileSync(datei, ziel);
   const alle = leseJson(manifest, {});
-  alle[slug] = { ...(alle[slug] ?? {}), [rolle]: { datei: path.relative(REPO, ziel), herkunft, quelle, eingetragen: new Date().toISOString() } };
+  // fokus: Bildausschnitt als CSS object-position (z. B. "50% 85%"), damit beim
+  // Zuschnitt das Wesentliche (Teller, Tisch) im Bild bleibt.
+  alle[slug] = { ...(alle[slug] ?? {}), [rolle]: { datei: path.relative(REPO, ziel), herkunft, quelle, ...(fokus ? { fokus } : {}), eingetragen: new Date().toISOString() } };
   mkdirSync(path.dirname(manifest), { recursive: true });
   writeFileSync(manifest, `${JSON.stringify(alle, null, 2)}\n`, "utf-8");
   return alle[slug][rolle];
@@ -251,9 +253,9 @@ export async function erzeugeMedien({ slug, ds, seed = 1, highlights = [], provi
 /* Auflösung für den Build                                             */
 /* ------------------------------------------------------------------ */
 
-function medium({ herkunft, src, datei = null, quelle, typ = "bild", zeigeBadge }) {
+function medium({ herkunft, src, datei = null, quelle, typ = "bild", zeigeBadge, fokus = "" }) {
   const kennzeichnung = KENNZEICHNUNG[herkunft];
-  return { src, datei, herkunft, kennzeichnung, badge: zeigeBadge ? kennzeichnung : null, quelle, typ };
+  return { src, datei, herkunft, kennzeichnung, badge: zeigeBadge ? kennzeichnung : null, quelle, typ, ...(fokus ? { fokus } : {}) };
 }
 
 /**
@@ -277,7 +279,7 @@ export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remote
     const e = eigeneSeite[rolle];
     if (e) {
       const endung = path.extname(e.datei);
-      return medium({ herkunft: e.herkunft, src: `medien/${rolle.replace(":", "-")}${endung}`, datei: path.join(REPO, e.datei), quelle: `eigene:${e.quelle || "Chat"}`, typ: /\.(mp4|webm)$/i.test(endung) ? "video" : "bild", zeigeBadge: badgeFuer(rolle, e.herkunft) });
+      return medium({ herkunft: e.herkunft, src: `medien/${rolle.replace(":", "-")}${endung}`, datei: path.join(REPO, e.datei), quelle: `eigene:${e.quelle || "Chat"}`, typ: /\.(mp4|webm)$/i.test(endung) ? "video" : "bild", zeigeBadge: badgeFuer(rolle, e.herkunft), fokus: e.fokus });
     }
     const upload = uploads[rolle];
     if (upload) {
