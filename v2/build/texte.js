@@ -134,7 +134,7 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
       bestellen: "Bestellen",
       reservieren: "Reservieren",
       mailBestaetigung: "Bestätigung per E-Mail senden",
-      demoHinweis: "Entwurfsansicht: In der fertigen Version geht diese Anfrage direkt an das Restaurant.",
+      vorschauHinweis: "Vorschau: Auf dieser Seite wird nichts verschickt. Auf der fertigen Website geht die Anfrage direkt an das Restaurant.",
       fehlerAbholzeit: "Bitte wählen Sie eine Abholzeit.",
     },
 

@@ -40,6 +40,7 @@ import {
 } from "./v1Funktionen.js";
 import { renderKopfzeile, renderHero, renderLeiste, HERO_AUFBAUTEN } from "./sektionen/kopf.js";
 import { renderHighlights, renderKarte, renderAmbiente, renderStimmen } from "./sektionen/inhalt.js";
+import { aktionsziele } from "./aktionsziele.js";
 import { renderReservierung, renderKontakt, renderBestellweg, renderFuss, renderEntwurfsleiste } from "./sektionen/service.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -237,7 +238,9 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   ].filter(([, m]) => m);
 
   const betont = ds.layout.betonterMoment;
-  const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv };
+  const apiUrl = String(optionen.apiUrl ?? "").replace(/\/+$/, "");
+  const aktionen = aktionsziele({ lead, apiUrl, fiktiv });
+  const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv, aktionen };
 
   const sektionen = {
     highlights: (tief) => renderHighlights({ ...ctx, betont: betont === "highlights", tief }),
@@ -251,8 +254,8 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   // Sektionswechsel über Flächen statt Linien: jede zweite auf flaecheTief.
   const hauptteil = reihenfolge.map((id, i) => sektionen[id](i % 2 === 1)).join("\n\n");
 
-  const apiUrl = String(optionen.apiUrl ?? "").replace(/\/+$/, "");
-  const pageData = jsonForScript({ name: texte.name, kontaktEmail: optionen.kontaktEmail ?? "", apiUrl });
+  // telefon nur mit echter Nummer: Die Vorschau-Bestätigung nennt sie als echten Weg zum Lokal.
+  const pageData = jsonForScript({ name: texte.name, kontaktEmail: optionen.kontaktEmail ?? "", apiUrl, ...(aktionen.anrufen ? { telefon: aktionen.anrufen.text } : {}) });
 
   const familien = [ds.typografie.display.familie, ds.typografie.text.familie, ds.typografie.label?.familie].filter(Boolean);
   const fontCss = optionen.fontCss ?? schriftCss(familien, optionen.fontsDir ?? FONTS_DIR, optionen.fontsPfad ?? "../../assets/fonts");
@@ -308,7 +311,7 @@ ${renderHero(heroVariante, ctx)}
 ${renderLeiste(ctx)}
 ${hauptteil}
 </main>
-${renderBestellweg({ ...ctx, apiUrl })}
+${renderBestellweg(ctx)}
 ${renderFuss(ctx)}
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${seitenSkript()}</script>

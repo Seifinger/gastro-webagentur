@@ -37,7 +37,12 @@ function feld({ id, name, label, typ = "text", pflicht = false, fehler = "", opt
           </div>`;
 }
 
-export function renderReservierung({ ds, texte, betont, tief }) {
+/** Vor dem Absenden: im Vorschau-Modus sagen, dass nichts verschickt wird. */
+function vorschauHinweis(aktionen, texte) {
+  return aktionen?.modus === "live" ? "" : `<p class="hint vorschau-hinweis">${e(texte.bestellung.vorschauHinweis)}</p>`;
+}
+
+export function renderReservierung({ ds, texte, betont, tief, aktionen }) {
   const t = texte.reservierung;
   const f = t.felder;
   const zeichen = ds.archetyp === "abend" ? `${gedeck()} ` : "";
@@ -60,6 +65,7 @@ export function renderReservierung({ ds, texte, betont, tief }) {
           ${feld({ id: "res-wunsch", name: "wunsch", label: f.wunsch, typ: "textarea", optional: f.optional, breit: true, platzhalter: f.wunschPlatzhalter })}
       </div>
       <button class="btn btn-primary btn-block formular-absenden" type="submit">${e(t.absenden)}</button>
+      ${vorschauHinweis(aktionen, texte)}
     </form>
   </div>
 </section>`;
@@ -92,7 +98,7 @@ export function renderKontakt({ texte, lead, oeffnungszeiten, tief }) {
 </section>`;
 }
 
-export function renderBestellweg({ ds, texte, apiUrl }) {
+export function renderBestellweg({ ds, texte, aktionen }) {
   const b = texte.bestellung;
   const bestellen = (k) => `<button class="btn ${k}" id="bar-order" type="button">${e(b.bestellen)}</button>`;
   const reservieren = (k) => `<a class="btn ${k}" href="#reservierung">${e(b.reservieren)}</a>`;
@@ -128,6 +134,7 @@ ${leiste}
         <div class="totals"><span>${e(b.gesamt)}</span><span id="cart-total">0,00 €</span></div>
         <button class="btn btn-primary btn-block" id="order-submit" type="submit">${e(b.absenden)}</button>
         <p class="hint drawer-hinweis">${e(b.bezahlung)}</p>
+        ${vorschauHinweis(aktionen, texte)}
       </div>
     </form>
   </div>
@@ -142,7 +149,6 @@ ${leiste}
   <div class="confirm-summary" id="confirm-summary"></div>
   <a class="btn btn-ghost" id="confirm-mail" style="display:none" href="#">${e(b.mailBestaetigung)}</a>
   <button class="btn btn-primary btn-block" id="confirm-close" type="button">${e(b.schliessen)}</button>
-  ${apiUrl ? "" : `<p class="demo-note">${e(b.demoHinweis)}</p>`}
 </div>`;
 }
 
