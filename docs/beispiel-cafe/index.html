@@ -924,7 +924,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       <div class="field-grid field-grid--eins">
         <div class="field">
             <label for="ord-abholzeit">Abholzeit</label>
-            <select id="ord-abholzeit" name="abholzeit" required><option value="">Bitte wählen</option><option>So schnell wie möglich (ca. 20 Min.)</option><option>11:30</option><option>11:45</option><option>12:00</option><option>12:15</option><option>12:30</option><option>12:45</option><option>13:00</option><option>13:15</option><option>13:30</option><option>13:45</option><option>14:00</option><option>17:00</option><option>17:15</option><option>17:30</option><option>17:45</option><option>18:00</option><option>18:15</option><option>18:30</option><option>18:45</option><option>19:00</option><option>19:15</option><option>19:30</option><option>19:45</option><option>20:00</option><option>20:15</option><option>20:30</option><option>20:45</option><option>21:00</option><option>21:15</option><option>21:30</option></select>
+            <select id="ord-abholzeit" name="abholzeit" required data-oeffnungszeiten="[{&quot;tage&quot;:&quot;Montag – Donnerstag&quot;,&quot;zeiten&quot;:&quot;11:30 – 14:00 &amp; 17:00 – 22:00&quot;},{&quot;tage&quot;:&quot;Freitag – Samstag&quot;,&quot;zeiten&quot;:&quot;11:30 – 14:00 &amp; 17:00 – 23:00&quot;},{&quot;tage&quot;:&quot;Sonntag &amp; Feiertage&quot;,&quot;zeiten&quot;:&quot;11:30 – 21:00&quot;}]" data-zeitzone="Europe/Berlin"><option value="">Bitte wählen</option></select>
             <span class="error">Bitte wählen Sie eine Abholzeit.</span>
           </div>
         <div class="field">
@@ -983,6 +983,347 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   </div>
 </footer>
 <script>window.PAGE_DATA = {"name":"Café Morgenrot","kontaktEmail":"","apiUrl":""};</script>
+<script>window.Abholzeiten = (function abholzeitKern() {
+  var MINUTE = 60000;
+  var ASAP_VORLAUF_MINUTEN = 20;
+  var PLAN_VORLAUF_MINUTEN = 25;
+  var RASTER_MINUTEN = 5;
+  // Spielraum für die Prüfung auf dem Server: Zwischen der letzten
+  // Berechnung im Browser und dem Eingang der Bestellung vergehen Sekunden.
+  var TOLERANZ_MINUTEN = 2;
+  // Eine als "so schnell wie möglich" geschickte Zeit darf nicht beliebig
+  // spät liegen – sonst ist sie keine ASAP-Zeit mehr.
+  var ASAP_SPIELRAUM_MINUTEN = 10;
+  // Sicherheitsgrenze für durchgehend geöffnete Betriebe (verbundene Intervalle).
+  var HORIZONT_MINUTEN = 36 * 60;
+  var ZEITZONE_STANDARD = "Europe/Berlin";
+
+  // Index = Date#getUTCDay(): 0 = Sonntag.
+  var TAGE = ["sonntag", "montag", "dienstag", "mittwoch", "donnerstag", "freitag", "samstag"];
+  var TAGE_KURZ = ["so", "mo", "di", "mi", "do", "fr", "sa"];
+  var TAGE_ANZEIGE = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"];
+
+  function zweistellig(n) { return (n < 10 ? "0" : "") + n; }
+
+  function tagIndex(wort) {
+    var w = wort.replace(/\./g, "");
+    for (var i = 0; i < 7; i += 1) {
+      if (w === TAGE[i] || w === TAGE_KURZ[i]) return i;
+    }
+    return -1;
+  }
+
+  /** "Montag – Donnerstag", "Sa & So", "Fr, Sa" → Liste von Wochentag-Indizes. */
+  function tageAus(text) {
+    var tage = [];
+    var teile = String(text || "").toLowerCase().split(/,|&|\/|\bund\b/);
+    teile.forEach(function (teil) {
+      var bereich = teil.split(/\s*(?:–|—|-|\bbis\b)\s*/);
+      var von = tagIndex(bereich[0].trim().split(/\s+/)[0] || "");
+      var bis = bereich.length > 1 ? tagIndex(bereich[1].trim().split(/\s+/)[0] || "") : -1;
+      if (von === -1) return;
+      if (bis === -1) { tage.push(von); return; }
+      // Montag = 1 … Sonntag = 0: Bereiche dürfen über das Wochenende laufen.
+      for (var i = von; ; i = (i + 1) % 7) {
+        tage.push(i);
+        if (i === bis) break;
+      }
+    });
+    return tage;
+  }
+
+  /** "12:00 – 15:00 & 18:00 – 01:00" → [[720, 900], [1080, 1500]] (Minuten ab Mitternacht des Tages). */
+  function intervalleAus(text) {
+    var liste = [];
+    var muster = /(\d{1,2})[:.](\d{2})\s*(?:uhr\s*)?(?:–|—|-|bis)\s*(\d{1,2})[:.](\d{2})/gi;
+    var treffer;
+    while ((treffer = muster.exec(String(text || "")))) {
+      var start = Number(treffer[1]) * 60 + Number(treffer[2]);
+      var ende = Number(treffer[3]) * 60 + Number(treffer[4]);
+      if (start >= 1440 || ende > 1440) continue;
+      // Über Mitternacht: Ende liegt am Folgetag.
+      if (ende <= start) ende += 1440;
+      liste.push([start, ende]);
+    }
+    return liste;
+  }
+
+  /**
+   * Wochenplan aus den Anzeigezeilen der Seite ({ tage, zeiten }) – dieselben
+   * Zeilen, die die Seite als Öffnungszeiten zeigt. Feiertage kennt die
+   * Rechnung nicht; sie zählen wie der Wochentag. null, wenn sich nichts lesen lässt.
+   */
+  function wochenplan(zeilen) {
+    if (!Array.isArray(zeilen)) return null;
+    var plan = [[], [], [], [], [], [], []];
+    var gefunden = false;
+    zeilen.forEach(function (zeile) {
+      if (!zeile) return;
+      var intervalle = intervalleAus(zeile.zeiten);
+      tageAus(zeile.tage).forEach(function (tag) {
+        intervalle.forEach(function (iv) { plan[tag].push(iv); gefunden = true; });
+      });
+    });
+    return gefunden ? plan : null;
+  }
+
+  var formatierer = {};
+  function wandzeit(ms, zeitzone) {
+    var f = formatierer[zeitzone];
+    if (!f) {
+      f = new Intl.DateTimeFormat("en-US", {
+        timeZone: zeitzone, hourCycle: "h23",
+        year: "numeric", month: "numeric", day: "numeric",
+        hour: "numeric", minute: "numeric", second: "numeric",
+      });
+      formatierer[zeitzone] = f;
+    }
+    var w = {};
+    f.formatToParts(new Date(ms)).forEach(function (p) { w[p.type] = p.value; });
+    var stunde = Number(w.hour) % 24;
+    return {
+      jahr: Number(w.year), monat: Number(w.month), tag: Number(w.day),
+      stunde: stunde, minute: Number(w.minute), sekunde: Number(w.second),
+      wochentag: new Date(Date.UTC(Number(w.year), Number(w.month) - 1, Number(w.day))).getUTCDay(),
+    };
+  }
+
+  /** Abstand der Wanduhr zu UTC in Millisekunden zum Zeitpunkt ms. */
+  function versatz(ms, zeitzone) {
+    var sekunden = Math.floor(ms / 1000) * 1000;
+    var w = wandzeit(sekunden, zeitzone);
+    return Date.UTC(w.jahr, w.monat - 1, w.tag, w.stunde, w.minute, w.sekunde) - sekunden;
+  }
+
+  /** Zeitpunkt für ein Wanduhr-Datum plus Minuten (auch ≥ 1440 = Folgetag). */
+  function zeitpunkt(jahr, monat, tag, minuten, zeitzone) {
+    var geschaetzt = Date.UTC(jahr, monat - 1, tag, 0, minuten);
+    var v1 = versatz(geschaetzt, zeitzone);
+    var ergebnis = geschaetzt - v1;
+    var v2 = versatz(ergebnis, zeitzone);
+    return v2 === v1 ? ergebnis : geschaetzt - v2;
+  }
+
+  function uhrzeit(ms, zeitzone) {
+    var w = wandzeit(ms, zeitzone);
+    return zweistellig(w.stunde) + ":" + zweistellig(w.minute);
+  }
+
+  function datum(ms, zeitzone) {
+    var w = wandzeit(ms, zeitzone);
+    return w.jahr + "-" + zweistellig(w.monat) + "-" + zweistellig(w.tag);
+  }
+
+  /** "heute, 17:30 Uhr" / "morgen, 11:30 Uhr" / "Montag, 11:30 Uhr". */
+  function beschreibe(ms, jetzt, zeitzone) {
+    var heute = wandzeit(jetzt, zeitzone);
+    var dann = wandzeit(ms, zeitzone);
+    var tage = Math.round((Date.UTC(dann.jahr, dann.monat - 1, dann.tag) - Date.UTC(heute.jahr, heute.monat - 1, heute.tag)) / 86400000);
+    var tag = tage === 0 ? "heute" : tage === 1 ? "morgen" : TAGE_ANZEIGE[dann.wochentag];
+    return tag + ", " + uhrzeit(ms, zeitzone) + " Uhr";
+  }
+
+  /**
+   * Öffnungsintervalle als Zeitpunkte, von gestern (läuft evtl. noch über
+   * Mitternacht) bis eine Woche voraus. Aneinanderstoßende Intervalle
+   * werden verbunden. tag: Tag des Beginns relativ zu heute (−1, 0, 1 …).
+   */
+  function intervalle(plan, jetzt, zeitzone) {
+    var heute = wandzeit(jetzt, zeitzone);
+    var liste = [];
+    for (var d = -1; d <= 7; d += 1) {
+      var t = new Date(Date.UTC(heute.jahr, heute.monat - 1, heute.tag + d));
+      var j = t.getUTCFullYear();
+      var m = t.getUTCMonth() + 1;
+      var tg = t.getUTCDate();
+      plan[t.getUTCDay()].forEach(function (iv) {
+        var start = zeitpunkt(j, m, tg, iv[0], zeitzone);
+        var ende = zeitpunkt(j, m, tg, iv[1], zeitzone);
+        if (ende > start) liste.push({ start: start, ende: ende, tag: d });
+      });
+    }
+    liste.sort(function (a, b) { return a.start - b.start; });
+    var verbunden = [];
+    liste.forEach(function (iv) {
+      var letztes = verbunden[verbunden.length - 1];
+      if (letztes && iv.start <= letztes.ende) letztes.ende = Math.max(letztes.ende, iv.ende);
+      else verbunden.push({ start: iv.start, ende: iv.ende, tag: iv.tag });
+    });
+    return verbunden;
+  }
+
+  function aufrunden(ms, schritt) { return Math.ceil(ms / schritt) * schritt; }
+
+  function eintrag(ms, art, iv, zeitzone) {
+    return {
+      art: art,
+      zeitpunkt: ms,
+      iso: new Date(ms).toISOString(),
+      uhrzeit: uhrzeit(ms, zeitzone),
+      datum: datum(ms, zeitzone),
+      intervall: { start: iv.start, ende: iv.ende, von: uhrzeit(iv.start, zeitzone), bis: uhrzeit(iv.ende, zeitzone) },
+    };
+  }
+
+  function einstellungen(e) {
+    var zeitzone = (e && e.zeitzone) || ZEITZONE_STANDARD;
+    var zusatz = Math.max(0, Math.round(Number(e && e.zusatzMinuten) || 0));
+    var jetzt = e && e.jetzt !== undefined ? Number(new Date(e.jetzt).getTime()) : Date.now();
+    // Ohne Öffnungszeiten keine Abholzeiten – erfunden wird nichts.
+    return { zeitzone: zeitzone, zusatz: zusatz, jetzt: jetzt, plan: wochenplan(e && e.oeffnungszeiten) };
+  }
+
+  /**
+   * Alle heute noch möglichen Abholzeiten.
+   *
+   * @param {object} e
+   * @param {Date|number|string} [e.jetzt] - Zeitpunkt der Berechnung (Standard: jetzt).
+   * @param {Array<{tage: string, zeiten: string}>} e.oeffnungszeiten - Anzeigezeilen der Öffnungszeiten (ohne: keine Zeiten).
+   * @param {string} [e.zeitzone] - Zeitzone des Restaurants (Standard Europe/Berlin).
+   * @param {number} [e.zusatzMinuten] - Zusatz-Wartezeit des Wirts, additiv.
+   * @returns {{ asap: object|null, slots: object[], naechsteOeffnung: object|null, geoeffnet: boolean, zusatzMinuten: number, zeitzone: string }}
+   */
+  function berechne(e) {
+    var s = einstellungen(e);
+    var ergebnis = { asap: null, slots: [], naechsteOeffnung: null, geoeffnet: false, ohneOeffnungszeiten: !s.plan, zusatzMinuten: s.zusatz, zeitzone: s.zeitzone, jetzt: s.jetzt };
+    if (!s.plan) return ergebnis;
+
+    var asapVorlauf = (ASAP_VORLAUF_MINUTEN + s.zusatz) * MINUTE;
+    var planVorlauf = (PLAN_VORLAUF_MINUTEN + s.zusatz) * MINUTE;
+    var schritt = RASTER_MINUTEN * MINUTE;
+    var horizont = s.jetzt + HORIZONT_MINUTEN * MINUTE;
+    var alle = intervalle(s.plan, s.jetzt, s.zeitzone);
+
+    alle.forEach(function (iv) {
+      if (iv.start <= s.jetzt && s.jetzt < iv.ende) ergebnis.geoeffnet = true;
+      // Nur der laufende Öffnungstag: was gerade läuft oder heute beginnt.
+      if (iv.ende <= s.jetzt || iv.tag > 0) return;
+      var start = Math.max(s.jetzt, iv.start);
+
+      var asap = aufrunden(start + asapVorlauf, MINUTE);
+      if (!ergebnis.asap && asap < iv.ende) ergebnis.asap = eintrag(asap, "asap", iv, s.zeitzone);
+
+      for (var t = aufrunden(start + planVorlauf, schritt); t < iv.ende && t <= horizont; t += schritt) {
+        ergebnis.slots.push(eintrag(t, "geplant", iv, s.zeitzone));
+      }
+    });
+
+    if (!ergebnis.asap) {
+      for (var i = 0; i < alle.length; i += 1) {
+        var iv = alle[i];
+        if (iv.tag <= 0 && iv.start <= s.jetzt) continue;
+        if (iv.start > s.jetzt && iv.start + asapVorlauf < iv.ende) {
+          ergebnis.naechsteOeffnung = {
+            zeitpunkt: iv.start,
+            iso: new Date(iv.start).toISOString(),
+            uhrzeit: uhrzeit(iv.start, s.zeitzone),
+            text: beschreibe(iv.start, s.jetzt, s.zeitzone),
+          };
+          break;
+        }
+      }
+    }
+    return ergebnis;
+  }
+
+  /** Das Vorkommen von "HH:MM" (Wanduhr), das dem Referenzzeitpunkt am nächsten liegt. */
+  function zeitpunktFuerUhrzeit(referenz, hhmm, zeitzone) {
+    var treffer = /^(\d{1,2}):(\d{2})$/.exec(String(hhmm || "").trim());
+    if (!treffer) return null;
+    var minuten = Number(treffer[1]) * 60 + Number(treffer[2]);
+    if (minuten >= 1440 || Number(treffer[2]) >= 60) return null;
+    var zz = zeitzone || ZEITZONE_STANDARD;
+    var ref = Number(new Date(referenz).getTime());
+    var w = wandzeit(ref, zz);
+    var bester = null;
+    for (var d = -1; d <= 1; d += 1) {
+      var kandidat = zeitpunkt(w.jahr, w.monat, w.tag + d, minuten, zz);
+      if (bester === null || Math.abs(kandidat - ref) < Math.abs(bester - ref)) bester = kandidat;
+    }
+    return bester;
+  }
+
+  function keineMehr(r) {
+    return "Heute nehmen wir keine Abholbestellungen mehr an." +
+      (r.naechsteOeffnung ? " Nächste Öffnung: " + r.naechsteOeffnung.text + "." : "");
+  }
+
+  /**
+   * Prüft eine eingegangene Abholzeit gegen dieselben Regeln wie die Anzeige.
+   * Nichts wird still umgebucht: Passt die Zeit nicht (mehr), gibt es einen
+   * Fehler mit der frühesten möglichen Zeit.
+   *
+   * @param {object} e - wie berechne(), dazu:
+   * @param {"asap"|"geplant"} [e.art]
+   * @param {string|number} [e.zeitpunkt] - ISO-Zeitpunkt der gewählten Option.
+   * @param {string} [e.abholzeit] - Nur "HH:MM" (ältere Seiten): gilt als geplante Zeit am nächstliegenden Tag.
+   * @returns {{ ok: true, art: string, zeitpunkt: number, iso: string, uhrzeit: string } | { ok: false, fehler: string }}
+   */
+  function pruefe(e) {
+    var s = einstellungen(e);
+    var toleranz = TOLERANZ_MINUTEN * MINUTE;
+    var streng = berechne({ jetzt: s.jetzt, oeffnungszeiten: e.oeffnungszeiten, zeitzone: s.zeitzone, zusatzMinuten: s.zusatz });
+    var milde = berechne({ jetzt: s.jetzt - toleranz, oeffnungszeiten: e.oeffnungszeiten, zeitzone: s.zeitzone, zusatzMinuten: s.zusatz });
+
+    var art = e.art;
+    var t = NaN;
+    if (!art && /^\d{1,2}:\d{2}$/.test(String(e.abholzeit || "").trim())) {
+      art = "geplant";
+      t = zeitpunktFuerUhrzeit(s.jetzt, e.abholzeit, s.zeitzone);
+    } else if (e.zeitpunkt !== undefined && e.zeitpunkt !== null && e.zeitpunkt !== "") {
+      t = new Date(e.zeitpunkt).getTime();
+    }
+    if (art !== "asap" && art !== "geplant") return { ok: false, fehler: "Bitte wählen Sie eine Abholzeit aus der Liste." };
+    if (!isFinite(t)) return { ok: false, fehler: "Bitte wählen Sie eine Abholzeit aus der Liste." };
+
+    function ok() {
+      return { ok: true, art: art, zeitpunkt: t, iso: new Date(t).toISOString(), uhrzeit: uhrzeit(t, s.zeitzone), datum: datum(t, s.zeitzone) };
+    }
+    function frueheste() {
+      if (!streng.asap) return " " + keineMehr(streng);
+      var f = art === "asap" ? streng.asap : streng.slots[0];
+      if (!f) return " Heute ist nur noch „so schnell wie möglich“ möglich (ca. " + streng.asap.uhrzeit + " Uhr).";
+      return " Frühestens möglich: " + f.uhrzeit + " Uhr. Bitte wählen Sie die Abholzeit neu.";
+    }
+
+    if (streng.ohneOeffnungszeiten) return { ok: false, fehler: "F\u00FCr diesen Betrieb sind keine \u00D6ffnungszeiten hinterlegt \u2013 bitte bestellen Sie telefonisch." };
+    if (!streng.asap && !milde.asap) return { ok: false, fehler: keineMehr(streng) };
+
+    if (art === "asap") {
+      var kandidaten = [streng.asap, milde.asap].filter(Boolean);
+      var passend = kandidaten.some(function (a) {
+        return t >= a.zeitpunkt && t <= a.zeitpunkt + toleranz + ASAP_SPIELRAUM_MINUTEN * MINUTE && t < a.intervall.ende;
+      });
+      if (passend) return ok();
+      var zuFrueh = kandidaten.every(function (a) { return t < a.zeitpunkt; });
+      return { ok: false, fehler: (zuFrueh ? "Die Abholzeit " + uhrzeit(t, s.zeitzone) + " Uhr ist nicht mehr zu schaffen." : "Diese Abholzeit passt nicht zu „so schnell wie möglich“.") + frueheste() };
+    }
+
+    var angeboten = streng.slots.concat(milde.slots).some(function (slot) { return slot.zeitpunkt === t; });
+    if (angeboten) return ok();
+    var imRaster = t % (RASTER_MINUTEN * MINUTE) === 0;
+    var ersteZeit = streng.slots[0];
+    if (imRaster && ersteZeit && t < ersteZeit.zeitpunkt && t > s.jetzt - HORIZONT_MINUTEN * MINUTE) {
+      return { ok: false, fehler: "Die Abholzeit " + uhrzeit(t, s.zeitzone) + " Uhr ist nicht mehr möglich." + frueheste() };
+    }
+    return { ok: false, fehler: "Um " + uhrzeit(t, s.zeitzone) + " Uhr bieten wir keine Abholung an." + frueheste() };
+  }
+
+  return {
+    ASAP_VORLAUF_MINUTEN: ASAP_VORLAUF_MINUTEN,
+    PLAN_VORLAUF_MINUTEN: PLAN_VORLAUF_MINUTEN,
+    RASTER_MINUTEN: RASTER_MINUTEN,
+    TOLERANZ_MINUTEN: TOLERANZ_MINUTEN,
+    ZEITZONE_STANDARD: ZEITZONE_STANDARD,
+    wochenplan: wochenplan,
+    berechne: berechne,
+    pruefe: pruefe,
+    zeitpunktFuerUhrzeit: zeitpunktFuerUhrzeit,
+    uhrzeit: uhrzeit,
+    datum: datum,
+    beschreibe: beschreibe,
+  };
+})();</script>
 <script>
 (function () {
   var data = window.PAGE_DATA;
@@ -1078,6 +1419,8 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   function openDrawer() {
     byId("drawer").classList.add("open");
     byId("overlay").classList.add("open");
+    ladeAbholKonfig();
+    aktualisiereAbholzeiten();
   }
   function closeDrawer() {
     byId("drawer").classList.remove("open");
@@ -1228,6 +1571,165 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       });
   }
 
+  /*
+   * Abholzeiten. Gerechnet wird nur in window.Abholzeiten (src/abholzeiten.js,
+   * dieselbe Rechnung pr\u00FCft der Server). Hier: Auswahl bauen, veraltete
+   * Zeiten entfernen, Serverzeit und Zusatz-Wartezeit des Wirts \u00FCbernehmen.
+   */
+  var abhol = { gelesen: false, versatz: 0, oeffnungszeiten: null, zeitzone: "", zusatzMinuten: 0, geladenUm: 0, verfallen: false, stand: "" };
+
+  function abholGrundlage(feld) {
+    if (!abhol.gelesen) {
+      abhol.gelesen = true;
+      try { abhol.oeffnungszeiten = JSON.parse(feld.getAttribute("data-oeffnungszeiten") || "null"); } catch (e) { abhol.oeffnungszeiten = null; }
+      abhol.zeitzone = feld.getAttribute("data-zeitzone") || "";
+    }
+    return {
+      jetzt: Date.now() + abhol.versatz,
+      oeffnungszeiten: abhol.oeffnungszeiten || undefined,
+      zeitzone: abhol.zeitzone || undefined,
+      zusatzMinuten: abhol.zusatzMinuten
+    };
+  }
+
+  function abholOption(text, eintrag) {
+    var option = document.createElement("option");
+    option.textContent = text;
+    option.value = eintrag ? eintrag.iso : "";
+    if (eintrag) {
+      option.setAttribute("data-art", eintrag.art);
+      option.setAttribute("data-uhrzeit", eintrag.uhrzeit);
+    }
+    return option;
+  }
+
+  function abholHinweis(feld) {
+    var hinweis = byId("ord-abholzeit-hinweis");
+    if (!hinweis) {
+      hinweis = document.createElement("p");
+      hinweis.id = "ord-abholzeit-hinweis";
+      hinweis.className = "hint abholzeit-hinweis";
+      hinweis.setAttribute("aria-live", "polite");
+      feld.parentNode.appendChild(hinweis);
+    }
+    return hinweis;
+  }
+
+  /**
+   * Baut die Auswahl aus der aktuellen Uhrzeit neu: nur offene, k\u00FCnftige
+   * Zeiten. Eine gew\u00E4hlte Zeit, die inzwischen nicht mehr geht, wird nicht
+   * still ersetzt: Die Auswahl wird geleert, der Gast bekommt einen Hinweis.
+   * "So schnell wie m\u00F6glich" bleibt gew\u00E4hlt, die Uhrzeit dazu wandert mit.
+   * Gibt false zur\u00FCck, wenn die bisherige Wahl verfallen ist.
+   */
+  function aktualisiereAbholzeiten() {
+    var feld = byId("ord-abholzeit");
+    if (!feld || !window.Abholzeiten) return true;
+    var gewaehlt = feld.selectedIndex > 0 ? feld.options[feld.selectedIndex] : null;
+    var vorherArt = gewaehlt ? gewaehlt.getAttribute("data-art") : "";
+    var vorherWert = gewaehlt ? gewaehlt.value : "";
+    var grundlage = abholGrundlage(feld);
+    var r = window.Abholzeiten.berechne(grundlage);
+    var heute = window.Abholzeiten.datum(grundlage.jetzt, r.zeitzone);
+    // Unverändert? Dann bleibt das Feld unangetastet (kein Flackern, eine
+    // gerade geöffnete Auswahl klappt nicht zu).
+    var stand = [r.asap ? r.asap.iso : "", r.geoeffnet, r.ohneOeffnungszeiten, r.slots.map(function (x) { return x.iso; }).join()].join("|");
+    if (stand === abhol.stand && feld.options.length > 0) return true;
+    abhol.stand = stand;
+
+    feld.innerHTML = "";
+    feld.appendChild(abholOption(r.asap ? "Bitte w\u00E4hlen" : r.ohneOeffnungszeiten ? "Abholzeit bitte telefonisch" : "Heute keine Abholung mehr m\u00F6glich", null));
+    if (r.asap) feld.appendChild(abholOption("So schnell wie m\u00F6glich \u2013 ca. " + r.asap.uhrzeit + " Uhr", r.asap));
+    var gruppen = {};
+    var reihenfolge = [];
+    r.slots.forEach(function (slot) {
+      var schluessel = slot.intervall.von + " \u2013 " + slot.intervall.bis + " Uhr";
+      if (!gruppen[schluessel]) { gruppen[schluessel] = []; reihenfolge.push(schluessel); }
+      gruppen[schluessel].push(slot);
+    });
+    reihenfolge.forEach(function (schluessel) {
+      var ziel = feld;
+      if (reihenfolge.length > 1) {
+        ziel = document.createElement("optgroup");
+        ziel.label = schluessel;
+        feld.appendChild(ziel);
+      }
+      gruppen[schluessel].forEach(function (slot) {
+        ziel.appendChild(abholOption(slot.uhrzeit + " Uhr" + (slot.datum !== heute ? " (nach Mitternacht)" : ""), slot));
+      });
+    });
+
+    var gueltig = true;
+    if (vorherArt === "asap" && r.asap) feld.value = r.asap.iso;
+    else if (vorherWert) {
+      feld.value = vorherWert;
+      if (feld.value !== vorherWert) { feld.selectedIndex = 0; gueltig = false; abhol.verfallen = true; }
+    }
+
+    var text = "";
+    // Der Hinweis bleibt stehen, bis der Gast neu gewählt hat.
+    if (abhol.verfallen && !feld.value) text = "Die gew\u00E4hlte Abholzeit ist nicht mehr m\u00F6glich \u2013 bitte w\u00E4hlen Sie eine neue.";
+    else if (r.ohneOeffnungszeiten) text = "Abholzeiten k\u00F6nnen wir hier noch nicht anbieten \u2013 bitte rufen Sie uns an.";
+    else if (!r.asap) text = "Heute nehmen wir keine Abholbestellungen mehr an." + (r.naechsteOeffnung ? " N\u00E4chste \u00D6ffnung: " + r.naechsteOeffnung.text + "." : "");
+    else if (!r.geoeffnet) text = "Gerade ist geschlossen \u2013 Sie k\u00F6nnen f\u00FCr heute ab " + r.asap.uhrzeit + " Uhr vorbestellen.";
+    var hinweis = abholHinweis(feld);
+    hinweis.textContent = text;
+    hinweis.hidden = !text;
+    if (abhol.verfallen && !feld.value) {
+      var feldRahmen = feld.closest(".field");
+      if (feldRahmen) feldRahmen.classList.add("invalid");
+    }
+    return gueltig;
+  }
+
+  /** Live: \u00D6ffnungszeiten, Zeitzone, Zusatz-Wartezeit und Uhr des Betriebs. */
+  function ladeAbholKonfig() {
+    if (!data.apiUrl || Date.now() - abhol.geladenUm < 60000) return;
+    abhol.geladenUm = Date.now();
+    var gesendet = Date.now();
+    fetch(data.apiUrl + "/oeffentlich/abholzeiten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    })
+      .then(function (antwort) { return antwort.json(); })
+      .then(function (ergebnis) {
+        if (!ergebnis || !ergebnis.ok) return;
+        var server = new Date(ergebnis.jetzt).getTime();
+        if (isFinite(server)) abhol.versatz = server - (gesendet + Date.now()) / 2;
+        var feld = byId("ord-abholzeit");
+        if (feld) abholGrundlage(feld);
+        if (ergebnis.oeffnungszeiten) abhol.oeffnungszeiten = ergebnis.oeffnungszeiten;
+        if (ergebnis.zeitzone) abhol.zeitzone = ergebnis.zeitzone;
+        abhol.zusatzMinuten = Number(ergebnis.zusatzMinuten) || 0;
+        aktualisiereAbholzeiten();
+      })
+      .catch(function () {
+        // Ohne Antwort rechnet die Seite mit ihren eigenen Angaben weiter;
+        // der Server pr\u00FCft beim Absenden ohnehin noch einmal.
+        abhol.geladenUm = 0;
+      });
+  }
+
+  function beobachteAbholzeiten() {
+    var feld = byId("ord-abholzeit");
+    if (!feld) return;
+    aktualisiereAbholzeiten();
+    // Beim \u00D6ffnen der Auswahl frisch rechnen, dazu alle 30 Sekunden -
+    // aber nie w\u00E4hrend der Gast gerade darin w\u00E4hlt.
+    feld.addEventListener("focus", aktualisiereAbholzeiten);
+    feld.addEventListener("pointerdown", aktualisiereAbholzeiten);
+    feld.addEventListener("change", function () {
+      if (!feld.value || !abhol.verfallen) return;
+      abhol.verfallen = false;
+      var hinweis = byId("ord-abholzeit-hinweis");
+      if (hinweis) { hinweis.textContent = ""; hinweis.hidden = true; }
+    });
+    setInterval(function () {
+      if (document.activeElement !== feld) aktualisiereAbholzeiten();
+    }, 30000);
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     ladeNoShowEinstellungen();
     Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function (button) {
@@ -1274,6 +1776,9 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       event.preventDefault();
       var form = event.target;
       if (lines().length === 0) return;
+      // Unmittelbar vor dem Absenden neu rechnen: Eine inzwischen verfallene
+      // Zeit wird geleert (mit Hinweis) und die Prüfung unten schlägt an.
+      aktualisiereAbholzeiten();
       if (!validate(form, ["name", "telefon", "abholzeit"])) return;
 
       var noShowFeld = byId("ord-noshow-feld");
@@ -1285,7 +1790,12 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       }
 
       var nummer = referenz("AB");
-      var zeit = form.elements.abholzeit.value;
+      var abholWahl = form.elements.abholzeit.options[form.elements.abholzeit.selectedIndex];
+      var abholArt = abholWahl.getAttribute("data-art") || "";
+      var abholUhrzeit = abholWahl.getAttribute("data-uhrzeit") || form.elements.abholzeit.value;
+      var zeit = abholArt === "asap"
+        ? "so schnell wie möglich (ca. " + abholUhrzeit + " Uhr)"
+        : abholUhrzeit + " Uhr";
       var summary = lines().map(function (line) {
         return line.menge + " \u00D7 " + line.name + " (" + euro(line.preis * line.menge) + ")";
       }).join("\n");
@@ -1305,7 +1815,9 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 
       sende("/oeffentlich/bestellung", {
         positionen: positionen,
-        abholzeit: zeit,
+        abholzeit: abholUhrzeit,
+        abholArt: abholArt,
+        abholZeitpunkt: abholArt ? form.elements.abholzeit.value : "",
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
         hinweis: form.elements.hinweis.value,
@@ -1338,6 +1850,10 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
         form.reset();
         closeDrawer();
       }).catch(function (fehler) {
+        // Z.B. eine Abholzeit, die der Server nicht mehr annimmt: Zeiten neu holen.
+        abhol.geladenUm = 0;
+        ladeAbholKonfig();
+        aktualisiereAbholzeiten();
         zeigeFehler(fehler.message);
       });
     });
@@ -1394,6 +1910,8 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       });
     });
 
+    beobachteAbholzeiten();
+    ladeAbholKonfig();
     renderCart();
   });
 })();

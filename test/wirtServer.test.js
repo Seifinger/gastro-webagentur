@@ -11,7 +11,12 @@ import { fileURLToPath } from "node:url";
 const SLUG = "__test-wirt-server";
 process.env.BETRIEB = SLUG;
 const { handler } = await import("../src/wirtServer.js");
-const { ladeBetrieb, speichereBetrieb, legeTischAn } = await import("../src/betriebStore.js");
+const { ladeBetrieb, speichereBetrieb, legeTischAn, uhrHook } = await import("../src/betriebStore.js");
+
+// Feste Uhr (Donnerstag, 24.09.2026, 17:00 Berlin): "18:30" ist dann eine
+// angebotene Abholzeit – unabhängig davon, wann der Test läuft.
+const JETZT = new Date("2026-09-24T17:00:00+02:00");
+uhrHook.jetzt = () => new Date(JETZT);
 const { pushSendenHook } = await import("../src/pushNotify.js");
 const { telegramSendenHook } = await import("../src/telegramNotify.js");
 const { smsHook, emailHook } = await import("../src/kundenBenachrichtigung.js");

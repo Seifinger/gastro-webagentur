@@ -146,7 +146,6 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
       titel: "Ihre Abholbestellung",
       schliessen: "Schließen",
       abholzeit: "Abholzeit",
-      asap: "So schnell wie möglich (ca. 20 Min.)",
       hinweis: "Hinweis",
       hinweisPlatzhalter: "Allergien, Sonderwünsche …",
       gesamt: "Gesamt",

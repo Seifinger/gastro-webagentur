@@ -155,12 +155,10 @@ export function verfuegbareAbholzeitenMitLernen(slug, betrieb, jetzt = new Date(
     Math.round(gelernterZuschlag(tabelle, wochentag(datum), zeitfenster(uhrzeit), stufe)),
   );
 
-  // verfuegbareAbholzeiten() addiert auf "jetzt" bereits Grundvorlauf und
-  // manuelle Zusatz-Wartezeit – der gelernte Zuschlag kommt additiv oben
-  // drauf, indem "jetzt" selbst entsprechend weiter in der Zukunft liegt.
-  // So bleibt die Basislogik einmalig an einer Stelle.
-  const virtuellesJetzt = new Date(jetzt.getTime() + zuschlag * 60000);
-  return verfuegbareAbholzeiten(betrieb, virtuellesJetzt);
+  // verfuegbareAbholzeiten() rechnet Grundvorlauf und manuelle
+  // Zusatz-Wartezeit bereits ein – der gelernte Zuschlag kommt additiv
+  // obendrauf. So bleibt die Basislogik einmalig an einer Stelle (abholzeiten.js).
+  return verfuegbareAbholzeiten(betrieb, jetzt, { extraMinuten: zuschlag });
 }
 
 /**

@@ -28,6 +28,7 @@ import { verfeinereTexte } from "./copyRefiner.js";
 import { schriftCss } from "./schriften.js";
 import {
   seitenSkript,
+  abholzeitSkript,
   pruefeFunktionsVertrag,
   themeForLead,
   slugify,
@@ -338,9 +339,10 @@ ${ausdruck ? `${renderErsterBildschirm(ctx)}\n${renderEinladung(ctx)}` : renderH
 ${ausdruck ? "" : renderLeiste(ctx)}
 ${hauptteil}
 </main>
-${renderBestellweg(ausdruck ? { ...ctx, ds: { ...ds, layout: { ...ds.layout, primaerAktion: ausdruck.hauptaktion === "reservieren" ? "reservation" : "order" } } } : ctx)}
+${renderBestellweg({ ...(ausdruck ? { ...ctx, ds: { ...ds, layout: { ...ds.layout, primaerAktion: ausdruck.hauptaktion === "reservieren" ? "reservation" : "order" } } } : ctx), oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS })}
 ${ausdruck ? renderFussAusdruck(ctx) : renderFuss(ctx)}
 <script>window.PAGE_DATA = ${pageData};</script>
+<script>${abholzeitSkript()}</script>
 <script>${seitenSkript()}</script>
 <script>${BEWEGUNG_SKRIPT}</script>
 ${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</script>\n<script>${ABFOLGE_SKRIPT}</script>\n` : ""}</body>

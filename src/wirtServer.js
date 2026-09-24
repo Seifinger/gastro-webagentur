@@ -25,6 +25,8 @@ import {
   setzeBankverbindung,
   storniereBestellung,
   bestaetigeNoShow,
+  abholEinstellungen,
+  uhrHook,
 } from "./betriebStore.js";
 import { benachrichtigeBetrieb, oeffentlicherVapidSchluessel } from "./pushNotify.js";
 import { benachrichtigeUeberTelegram } from "./telegramNotify.js";
@@ -203,6 +205,15 @@ export const handler = async (req, res) => {
           await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
         }
         json(res, 200, { ok: true, bestellung: { id: b.id, nummer: b.nummer } }, CORS);
+        return;
+      }
+
+      // Womit das Bestellformular die Abholzeiten rechnet: dieselben
+      // Öffnungszeiten, Zeitzone und Zusatz-Wartezeit, mit denen die
+      // Bestellung hier gleich geprüft wird – dazu die Serverzeit, damit eine
+      // falsch gehende Uhr im Gerät des Gastes nichts verschiebt.
+      if (pathname === "/oeffentlich/abholzeiten") {
+        json(res, 200, { ok: true, ...abholEinstellungen(ladeBetrieb(slug)), jetzt: uhrHook.jetzt().toISOString() }, CORS);
         return;
       }
 
