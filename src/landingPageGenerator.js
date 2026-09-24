@@ -747,6 +747,11 @@ const PAGE_SCRIPT = `
       "&body=" + encodeURIComponent(body);
   }
 
+  /** Im Vorschau-Modus: der echte Weg zum Lokal, falls eine Nummer bekannt ist. */
+  function telefonSatz(zweck) {
+    return data.telefon ? " " + zweck + " bitte anrufen: " + data.telefon + "." : "";
+  }
+
   function referenz(prefix) {
     return prefix + "-" + String(Math.floor(1000 + Math.random() * 9000));
   }
@@ -914,19 +919,22 @@ const PAGE_SCRIPT = `
         // Die Abholzeit ist zun\\u00E4chst nur ein Wunsch: ob sie machbar ist,
         // best\\u00E4tigt die K\\u00FCche.
         var echteNummer = ergebnis.demo ? nummer : ergebnis.bestellung.nummer;
+        // Ohne Betriebsserver (Beispielseite, Entwurf) ist nichts passiert \\u2013
+        // die Best\\u00E4tigung sagt das ehrlich, statt Erfolg vorzut\\u00E4uschen.
         var text = ergebnis.demo
-          ? "Wir bereiten Ihr Essen frisch zu. Bitte holen Sie es zur gew\\u00E4hlten Zeit bei uns ab."
+          ? "Das ist eine Vorschau: Ihre Bestellung wurde nicht verschickt und wird nicht zubereitet. Auf der fertigen Website landet sie direkt in der K\\u00FCche des Restaurants." + telefonSatz("Zum Bestellen")
           : "Ihre Bestellung liegt in der K\\u00FCche. Die Abholzeit best\\u00E4tigen wir Ihnen gleich \\u2013 falls es knapp wird, melden wir uns telefonisch.";
+        var zeilen = [
+          [ergebnis.demo ? "Abholung" : "Abholung (gew\\u00FCnscht)", zeit],
+          ["Positionen", stueck],
+          ["Gesamt", summe],
+        ];
+        if (!ergebnis.demo) zeilen.unshift(["Bestellnummer", echteNummer]);
 
         showConfirm(
-          ergebnis.demo ? "Bestellung aufgenommen" : "Bestellung eingegangen",
+          ergebnis.demo ? "Vorschau \\u2013 nichts bestellt" : "Bestellung eingegangen",
           text,
-          [
-            ["Bestellnummer", echteNummer],
-            [ergebnis.demo ? "Abholung" : "Abholung (gew\\u00FCnscht)", zeit],
-            ["Positionen", stueck],
-            ["Gesamt", summe],
-          ],
+          zeilen,
           mailtoLink("Abholbestellung " + echteNummer + " \\u2013 " + data.name, body)
         );
 
@@ -969,17 +977,18 @@ const PAGE_SCRIPT = `
         email: form.elements.email.value,
         wunsch: form.elements.wunsch.value
       }, form.querySelector("button[type=submit]")).then(function (ergebnis) {
+        var zeilen = [
+          ["Datum", datum],
+          ["Uhrzeit", uhrzeit],
+          ["Personen", personenText],
+        ];
+        if (!ergebnis.demo) zeilen.unshift(["Reservierungsnr.", nummer]);
         showConfirm(
-          ergebnis.demo ? "Tisch reserviert" : "Anfrage eingegangen",
+          ergebnis.demo ? "Vorschau \\u2013 nichts gesendet" : "Anfrage eingegangen",
           ergebnis.demo
-            ? "Vielen Dank! Ihre Reservierung liegt uns vor \\u2013 wir freuen uns auf Ihren Besuch."
+            ? "Das ist eine Vorschau: Ihre Anfrage wurde nicht verschickt, es ist kein Tisch reserviert. Auf der fertigen Website geht sie direkt an das Restaurant." + telefonSatz("Zum Reservieren")
             : "Vielen Dank! Wir haben Ihren Tisch vorgemerkt und best\\u00E4tigen Ihnen die Reservierung in K\\u00FCrze.",
-          [
-            ["Reservierungsnr.", nummer],
-            ["Datum", datum],
-            ["Uhrzeit", uhrzeit],
-            ["Personen", personenText],
-          ],
+          zeilen,
           mailtoLink("Tischreservierung " + nummer + " \\u2013 " + data.name, body)
         );
 

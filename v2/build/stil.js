@@ -346,7 +346,7 @@ textarea { min-height: var(--s-12); resize: vertical; }
 .confirm-summary div { display: flex; justify-content: space-between; gap: var(--s-2); }
 .confirm-summary .label { color: var(--text-leise); }
 #confirm-close { margin-top: var(--s-2); }
-.demo-note { margin-top: var(--s-2); font-size: var(--t-klein); color: var(--text-leise); }
+.vorschau-hinweis { margin-top: var(--s-2); font-size: var(--t-klein); color: var(--text-leise); }
 
 /* Abend: die Reservierung ist der eine starke Moment */
 .a-abend .reservierung--betont { background: var(--flaeche); border-block: 1px solid var(--linie); }

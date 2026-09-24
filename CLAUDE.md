@@ -25,6 +25,15 @@ Aktueller Stand laut README.md:
 Goal: Die bestehenden Landing-Pages und Dashboards sollen visuell und UX-seitig auf das Niveau außergewöhnlicher, menschlich wirkender Restaurant-Websites gehoben werden – ohne die bewährte Architektur zu zerstören. Wir vermeiden generische "AI Slop"-Optik, indem wir Design-first statt Code-first arbeiten und echte Design-Referenzen nutzen.
 </project_context>
 
+<active_pipeline>
+Stand 24.09.2026 – Details und Belege: v2/GESTALTUNGS-UMBAU-PLAN.md (Abschnitt A).
+- Veröffentlicht wird über `npm run publish-site` → Engine-Wahl (data/v2-engine.json, gitignoriert; ohne Datei: v1).
+  Alle Seiten unter docs/ stammen aktuell von v2: v2/build/zyklus.js → v2/build/siteBuilder.js (+ sektionen/, stil.js, bewegung.js).
+- Der Gestaltungs-Umbau setzt dort an (neue Ebene "Ausdruck": kino / gesellig / handwerk / editorial), opt-in.
+  Seiten ohne Ausdruck bleiben Byte für Byte gleich (test/v2-unveraendert.test.js, `npm run v2:snapshot`).
+- src/landingPageGenerator.js bleibt Pflicht: v2 liest PAGE_SCRIPT (Bestellung/Reservierung) zur Build-Zeit daraus.
+</active_pipeline>
+
 <constraints>
 - Keine komplette Neuimplementierung: bestehender Generator, Scoring-Logik, Dashboard- und Wirt-Server bleiben erhalten.
 - Der Archetypen-/Stimmungs-Ansatz in designPresets.js, stimmungen.js und heroSignature.js bleibt die Basis der Gestaltung.

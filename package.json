@@ -29,7 +29,10 @@
     "v2:pilot": "node v2/build/pilotCli.js",
     "v2:tauschprobe": "node v2/build/tauschprobe.js",
     "v2:art-review": "node v2/build/artDirectionScreenshots.js --piloten",
-    "v2:art-audit": "node v2/build/artDirectionAudit.js"
+    "v2:art-audit": "node v2/build/artDirectionAudit.js",
+    "v2:snapshot": "node v2/build/unveraendert.js",
+    "v2:baseline": "node v2/build/artDirectionScreenshots.js --docs",
+    "v2:sequenz": "node v2/build/scrollSequenz.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",

@@ -10,6 +10,16 @@
 
 import { ortsbezug, strasseAusAdresse } from "./v1Funktionen.js";
 
+// Slogan der Bühne (nur Seiten mit Ausdruck): höchstens sechs Wörter, keine
+// Behauptung über das Haus (kein "seit 1890", kein "bestes"), nur eine
+// Einladung mit Ortsbezug. Eigener Slogan aus dem Dashboard hat Vorrang.
+const SLOGAN = {
+  bayerisch: (ort) => (ort ? `Einkehren in ${ort}` : "Einkehren und bleiben"),
+  italienisch: (ort) => (ort ? `Zu Tisch in ${ort}` : "Zu Tisch, bitte"),
+  griechisch: (ort) => (ort ? `Zu Gast in ${ort}` : "Zu Gast am Tisch"),
+};
+const sloganFuer = (kueche, ort) => (SLOGAN[kueche] ?? ((o) => (o ? `Zu Gast in ${o}` : "Zu Gast bei uns")))(ort);
+
 export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
   const ort = lead.ort || "";
   const lage = ortsbezug(lead.adresse, ort);
@@ -25,6 +35,16 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
     kicker: `${konzept}${ort ? ` · ${ort}` : ""}`,
     headline: eigeneTexte.headline ?? (lead.name || "Ihr Restaurant"),
     claim: eigeneTexte.schlagzeile ?? (lage ? `${menu.tagline} – ${lage}.` : `${menu.tagline}.`),
+    slogan: eigeneTexte.slogan ?? sloganFuer(ds.kueche, ort),
+    buehne: { bereich: "Willkommen", alt: `${lead.name || "Restaurant"} – Stimmungsbild` },
+    // Seiten mit Ausdruck: Die Adresse steht rechts in "Besuch", der Satz links bleibt ohne sie.
+    einladungText: eigeneTexte.schlagzeile ?? `${menu.tagline}.`,
+    besuch: { titel: "Besuch", lieberAnrufen: "Lieber anrufen?" },
+    tisch: {
+      rubrik: kurz ? "Aus der Küche" : "Auf dem Tisch",
+      titel: kurz ? "Was wir heute empfehlen" : "Was hier auf den Tisch kommt",
+      intro: "Drei Gerichte aus der Karte – alle auch zum Abholen.",
+    },
     ctaBestellen: direkt ? "Jetzt vorbestellen" : "Zur Abholung bestellen",
     ctaReservieren: kurz ? "Tisch anfragen" : "Tisch reservieren",
     nav: { highlights: "Empfehlungen", karte: "Karte", reservierung: "Reservieren", kontakt: "Anfahrt" },
@@ -134,7 +154,7 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
       bestellen: "Bestellen",
       reservieren: "Reservieren",
       mailBestaetigung: "Bestätigung per E-Mail senden",
-      demoHinweis: "Entwurfsansicht: In der fertigen Version geht diese Anfrage direkt an das Restaurant.",
+      vorschauHinweis: "Vorschau: Auf dieser Seite wird nichts verschickt. Auf der fertigen Website geht die Anfrage direkt an das Restaurant.",
       fehlerAbholzeit: "Bitte wählen Sie eine Abholzeit.",
     },
 

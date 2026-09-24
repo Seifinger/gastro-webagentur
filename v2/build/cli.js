@@ -1,4 +1,7 @@
 // npm run v2:build -- --kueche <k> --stimmung <s> [--judge] [--medien] [--offline] [--api <url>]
+// npm run v2:build -- --demo beispiel-<küche> [--ausdruck <kino|gesellig|handwerk|editorial>] [--ziel <ordner>]
+//     Beispielseite aus src/demoLeads.js (wie auf der Startseite unter docs/), optional mit
+//     Ausdruck (Gestaltungs-Umbau). Ohne --ziel: v2/output/sites/. docs/ wird nie beschrieben.
 // npm run v2:build:all            (alle 36 Kombinationen, voller Zyklus mit Judge)
 //
 // Ohne --lead-Angabe wird der synthetische Test-Lead der Kombination gebaut
@@ -8,6 +11,10 @@ import { fileURLToPath } from "node:url";
 import { baueImZyklus, schreibeJudgeProtokoll } from "./zyklus.js";
 import { testLeads, testLeadFuer } from "./testLeads.js";
 import { starteBrowser } from "./browser.js";
+import { ausdruckFuer } from "./ausdruck.js";
+import { DEMO_LEADS } from "../../src/demoLeads.js";
+import { themeForLead } from "./v1Funktionen.js";
+import path from "node:path";
 
 function flag(argv, name) {
   const i = argv.indexOf(`--${name}`);
@@ -23,9 +30,31 @@ export async function cli(argv) {
   const apiUrl = flag(argv, "api");
   const medienErzeugen = Boolean(flag(argv, "medien"));
 
+  const ausdruck = flag(argv, "ausdruck");
+  try {
+    ausdruckFuer(ausdruck === true ? "" : ausdruck);
+  } catch (e) {
+    console.log(e.message);
+    process.exitCode = 1;
+    return;
+  }
+  const ziel = flag(argv, "ziel");
+  const zielDir = typeof ziel === "string" ? path.resolve(ziel) : undefined;
+  const demo = flag(argv, "demo");
+
   let auftraege;
   if (alle) auftraege = testLeads();
-  else {
+  else if (typeof demo === "string") {
+    const lead = DEMO_LEADS.find((l) => `beispiel-${l.kueche}` === demo);
+    if (!lead) {
+      console.log(`Unbekannte Beispielseite "${demo}". Möglich: ${DEMO_LEADS.map((l) => `beispiel-${l.kueche}`).join(", ")}`);
+      process.exitCode = 1;
+      return;
+    }
+    // Stimmung wie bei der Veröffentlichung (Seed des Demo-Leads).
+    const { stimmung } = themeForLead(lead, lead.kueche);
+    auftraege = [{ ...lead, fiktiv: true, stimmung, slug: demo, veroeffentlicht: true }];
+  } else {
     const kueche = flag(argv, "kueche");
     const stimmung = flag(argv, "stimmung");
     if (!kueche || !stimmung) {
@@ -57,9 +86,15 @@ export async function cli(argv) {
           judge: judge && Boolean(browser),
           browser,
           slug: lead.slug,
+          ...(zielDir ? { zielDir } : {}),
           medienErzeugen,
           offline,
-          optionen: { fiktiv: lead.fiktiv, ...(apiUrl ? { apiUrl } : {}) },
+          optionen: {
+            fiktiv: lead.fiktiv,
+            ...(lead.veroeffentlicht ? { veroeffentlicht: true } : {}),
+            ...(apiUrl ? { apiUrl } : {}),
+            ...(typeof ausdruck === "string" ? { ausdruck } : {}),
+          },
           log: (z) => console.log(z),
         });
         protokolle.push(protokoll);

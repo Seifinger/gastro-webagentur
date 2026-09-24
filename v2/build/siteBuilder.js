@@ -40,6 +40,12 @@ import {
 } from "./v1Funktionen.js";
 import { renderKopfzeile, renderHero, renderLeiste, HERO_AUFBAUTEN } from "./sektionen/kopf.js";
 import { renderHighlights, renderKarte, renderAmbiente, renderStimmen } from "./sektionen/inhalt.js";
+import { aktionsziele } from "./aktionsziele.js";
+import { ausdruckFuer, ausdruckVariablen, buehnenSchleier } from "./ausdruck.js";
+import { renderKopfAusdruck, renderBuehne, renderEinladung } from "./sektionen/buehne.js";
+import { BUEHNE_CSS, BUEHNE_SKRIPT } from "./buehneStil.js";
+import { renderTisch, renderHausBand, renderAnfahrt, renderFussAusdruck, ABFOLGE_CSS, ABFOLGE_SKRIPT } from "./sektionen/abfolge.js";
+import { renderAtmosphaere, ATMOSPHAERE_CSS, ATMOSPHAERE_SKRIPT } from "./atmosphaere.js";
 import { renderReservierung, renderKontakt, renderBestellweg, renderFuss, renderEntwurfsleiste } from "./sektionen/service.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -196,6 +202,8 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   const gestaltung = themeForLead(lead, kueche, stimmung);
   const dsDatei = optionen.designsystem ?? ladeDesignsystem(gestaltung.cuisine, gestaltung.stimmung);
   const { ds, protokoll: korrekturProtokoll } = wendeKorrekturenAn(dsDatei, optionen.korrekturen);
+  // Opt-in (Gestaltungs-Umbau): ohne Ausdruck bleibt die Ausgabe Byte für Byte wie bisher.
+  const ausdruck = ausdruckFuer(optionen.ausdruck);
 
   // Gate 1: Kontraste
   const kontrastFehler = pruefeKontraste(ds);
@@ -205,7 +213,12 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   // Gate 2: Hero-Varianten
   const heroFehler = pruefeHeroVarianten(ds);
   if (heroFehler.length) throw new BuildAbbruch("hero-varianten", heroFehler);
-  const heroVariante = waehleHeroVariante(ds, gestaltung.seed, ds.darstellung.heroVariante);
+  const heroVariante = ausdruck ? ausdruck.hero.typ : waehleHeroVariante(ds, gestaltung.seed, ds.darstellung.heroVariante);
+  // Gate (nur mit Ausdruck): Der Schleier der Bühne muss die Schrift auch über
+  // einem rein weißen Bild tragen (ausdruck.js, buehnenSchleier).
+  if (ausdruck && !buehnenSchleier(ds).ok) {
+    throw new BuildAbbruch("buehne-kontrast", [`Kein Schleier erreicht den Kontrast für Kopfzeile/Slogan auf ${ds.farben.rollen.tint.hex}`]);
+  }
 
   const menu = optionen.menu ?? menuForCuisine(gestaltung.cuisine);
   const fiktiv = Boolean(optionen.fiktiv);
@@ -232,16 +245,18 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   // Welche Medien diese Seite wirklich benutzt – für den Bericht (Dashboard-
   // Badges) und damit schreibeSite() lokale Dateien mitkopieren kann.
   const genutzt = [
-    ...["hero", "heroVideo", "haus", "team", "bestseller"].map((rolle) => [rolle, medien[rolle]]),
+    ...["hero", "heroVideo", "heroMobil", "heroVideoMobil", "haus", "team", "bestseller"].map((rolle) => [rolle, medien[rolle]]),
     ...highlights.map((g) => [`gericht:${g.id}`, medien.gericht(g)]),
   ].filter(([, m]) => m);
 
   const betont = ds.layout.betonterMoment;
-  const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv };
+  const apiUrl = String(optionen.apiUrl ?? "").replace(/\/+$/, "");
+  const aktionen = aktionsziele({ lead, apiUrl, fiktiv });
+  const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv, aktionen, ausdruck };
 
   const sektionen = {
     highlights: (tief) => renderHighlights({ ...ctx, betont: betont === "highlights", tief }),
-    karte: (tief) => renderKarte({ ...ctx, menu: { ...menu, kategorien: menu.kategorien.map((k, ki) => ({ ...k, gerichte: k.gerichte.map((g, gi) => ({ ...g, beschreibung: eigeneBeschreibungen[`${ki}-${gi}`] ?? g.beschreibung })) })) }, tief }),
+    karte: (tief, extra = {}) => renderKarte({ ...ctx, ...extra, menu: { ...menu, kategorien: menu.kategorien.map((k, ki) => ({ ...k, gerichte: k.gerichte.map((g, gi) => ({ ...g, beschreibung: eigeneBeschreibungen[`${ki}-${gi}`] ?? g.beschreibung })) })) }, tief }),
     ambiente: (tief) => renderAmbiente({ ...ctx, tief }),
     stimmen: (tief) => renderStimmen({ ...ctx, tief }),
     reservierung: (tief) => renderReservierung({ ...ctx, betont: betont === "reservierung", tief }),
@@ -249,10 +264,24 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   };
   const reihenfolge = [...ds.layout.sektionsReihenfolge.filter((id) => sektionen[id]), ...Object.keys(sektionen).filter((id) => !ds.layout.sektionsReihenfolge.includes(id))];
   // Sektionswechsel über Flächen statt Linien: jede zweite auf flaecheTief.
-  const hauptteil = reihenfolge.map((id, i) => sektionen[id](i % 2 === 1)).join("\n\n");
+  // Mit Ausdruck: Abfolge und Flächen aus dem Profil (ausdruck.js), die Einladung
+  // steht schon unter der Bühne. "raum" (kino) und "herkunft" (editorial) nutzen
+  // bis zu ihren eigenen Formen das Raum-Band.
+  const ausdruckSektionen = {
+    tisch: () => renderTisch(ctx),
+    karte: () => sektionen.karte(true, { sprung: true }),
+    haus: () => renderHausBand(ctx),
+    raum: () => renderHausBand(ctx),
+    herkunft: () => renderHausBand(ctx),
+    reservierung: () => sektionen.reservierung(true),
+    kontakt: () => renderAnfahrt({ ...ctx, oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS }),
+  };
+  const hauptteil = ausdruck
+    ? ausdruck.abfolge.filter((id) => ausdruckSektionen[id]).map((id) => ausdruckSektionen[id]()).join("\n\n")
+    : reihenfolge.map((id, i) => sektionen[id](i % 2 === 1)).join("\n\n");
 
-  const apiUrl = String(optionen.apiUrl ?? "").replace(/\/+$/, "");
-  const pageData = jsonForScript({ name: texte.name, kontaktEmail: optionen.kontaktEmail ?? "", apiUrl });
+  // telefon nur mit echter Nummer: Die Vorschau-Bestätigung nennt sie als echten Weg zum Lokal.
+  const pageData = jsonForScript({ name: texte.name, kontaktEmail: optionen.kontaktEmail ?? "", apiUrl, ...(aktionen.anrufen ? { telefon: aktionen.anrufen.text } : {}) });
 
   const familien = [ds.typografie.display.familie, ds.typografie.text.familie, ds.typografie.label?.familie].filter(Boolean);
   const fontCss = optionen.fontCss ?? schriftCss(familien, optionen.fontsDir ?? FONTS_DIR, optionen.fontsPfad ?? "../../assets/fonts");
@@ -272,6 +301,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
     `schema-${ds.farben.schema}`,
     `rubrik-${ds.typografie.rubrik.stil}`,
     `moment-${betont}`,
+    ausdruck ? `ausdruck-${ausdruck.id}` : "",
     optionen.veroeffentlicht ? "veroeffentlicht" : "",
     ...darstellungsKlassen,
   ].filter(Boolean).join(" ");
@@ -290,30 +320,30 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
 <meta name="engine" content="${ENGINE_KENNUNG}">
 <meta name="v2-designsystem" content="${escapeHtml(ds.id)}">
 <meta name="v2-hero" content="${heroVariante}">
-<meta name="theme-color" content="${ds.farben.rollen.grund.hex}">
+${ausdruck ? `<meta name="v2-ausdruck" content="${ausdruck.id}">\n` : ""}<meta name="theme-color" content="${ds.farben.rollen.grund.hex}">
 ${optionen.veroeffentlicht ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<link rel="icon" href="${favicon(ds)}">
 <style>
 ${fontCss}
 ${cssVariablen(ds)}
 ${STIL}
 ${BEWEGUNG_CSS}
-${darstellungsCss}
+${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}\n${ABFOLGE_CSS}\n${ATMOSPHAERE_CSS}` : ""}
 </style>
 </head>
 <body class="${bodyKlassen}">
-${optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : ""}
-${renderKopfzeile(ctx)}
+${ausdruck ? "" : optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : ""}
+${ausdruck ? renderKopfAusdruck({ ...ctx, hinweis: optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : "" }) : renderKopfzeile(ctx)}${ausdruck ? `\n${renderAtmosphaere(ctx)}` : ""}
 <main>
-${renderHero(heroVariante, ctx)}
-${renderLeiste(ctx)}
+${ausdruck ? `${renderBuehne(ctx)}\n${renderEinladung(ctx)}` : renderHero(heroVariante, ctx)}
+${ausdruck ? "" : renderLeiste(ctx)}
 ${hauptteil}
 </main>
-${renderBestellweg({ ...ctx, apiUrl })}
-${renderFuss(ctx)}
+${renderBestellweg(ausdruck ? { ...ctx, ds: { ...ds, layout: { ...ds.layout, primaerAktion: ausdruck.hauptaktion === "reservieren" ? "reservation" : "order" } } } : ctx)}
+${ausdruck ? renderFussAusdruck(ctx) : renderFuss(ctx)}
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${seitenSkript()}</script>
 <script>${BEWEGUNG_SKRIPT}</script>
-</body>
+${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</script>\n<script>${ABFOLGE_SKRIPT}</script>\n` : ""}</body>
 </html>
 `;
 
@@ -327,7 +357,7 @@ ${renderFuss(ctx)}
 
   return {
     html,
-    dateien: genutzt.filter(([, m]) => m.datei).map(([, m]) => ({ datei: m.datei, src: m.src })),
+    dateien: genutzt.filter(([, m]) => m.datei).flatMap(([, m]) => [{ datei: m.datei, src: m.src }, ...(m.webm?.datei ? [{ datei: m.webm.datei, src: m.webm.src }] : [])]),
     bericht: {
       engine: ENGINE_KENNUNG,
       designsystem: ds.id,
@@ -337,6 +367,7 @@ ${renderFuss(ctx)}
       seed: gestaltung.seed,
       heroVariante,
       heroVarianten: ds.layout.heroVarianten,
+      ...(ausdruck ? { ausdruck: ausdruck.id } : {}),
       highlights: highlights.map((h) => h.id),
       kontrast: { geprueft: ds.kontrastPaare.length, fehler: 0 },
       lint: { fehler: 0, warnungen: lintErgebnis.warnungen },
