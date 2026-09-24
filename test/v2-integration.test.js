@@ -300,7 +300,7 @@ test(
 /* ---------------- Agentur-Dashboard ---------------- */
 
 test("Dashboard: Engine-Wahl global und je Lead, ungültige Werte werden abgelehnt", () => {
-  assert.equal(dashboardV2.ladeEngineWahl().standard, "v1", "ohne Datei bleibt alles v1");
+  assert.equal(dashboardV2.ladeEngineWahl().standard, "v2", "ohne Datei gilt v2 – kein stiller Rückfall auf v1 (AP11)");
   dashboardV2.speichereEngineWahl({ standard: "v2" });
   dashboardV2.speichereEngineWahl({ placeId: "p-1", engine: "v1" });
   const wahl = dashboardV2.ladeEngineWahl();
@@ -314,6 +314,8 @@ test("Dashboard: Engine-Wahl global und je Lead, ungültige Werte werden abgeleh
   assert.equal(lead.v2.gebaut, false);
   assert.equal(lead.entwurf, "/entwurf/x/", "ohne v2-Bau bleibt der v1-Entwurf verlinkt");
   dashboardV2.speichereEngineWahl({ standard: "v1" });
+  assert.equal(dashboardV2.ladeEngineWahl().standard, "v1", "v1 bleibt wählbar");
+  rmSync(process.env.V2_ENGINE_DATEI, { force: true });
 });
 
 test("Dashboard: Token-Set aus dashboard.json – eigene Schriften, keine verbotenen, keine Schatten", () => {
@@ -351,7 +353,9 @@ test("Dashboard: Routen im echten dashboardServer – Injektion, Token-Schutz, k
     process.env.DASHBOARD_TOKEN = "geheim";
     const ohne = await fetch(`${basis}/intern/v2/engine`, { method: "POST", body: JSON.stringify({ standard: "v2" }) });
     assert.equal(ohne.status, 401, "/intern/v2/* hängt am selben Token wie v1");
-    assert.equal(dashboardV2.ladeEngineWahl().standard, "v1");
+    assert.equal(dashboardV2.ladeEngineWahl().standard, "v2", "abgelehnt: nichts gespeichert, es bleibt beim Standard");
+    const ausdruckOhne = await fetch(`${basis}/intern/v2/lead/x/ausdruck`, { method: "POST", body: JSON.stringify({ ausdruck: "kino" }) });
+    assert.equal(ausdruckOhne.status, 401, "Ausdruck-Wahl hängt am selben Token");
   } finally {
     if (alterToken === undefined) delete process.env.DASHBOARD_TOKEN;
     else process.env.DASHBOARD_TOKEN = alterToken;

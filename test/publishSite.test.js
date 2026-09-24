@@ -239,12 +239,14 @@ test("baueUndSchreibeEinzelnenEntwurf kopiert ein eigenes Foto mit und schreibt 
 
   // Die Referenz im HTML zeigt relativ in den Entwurfsordner selbst – nicht
   // mehr auf den lokalen, gitignorten /uploads/-Pfad, den es auf GitHub
-  // Pages gar nicht gibt.
+  // Pages gar nicht gibt. Seit AP11 baut der Standard über v2 (Ausdruck der
+  // Küche): dort liegt das Foto unter medien/.
   const html = readFileSync(path.join(scratchDocsDir, slug, "index.html"), "utf-8");
-  assert.match(html, /<img src="\.\/bilder\/hero\.jpg" alt="Gasthaus Zum Löwen">/);
+  assert.match(html, /<meta name="v2-ausdruck" content="gesellig">/);
+  assert.match(html, /<img class="buehne-poster" src="medien\/hero\.jpg"/);
   assert.ok(!html.includes("/uploads/"));
 
-  const kopie = path.join(scratchDocsDir, slug, "bilder", "hero.jpg");
+  const kopie = path.join(scratchDocsDir, slug, "medien", "hero.jpg");
   assert.ok(existsSync(kopie));
   assert.deepEqual(readFileSync(kopie), bildInhalt);
 

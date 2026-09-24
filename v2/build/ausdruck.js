@@ -16,7 +16,7 @@
 // Referenz-Prinzipien, keine Vorlagen: übernommen wird die Haltung, nie Layout,
 // Farben, Texte oder Medien der Referenzseiten.
 
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { contrastRatio, mixColors } from "../../src/colorMath.js";
@@ -28,13 +28,22 @@ export const AUSDRUCK_WAHL = path.join(path.dirname(fileURLToPath(import.meta.ur
  * Eintrag je Slug: "gesellig" oder { "ausdruck": "handwerk", "stimmung": "basar" }.
  * Die Stimmung (Farbwelt) ist optional; ohne sie gilt die bisherige Wahl bzw. der Seed.
  */
-export function wahlFuerSlug(slug, datei = process.env.V2_AUSDRUCK_WAHL || AUSDRUCK_WAHL) {
-  let wahl = {};
+const wahlDatei = () => process.env.V2_AUSDRUCK_WAHL || AUSDRUCK_WAHL;
+
+/** "Ohne Ausdruck" als bewusste Wahl – schlägt die Standard-Zuordnung der Küche. */
+export const AUSDRUCK_AUS = "aus";
+
+function ladeWahl(datei) {
   try {
-    wahl = JSON.parse(readFileSync(datei, "utf-8"));
+    return JSON.parse(readFileSync(datei, "utf-8"));
   } catch {
     return null;
   }
+}
+
+export function wahlFuerSlug(slug, datei = wahlDatei()) {
+  const wahl = ladeWahl(datei);
+  if (!wahl) return null;
   const eintrag = wahl[slug];
   const ausdruck = typeof eintrag === "string" ? eintrag : eintrag?.ausdruck;
   if (!ausdruck || !AUSDRUECKE[ausdruck]) return null;
@@ -45,8 +54,9 @@ export function ausdruckFuerSlug(slug, datei) {
   return wahlFuerSlug(slug, datei)?.ausdruck ?? null;
 }
 
-export function stimmungFuerSlug(slug, datei) {
-  return wahlFuerSlug(slug, datei)?.stimmung ?? null;
+export function stimmungFuerSlug(slug, datei = wahlDatei()) {
+  const eintrag = ladeWahl(datei)?.[slug];
+  return typeof eintrag === "object" && eintrag?.stimmung ? eintrag.stimmung : null;
 }
 
 export const AUSDRUECKE = {
@@ -103,9 +113,9 @@ export const AUSDRUECKE = {
 export const AUSDRUCK_IDS = Object.keys(AUSDRUECKE);
 
 /**
- * Standard je Küche (Plan B.3) – noch NICHT aktiv. Wird erst beim Rollout
- * (AP11) als Vorschlag im Dashboard genutzt. `kino` steht bewusst nirgends:
- * Dunkel-Luxus per Automatik wäre genau der falsche Premium-Charakter.
+ * Standard je Küche (Plan B.3) – seit AP11 aktiv: Ohne eigene Wahl baut jede
+ * v2-Seite mit diesem Ausdruck (ausdruckZumBauen). `kino` steht bewusst
+ * nirgends: Dunkel-Luxus per Automatik wäre genau der falsche Premium-Charakter.
  */
 export const STANDARD_JE_KUECHE = {
   bayerisch: "gesellig",
@@ -121,6 +131,45 @@ export const STANDARD_JE_KUECHE = {
   japanisch: "editorial",
   cafe: "editorial",
 };
+
+/**
+ * Der Ausdruck, mit dem eine Seite gebaut wird (AP11): die Wahl aus
+ * v2/ausdruck-wahl.json, sonst die Standard-Zuordnung der Küche. "aus" in der
+ * Wahl heißt bewusst ohne Ausdruck (bisherige v2-Seite).
+ *
+ * @returns {{ ausdruck: string|null, quelle: "gewaehlt"|"standard"|"aus"|"keiner", vorschlag: string|null }}
+ */
+export function ausdruckZumBauen(slug, kueche, datei = wahlDatei()) {
+  const vorschlag = STANDARD_JE_KUECHE[kueche] ?? null;
+  const eintrag = ladeWahl(datei)?.[slug];
+  const id = typeof eintrag === "string" ? eintrag : eintrag?.ausdruck;
+  if (id === AUSDRUCK_AUS) return { ausdruck: null, quelle: "aus", vorschlag };
+  if (id && AUSDRUECKE[id]) return { ausdruck: id, quelle: "gewaehlt", vorschlag };
+  return vorschlag ? { ausdruck: vorschlag, quelle: "standard", vorschlag } : { ausdruck: null, quelle: "keiner", vorschlag };
+}
+
+/**
+ * Speichert die Ausdruck-Wahl einer Seite (Dashboard). Leer = zurück zur
+ * Standard-Zuordnung der Küche, "aus" = bewusst ohne Ausdruck. Eine
+ * gespeicherte Farbwelt (stimmung) bleibt dabei erhalten.
+ */
+export function speichereAusdruckWahl(slug, ausdruck, datei = wahlDatei()) {
+  if (!slug || slug.startsWith("_")) throw new Error("Ungültige Seite.");
+  if (ausdruck && ausdruck !== AUSDRUCK_AUS && !AUSDRUECKE[ausdruck]) {
+    throw new Error(`Unbekannter Ausdruck "${ausdruck}". Möglich: ${AUSDRUCK_IDS.join(", ")}, ${AUSDRUCK_AUS}`);
+  }
+  const wahl = ladeWahl(datei) ?? {};
+  const alt = wahl[slug];
+  const stimmung = typeof alt === "object" && alt?.stimmung ? alt.stimmung : null;
+  if (!ausdruck) {
+    if (stimmung) wahl[slug] = { stimmung };
+    else delete wahl[slug];
+  } else {
+    wahl[slug] = stimmung ? { ausdruck, stimmung } : ausdruck;
+  }
+  writeFileSync(datei, `${JSON.stringify(wahl, null, 2)}\n`);
+  return ausdruckZumBauen(slug, null, datei);
+}
 
 /** Liefert das Profil oder null (kein Ausdruck = bisherige Seite). Unbekannte IDs sind ein Fehler. */
 export function ausdruckFuer(id) {
