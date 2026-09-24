@@ -19,7 +19,12 @@ const SLUG = "__test-v2-art-e2e";
 process.env.BETRIEB = SLUG;
 delete process.env.V2_COPY_LLM;
 
-const { speichereBetrieb, legeTischAn } = await import("../src/betriebStore.js");
+const { speichereBetrieb, legeTischAn, uhrHook } = await import("../src/betriebStore.js");
+
+// Feste Uhr für Server und Browser (Donnerstag, 24.09.2026, 17:00 Berlin):
+// Die Abholzeiten hängen sonst von der Tageszeit des Testlaufs ab.
+const JETZT = new Date("2026-09-24T17:00:00+02:00");
+uhrHook.jetzt = () => new Date(JETZT);
 const { erzeugeHandlerV2 } = await import("../v2/integration/wirtServerV2.js");
 const { erzeugeVerknuepfungscode } = await import("../v2/integration/wirtAdapter.js");
 const bot = await import("../v2/integration/telegramBot.js");
@@ -121,11 +126,13 @@ test("E2E Pilotseiten: Reservierung (Trattoria) und Bestellung (Rösterei) bis W
     // 2. Abholbestellung auf der Rösterei (Karte → Warenkorb → Bestellung) – Desktop
     {
       const k = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1280, height: 900 }, locale: "de-DE" });
+      await k.clock.setFixedTime(JETZT);
       const tab = await k.newPage();
       await tab.goto(`${seite.url}/pilot-roesterei-kornfeld/`, { waitUntil: "domcontentloaded" });
       await tab.locator('#karte [data-name="Cappuccino"]').click();
       await tab.locator("#drawer.open").waitFor({ timeout: 4000 });
       const f = tab.locator("#order-form");
+      // Index 1 = "So schnell wie möglich – ca. 17:20 Uhr"
       await f.locator('[name="abholzeit"]').selectOption({ index: 1 });
       await f.locator('[name="name"]').fill("Kornfeld Gast");
       await f.locator('[name="telefon"]').fill("030 555 0202");
@@ -144,6 +151,8 @@ test("E2E Pilotseiten: Reservierung (Trattoria) und Bestellung (Rösterei) bis W
     const b = uebersicht.bestellungen.find((x) => x.name === "Kornfeld Gast");
     assert.ok(b, "Bestellung im Wirt-Dashboard");
     assert.ok(JSON.stringify(b).includes("Cappuccino"));
+    assert.equal(b.abholArt, "asap");
+    assert.equal(b.abholzeit, "17:20");
 
     // 4. Telegram (Mock) für beide, mit Knöpfen; Bestätigen wirkt zurück
     assert.ok(await warteAuf(() => aufrufe.some((a) => a.methode === "sendMessage" && a.daten.text.includes("Lucia Gast"))));

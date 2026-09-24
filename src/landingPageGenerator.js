@@ -14,14 +14,15 @@ import { checkCircle, warnung, hatKuechenMarke } from "./signaturIcons.js";
 import { resonanzSkript } from "./resonanzBeacon.js";
 import { engineMarkerMeta } from "./engineVersion.js";
 import { getPresetVariant, withDesignDefaults, presetFuerArchetyp } from "./designPresets.js";
-import { escapeHtml, jsonForScript, optionList } from "./htmlHelpers.js";
+import { escapeHtml, jsonForScript } from "./htmlHelpers.js";
 import { renderHeader } from "./sections/header.js";
 import { renderHero, renderUspStrip } from "./sections/hero.js";
 import { renderHighlights } from "./sections/highlights.js";
 import { renderMenu } from "./sections/menu.js";
 import { renderAmbiente, renderContact, renderKontaktZeilen, renderOeffnungszeiten, FOTO_SLOTS } from "./sections/contact.js";
 import { renderStimmen } from "./sections/testimonials.js";
-import { renderReservation, PICKUP_SLOTS } from "./sections/reservation.js";
+import { renderReservation } from "./sections/reservation.js";
+import { abholzeitSkript, abholzeitAttribute, STANDARD_OEFFNUNGSZEITEN } from "./abholzeiten.js";
 import { renderFooter } from "./sections/footer.js";
 
 export { escapeHtml, FOTO_SLOTS };
@@ -29,11 +30,8 @@ export { escapeHtml, FOTO_SLOTS };
 // Standard-Öffnungszeiten für den Entwurf. Google liefert diese Felder in
 // unserer Suchabfrage nicht mit, deshalb sind es bewusst Platzhalter, die auf
 // der Seite auch als solche gekennzeichnet werden.
-export const DEFAULT_OPENING_HOURS = [
-  { tage: "Montag – Donnerstag", zeiten: "11:30 – 14:00 & 17:00 – 22:00" },
-  { tage: "Freitag – Samstag", zeiten: "11:30 – 14:00 & 17:00 – 23:00" },
-  { tage: "Sonntag & Feiertage", zeiten: "11:30 – 21:00" },
-];
+// Mit denselben Zeilen rechnen die Abholzeiten (src/abholzeiten.js).
+export const DEFAULT_OPENING_HOURS = STANDARD_OEFFNUNGSZEITEN;
 
 function hashText(text) {
   let hash = 0;
@@ -683,6 +681,8 @@ const PAGE_SCRIPT = `
   function openDrawer() {
     byId("drawer").classList.add("open");
     byId("overlay").classList.add("open");
+    ladeAbholKonfig();
+    aktualisiereAbholzeiten();
   }
   function closeDrawer() {
     byId("drawer").classList.remove("open");
@@ -833,6 +833,165 @@ const PAGE_SCRIPT = `
       });
   }
 
+  /*
+   * Abholzeiten. Gerechnet wird nur in window.Abholzeiten (src/abholzeiten.js,
+   * dieselbe Rechnung pr\\u00FCft der Server). Hier: Auswahl bauen, veraltete
+   * Zeiten entfernen, Serverzeit und Zusatz-Wartezeit des Wirts \\u00FCbernehmen.
+   */
+  var abhol = { gelesen: false, versatz: 0, oeffnungszeiten: null, zeitzone: "", zusatzMinuten: 0, geladenUm: 0, verfallen: false, stand: "" };
+
+  function abholGrundlage(feld) {
+    if (!abhol.gelesen) {
+      abhol.gelesen = true;
+      try { abhol.oeffnungszeiten = JSON.parse(feld.getAttribute("data-oeffnungszeiten") || "null"); } catch (e) { abhol.oeffnungszeiten = null; }
+      abhol.zeitzone = feld.getAttribute("data-zeitzone") || "";
+    }
+    return {
+      jetzt: Date.now() + abhol.versatz,
+      oeffnungszeiten: abhol.oeffnungszeiten || undefined,
+      zeitzone: abhol.zeitzone || undefined,
+      zusatzMinuten: abhol.zusatzMinuten
+    };
+  }
+
+  function abholOption(text, eintrag) {
+    var option = document.createElement("option");
+    option.textContent = text;
+    option.value = eintrag ? eintrag.iso : "";
+    if (eintrag) {
+      option.setAttribute("data-art", eintrag.art);
+      option.setAttribute("data-uhrzeit", eintrag.uhrzeit);
+    }
+    return option;
+  }
+
+  function abholHinweis(feld) {
+    var hinweis = byId("ord-abholzeit-hinweis");
+    if (!hinweis) {
+      hinweis = document.createElement("p");
+      hinweis.id = "ord-abholzeit-hinweis";
+      hinweis.className = "hint abholzeit-hinweis";
+      hinweis.setAttribute("aria-live", "polite");
+      feld.parentNode.appendChild(hinweis);
+    }
+    return hinweis;
+  }
+
+  /**
+   * Baut die Auswahl aus der aktuellen Uhrzeit neu: nur offene, k\\u00FCnftige
+   * Zeiten. Eine gew\\u00E4hlte Zeit, die inzwischen nicht mehr geht, wird nicht
+   * still ersetzt: Die Auswahl wird geleert, der Gast bekommt einen Hinweis.
+   * "So schnell wie m\\u00F6glich" bleibt gew\\u00E4hlt, die Uhrzeit dazu wandert mit.
+   * Gibt false zur\\u00FCck, wenn die bisherige Wahl verfallen ist.
+   */
+  function aktualisiereAbholzeiten() {
+    var feld = byId("ord-abholzeit");
+    if (!feld || !window.Abholzeiten) return true;
+    var gewaehlt = feld.selectedIndex > 0 ? feld.options[feld.selectedIndex] : null;
+    var vorherArt = gewaehlt ? gewaehlt.getAttribute("data-art") : "";
+    var vorherWert = gewaehlt ? gewaehlt.value : "";
+    var grundlage = abholGrundlage(feld);
+    var r = window.Abholzeiten.berechne(grundlage);
+    var heute = window.Abholzeiten.datum(grundlage.jetzt, r.zeitzone);
+    // Unver\u00E4ndert? Dann bleibt das Feld unangetastet (kein Flackern, eine
+    // gerade ge\u00F6ffnete Auswahl klappt nicht zu).
+    var stand = [r.asap ? r.asap.iso : "", r.geoeffnet, r.ohneOeffnungszeiten, r.slots.map(function (x) { return x.iso; }).join()].join("|");
+    if (stand === abhol.stand && feld.options.length > 0) return true;
+    abhol.stand = stand;
+
+    feld.innerHTML = "";
+    feld.appendChild(abholOption(r.asap ? "Bitte w\\u00E4hlen" : r.ohneOeffnungszeiten ? "Abholzeit bitte telefonisch" : "Heute keine Abholung mehr m\\u00F6glich", null));
+    if (r.asap) feld.appendChild(abholOption("So schnell wie m\\u00F6glich \\u2013 ca. " + r.asap.uhrzeit + " Uhr", r.asap));
+    var gruppen = {};
+    var reihenfolge = [];
+    r.slots.forEach(function (slot) {
+      var schluessel = slot.intervall.von + " \\u2013 " + slot.intervall.bis + " Uhr";
+      if (!gruppen[schluessel]) { gruppen[schluessel] = []; reihenfolge.push(schluessel); }
+      gruppen[schluessel].push(slot);
+    });
+    reihenfolge.forEach(function (schluessel) {
+      var ziel = feld;
+      if (reihenfolge.length > 1) {
+        ziel = document.createElement("optgroup");
+        ziel.label = schluessel;
+        feld.appendChild(ziel);
+      }
+      gruppen[schluessel].forEach(function (slot) {
+        ziel.appendChild(abholOption(slot.uhrzeit + " Uhr" + (slot.datum !== heute ? " (nach Mitternacht)" : ""), slot));
+      });
+    });
+
+    var gueltig = true;
+    if (vorherArt === "asap" && r.asap) feld.value = r.asap.iso;
+    else if (vorherWert) {
+      feld.value = vorherWert;
+      if (feld.value !== vorherWert) { feld.selectedIndex = 0; gueltig = false; abhol.verfallen = true; }
+    }
+
+    var text = "";
+    // Der Hinweis bleibt stehen, bis der Gast neu gew\u00E4hlt hat.
+    if (abhol.verfallen && !feld.value) text = "Die gew\\u00E4hlte Abholzeit ist nicht mehr m\\u00F6glich \\u2013 bitte w\\u00E4hlen Sie eine neue.";
+    else if (r.ohneOeffnungszeiten) text = "Abholzeiten k\\u00F6nnen wir hier noch nicht anbieten \\u2013 bitte rufen Sie uns an.";
+    else if (!r.asap) text = "Heute nehmen wir keine Abholbestellungen mehr an." + (r.naechsteOeffnung ? " N\\u00E4chste \\u00D6ffnung: " + r.naechsteOeffnung.text + "." : "");
+    else if (!r.geoeffnet) text = "Gerade ist geschlossen \\u2013 Sie k\\u00F6nnen f\\u00FCr heute ab " + r.asap.uhrzeit + " Uhr vorbestellen.";
+    var hinweis = abholHinweis(feld);
+    hinweis.textContent = text;
+    hinweis.hidden = !text;
+    if (abhol.verfallen && !feld.value) {
+      var feldRahmen = feld.closest(".field");
+      if (feldRahmen) feldRahmen.classList.add("invalid");
+    }
+    return gueltig;
+  }
+
+  /** Live: \\u00D6ffnungszeiten, Zeitzone, Zusatz-Wartezeit und Uhr des Betriebs. */
+  function ladeAbholKonfig() {
+    if (!data.apiUrl || Date.now() - abhol.geladenUm < 60000) return;
+    abhol.geladenUm = Date.now();
+    var gesendet = Date.now();
+    fetch(data.apiUrl + "/oeffentlich/abholzeiten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    })
+      .then(function (antwort) { return antwort.json(); })
+      .then(function (ergebnis) {
+        if (!ergebnis || !ergebnis.ok) return;
+        var server = new Date(ergebnis.jetzt).getTime();
+        if (isFinite(server)) abhol.versatz = server - (gesendet + Date.now()) / 2;
+        var feld = byId("ord-abholzeit");
+        if (feld) abholGrundlage(feld);
+        if (ergebnis.oeffnungszeiten) abhol.oeffnungszeiten = ergebnis.oeffnungszeiten;
+        if (ergebnis.zeitzone) abhol.zeitzone = ergebnis.zeitzone;
+        abhol.zusatzMinuten = Number(ergebnis.zusatzMinuten) || 0;
+        aktualisiereAbholzeiten();
+      })
+      .catch(function () {
+        // Ohne Antwort rechnet die Seite mit ihren eigenen Angaben weiter;
+        // der Server pr\\u00FCft beim Absenden ohnehin noch einmal.
+        abhol.geladenUm = 0;
+      });
+  }
+
+  function beobachteAbholzeiten() {
+    var feld = byId("ord-abholzeit");
+    if (!feld) return;
+    aktualisiereAbholzeiten();
+    // Beim \\u00D6ffnen der Auswahl frisch rechnen, dazu alle 30 Sekunden -
+    // aber nie w\\u00E4hrend der Gast gerade darin w\\u00E4hlt.
+    feld.addEventListener("focus", aktualisiereAbholzeiten);
+    feld.addEventListener("pointerdown", aktualisiereAbholzeiten);
+    feld.addEventListener("change", function () {
+      if (!feld.value || !abhol.verfallen) return;
+      abhol.verfallen = false;
+      var hinweis = byId("ord-abholzeit-hinweis");
+      if (hinweis) { hinweis.textContent = ""; hinweis.hidden = true; }
+    });
+    setInterval(function () {
+      if (document.activeElement !== feld) aktualisiereAbholzeiten();
+    }, 30000);
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     ladeNoShowEinstellungen();
     Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function (button) {
@@ -879,6 +1038,9 @@ const PAGE_SCRIPT = `
       event.preventDefault();
       var form = event.target;
       if (lines().length === 0) return;
+      // Unmittelbar vor dem Absenden neu rechnen: Eine inzwischen verfallene
+      // Zeit wird geleert (mit Hinweis) und die Pr\u00FCfung unten schl\u00E4gt an.
+      aktualisiereAbholzeiten();
       if (!validate(form, ["name", "telefon", "abholzeit"])) return;
 
       var noShowFeld = byId("ord-noshow-feld");
@@ -890,7 +1052,12 @@ const PAGE_SCRIPT = `
       }
 
       var nummer = referenz("AB");
-      var zeit = form.elements.abholzeit.value;
+      var abholWahl = form.elements.abholzeit.options[form.elements.abholzeit.selectedIndex];
+      var abholArt = abholWahl.getAttribute("data-art") || "";
+      var abholUhrzeit = abholWahl.getAttribute("data-uhrzeit") || form.elements.abholzeit.value;
+      var zeit = abholArt === "asap"
+        ? "so schnell wie m\u00F6glich (ca. " + abholUhrzeit + " Uhr)"
+        : abholUhrzeit + " Uhr";
       var summary = lines().map(function (line) {
         return line.menge + " \\u00D7 " + line.name + " (" + euro(line.preis * line.menge) + ")";
       }).join("\\n");
@@ -910,7 +1077,9 @@ const PAGE_SCRIPT = `
 
       sende("/oeffentlich/bestellung", {
         positionen: positionen,
-        abholzeit: zeit,
+        abholzeit: abholUhrzeit,
+        abholArt: abholArt,
+        abholZeitpunkt: abholArt ? form.elements.abholzeit.value : "",
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
         hinweis: form.elements.hinweis.value,
@@ -943,6 +1112,10 @@ const PAGE_SCRIPT = `
         form.reset();
         closeDrawer();
       }).catch(function (fehler) {
+        // Z.B. eine Abholzeit, die der Server nicht mehr annimmt: Zeiten neu holen.
+        abhol.geladenUm = 0;
+        ladeAbholKonfig();
+        aktualisiereAbholzeiten();
         zeigeFehler(fehler.message);
       });
     });
@@ -999,6 +1172,8 @@ const PAGE_SCRIPT = `
       });
     });
 
+    beobachteAbholzeiten();
+    ladeAbholKonfig();
     renderCart();
   });
 })();
@@ -1331,10 +1506,8 @@ ${
       <div class="field-grid">
         <div class="field">
           <label for="ord-abholzeit">Abholzeit</label>
-          <select id="ord-abholzeit" name="abholzeit" required>
+          <select id="ord-abholzeit" name="abholzeit" required${abholzeitAttribute({ oeffnungszeiten: openingHours }, escapeHtml)}>
             <option value="">Bitte wählen</option>
-            <option>So schnell wie möglich (ca. 20 Min.)</option>
-            ${optionList(PICKUP_SLOTS)}
           </select>
           <span class="error">Bitte wählen Sie eine Abholzeit.</span>
         </div>
@@ -1389,6 +1562,7 @@ ${
 ${renderFooter({ name, adresse, telefon, cuisine: gestaltung.cuisine, handschrift })}
 
 <script>window.PAGE_DATA = ${pageData};</script>
+<script>${abholzeitSkript()}</script>
 <script>${PAGE_SCRIPT}</script>
 <script>${MOTION_SCRIPT}</script>${brauchtExtraBewegung ? `
 <script>${MOTION_EXTRA_SKRIPT}</script>` : ""}

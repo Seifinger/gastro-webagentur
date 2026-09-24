@@ -2,6 +2,15 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
+import {
+  berechneAbholzeiten,
+  pruefeAbholwunsch,
+  zeitpunktFuerUhrzeit,
+  ASAP_VORLAUF_MINUTEN,
+  RASTER_MINUTEN,
+  STANDARD_OEFFNUNGSZEITEN,
+  ZEITZONE_STANDARD,
+} from "./abholzeiten.js";
 
 // Datenhaltung eines Betriebs: Tischplan, Reservierungen, Bestellungen.
 // Eine JSON-Datei je Betrieb – das reicht für ein Haus mit ein paar Dutzend
@@ -18,6 +27,13 @@ export const RESERVIERUNG_STATUS = ["neu", "bestaetigt", "abgesagt"];
 export const BESTELLUNG_STATUS = ["neu", "bestaetigt", "abgeholt", "abgelehnt", "storniert"];
 
 export const NO_SHOW_STORNOFENSTER_MINUTEN_DEFAULT = 30;
+
+/**
+ * Die Uhr des Betriebs. Im Betrieb schlicht new Date(); Tests stellen sie
+ * fest (dasselbe Hook-Muster wie pushSendenHook/telegramSendenHook), damit
+ * Abholzeiten nicht von der Tageszeit des Testlaufs abhängen.
+ */
+export const uhrHook = { jetzt: () => new Date() };
 export const NO_SHOW_WARN_SCHWELLE_DEFAULT = 2;
 
 function datei(slug) {
@@ -230,19 +246,31 @@ export function tischKonflikte(daten) {
 
 /* ---------- Abholzeiten ---------- */
 
-// Grundvorlauf der Küche, bevor die erste Zeit überhaupt angeboten wird.
-export const ABHOL_VORLAUF_MINUTEN = 20;
-// Wie weit im Voraus Abholzeiten angeboten werden – dasselbe Kapazitätsfenster
-// wie bei Tischreservierungen (BELEGDAUER_MINUTEN), hier für die Küche statt
-// den Tischplan.
-export const ABHOL_FENSTER_MINUTEN = 120;
-export const ABHOL_SCHRITT_MINUTEN = 15;
+// Die Rechnung selbst steht in abholzeiten.js – für Browser und Server
+// dieselbe. Hier nur die Werte, die der Betrieb dazu beisteuert.
+export const ABHOL_VORLAUF_MINUTEN = ASAP_VORLAUF_MINUTEN;
+export const ABHOL_SCHRITT_MINUTEN = RASTER_MINUTEN;
+
+/**
+ * Womit für diesen Betrieb gerechnet wird: eigene Öffnungszeiten (Feld
+ * "oeffnungszeiten", dieselben Zeilen { tage, zeiten } wie auf der Seite)
+ * oder die Standardzeiten der Seite, Zeitzone des Restaurants und die
+ * Zusatz-Wartezeit des Wirts (additiv auf den Grundvorlauf).
+ */
+export function abholEinstellungen(daten, { extraMinuten = 0 } = {}) {
+  return {
+    oeffnungszeiten: Array.isArray(daten.oeffnungszeiten) && daten.oeffnungszeiten.length ? daten.oeffnungszeiten : STANDARD_OEFFNUNGSZEITEN,
+    zeitzone: daten.zeitzone || ZEITZONE_STANDARD,
+    zusatzMinuten: (Number(daten.zusaetzlicheWartezeitMinuten) || 0) + (Number(extraMinuten) || 0),
+  };
+}
 
 export const WARTEZEIT_MAX_MINUTEN = 180;
 
 /**
  * Setzt die Zusatz-Wartezeit, die der Wirt bei Rückstand in der Küche selbst
- * hochsetzt. Wirkt nur auf neu berechnete Abholzeiten (verfuegbareAbholzeiten)
+ * hochsetzt. Wirkt additiv auf neu berechnete Abholzeiten (20 + Zusatz für
+ * "so schnell wie möglich", 25 + Zusatz für geplante Zeiten, abholzeiten.js)
  * – bereits bestätigte Bestellungen behalten ihre einmal zugesagte Zeit.
  */
 export function setzeWartezeit(slug, minuten) {
@@ -326,29 +354,16 @@ export function setzeBankverbindung(slug, text) {
   });
 }
 
-function zeitString(minutenSeitMitternacht) {
-  const normiert = ((minutenSeitMitternacht % 1440) + 1440) % 1440;
-  const hh = String(Math.floor(normiert / 60)).padStart(2, "0");
-  const mm = String(normiert % 60).padStart(2, "0");
-  return `${hh}:${mm}`;
-}
-
 /**
- * Die als Nächstes anbietbaren Abholzeiten: ab jetzt plus Grundvorlauf plus
- * die vom Wirt gesetzte Zusatz-Wartezeit, im 15-Minuten-Raster, für ein
- * 120-Minuten-Fenster. Reine Berechnung ohne Bezug zu bestehenden
- * Bestellungen – eine bereits bestätigte Abholzeit läuft nie nachträglich mit.
+ * Die geplanten Abholzeiten ("HH:MM"), die jetzt angeboten würden – nach
+ * denselben Regeln wie das Bestellformular (abholzeiten.js): ab jetzt bzw.
+ * Öffnung plus 25 Minuten plus Zusatz-Wartezeit, im 5-Minuten-Raster, nur
+ * innerhalb der Öffnungszeiten. extraMinuten kommt additiv dazu (gelernter
+ * Zuschlag, wartezeitLernStore.js). Reine Berechnung ohne Bezug zu
+ * bestehenden Bestellungen – eine bestätigte Abholzeit läuft nie nachträglich mit.
  */
-export function verfuegbareAbholzeiten(daten, jetzt = new Date()) {
-  const zusatz = Number(daten.zusaetzlicheWartezeitMinuten) || 0;
-  const abMinuten = jetzt.getHours() * 60 + jetzt.getMinutes() + ABHOL_VORLAUF_MINUTEN + zusatz;
-  const start = Math.ceil(abMinuten / ABHOL_SCHRITT_MINUTEN) * ABHOL_SCHRITT_MINUTEN;
-
-  const slots = [];
-  for (let m = start; m <= start + ABHOL_FENSTER_MINUTEN; m += ABHOL_SCHRITT_MINUTEN) {
-    slots.push(zeitString(m));
-  }
-  return slots;
+export function verfuegbareAbholzeiten(daten, jetzt = uhrHook.jetzt(), { extraMinuten = 0 } = {}) {
+  return berechneAbholzeiten({ jetzt, ...abholEinstellungen(daten, { extraMinuten }) }).slots.map((s) => s.uhrzeit);
 }
 
 /* ---------- Reservierungen ---------- */
@@ -470,12 +485,22 @@ export function weiseTischZu(slug, id, tischId) {
 
 /* ---------- Bestellungen ---------- */
 
-export function legeBestellungAn(slug, eingabe) {
+/**
+ * Legt eine Abholbestellung an. Die Abholzeit wird dabei erneut geprüft –
+ * mit derselben Rechnung wie im Formular, mit den aktuellen Öffnungszeiten
+ * und der aktuellen Zusatz-Wartezeit. Veraltete oder manipulierte Zeiten
+ * werden mit klarer Meldung abgelehnt, nie still verschoben.
+ *
+ * eingabe.abholArt ("asap" | "geplant") und eingabe.abholZeitpunkt (ISO)
+ * schickt das Formular; ältere Seiten schicken nur abholzeit "HH:MM" – das
+ * gilt dann als geplante Zeit und wird genauso geprüft.
+ */
+export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
   const positionen = Array.isArray(eingabe.positionen) ? eingabe.positionen : [];
 
   if (positionen.length === 0) throw new Error("Die Bestellung ist leer.");
   if (!String(eingabe.name ?? "").trim()) throw new Error("Bitte einen Namen angeben.");
-  if (!String(eingabe.abholzeit ?? "").trim()) throw new Error("Bitte eine Abholzeit angeben.");
+  if (!String(eingabe.abholzeit ?? "").trim() && !eingabe.abholZeitpunkt) throw new Error("Bitte eine Abholzeit angeben.");
 
   const sauber = positionen.map((p) => ({
     name: String(p.name ?? "").trim(),
@@ -484,6 +509,15 @@ export function legeBestellungAn(slug, eingabe) {
   }));
 
   return aendere(slug, (daten) => {
+    const abholung = pruefeAbholwunsch({
+      jetzt,
+      ...abholEinstellungen(daten),
+      art: eingabe.abholArt,
+      zeitpunkt: eingabe.abholZeitpunkt,
+      abholzeit: eingabe.abholArt ? "" : eingabe.abholzeit,
+    });
+    if (!abholung.ok) throw new Error(abholung.fehler);
+
     // Ist die Funktion aktiv, ist die Zustimmung Pflicht – ohne Häkchen keine
     // Bestellung. Der Text wird serverseitig aus der aktuellen Konfiguration
     // gebaut, nicht vom Client übernommen: Beweistext und tatsächlich
@@ -496,7 +530,7 @@ export function legeBestellungAn(slug, eingabe) {
       }
       noShowZustimmung = {
         text: noShowZustimmungstext(daten),
-        zeitpunkt: new Date().toISOString(),
+        zeitpunkt: jetzt.toISOString(),
       };
       noShowGebuehrBetragVereinbart = daten.noShowGebuehrBetrag;
     }
@@ -506,15 +540,18 @@ export function legeBestellungAn(slug, eingabe) {
       nummer: `AB-${String(Math.floor(1000 + Math.random() * 9000))}`,
       positionen: sauber,
       gesamt: sauber.reduce((summe, p) => summe + p.preis * p.menge, 0),
-      // Wunsch des Gastes; was tatsächlich gilt, bestätigt der Wirt.
-      abholzeit: String(eingabe.abholzeit).trim(),
+      // Wunsch des Gastes; was tatsächlich gilt, bestätigt der Wirt. Die
+      // Uhrzeit kommt aus dem geprüften Zeitpunkt, nicht aus dem Text des Browsers.
+      abholzeit: abholung.uhrzeit,
+      abholArt: abholung.art,
+      abholZeitpunkt: abholung.iso,
       bestaetigteAbholzeit: "",
       name: String(eingabe.name).trim(),
       telefon: String(eingabe.telefon ?? "").trim(),
       email: String(eingabe.email ?? "").trim(),
       hinweis: String(eingabe.hinweis ?? "").trim(),
       status: "neu",
-      eingegangen: new Date().toISOString(),
+      eingegangen: jetzt.toISOString(),
       // Beweis für eine spätere Forderung: exakter Text, Zeitpunkt, dazu
       // Name/Kontakt – die stehen ohnehin schon oben auf der Bestellung.
       noShowZustimmung,
@@ -531,15 +568,21 @@ export function legeBestellungAn(slug, eingabe) {
 
 /**
  * Der Zeitpunkt, den die Bestellung dem Gast versprochen hat (bestätigt oder,
- * falls noch offen, gewünscht) – kombiniert mit dem Eingangsdatum, weil
- * Abholzeiten nur "HH:MM" ohne Datum sind (Abholung ist immer am selben Tag).
+ * falls noch offen, gewünscht). Neue Bestellungen tragen ihn als
+ * abholZeitpunkt; eine bestätigte "HH:MM" wird in der Zeitzone des
+ * Restaurants auf das nächstliegende Vorkommen um diesen Zeitpunkt (bzw. den
+ * Eingang) gelegt – so stimmt es auch über Mitternacht.
  */
-function versprochenerAbholZeitpunkt(bestellung) {
+function versprochenerAbholZeitpunkt(bestellung, daten) {
   const zeit = bestellung.bestaetigteAbholzeit || bestellung.abholzeit;
-  const datum = String(bestellung.eingegangen ?? "").slice(0, 10);
-  if (!zeit || !datum) return null;
-  const zeitpunkt = new Date(`${datum}T${zeit}:00`);
-  return Number.isNaN(zeitpunkt.getTime()) ? null : zeitpunkt;
+  if (bestellung.abholZeitpunkt && zeit === bestellung.abholzeit) {
+    const zeitpunkt = new Date(bestellung.abholZeitpunkt);
+    if (!Number.isNaN(zeitpunkt.getTime())) return zeitpunkt;
+  }
+  const referenz = bestellung.abholZeitpunkt || bestellung.eingegangen;
+  if (!zeit || !referenz || Number.isNaN(new Date(referenz).getTime())) return null;
+  const ms = zeitpunktFuerUhrzeit(referenz, zeit, abholEinstellungen(daten).zeitzone);
+  return ms === null ? null : new Date(ms);
 }
 
 /**
@@ -548,14 +591,14 @@ function versprochenerAbholZeitpunkt(bestellung) {
  * Gebühr – eine Stornierung selbst löst nie automatisch eine Forderung aus,
  * das entscheidet der Wirt über "Kunde nicht erschienen" (bestaetigeNoShow).
  */
-export function storniereBestellung(slug, id, jetzt = new Date()) {
+export function storniereBestellung(slug, id, jetzt = uhrHook.jetzt()) {
   return aendere(slug, (daten) => {
     const b = daten.bestellungen.find((x) => x.id === id);
     if (!b) throw new Error("Bestellung nicht gefunden.");
     if (b.storniertAm) throw new Error("Diese Bestellung wurde bereits storniert.");
     if (b.status === "abgeholt") throw new Error("Diese Bestellung wurde bereits abgeholt.");
 
-    const versprochen = versprochenerAbholZeitpunkt(b);
+    const versprochen = versprochenerAbholZeitpunkt(b, daten);
     const minutenBisAbholung = versprochen ? (versprochen.getTime() - jetzt.getTime()) / 60000 : Infinity;
     const kostenfrei = minutenBisAbholung >= Number(daten.noShowStornofensterMinuten ?? 0);
 

@@ -16,7 +16,8 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-export { RESERVATION_SLOTS, PICKUP_SLOTS } from "../../src/sections/reservation.js";
+export { RESERVATION_SLOTS } from "../../src/sections/reservation.js";
+export { abholzeitSkript, abholzeitAttribute } from "../../src/abholzeiten.js";
 export {
   themeForLead,
   slugify,
@@ -80,6 +81,7 @@ export const PFLICHT_IDS = [
   "confirm-mail",
   "confirm-close",
   "order-form",
+  "ord-abholzeit",
   "ord-noshow-feld",
   "ord-noshow",
   "ord-noshow-text",

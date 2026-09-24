@@ -19,14 +19,14 @@ import { BEWEGUNG_CSS, BEWEGUNG_SKRIPT } from "../bewegung.js";
 import { lint } from "../antiSlopLint.js";
 import { verfeinereTexte } from "../copyRefiner.js";
 import { schriftCss } from "../schriften.js";
-import { seitenSkript, pruefeFunktionsVertrag, menuForCuisine, escapeHtml, jsonForScript } from "../v1Funktionen.js";
+import { seitenSkript, abholzeitSkript, pruefeFunktionsVertrag, menuForCuisine, escapeHtml, jsonForScript } from "../v1Funktionen.js";
 import { renderBestellweg } from "../sektionen/service.js";
 import { aktionsziele } from "../aktionsziele.js";
 import { BuildAbbruch, FONTS_DIR, OUTPUT_DIR } from "../siteBuilder.js";
 import { istFreigegeben, pruefeBriefing, statusZaehlung, offenePunkte, tatsache } from "../../briefing/briefing.js";
 import { belegPruefung, pruefeCreativeDirection } from "../../creative/creativeDirection.js";
 import { erstelleBildplan } from "../../assets-pipeline/bildplan.js";
-import { texteKomponiert } from "./texte.js";
+import { texteKomponiert, oeffnungszeiten } from "./texte.js";
 import { KOMPOSITION_STIL } from "./stil.js";
 import { renderKopf, renderHero, renderAbschnitt, navAnker, mobilLeiste, renderFuss, LEISTE_SKRIPT, WOCHENPLAN_SKRIPT } from "./sektionen.js";
 
@@ -90,7 +90,8 @@ export function baueKomponierteSite({ briefing, cd, optionen = {} }) {
 
   // renderBestellweg liefert Warenkorb, Drawer und Bestätigung des v1-Skripts;
   // die Aktionsleiste ersetzen wir durch die der Creative Direction.
-  const bestellweg = renderBestellweg({ ds: { ...ds, layout: { ...ds.layout, mobileAktionsleiste: false } }, texte, aktionen: aktionsziele({ lead, apiUrl, fiktiv: Boolean(briefing.fiktiv) }) });
+  // Abholzeiten rechnen mit den Öffnungszeiten aus dem Briefing; ohne sie mit den Standardzeiten.
+  const bestellweg = renderBestellweg({ ds: { ...ds, layout: { ...ds.layout, mobileAktionsleiste: false } }, texte, aktionen: aktionsziele({ lead, apiUrl, fiktiv: Boolean(briefing.fiktiv) }), oeffnungszeiten: oeffnungszeiten(briefing) });
 
   const bodyKlassen = [`a-${ds.archetyp}`, `schema-${ds.farben.schema}`, `rubrik-${ds.typografie.rubrik.stil}`, `k-hero-${heroTyp}`, `k-${briefing.slug}`, cd.komposition?.abschnittsSchrift === "text" ? "k-titel-text" : ""].filter(Boolean).join(" ");
   const titel = `${texte.name}${lead.ort ? ` – ${texte.kicker}` : ""}`;
@@ -128,6 +129,7 @@ ${bestellweg}
 ${mobilLeiste(k)}
 ${renderFuss(k, anker)}
 <script>window.PAGE_DATA = ${pageData};</script>
+<script>${abholzeitSkript()}</script>
 <script>${seitenSkript()}</script>
 <script>${BEWEGUNG_SKRIPT}</script>
 <script>${LEISTE_SKRIPT}${getragen.has("wochenplan") ? WOCHENPLAN_SKRIPT : ""}</script>

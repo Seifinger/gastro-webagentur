@@ -21,8 +21,8 @@ import {
   setzeWartezeit,
   verfuegbareAbholzeiten,
   ABHOL_VORLAUF_MINUTEN,
-  ABHOL_FENSTER_MINUTEN,
   ABHOL_SCHRITT_MINUTEN,
+  uhrHook,
   fuegePushSubscriptionHinzu,
   entfernePushSubscription,
   setzeTelegramChatId,
@@ -37,6 +37,12 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SLUG = "__test-betrieb";
 const dateiPfad = path.join(__dirname, "..", "data", "betrieb", `${SLUG}.json`);
+
+// Feste Uhr: Donnerstag, 24.09.2026, 17:00 in Berlin – Standardzeiten
+// 17:00–22:00, also ist "18:30" eine angebotene Abholzeit, egal wann der
+// Test läuft. Die Zeitregeln selbst prüft test/abholzeiten.test.js.
+const JETZT = new Date("2026-09-24T17:00:00+02:00");
+uhrHook.jetzt = () => new Date(JETZT);
 
 function grundriss() {
   legeTischAn(SLUG, { name: "Tisch 1", plaetze: 4 });
@@ -266,22 +272,23 @@ test("die Zusatz-Wartezeit wird geprüft und gespeichert", () => {
   assert.equal(ladeBetrieb(SLUG).zusaetzlicheWartezeitMinuten, 20);
 });
 
-test("verfuegbareAbholzeiten liegt im 120-Minuten-Fenster nach Vorlauf und Raster", () => {
-  const jetzt = new Date(2026, 8, 20, 12, 3);
+test("verfuegbareAbholzeiten folgt den Regeln des Bestellformulars (abholzeiten.js)", () => {
+  // Sonntag, 20.09.2026, 12:03 in Berlin – Standardzeiten sonntags 11:30–21:00.
+  const jetzt = new Date("2026-09-20T12:03:00+02:00");
   const slots = verfuegbareAbholzeiten({ zusaetzlicheWartezeitMinuten: 0 }, jetzt);
 
   assert.equal(ABHOL_VORLAUF_MINUTEN, 20);
-  assert.equal(ABHOL_FENSTER_MINUTEN, 120);
-  assert.equal(ABHOL_SCHRITT_MINUTEN, 15);
+  assert.equal(ABHOL_SCHRITT_MINUTEN, 5);
 
-  // 12:03 + 20 Minuten Vorlauf = 12:23, aufgerundet aufs 15-Minuten-Raster: 12:30.
+  // 12:03 + 25 Minuten = 12:28, aufgerundet aufs 5-Minuten-Raster: 12:30.
   assert.equal(slots[0], "12:30");
-  assert.equal(slots.at(-1), "14:30");
-  assert.equal(slots.length, 9);
+  assert.equal(slots[1], "12:35");
+  // Letzte Zeit vor der Schließzeit 21:00.
+  assert.equal(slots.at(-1), "20:55");
 });
 
 test("die Zusatz-Wartezeit verschiebt neu berechnete Abholzeiten, bestehende Bestellungen bleiben unberührt", () => {
-  const jetzt = new Date(2026, 8, 20, 12, 3);
+  const jetzt = new Date("2026-09-20T12:03:00+02:00");
   const ohneZusatz = verfuegbareAbholzeiten({ zusaetzlicheWartezeitMinuten: 0 }, jetzt);
   const mitZusatz = verfuegbareAbholzeiten({ zusaetzlicheWartezeitMinuten: 15 }, jetzt);
 
@@ -290,16 +297,72 @@ test("die Zusatz-Wartezeit verschiebt neu berechnete Abholzeiten, bestehende Bes
 
   const b = legeBestellungAn(SLUG, {
     positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
-    abholzeit: "12:30",
+    abholzeit: "18:30",
     name: "Bestandskunde",
   });
-  const bestaetigt = bestaetigeBestellung(SLUG, b.id, "12:30");
+  const bestaetigt = bestaetigeBestellung(SLUG, b.id, "18:30");
 
   setzeWartezeit(SLUG, 45);
 
   const nachher = ladeBetrieb(SLUG).bestellungen.find((x) => x.id === b.id);
-  assert.equal(nachher.abholzeit, "12:30", "der ursprüngliche Wunsch bleibt stehen");
-  assert.equal(nachher.bestaetigteAbholzeit, "12:30", "eine bereits bestätigte Zeit läuft nicht mit");
+  assert.equal(nachher.abholzeit, "18:30", "der ursprüngliche Wunsch bleibt stehen");
+  assert.equal(nachher.bestaetigteAbholzeit, "18:30", "eine bereits bestätigte Zeit läuft nicht mit");
+});
+
+/* ----- Serverseitige Prüfung der Abholzeit (legeBestellungAn) ----- */
+
+const PIZZA = [{ name: "Pizza", menge: 1, preis: 9.9 }];
+
+test("legeBestellungAn speichert eine geprüfte ASAP-Zeit mit vollem Zeitpunkt", () => {
+  // 17:00 → so schnell wie möglich 17:20.
+  const b = legeBestellungAn(SLUG, { positionen: PIZZA, name: "X", abholzeit: "17:20", abholArt: "asap", abholZeitpunkt: "2026-09-24T15:20:00.000Z" });
+  assert.equal(b.abholzeit, "17:20");
+  assert.equal(b.abholArt, "asap");
+  assert.equal(b.abholZeitpunkt, "2026-09-24T15:20:00.000Z");
+});
+
+test("legeBestellungAn nimmt die Uhrzeit aus dem geprüften Zeitpunkt, nicht aus dem Text des Browsers", () => {
+  const b = legeBestellungAn(SLUG, { positionen: PIZZA, name: "X", abholzeit: "09:00", abholArt: "geplant", abholZeitpunkt: "2026-09-24T16:30:00.000Z" });
+  assert.equal(b.abholzeit, "18:30");
+});
+
+test("legeBestellungAn lehnt vergangene, zu frühe, geschlossene und krumme Zeiten ab – ohne zu speichern", () => {
+  const fall = (eingabe) => () => legeBestellungAn(SLUG, { positionen: PIZZA, name: "X", ...eingabe });
+  // Vergangen (16:30) und zu früh (17:20 < 17:25 erste geplante Zeit)
+  assert.throws(fall({ abholArt: "geplant", abholZeitpunkt: "2026-09-24T14:30:00.000Z" }), /nicht mehr möglich.*Frühestens möglich: 17:25/);
+  assert.throws(fall({ abholArt: "geplant", abholZeitpunkt: "2026-09-24T15:20:00.000Z" }), /17:20 Uhr ist nicht mehr möglich/);
+  // Nach Schließung (22:00) und außerhalb des Rasters (18:32)
+  assert.throws(fall({ abholArt: "geplant", abholZeitpunkt: "2026-09-24T20:00:00.000Z" }), /bieten wir keine Abholung an/);
+  assert.throws(fall({ abholArt: "geplant", abholZeitpunkt: "2026-09-24T16:32:00.000Z" }), /bieten wir keine Abholung an/);
+  // ASAP früher als möglich (manipuliert) oder uralt
+  assert.throws(fall({ abholArt: "asap", abholZeitpunkt: "2026-09-24T15:05:00.000Z" }), /nicht mehr zu schaffen/);
+  // Unsinn
+  assert.throws(fall({ abholArt: "geplant", abholZeitpunkt: "morgen" }), /Abholzeit aus der Liste/);
+  assert.throws(fall({ abholArt: "irgendwann", abholZeitpunkt: "2026-09-24T16:30:00.000Z" }), /Abholzeit aus der Liste/);
+  assert.throws(fall({ abholzeit: "So schnell wie möglich (ca. 20 Min.)" }), /Abholzeit aus der Liste/);
+  assert.equal(ladeBetrieb(SLUG).bestellungen.length, 0, "nichts wurde angelegt");
+});
+
+test("legeBestellungAn rechnet mit der aktuellen Zusatz-Wartezeit des Wirts", () => {
+  setzeWartezeit(SLUG, 10);
+  // 17:00 + 25 + 10 = 17:35 → 17:30 ist nicht mehr zu haben, 17:35 schon.
+  assert.throws(
+    () => legeBestellungAn(SLUG, { positionen: PIZZA, name: "X", abholArt: "geplant", abholZeitpunkt: "2026-09-24T15:30:00.000Z" }),
+    /Frühestens möglich: 17:35/,
+  );
+  const b = legeBestellungAn(SLUG, { positionen: PIZZA, name: "X", abholArt: "geplant", abholZeitpunkt: "2026-09-24T15:35:00.000Z" });
+  assert.equal(b.abholzeit, "17:35");
+});
+
+test("legeBestellungAn nutzt die Öffnungszeiten des Betriebs, wenn welche hinterlegt sind", () => {
+  speichereBetrieb(SLUG, { tische: [], reservierungen: [], bestellungen: [], oeffnungszeiten: [{ tage: "Montag – Sonntag", zeiten: "11:00 – 17:30" }] });
+  assert.throws(
+    () => legeBestellungAn(SLUG, { positionen: PIZZA, name: "X", abholzeit: "18:30" }),
+    /bieten wir keine Abholung an/,
+  );
+  // 17:00 + 20 = 17:20 liegt noch vor 17:30.
+  const b = legeBestellungAn(SLUG, { positionen: PIZZA, name: "X", abholArt: "asap", abholZeitpunkt: "2026-09-24T15:20:00.000Z" });
+  assert.equal(b.abholzeit, "17:20");
 });
 
 test("eine Push-Subscription wird gespeichert", () => {
@@ -490,11 +553,12 @@ test("eine Stornierung innerhalb des Fensters ist gebührenfrei", () => {
   aktiviereNoShowSchutz(10, 30);
   const b = legeBestellungAn(SLUG, {
     positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
-    abholzeit: "23:50",
+    abholzeit: "21:30",
     name: "X",
     noShowZustimmung: true,
   });
-  const abholzeitpunkt = new Date(`${b.eingegangen.slice(0, 10)}T23:50:00`);
+  const abholzeitpunkt = new Date(b.abholZeitpunkt);
+  assert.equal(b.abholZeitpunkt, "2026-09-24T19:30:00.000Z", "21:30 Berliner Sommerzeit");
   const vierzigMinutenVorher = new Date(abholzeitpunkt.getTime() - 40 * 60_000);
 
   const ergebnis = storniereBestellung(SLUG, b.id, vierzigMinutenVorher);
@@ -506,11 +570,12 @@ test("eine Stornierung nach Ablauf des Fensters wird nicht als gebührenfrei mar
   aktiviereNoShowSchutz(10, 30);
   const b = legeBestellungAn(SLUG, {
     positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
-    abholzeit: "23:50",
+    abholzeit: "21:30",
     name: "X",
     noShowZustimmung: true,
   });
-  const abholzeitpunkt = new Date(`${b.eingegangen.slice(0, 10)}T23:50:00`);
+  const abholzeitpunkt = new Date(b.abholZeitpunkt);
+  assert.equal(b.abholZeitpunkt, "2026-09-24T19:30:00.000Z", "21:30 Berliner Sommerzeit");
   const zehnMinutenVorher = new Date(abholzeitpunkt.getTime() - 10 * 60_000);
 
   const ergebnis = storniereBestellung(SLUG, b.id, zehnMinutenVorher);

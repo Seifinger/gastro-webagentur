@@ -6,11 +6,6 @@ export const RESERVATION_SLOTS = [
   ...timeSlots(17 * 60, 21 * 60 + 30, 30),
 ];
 
-export const PICKUP_SLOTS = [
-  ...timeSlots(11 * 60 + 30, 14 * 60, 15),
-  ...timeSlots(17 * 60, 21 * 60 + 30, 15),
-];
-
 /**
  * Die Reservierungs-Sektion mit Vorteils-Liste und Formular.
  *
