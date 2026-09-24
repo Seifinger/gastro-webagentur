@@ -28,7 +28,8 @@ import { OUTPUT_DIR, FONTS_DIR } from "../build/siteBuilder.js";
 import { schriftCss } from "../build/schriften.js";
 import { loeseMedien, medienUebersicht } from "../assets-pipeline/mediaGenerator.js";
 import { creativeHandler } from "./creativeDashboard.js";
-import { AUSDRUECKE, AUSDRUCK_AUS, ausdruckZumBauen, speichereAusdruckWahl } from "../build/ausdruck.js";
+import { AUSDRUECKE, AUSDRUCK_AUS } from "../build/ausdruck.js";
+import { demoEinstellungen, speichereDemoEinstellungen } from "../../src/demoEinstellungen.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.join(__dirname, "..", "..");
@@ -124,8 +125,9 @@ export function ergaenzeLeadsV2(leads) {
 }
 
 /** Ausdruck eines Leads mit Herkunft und Auswahl fürs Dashboard. */
-function ausdruckInfo(slug, kueche) {
-  const stand = ausdruckZumBauen(slug, kueche);
+function ausdruckInfo(slug) {
+  const v = demoEinstellungen(slug)?.vorlage;
+  const stand = v ? { ausdruck: v.ausdruck, quelle: v.quelle, vorschlag: v.standard } : { ausdruck: null, quelle: "keiner", vorschlag: null };
   return {
     ...stand,
     optionen: Object.values(AUSDRUECKE).map((a) => ({ id: a.id, label: a.label, prinzip: a.prinzip, passtZu: a.passtZu })),
@@ -144,7 +146,7 @@ export function leadDetailV2(slug) {
     slug,
     name: lead.name,
     engine: engineFuerLead(lead.placeId),
-    ausdruck: ausdruckInfo(slug, k.kueche),
+    ausdruck: ausdruckInfo(slug),
     v2Entwurf: bericht ? `/v2/leads/${encodeURIComponent(slug)}/` : "",
     designsystem: {
       id: ds.id,
@@ -177,13 +179,13 @@ export async function baueLeadV2(slug, { judge = false, apiUrl = process.env.V2_
     judge,
     zielDir: LEADS_DIR,
     slug,
-    optionen: { editUebersteuerung: loadLeadEdits(slug), apiUrl, fiktiv: false, ...ausdruckOption(slug, k.kueche) },
+    optionen: { editUebersteuerung: loadLeadEdits(slug), apiUrl, fiktiv: false, ...ausdruckOption(slug) },
   });
   return protokoll;
 }
 
-function ausdruckOption(slug, kueche) {
-  const { ausdruck } = ausdruckZumBauen(slug, kueche);
+function ausdruckOption(slug) {
+  const ausdruck = demoEinstellungen(slug)?.vorlage.ausdruck;
   return ausdruck ? { ausdruck } : {};
 }
 
@@ -205,7 +207,7 @@ export async function textVorschauV2(slug, texte) {
       editUebersteuerung: { bilder: edits.bilder, texte: { ...edits.texte, ...texte } },
       fiktiv: false,
       fontsPfad: "/v2/assets/fonts",
-      ...ausdruckOption(slug, k.kueche),
+      ...ausdruckOption(slug),
     },
   });
   return html;
@@ -493,8 +495,10 @@ export async function v2Handler(req, res, pathname) {
       const k = leadKontext(slug);
       if (!k) throw new Error("Zu diesem Entwurf gibt es keinen Lead.");
       const { ausdruck: wert = "" } = await lies(req);
-      speichereAusdruckWahl(slug, wert);
-      return sende(res, 200, { ok: true, ausdruck: ausdruckInfo(slug, k.kueche) }), true;
+      // Je Lead privat in data/lead-edits (gitignoriert) – nie im öffentlichen
+      // v2/ausdruck-wahl.json, das nur die Beispielseiten führt.
+      speichereDemoEinstellungen(slug, { vorlage: wert === AUSDRUCK_AUS ? "" : wert });
+      return sende(res, 200, { ok: true, ausdruck: ausdruckInfo(slug) }), true;
     } catch (e) {
       return sende(res, 400, { ok: false, fehler: e.message }), true;
     }

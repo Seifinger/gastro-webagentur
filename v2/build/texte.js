@@ -21,7 +21,7 @@ const SLOGAN = {
   cafe: (ort) => (ort ? `Guten Morgen, ${ort}` : "Guten Morgen"),
   japanisch: (ort) => (ort ? `Abends am Tresen in ${ort}` : "Abends am Tresen"),
 };
-const sloganFuer = (kueche, ort) => (SLOGAN[kueche] ?? ((o) => (o ? `Zu Gast in ${o}` : "Zu Gast bei uns")))(ort);
+export const sloganFuer = (kueche, ort) => (SLOGAN[kueche] ?? ((o) => (o ? `Zu Gast in ${o}` : "Zu Gast bei uns")))(ort);
 
 export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
   const ort = lead.ort || "";
