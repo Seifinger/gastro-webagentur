@@ -75,6 +75,29 @@ section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 .buehne-herkunft { position: absolute; right: var(--s-2); bottom: var(--s-2); padding: var(--s-halb) var(--s-1); background: var(--tint);
   color: var(--auf-tint-leise); font-size: var(--t-klein); }
 .buehne-ende { height: 0; }
+/* kino: Raum und Licht zuerst – der Slogan tritt eine Stufe leiser auf. */
+.ausdruck-kino .buehne-slogan { font-size: var(--t-h1); max-width: 20ch; }
+
+/* Kopfzeile "flaeche" (handwerk, editorial): sitzt im Fluss, liegt nie über dem Bild. */
+.kopf[data-ueber="flaeche"] { position: sticky; }
+
+/* Slogan unter dem Medium (handwerk): kurze Bühne, darunter der Satz auf dem Grund. */
+.buehne[data-slogan="unter-medium"] { height: auto; overflow: visible; background: var(--grund); color: var(--text); }
+.buehne[data-slogan="unter-medium"] .buehne-medium { position: relative; z-index: 0; height: var(--hero-hoehe-mobil); overflow: hidden; }
+.buehne[data-slogan="unter-medium"] .buehne-schleier, .buehne[data-slogan="unter-medium"] .buehne-pfeil { display: none; }
+.buehne[data-slogan="unter-medium"] .buehne-text { position: static; justify-content: flex-start; max-width: var(--max-breite); margin-inline: auto;
+  padding: var(--s-5) var(--rand) 0; text-align: left; }
+.buehne[data-slogan="unter-medium"] .buehne-slogan { max-width: 22ch; }
+@media (min-width: 768px) { .buehne[data-slogan="unter-medium"] .buehne-medium { height: var(--hero-hoehe); } }
+
+/* Titelblatt (editorial): Satz auf dem Grund, Bild im Rahmen. */
+.titelblatt { padding-block: var(--sektion) 0; }
+.titelblatt-raster { display: grid; gap: var(--s-5); align-items: end; }
+.titelblatt-slogan { font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform);
+  letter-spacing: var(--f-display-sperrung); font-size: var(--t-display); line-height: 1.05; max-width: 14ch; text-wrap: balance; }
+.titelblatt-bild { position: relative; aspect-ratio: 4 / 5; max-height: 72svh; overflow: hidden; border-radius: var(--r-bild); background: var(--flaeche-tief); }
+.titelblatt-bild img { width: 100%; height: 100%; object-fit: cover; object-position: var(--fokus, 50% 50%); }
+@media (min-width: 1024px) { .titelblatt-raster { grid-template-columns: 7fr 5fr; column-gap: calc(var(--rinne) * 2); } }
 @media (min-width: 768px) { .buehne { height: var(--hero-hoehe); } }
 
 /* Einladung: Name und Haus links, Besuch rechts (Details in abfolge.js). */
@@ -97,12 +120,12 @@ section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
   .buehne-video { transition: opacity var(--m-lang) var(--m-kurve); }
   .mobilebar { transition: opacity var(--m-mittel) var(--m-kurve), transform var(--m-mittel) var(--m-kurve); }
   @supports (animation-timeline: scroll()) {
-    .buehne-text { animation: buehne-rueckzug linear both; animation-timeline: scroll(root block); animation-range: 0 calc(var(--hero-hoehe-mobil) * .3); }
+    .buehne[data-rueckzug] .buehne-text { animation: buehne-rueckzug linear both; animation-timeline: scroll(root block); animation-range: 0 calc(var(--hero-hoehe-mobil) * .3); }
   }
 }
 @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
   @supports (animation-timeline: scroll()) {
-    .buehne-text { animation-range: 0 calc(var(--hero-hoehe) * .3); }
+    .buehne[data-rueckzug] .buehne-text { animation-range: 0 calc(var(--hero-hoehe) * .3); }
   }
 }
 /* Der Slogan bleibt hinter der Seite zurück (bewegt sich halb so schnell) und ist
@@ -123,8 +146,9 @@ export const BUEHNE_SKRIPT = `
 
   // 1. Kopfzeile: transparent, solange die Bühne unter ihr liegt.
   if (kopf && ende && "IntersectionObserver" in window) {
+    var transparent = kopf.getAttribute("data-ueber") !== "flaeche";
     var setze = function (ueber) {
-      kopf.setAttribute("data-zustand", ueber ? "ueber-buehne" : "fest");
+      kopf.setAttribute("data-zustand", ueber && transparent ? "ueber-buehne" : "fest");
       body.classList.toggle("buehne-sichtbar", ueber);
     };
     var hoehe = kopf.offsetHeight;
@@ -179,7 +203,7 @@ export const BUEHNE_SKRIPT = `
   // 3. Slogan-Rückzug ohne CSS-Scroll-Timeline: eine Variable je Frame.
   var text = document.querySelector(".buehne-text");
   var zeitleiste = window.CSS && CSS.supports && CSS.supports("animation-timeline: scroll()");
-  if (text && buehne && !reduziert && !zeitleiste) {
+  if (text && buehne && buehne.hasAttribute("data-rueckzug") && !reduziert && !zeitleiste) {
     var geplant = false;
     var rechne = function () {
       geplant = false;

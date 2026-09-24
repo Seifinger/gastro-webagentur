@@ -42,7 +42,7 @@ import { renderKopfzeile, renderHero, renderLeiste, HERO_AUFBAUTEN } from "./sek
 import { renderHighlights, renderKarte, renderAmbiente, renderStimmen } from "./sektionen/inhalt.js";
 import { aktionsziele } from "./aktionsziele.js";
 import { ausdruckFuer, ausdruckVariablen, buehnenSchleier } from "./ausdruck.js";
-import { renderKopfAusdruck, renderBuehne, renderEinladung } from "./sektionen/buehne.js";
+import { renderKopfAusdruck, renderErsterBildschirm, renderEinladung } from "./sektionen/buehne.js";
 import { BUEHNE_CSS, BUEHNE_SKRIPT } from "./buehneStil.js";
 import { renderTisch, renderHausBand, renderAnfahrt, renderFussAusdruck, ABFOLGE_CSS, ABFOLGE_SKRIPT } from "./sektionen/abfolge.js";
 import { renderAtmosphaere, ATMOSPHAERE_CSS, ATMOSPHAERE_SKRIPT } from "./atmosphaere.js";
@@ -334,7 +334,7 @@ ${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_C
 ${ausdruck ? "" : optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : ""}
 ${ausdruck ? renderKopfAusdruck({ ...ctx, hinweis: optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : "" }) : renderKopfzeile(ctx)}${ausdruck ? `\n${renderAtmosphaere(ctx)}` : ""}
 <main>
-${ausdruck ? `${renderBuehne(ctx)}\n${renderEinladung(ctx)}` : renderHero(heroVariante, ctx)}
+${ausdruck ? `${renderErsterBildschirm(ctx)}\n${renderEinladung(ctx)}` : renderHero(heroVariante, ctx)}
 ${ausdruck ? "" : renderLeiste(ctx)}
 ${hauptteil}
 </main>

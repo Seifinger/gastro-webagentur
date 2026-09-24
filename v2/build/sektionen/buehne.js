@@ -32,7 +32,8 @@ export function renderKopfAusdruck(ctx) {
   const aktion = (a, klasse) => (a ? `<a class="btn ${klasse}" href="${e(a.href)}" data-aktion="${a.id}">${e(a.kurz)}</a>` : "");
   // Grundzustand im Markup ist "fest" (Fläche): Ohne Skript bleibt die Schrift
   // auf jedem Untergrund lesbar. Das Skript schaltet über der Bühne auf transparent.
-  return `<header class="kopf" id="topbar" data-zustand="fest">
+  // data-ueber: "transparent" (über der Bühne durchsichtig) oder "flaeche" (immer fest) – aus dem Profil.
+  return `<header class="kopf" id="topbar" data-zustand="fest" data-ueber="${e(ctx.ausdruck?.kopfzeile?.ueberHero ?? "transparent")}">
   ${ctx.hinweis ?? ""}
   <div class="kopf-innen">
     <a class="kopf-marke" href="#">${e(texte.name)}</a>
@@ -85,13 +86,40 @@ export function renderBuehne(ctx) {
   const kennzeichnung = hero && hero.herkunft !== "eigen" ? `<span class="buehne-herkunft">${e(hero.kennzeichnung ?? texte.platzhalter)}</span>` : "";
   // Bildausschnitt je Medium (eigene.json → fokus), getrennt für Quer- und Hochformat.
   const fokus = [hero?.fokus ? `--fokus: ${hero.fokus}` : "", medien.heroMobil?.fokus ? `--fokus-mobil: ${medien.heroMobil.fokus}` : "", medien.heroVideo?.fokus ? `--fokus-video: ${medien.heroVideo.fokus}` : ""].filter(Boolean).join("; ");
-  return `<section class="buehne" data-hero="buehne" aria-label="${e(texte.buehne.bereich)}"${fokus ? ` style="${e(fokus)}"` : ""}>
-  <div class="buehne-medium">${poster}${videoTag}<div class="buehne-schleier"></div></div>
+  // Slogan über dem Medium (kino, gesellig) oder darunter auf dem Grund (handwerk); Rückzug nur, wo das Profil ihn will.
+  const profil = ctx.ausdruck?.hero ?? { slogan: "ueber-medium", sloganRueckzug: true };
+  return `<section class="buehne" data-hero="buehne" data-slogan="${e(profil.slogan)}"${profil.sloganRueckzug ? " data-rueckzug" : ""} aria-label="${e(texte.buehne.bereich)}"${fokus ? ` style="${e(fokus)}"` : ""}>
+  <div class="buehne-medium">${poster}${videoTag}<div class="buehne-schleier"></div>${kennzeichnung}</div>
   <div class="buehne-text"><p class="buehne-slogan">${e(texte.slogan)}</p></div>
   <span class="buehne-pfeil" aria-hidden="true"></span>
-  ${kennzeichnung}
 </section>
 <div class="buehne-ende" id="buehne-ende" aria-hidden="true"></div>`;
+}
+
+/**
+ * Titelblatt (editorial): Typografie auf ruhigem Grund, das Bild im Rahmen
+ * daneben – kein Schleier, kein Vollbild-Video. Hochformat-Poster bevorzugt.
+ */
+export function renderTitelblatt(ctx) {
+  const { medien, texte } = ctx;
+  const basis = medien.heroMobil?.src ? medien.heroMobil : medien.hero?.quelle === "platzhalter:svg" ? { ...medien.hero, src: buehnenPlatzhalter(ctx.ds) } : medien.hero;
+  const fokus = basis?.fokus ? ` style="${e(`--fokus: ${basis.fokus}`)}"` : "";
+  const kennzeichnung = basis && basis.herkunft !== "eigen" ? `<span class="buehne-herkunft">${e(basis.kennzeichnung ?? texte.platzhalter)}</span>` : "";
+  return `<section class="titelblatt" data-hero="titelblatt" aria-label="${e(texte.buehne.bereich)}">
+  <div class="rahmen titelblatt-raster">
+    <div class="titelblatt-text">
+      <p class="rubrik">${e(texte.kicker)}</p>
+      <p class="titelblatt-slogan">${e(texte.slogan)}</p>
+    </div>
+    <figure class="titelblatt-bild"${fokus}>${basis?.src ? `<img class="buehne-poster" src="${e(basis.src)}" alt="${e(texte.buehne.alt)}" fetchpriority="high" decoding="async">` : ""}${kennzeichnung}</figure>
+  </div>
+</section>
+<div class="buehne-ende" id="buehne-ende" aria-hidden="true"></div>`;
+}
+
+/** Erster Bildschirm je Ausdruck: Bühne oder Titelblatt. */
+export function renderErsterBildschirm(ctx) {
+  return ctx.ausdruck?.hero?.typ === "titelblatt" ? renderTitelblatt(ctx) : renderBuehne(ctx);
 }
 
 export function renderEinladung(ctx) {
