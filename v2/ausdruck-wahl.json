@@ -1,4 +1,16 @@
 {
   "_hinweis": "Welche Seite mit welchem Ausdruck veröffentlicht wird (Gestaltungs-Umbau). Schlüssel = Slug unter docs/. Eine Seite mit Ausdruck wird immer über v2 gebaut.",
-  "beispiel-bayerisch": "gesellig"
+  "beispiel-bayerisch": "gesellig",
+  "beispiel-cafe": {
+    "ausdruck": "editorial",
+    "stimmung": "third-wave"
+  },
+  "beispiel-tuerkisch": {
+    "ausdruck": "handwerk",
+    "stimmung": "basar"
+  },
+  "beispiel-japanisch": {
+    "ausdruck": "kino",
+    "stimmung": "omakase"
+  }
 }

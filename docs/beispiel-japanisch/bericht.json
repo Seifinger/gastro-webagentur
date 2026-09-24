@@ -1,17 +1,18 @@
 {
   "engine": "v2",
-  "designsystem": "japanisch--washitsu",
+  "designsystem": "japanisch--omakase",
   "kueche": "japanisch",
-  "stimmung": "washitsu",
-  "archetyp": "hell",
+  "stimmung": "omakase",
+  "archetyp": "abend",
   "seed": 3428071313,
-  "heroVariante": "spalte-bild",
+  "heroVariante": "buehne",
   "heroVarianten": [
+    "tafel",
     "typo",
-    "karte",
-    "streifen",
-    "spalte-bild"
+    "spalte-bild",
+    "passepartout"
   ],
+  "ausdruck": "kino",
   "highlights": [
     "2-0",
     "0-1",
@@ -28,15 +29,27 @@
   "korrekturen": [],
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1512058564366-18510be2db19",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {
       "herkunft": "platzhalter",
       "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1590846406792-0adc7f938f1d",
+      "quelle": "stock:photo-1746003668321-d400319650ce",
       "typ": "bild"
     },
     "team": {
@@ -76,7 +89,7 @@
     "verbleibend": [],
     "llm": [],
     "ausrufezeichen": 0,
-    "kanon": "direkt und praktisch – beantwortet zuerst: was, wann, wie schnell"
+    "kanon": "ruhig und knapp – wenige Worte, eher Einladung als Werbung"
   },
   "raster": {
     "1": 8,

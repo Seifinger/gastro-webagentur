@@ -1,7 +1,7 @@
 {
   "site": "beispiel-cafe",
   "designsystem": "cafe--third-wave",
-  "heroVariante": "typo",
+  "heroVariante": "titelblatt",
   "runden": [
     {
       "runde": 1,
@@ -26,14 +26,26 @@
     }
   ],
   "copy": {
-    "ersetzungen": 1,
+    "ersetzungen": 2,
     "verbleibend": 0
   },
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1546069901-ba9599a7e63c",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {
@@ -79,5 +91,5 @@
       "typ": "bild"
     }
   },
-  "zeitpunkt": "2026-09-23T05:39:31.117Z"
+  "zeitpunkt": "2026-09-24T14:47:31.126Z"
 }

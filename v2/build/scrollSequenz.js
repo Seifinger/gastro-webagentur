@@ -49,6 +49,11 @@ async function zustand(seite) {
  *   stehen bleiben, ohne Skriptfehler.
  * Laborwerte eines Laufs, keine Felddaten.
  */
+/** Wartet, bis alle geladenen Bilder dekodiert sind – sonst fotografiert man leere Flächen. */
+async function bilderDekodiert(seite) {
+  await seite.evaluate(() => Promise.all([...document.images].map((i) => (i.complete && i.naturalWidth ? i.decode().catch(() => {}) : null))));
+}
+
 export async function robustheit(browser, url, ziel) {
   const ergebnis = {};
   // Langsames Netz
@@ -79,6 +84,7 @@ export async function robustheit(browser, url, ziel) {
   seite.on("pageerror", (f) => fehler.push(f.message));
   await seite.route(/\.(mp4|webm)(\?|$)/, (r) => r.abort());
   await seite.goto(url, { waitUntil: "load" });
+    await bilderDekodiert(seite);
   await seite.waitForTimeout(2500);
   ergebnis.ohneVideo = {
     ...(await seite.evaluate(() => {
@@ -105,6 +111,7 @@ export async function scrollSequenz(browser, url, ziel) {
     const fehler = [];
     seite.on("pageerror", (f) => fehler.push(f.message));
     await seite.goto(url, { waitUntil: "load" });
+    await bilderDekodiert(seite);
     await seite.evaluate(() => { document.documentElement.style.scrollBehavior = "auto"; });
     const buehnenHoehe = await seite.evaluate(() => document.querySelector(".buehne")?.offsetHeight ?? window.innerHeight);
     for (const anteil of STUFEN) {
@@ -133,6 +140,7 @@ export async function scrollSequenz(browser, url, ziel) {
     kontext = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion: "reduce" });
     seite = await kontext.newPage();
     await seite.goto(url, { waitUntil: "load" });
+    await bilderDekodiert(seite);
     await seite.screenshot({ path: path.join(ziel, `${ansicht}--reduziert.jpg`), type: "jpeg", quality: 70 });
     eintrag.reduziert = await zustand(seite);
     await seite.evaluate(() => window.scrollTo(0, (document.querySelector(".buehne")?.offsetHeight ?? 0) * 0.5));
@@ -145,6 +153,7 @@ export async function scrollSequenz(browser, url, ziel) {
     kontext = await browser.newContext({ viewport, deviceScaleFactor: 1, javaScriptEnabled: false });
     seite = await kontext.newPage();
     await seite.goto(url, { waitUntil: "load" });
+    await bilderDekodiert(seite);
     await seite.screenshot({ path: path.join(ziel, `${ansicht}--ohne-js.jpg`), type: "jpeg", quality: 70 });
     eintrag.ohneJs = await zustand(seite);
     await kontext.close();
