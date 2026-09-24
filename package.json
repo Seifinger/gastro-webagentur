@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dashboard": "node src/dashboardServer.js",
+    "dashboard:passwort": "node scripts/passwortHash.mjs",
     "pages": "node src/generateLandingPages.js",
     "publish-site": "node src/publishSite.js",
     "wirt": "node src/wirtServer.js",

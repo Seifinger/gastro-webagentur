@@ -12,7 +12,7 @@ import { richteTestLeadsEin } from "./hilfen/testLead.js";
 // sind simuliert (Hooks); gebaut wird echt.
 
 const REPO = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
-const LEAD = { slug: "__test-panel-0ppp111", placeId: "ChIJtestPanel01", name: "Wirtshaus Zum Test", adresse: "Marktplatz 1, 84453 Mühldorf am Inn, Deutschland", telefon: "08631 4711", ort: "Mühldorf am Inn", rating: 4.2, anzahlBewertungen: 99 };
+const LEAD = { slug: "testdemo-panel-0ppp111", placeId: "ChIJtestPanel01", name: "Wirtshaus Zum Test", adresse: "Marktplatz 1, 84453 Mühldorf am Inn, Deutschland", telefon: "08631 4711", ort: "Mühldorf am Inn", rating: 4.2, anzahlBewertungen: 99 };
 const VORSCHAU = path.join(REPO, "v2", "output", "leads", LEAD.slug);
 const DOCS = path.join(REPO, "docs", LEAD.slug);
 

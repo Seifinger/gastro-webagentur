@@ -9,8 +9,8 @@ import { baueDemo, veroeffentlichungsHindernisse } from "../v2/integration/demoB
 import { baueUndSchreibeEinzelnenEntwurf } from "../src/publishSite.js";
 import { ladeManifest } from "../src/entwurfsManifest.js";
 
-const BAYER = { slug: "__test-demo-bayer-0abc123", placeId: "ChIJtestDemoBayer", name: "Gasthof Zum Hirschen", adresse: "Kirchplatz 7, 84453 Mühldorf am Inn, Deutschland", telefon: "08631 99999", ort: "Mühldorf am Inn", rating: 4.3, anzahlBewertungen: 287 };
-const SUSHI = { slug: "__test-demo-sushi-0def456", placeId: "ChIJtestDemoSushi", name: "Sushi Kaito", adresse: "Bahnhofstr. 2, 84503 Altötting, Deutschland", telefon: "08671 12121", ort: "Altötting", rating: 4.9, anzahlBewertungen: 1203 };
+const BAYER = { slug: "testdemo-demo-bayer-0abc123", placeId: "ChIJtestDemoBayer", name: "Gasthof Zum Hirschen", adresse: "Kirchplatz 7, 84453 Mühldorf am Inn, Deutschland", telefon: "08631 99999", ort: "Mühldorf am Inn", rating: 4.3, anzahlBewertungen: 287 };
+const SUSHI = { slug: "testdemo-demo-sushi-0def456", placeId: "ChIJtestDemoSushi", name: "Sushi Kaito", adresse: "Bahnhofstr. 2, 84503 Altötting, Deutschland", telefon: "08671 12121", ort: "Altötting", rating: 4.9, anzahlBewertungen: 1203 };
 const ZIEL = mkdtempSync(path.join(tmpdir(), "demo-bau-"));
 let umgebung;
 before(() => {

@@ -12,7 +12,7 @@ import {
 } from "../src/demoEinstellungen.js";
 import { loadLeadEdits } from "../src/leadEdits.js";
 
-const LEAD = { slug: "__test-wirtshaus-linde", placeId: "ChIJtestLinde01", name: "Gasthof Zur Linde", adresse: "Stadtplatz 3, 84453 Mühldorf am Inn, Deutschland", ort: "Mühldorf am Inn", rating: 4.4, anzahlBewertungen: 321 };
+const LEAD = { slug: "testdemo-wirtshaus-linde", placeId: "ChIJtestLinde01", name: "Gasthof Zur Linde", adresse: "Stadtplatz 3, 84453 Mühldorf am Inn, Deutschland", ort: "Mühldorf am Inn", rating: 4.4, anzahlBewertungen: 321 };
 let umgebung;
 before(() => {
   umgebung = richteTestLeadsEin([LEAD]);

@@ -10,7 +10,7 @@ import { siteBaseUrl } from "../src/config.js";
 // Veröffentlichen aus dem Dashboard: Der Status sagt nur "online", wenn die
 // öffentliche URL nachweislich die neue Fassung (Build-ID) ausliefert.
 
-const LEAD = { slug: "__test-status-0aaa111", placeId: "ChIJtestStatus01", name: "Trattoria Da Test", ort: "Altötting" };
+const LEAD = { slug: "testdemo-status-0aaa111", placeId: "ChIJtestStatus01", name: "Trattoria Da Test", ort: "Altötting" };
 const repoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 let umgebung;
 before(() => { umgebung = richteTestLeadsEin([LEAD], "__test-status"); });
