@@ -20,5 +20,9 @@
   "beispiel-griechisch": {
     "ausdruck": "gesellig",
     "stimmung": "olivenhain"
+  },
+  "beispiel-syrisch": {
+    "ausdruck": "gesellig",
+    "stimmung": "levante-modern"
   }
 }

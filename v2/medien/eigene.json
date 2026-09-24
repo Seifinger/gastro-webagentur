@@ -148,5 +148,30 @@
       "webm": "v2/medien/eigene/beispiel-griechisch/heroVideo.webm",
       "eingetragen": "2026-09-24T18:23:43.836Z"
     }
+  },
+  "beispiel-syrisch": {
+    "hero": {
+      "datei": "v2/medien/eigene/beispiel-syrisch/hero.jpg",
+      "herkunft": "ki",
+      "quelle": "Querbild vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "fokus": "62% 65%",
+      "eingetragen": "2026-09-24T18:50:21.761Z"
+    },
+    "heroMobil": {
+      "datei": "v2/medien/eigene/beispiel-syrisch/heroMobil.jpg",
+      "herkunft": "ki",
+      "quelle": "Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "fokus": "50% 60%",
+      "eingetragen": "2026-09-24T18:50:21.771Z"
+    },
+    "heroVideo": {
+      "datei": "v2/medien/eigene/beispiel-syrisch/heroVideo.mp4",
+      "herkunft": "ki",
+      "quelle": "Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "fokus": "50% 65%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-syrisch/heroVideo.webm",
+      "eingetragen": "2026-09-24T18:50:21.774Z"
+    }
   }
 }
