@@ -87,3 +87,22 @@ test("Poster quer + hoch mit eigenem Bildausschnitt; beide Dateien werden mitkop
   assert.match(html, /<picture><source media="\(max-width: 767px\)" srcset="medien\/heroMobil.jpg"><img class="buehne-poster" src="medien\/hero.jpg"/);
   assert.deepEqual(dateien.map((d) => d.src).sort(), ["medien/hero.jpg", "medien/heroMobil.jpg"]);
 });
+
+test("Video 'einmal': ohne Schleife, WebM-Alternative, auf dem Handy nur Poster, beide Dateien mitkopiert", () => {
+  const medien = {
+    hero: { src: "medien/hero.jpg", herkunft: "ki", kennzeichnung: "KI-generiert" },
+    heroMobil: { src: "medien/heroMobil.jpg", herkunft: "ki" },
+    heroVideo: { src: "medien/heroVideo.mp4", datei: "/x/heroVideo.mp4", herkunft: "ki", typ: "video", wiedergabe: "einmal", webm: { src: "medien/heroVideo.webm", datei: "/x/heroVideo.webm" } },
+    haus: null,
+    team: null,
+    bestseller: null,
+    gericht: () => null,
+  };
+  const { html, dateien } = bau({ medien });
+  const video = html.match(/<video[^>]*>/)[0];
+  assert.ok(!/\sloop\b/.test(video), "keine Schleife");
+  assert.match(video, /data-src="medien\/heroVideo.mp4" data-src-webm="medien\/heroVideo.webm"/);
+  assert.match(video, /data-einmal data-nur-breit/);
+  assert.ok(dateien.some((d) => d.src === "medien/heroVideo.webm"));
+  assert.match(html, /if \(einmal && video\.ended\) return;/);
+});

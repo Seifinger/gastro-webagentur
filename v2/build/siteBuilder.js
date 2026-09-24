@@ -357,7 +357,7 @@ ${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</
 
   return {
     html,
-    dateien: genutzt.filter(([, m]) => m.datei).map(([, m]) => ({ datei: m.datei, src: m.src })),
+    dateien: genutzt.filter(([, m]) => m.datei).flatMap(([, m]) => [{ datei: m.datei, src: m.src }, ...(m.webm?.datei ? [{ datei: m.webm.datei, src: m.webm.src }] : [])]),
     bericht: {
       engine: ENGINE_KENNUNG,
       designsystem: ds.id,

@@ -74,12 +74,17 @@ export function renderBuehne(ctx) {
   // Das Poster ist immer ein echtes <img>: sichtbar vor dem ersten Frame, bei
   // reduzierter Bewegung, bei langsamem Netz, ohne Video und ohne Skript.
   const poster = hero?.src ? posterBild(hero, medien.heroMobil, texte.buehne.alt) : "";
+  // Wiedergabe "einmal": keine Schleife, das Video bleibt auf dem letzten Bild
+  // stehen. Gibt es ein Hochformat-Poster, aber kein Hochformat-Video, läuft
+  // das Querformat-Video nur auf breiten Bildschirmen (data-nur-breit).
+  const einmal = video?.wiedergabe === "einmal";
+  const nurBreit = !videoMobil?.src && Boolean(medien.heroMobil?.src);
   const videoTag = video?.src
-    ? `<video class="buehne-video" muted loop playsinline preload="none" aria-hidden="true" data-src="${e(video.src)}"${videoMobil?.src ? ` data-src-mobil="${e(videoMobil.src)}"` : ""}></video>`
+    ? `<video class="buehne-video" muted${einmal ? "" : " loop"} playsinline preload="none" aria-hidden="true" data-src="${e(video.src)}"${video.webm?.src ? ` data-src-webm="${e(video.webm.src)}"` : ""}${videoMobil?.src ? ` data-src-mobil="${e(videoMobil.src)}"` : ""}${einmal ? " data-einmal" : ""}${nurBreit ? " data-nur-breit" : ""}></video>`
     : "";
   const kennzeichnung = hero && hero.herkunft !== "eigen" ? `<span class="buehne-herkunft">${e(hero.kennzeichnung ?? texte.platzhalter)}</span>` : "";
   // Bildausschnitt je Medium (eigene.json → fokus), getrennt für Quer- und Hochformat.
-  const fokus = [hero?.fokus ? `--fokus: ${hero.fokus}` : "", medien.heroMobil?.fokus ? `--fokus-mobil: ${medien.heroMobil.fokus}` : ""].filter(Boolean).join("; ");
+  const fokus = [hero?.fokus ? `--fokus: ${hero.fokus}` : "", medien.heroMobil?.fokus ? `--fokus-mobil: ${medien.heroMobil.fokus}` : "", medien.heroVideo?.fokus ? `--fokus-video: ${medien.heroVideo.fokus}` : ""].filter(Boolean).join("; ");
   return `<section class="buehne" data-hero="buehne" aria-label="${e(texte.buehne.bereich)}"${fokus ? ` style="${e(fokus)}"` : ""}>
   <div class="buehne-medium">${poster}${videoTag}<div class="buehne-schleier"></div></div>
   <div class="buehne-text"><p class="buehne-slogan">${e(texte.slogan)}</p></div>

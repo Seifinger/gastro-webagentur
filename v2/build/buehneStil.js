@@ -63,7 +63,7 @@ section[id] { scroll-margin-top: var(--kopf-hoehe); }
 .buehne-poster, .buehne-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .buehne-poster, .buehne-video { object-position: var(--fokus, 50% 50%); }
 @media (max-width: 767px) { .buehne-poster, .buehne-video { object-position: var(--fokus-mobil, var(--fokus, 50% 50%)); } }
-.buehne-video { opacity: 0; }
+.buehne-video { opacity: 0; object-position: var(--fokus-video, var(--fokus, 50% 50%)); }
 .buehne-video.laeuft { opacity: 1; }
 .buehne-schleier { position: absolute; inset: 0; background: var(--schleier); }
 .buehne-text { position: absolute; left: 0; right: 0; top: 28%; bottom: 38%; display: flex; align-items: center; justify-content: center;
@@ -197,11 +197,19 @@ export const BUEHNE_SKRIPT = `
   var langsam = Boolean(netz.saveData) || /(^|-)2g$|^3g$/.test(netz.effectiveType || "");
   if (video && !reduziert && !langsam) {
     var starte = function () {
-      var mobil = video.getAttribute("data-src-mobil") && window.matchMedia("(max-width: 767px)").matches;
+      var schmal = window.matchMedia("(max-width: 767px)").matches;
+      // Hochformat-Poster ohne Hochformat-Video: auf dem Handy bleibt das Poster.
+      if (schmal && video.hasAttribute("data-nur-breit")) return;
+      var mobil = schmal && video.getAttribute("data-src-mobil");
+      var h264 = video.canPlayType('video/mp4; codecs="avc1.4d401f"');
+      var webm = video.getAttribute("data-src-webm");
+      var quelle = mobil ? video.getAttribute("data-src-mobil") : !h264 && webm && video.canPlayType('video/webm; codecs="vp9"') ? webm : video.getAttribute("data-src");
       video.addEventListener("playing", function () { video.classList.add("laeuft"); });
       video.addEventListener("error", function () { video.classList.remove("laeuft"); });
-      video.src = video.getAttribute(mobil ? "data-src-mobil" : "data-src");
-      var spielen = function () { var p = video.play(); if (p && p.catch) p.catch(function () {}); };
+      video.src = quelle;
+      // "einmal": nach dem Ende bleibt das letzte Bild stehen, kein Neustart beim Zurückscrollen.
+      var einmal = video.hasAttribute("data-einmal");
+      var spielen = function () { if (einmal && video.ended) return; var p = video.play(); if (p && p.catch) p.catch(function () {}); };
       spielen();
       if ("IntersectionObserver" in window) {
         new IntersectionObserver(function (eintraege) {
