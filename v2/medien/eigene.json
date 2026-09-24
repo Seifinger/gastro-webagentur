@@ -123,5 +123,30 @@
       "webm": "v2/medien/eigene/beispiel-italienisch/heroVideo.webm",
       "eingetragen": "2026-09-24T18:18:17.155Z"
     }
+  },
+  "beispiel-griechisch": {
+    "hero": {
+      "datei": "v2/medien/eigene/beispiel-griechisch/hero.jpg",
+      "herkunft": "ki",
+      "quelle": "Querbild vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "fokus": "62% 60%",
+      "eingetragen": "2026-09-24T18:23:43.834Z"
+    },
+    "heroMobil": {
+      "datei": "v2/medien/eigene/beispiel-griechisch/heroMobil.jpg",
+      "herkunft": "ki",
+      "quelle": "Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "fokus": "55% 60%",
+      "eingetragen": "2026-09-24T18:23:43.835Z"
+    },
+    "heroVideo": {
+      "datei": "v2/medien/eigene/beispiel-griechisch/heroVideo.mp4",
+      "herkunft": "ki",
+      "quelle": "Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "fokus": "45% 60%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-griechisch/heroVideo.webm",
+      "eingetragen": "2026-09-24T18:23:43.836Z"
+    }
   }
 }
