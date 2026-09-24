@@ -24,15 +24,29 @@ import { contrastRatio, mixColors } from "../../src/colorMath.js";
 /** Versionierte Zuordnung Slug → Ausdruck für die Veröffentlichung (v2/ausdruck-wahl.json). */
 export const AUSDRUCK_WAHL = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "ausdruck-wahl.json");
 
-export function ausdruckFuerSlug(slug, datei = process.env.V2_AUSDRUCK_WAHL || AUSDRUCK_WAHL) {
+/**
+ * Eintrag je Slug: "gesellig" oder { "ausdruck": "handwerk", "stimmung": "basar" }.
+ * Die Stimmung (Farbwelt) ist optional; ohne sie gilt die bisherige Wahl bzw. der Seed.
+ */
+export function wahlFuerSlug(slug, datei = process.env.V2_AUSDRUCK_WAHL || AUSDRUCK_WAHL) {
   let wahl = {};
   try {
     wahl = JSON.parse(readFileSync(datei, "utf-8"));
   } catch {
     return null;
   }
-  const id = wahl[slug];
-  return typeof id === "string" && AUSDRUECKE[id] ? id : null;
+  const eintrag = wahl[slug];
+  const ausdruck = typeof eintrag === "string" ? eintrag : eintrag?.ausdruck;
+  if (!ausdruck || !AUSDRUECKE[ausdruck]) return null;
+  return { ausdruck, stimmung: typeof eintrag === "object" && eintrag.stimmung ? eintrag.stimmung : null };
+}
+
+export function ausdruckFuerSlug(slug, datei) {
+  return wahlFuerSlug(slug, datei)?.ausdruck ?? null;
+}
+
+export function stimmungFuerSlug(slug, datei) {
+  return wahlFuerSlug(slug, datei)?.stimmung ?? null;
 }
 
 export const AUSDRUECKE = {

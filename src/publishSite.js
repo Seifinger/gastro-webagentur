@@ -20,7 +20,14 @@ import {
   schreibeSeiten,
 } from "./buildSite.js";
 import { ladeEngineWahl, engineFuerLead as engineAusWahl } from "../v2/integration/dashboardV2.js";
-import { ausdruckFuerSlug } from "../v2/build/ausdruck.js";
+import { ausdruckFuerSlug, stimmungFuerSlug } from "../v2/build/ausdruck.js";
+import { ladeEigeneMedien } from "../v2/assets-pipeline/mediaGenerator.js";
+
+/** Vorschaubild der Übersicht: das eigene Titelbild der Seite, sonst das Stockfoto. */
+function vorschauBild(slug, gestaltung) {
+  const eigen = ladeEigeneMedien()[slug]?.hero;
+  return eigen ? `./${slug}/medien/hero${path.extname(eigen.datei)}` : remoteImageUrl(gestaltung.heroImage, "hero");
+}
 import { baueImZyklus } from "../v2/build/zyklus.js";
 
 /**
@@ -47,7 +54,8 @@ async function baueUndSchreibeV2Entwurf(lead, slug, kueche, stimmung, { email = 
   const { protokoll, ordner } = await baueImZyklus({
     lead,
     kueche,
-    stimmung,
+    // Farbwelt aus v2/ausdruck-wahl.json hat Vorrang (bewusste Wahl statt Seed).
+    stimmung: stimmungFuerSlug(slug) ?? stimmung,
     judge,
     zielDir: zielordner,
     slug,
@@ -83,7 +91,7 @@ function buildShowcasePage(entries, kontakt) {
       ({ lead, slug, gestaltung, menu }) => `
       <a class="card" href="./${escapeHtml(slug)}/">
         <div class="thumb" style="background:${gestaltung.theme.tint}">
-          <img src="${escapeHtml(remoteImageUrl(gestaltung.heroImage, "hero"))}" alt="" loading="lazy">
+          <img src="${escapeHtml(vorschauBild(slug, gestaltung))}" alt="" loading="lazy">
         </div>
         <div class="body">
           <strong>${escapeHtml(lead.name)}</strong>
@@ -276,15 +284,18 @@ async function run() {
       process.exitCode = 1;
       return;
     }
-    const gestaltung = themeForLead(lead, lead.kueche);
+    const gestaltung = themeForLead(lead, lead.kueche, stimmungFuerSlug(args.beispiel) ?? undefined);
     if (engineFuerLead(lead.placeId, ladeEngineWahl(), args.beispiel) === "v2") {
       await baueUndSchreibeV2Entwurf(lead, args.beispiel, lead.kueche, gestaltung?.stimmung, { email: args.email, api: args.api, zielordner: docsDir, fiktiv: true });
     } else {
       const fontCss = await ladeSchriften(path.join(docsDir, "assets", "fonts"));
       schreibeSeiten([{ lead, cuisine: lead.kueche, gestaltung, slug: args.beispiel }], docsDir, { kontaktEmail: args.email, fontCss, veroeffentlicht: true, apiUrl: args.api, bildUrl: remoteImageUrl, fiktiv: true });
     }
+    // Übersicht mitziehen, damit die Karte das neue Titelbild zeigt.
+    const demoEntries = DEMO_LEADS.map((l) => ({ lead: l, gestaltung: themeForLead(l, l.kueche, stimmungFuerSlug(`beispiel-${l.kueche}`) ?? undefined), slug: `beispiel-${l.kueche}`, menu: menuForCuisine(l.kueche) }));
+    writeFileSync(path.join(docsDir, "index.html"), buildShowcasePage(demoEntries, args.kontakt), "utf-8");
     const ausdruck = ausdruckFuerSlug(args.beispiel);
-    console.log(`\n✅ Beispielseite "${args.beispiel}" neu gebaut${ausdruck ? ` (Ausdruck: ${ausdruck})` : ""}. Nur dieser Ordner wurde geschrieben: ${path.join(docsDir, args.beispiel)}\n`);
+    console.log(`\n✅ Beispielseite "${args.beispiel}" neu gebaut${ausdruck ? ` (Ausdruck: ${ausdruck})` : ""}. Geschrieben: ${path.join(docsDir, args.beispiel)} und die Übersicht docs/index.html\n`);
     return;
   }
 
@@ -381,7 +392,7 @@ async function run() {
   const demoEntries = DEMO_LEADS.map((lead) => ({
     lead,
     cuisine: lead.kueche,
-    gestaltung: themeForLead(lead, lead.kueche),
+    gestaltung: themeForLead(lead, lead.kueche, stimmungFuerSlug(`beispiel-${lead.kueche}`) ?? undefined),
     slug: `beispiel-${lead.kueche}`,
     menu: menuForCuisine(lead.kueche),
   }));

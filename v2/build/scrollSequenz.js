@@ -8,6 +8,7 @@
 //   - reduzierte Bewegung (erster Bildschirm)
 //   - ohne JavaScript (erster Bildschirm)
 //   - ganze Seite (reduzierte Bewegung)
+//   - Robustheit: Slow 4G + 4× CPU (LCP, Poster, Video) und "ohne Video"
 // Mobil zusätzlich: geöffnetes Menü.
 // Dazu je Frame: Zustand der Kopfzeile, Deckkraft des Slogans, horizontale
 // Scrollleiste. Ausgabe: v2/art-direction/ausdruck/<slug>/runde-<n>/.
@@ -15,9 +16,10 @@
 // Bewusst ohne Schätzung von Kurven oder Dauern: gemessen wird, was im Frame
 // steht, nicht wie es dorthin kam.
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, createReadStream, existsSync, statSync } from "node:fs";
+import http from "node:http";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { starteBrowser } from "./browser.js";
 import { ANSICHTEN } from "./screenshot.js";
 
@@ -37,6 +39,58 @@ async function zustand(seite) {
       kaputteBilder: [...document.images].filter((i) => i.complete && !i.naturalWidth).length,
     };
   });
+}
+
+/**
+ * Robustheit (AP4): langsames Netz und "ohne Video".
+ * - Slow 4G (1,6 Mbit/s, 150 ms RTT) + 4× CPU, Desktop: LCP (Labor), was die
+ *   Bühne nach 4 s zeigt, ob ein Video läuft.
+ * - Ohne Video: Anfragen auf *.mp4/*.webm werden blockiert – das Poster muss
+ *   stehen bleiben, ohne Skriptfehler.
+ * Laborwerte eines Laufs, keine Felddaten.
+ */
+export async function robustheit(browser, url, ziel) {
+  const ergebnis = {};
+  // Langsames Netz
+  let kontext = await browser.newContext({ viewport: ANSICHTEN.desktop, deviceScaleFactor: 1 });
+  let seite = await kontext.newPage();
+  const cdp = await kontext.newCDPSession(seite);
+  await cdp.send("Network.enable");
+  await cdp.send("Network.emulateNetworkConditions", { offline: false, latency: 150, downloadThroughput: (1.6 * 1024 * 1024) / 8, uploadThroughput: (750 * 1024) / 8, connectionType: "cellular4g" });
+  await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
+  await seite.addInitScript(() => {
+    window.__lcp = 0;
+    new PerformanceObserver((l) => { for (const e of l.getEntries()) window.__lcp = Math.round(e.startTime); }).observe({ type: "largest-contentful-paint", buffered: true });
+  });
+  await seite.goto(url, { waitUntil: "load", timeout: 120_000 });
+  await seite.waitForTimeout(4000);
+  ergebnis.langsam = await seite.evaluate(() => {
+    const poster = document.querySelector(".buehne-poster");
+    const video = document.querySelector(".buehne-video");
+    return { lcpMs: window.__lcp, posterGeladen: Boolean(poster && poster.naturalWidth), videoLaeuft: Boolean(video && video.classList.contains("laeuft")) };
+  });
+  await seite.screenshot({ path: path.join(ziel, "desktop--langsam.jpg"), type: "jpeg", quality: 70 });
+  await kontext.close();
+
+  // Ohne Video
+  kontext = await browser.newContext({ viewport: ANSICHTEN.desktop, deviceScaleFactor: 1 });
+  seite = await kontext.newPage();
+  const fehler = [];
+  seite.on("pageerror", (f) => fehler.push(f.message));
+  await seite.route(/\.(mp4|webm)(\?|$)/, (r) => r.abort());
+  await seite.goto(url, { waitUntil: "load" });
+  await seite.waitForTimeout(2500);
+  ergebnis.ohneVideo = {
+    ...(await seite.evaluate(() => {
+      const poster = document.querySelector(".buehne-poster");
+      const video = document.querySelector(".buehne-video");
+      return { posterGeladen: Boolean(poster && poster.naturalWidth), videoSichtbar: Boolean(video && video.classList.contains("laeuft")) };
+    })),
+    skriptfehler: fehler,
+  };
+  await seite.screenshot({ path: path.join(ziel, "desktop--ohne-video.jpg"), type: "jpeg", quality: 70 });
+  await kontext.close();
+  return ergebnis;
 }
 
 export async function scrollSequenz(browser, url, ziel) {
@@ -95,8 +149,36 @@ export async function scrollSequenz(browser, url, ziel) {
     eintrag.ohneJs = await zustand(seite);
     await kontext.close();
   }
+  bericht.robustheit = await robustheit(browser, url, ziel);
   writeFileSync(path.join(ziel, "sequenz.json"), `${JSON.stringify(bericht, null, 2)}\n`);
   return bericht;
+}
+
+const TYPEN = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".svg": "image/svg+xml", ".webp": "image/webp", ".woff2": "font/woff2", ".mp4": "video/mp4", ".webm": "video/webm", ".json": "application/json" };
+
+/**
+ * Kleiner Webserver über dem Repository: Nur über HTTP greifen Netzdrosselung
+ * und echtes Laden (file:// umgeht beides). Unterstützt Range-Anfragen für Video.
+ */
+export function starteServer(wurzel) {
+  const server = http.createServer((req, res) => {
+    const pfad = path.join(wurzel, decodeURIComponent(new URL(req.url, "http://x").pathname));
+    const datei = existsSync(pfad) && statSync(pfad).isDirectory() ? path.join(pfad, "index.html") : pfad;
+    if (!datei.startsWith(wurzel) || !existsSync(datei)) { res.writeHead(404); res.end(); return; }
+    const groesse = statSync(datei).size;
+    const typ = TYPEN[path.extname(datei).toLowerCase()] ?? "application/octet-stream";
+    const bereich = /bytes=(\d*)-(\d*)/.exec(req.headers.range ?? "");
+    if (bereich) {
+      const start = Number(bereich[1] || 0);
+      const ende = bereich[2] ? Number(bereich[2]) : groesse - 1;
+      res.writeHead(206, { "Content-Type": typ, "Content-Range": `bytes ${start}-${ende}/${groesse}`, "Accept-Ranges": "bytes", "Content-Length": ende - start + 1 });
+      createReadStream(datei, { start, end: ende }).pipe(res);
+      return;
+    }
+    res.writeHead(200, { "Content-Type": typ, "Content-Length": groesse, "Accept-Ranges": "bytes" });
+    createReadStream(datei).pipe(res);
+  });
+  return new Promise((ok) => server.listen(0, "127.0.0.1", () => ok(server)));
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -110,8 +192,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     process.exit(1);
   }
   try {
-    const b = await scrollSequenz(browser, pathToFileURL(datei).href, ziel);
-    for (const [ansicht, e] of Object.entries(b)) {
+    const wurzel = path.join(V2, "..");
+    const server = await starteServer(wurzel);
+    const url = `http://127.0.0.1:${server.address().port}/${path.relative(wurzel, datei).split(path.sep).join("/")}`;
+    const b = await scrollSequenz(browser, url, ziel).finally(() => server.close());
+    const { robustheit: rob, ...ansichten } = b;
+    console.log(`robust: langsam LCP ${rob.langsam.lcpMs} ms, Poster ${rob.langsam.posterGeladen ? "da" : "FEHLT"}, Video ${rob.langsam.videoLaeuft ? "läuft" : "aus"} · ohne Video: Poster ${rob.ohneVideo.posterGeladen ? "da" : "FEHLT"}, Skriptfehler ${rob.ohneVideo.skriptfehler.length}`);
+    for (const [ansicht, e] of Object.entries(ansichten)) {
       console.log(`${ansicht}: ${e.sequenz.map((s) => `${Math.round(s.anteil * 100)}% Kopf=${s.kopf} Slogan=${s.sloganDeckkraft}`).join(" · ")}`);
       if (e.menue) console.log(`  Menü: ${JSON.stringify(e.menue)}`);
       console.log(`  reduziert: Slogan=${e.reduziertNachScroll.sloganDeckkraft} nach Scroll · ohne JS: Kopf=${e.ohneJs.kopf} · Skriptfehler: ${e.skriptfehler.length}`);

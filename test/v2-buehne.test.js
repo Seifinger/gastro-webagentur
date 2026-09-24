@@ -25,7 +25,7 @@ test("Schleier trägt Kopfzeile (4,5:1) und Slogan (3:1) selbst über reinem Wei
 
 test("erster Bildschirm: Kopfzeile mit Zustand, Bühne mit Poster, Slogan, Einladung mit h1", () => {
   const { html, bericht } = bau();
-  assert.match(html, /<header class="kopf" id="topbar" data-zustand="fest">/, "ohne Skript: fest (lesbar)");
+  assert.match(html, /<header class="kopf" id="topbar" data-zustand="fest" data-ueber="transparent">/, "ohne Skript: fest (lesbar)");
   assert.match(html, /<section class="buehne" data-hero="buehne"/);
   assert.match(html, /<img class="buehne-poster" src="[^"]+" alt="[^"]+" fetchpriority="high"/);
   assert.match(html, /<p class="buehne-slogan">Einkehren in Mühldorf am Inn<\/p>/);
@@ -83,7 +83,7 @@ test("Poster quer + hoch mit eigenem Bildausschnitt; beide Dateien werden mitkop
     gericht: () => null,
   };
   const { html, dateien } = bau({ medien });
-  assert.match(html, /<section class="buehne" data-hero="buehne" aria-label="Willkommen" style="--fokus: 50% 82%; --fokus-mobil: 50% 55%">/);
+  assert.match(html, /<section class="buehne" data-hero="buehne" data-slogan="ueber-medium" data-rueckzug aria-label="Willkommen" style="--fokus: 50% 82%; --fokus-mobil: 50% 55%">/);
   assert.match(html, /<picture><source media="\(max-width: 767px\)" srcset="medien\/heroMobil.jpg"><img class="buehne-poster" src="medien\/hero.jpg"/);
   assert.deepEqual(dateien.map((d) => d.src).sort(), ["medien/hero.jpg", "medien/heroMobil.jpg"]);
 });
@@ -105,4 +105,26 @@ test("Video 'einmal': ohne Schleife, WebM-Alternative, auf dem Handy nur Poster,
   assert.match(video, /data-einmal data-nur-breit/);
   assert.ok(dateien.some((d) => d.src === "medien/heroVideo.webm"));
   assert.match(html, /if \(einmal && video\.ended\) return;/);
+});
+
+test("handwerk: Kopfzeile immer fest, Slogan unter dem Medium, kein Rückzug", () => {
+  const { html } = bau({ ausdruck: "handwerk" });
+  assert.match(html, /<header class="kopf" id="topbar" data-zustand="fest" data-ueber="flaeche">/);
+  assert.match(html, /<section class="buehne" data-hero="buehne" data-slogan="unter-medium" aria-label=/);
+  assert.match(html, /var transparent = kopf.getAttribute\("data-ueber"\) !== "flaeche";/);
+});
+
+test("editorial: Titelblatt mit Bild im Rahmen, kein Schleier-Medium, Hochformat bevorzugt", () => {
+  const medien = {
+    hero: { src: "medien/hero.jpg", herkunft: "ki", kennzeichnung: "KI-generiert" },
+    heroMobil: { src: "medien/heroMobil.jpg", herkunft: "ki", kennzeichnung: "KI-generiert", fokus: "50% 40%" },
+    haus: null, team: null, bestseller: null, gericht: () => null,
+  };
+  const { html, bericht } = bau({ ausdruck: "editorial", medien });
+  assert.equal(bericht.heroVariante, "titelblatt");
+  assert.match(html, /<section class="titelblatt" data-hero="titelblatt"/);
+  assert.match(html, /<figure class="titelblatt-bild" style="--fokus: 50% 40%"><img class="buehne-poster" src="medien\/heroMobil.jpg"/);
+  assert.ok(!html.includes('<section class="buehne"'));
+  assert.equal(lint(html).ok, true);
+  assert.deepEqual(pruefeFunktionsVertrag(html), []);
 });

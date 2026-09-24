@@ -1,5 +1,5 @@
 // npm run v2:build -- --kueche <k> --stimmung <s> [--judge] [--medien] [--offline] [--api <url>]
-// npm run v2:build -- --demo beispiel-<küche> [--ausdruck <kino|gesellig|handwerk|editorial>] [--ziel <ordner>]
+// npm run v2:build -- --demo beispiel-<küche> [--ausdruck <kino|gesellig|handwerk|editorial>] [--stimmung <id>] [--ziel <ordner>]
 //     Beispielseite aus src/demoLeads.js (wie auf der Startseite unter docs/), optional mit
 //     Ausdruck (Gestaltungs-Umbau). Ohne --ziel: v2/output/sites/. docs/ wird nie beschrieben.
 // npm run v2:build:all            (alle 36 Kombinationen, voller Zyklus mit Judge)
@@ -52,7 +52,8 @@ export async function cli(argv) {
       return;
     }
     // Stimmung wie bei der Veröffentlichung (Seed des Demo-Leads).
-    const { stimmung } = themeForLead(lead, lead.kueche);
+    const gewuenscht = flag(argv, "stimmung");
+    const { stimmung } = themeForLead(lead, lead.kueche, typeof gewuenscht === "string" ? gewuenscht : undefined);
     auftraege = [{ ...lead, fiktiv: true, stimmung, slug: demo, veroeffentlicht: true }];
   } else {
     const kueche = flag(argv, "kueche");

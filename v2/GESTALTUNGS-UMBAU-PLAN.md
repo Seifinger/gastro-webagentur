@@ -25,7 +25,8 @@ tatsächlich veröffentlicht, nicht ein neues System daneben.
 | Video (Pilot) | ✅ einmalige Wiedergabe, MP4 + WebM, auf dem Handy nur Poster (kein Hochformat-Video) | (dieser Stand) |
 | AP7 Karte/Bestellen mobil | ✅ mitlaufende Sprungleiste mit aktiver Kategorie, 48-px-Tippflächen, Aktionsleiste weicht der Tastatur | (dieser Stand) |
 | AP8 Reservierung/Anfahrt/Fuß | ✅ „Lieber anrufen?“ nur mit echter Nummer, Anfahrt als Hausschild + Öffnungstafel, Fuß mit Wortmarke. Runde 4: `v2/art-direction/ausdruck/beispiel-bayerisch/runde-4/` | (dieser Stand) |
-| AP4 Prüfwerkzeuge | teilweise: `npm run v2:sequenz -- --seite … --runde n` (Scroll-Sequenz, reduzierte Bewegung, ohne JS, Menü). Offen: Slow 4G, ohne Video (sobald Video da ist) | (dieser Stand) |
+| AP4 Prüfwerkzeuge | ✅ `npm run v2:sequenz -- --seite … --runde n`: Scroll-Sequenz, reduzierte Bewegung, ohne JS, Menü, dazu Slow 4G + 4× CPU (LCP) und „ohne Video“; Auslieferung über lokalen HTTP-Server statt file://. Pilot: LCP 1,72 s, Poster ohne Video stabil | – |
+| AP10 Vorbau (ohne Medien) | ✅ Farbwelt je Seite in `v2/ausdruck-wahl.json` (optional `stimmung`), `--stimmung` im Build; Bühnenformen: `handwerk` (feste Kopfzeile, Slogan unter dem Bild, kein Rückzug), `editorial` (Titelblatt, Bild im Rahmen), `kino` (dunkle Bühne, leiserer Slogan). Vorschauen mit Platzhaltern: `v2/output/piloten-ausdruck/beispiel-{tuerkisch,cafe,japanisch}` – **nicht veröffentlicht**, wartet auf Medien | – |
 
 **Abweichung in AP2:** Der Ausdruck ist eine **Build-Option** (später je Lead im Dashboard),
 kein Feld der 36 Designsystem-Dokumente. Er hängt am Haus, nicht an der Stimmung, und so

@@ -17,6 +17,9 @@ const SLOGAN = {
   bayerisch: (ort) => (ort ? `Einkehren in ${ort}` : "Einkehren und bleiben"),
   italienisch: (ort) => (ort ? `Zu Tisch in ${ort}` : "Zu Tisch, bitte"),
   griechisch: (ort) => (ort ? `Zu Gast in ${ort}` : "Zu Gast am Tisch"),
+  tuerkisch: (ort) => (ort ? `Vom Grill, mitten in ${ort}` : "Vom Grill auf die Hand"),
+  cafe: (ort) => (ort ? `Guten Morgen, ${ort}` : "Guten Morgen"),
+  japanisch: (ort) => (ort ? `Abends am Tresen in ${ort}` : "Abends am Tresen"),
 };
 const sloganFuer = (kueche, ort) => (SLOGAN[kueche] ?? ((o) => (o ? `Zu Gast in ${o}` : "Zu Gast bei uns")))(ort);
 
