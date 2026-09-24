@@ -16,7 +16,24 @@
 // Referenz-Prinzipien, keine Vorlagen: übernommen wird die Haltung, nie Layout,
 // Farben, Texte oder Medien der Referenzseiten.
 
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { contrastRatio, mixColors } from "../../src/colorMath.js";
+
+/** Versionierte Zuordnung Slug → Ausdruck für die Veröffentlichung (v2/ausdruck-wahl.json). */
+export const AUSDRUCK_WAHL = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "ausdruck-wahl.json");
+
+export function ausdruckFuerSlug(slug, datei = process.env.V2_AUSDRUCK_WAHL || AUSDRUCK_WAHL) {
+  let wahl = {};
+  try {
+    wahl = JSON.parse(readFileSync(datei, "utf-8"));
+  } catch {
+    return null;
+  }
+  const id = wahl[slug];
+  return typeof id === "string" && AUSDRUECKE[id] ? id : null;
+}
 
 export const AUSDRUECKE = {
   kino: {

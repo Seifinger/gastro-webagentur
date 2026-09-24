@@ -36,6 +36,8 @@ export function parseArgs(argv) {
     only: null,
     // Remotion-Signaturen aktivieren: animierte Hero-Elemente statt statische Bilder.
     remotion: false,
+    // Nur diese eine Beispielseite (docs/beispiel-<küche>) veröffentlichen.
+    beispiel: null,
   };
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === "--region") args.region = argv[++i];
@@ -48,6 +50,7 @@ export function parseArgs(argv) {
     if (argv[i] === "--resonanz") args.resonanz = argv[++i];
     if (argv[i] === "--only") args.only = argv[++i];
     if (argv[i] === "--remotion") args.remotion = true;
+    if (argv[i] === "--beispiel") args.beispiel = argv[++i];
   }
   return args;
 }

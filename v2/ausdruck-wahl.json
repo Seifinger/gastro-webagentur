@@ -1,0 +1,4 @@
+{
+  "_hinweis": "Welche Seite mit welchem Ausdruck veröffentlicht wird (Gestaltungs-Umbau). Schlüssel = Slug unter docs/. Eine Seite mit Ausdruck wird immer über v2 gebaut.",
+  "beispiel-bayerisch": "gesellig"
+}

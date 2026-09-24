@@ -19,7 +19,8 @@ import {
   ladeSchriften,
   schreibeSeiten,
 } from "./buildSite.js";
-import { ladeEngineWahl, engineFuerLead } from "../v2/integration/dashboardV2.js";
+import { ladeEngineWahl, engineFuerLead as engineAusWahl } from "../v2/integration/dashboardV2.js";
+import { ausdruckFuerSlug } from "../v2/build/ausdruck.js";
 import { baueImZyklus } from "../v2/build/zyklus.js";
 
 /**
@@ -33,6 +34,15 @@ import { baueImZyklus } from "../v2/build/zyklus.js";
  * in v2 noch nicht verdrahtet – veröffentlichte v2-Seiten senden aktuell
  * keine Resonanz-Daten.
  */
+/**
+ * Engine je Lead wie im Dashboard gewählt – mit einer Ausnahme: Eine Seite mit
+ * Ausdruck (v2/ausdruck-wahl.json) gibt es nur in v2, sie wird immer über v2 gebaut.
+ */
+function engineFuerLead(placeId, wahl, slug) {
+  if (slug && ausdruckFuerSlug(slug)) return "v2";
+  return wahl ? engineAusWahl(placeId, wahl) : engineAusWahl(placeId);
+}
+
 async function baueUndSchreibeV2Entwurf(lead, slug, kueche, stimmung, { email = "", api = "", zielordner = docsDir, judge = false, fiktiv = false } = {}) {
   const { protokoll, ordner } = await baueImZyklus({
     lead,
@@ -48,6 +58,7 @@ async function baueUndSchreibeV2Entwurf(lead, slug, kueche, stimmung, { email = 
       apiUrl: api,
       kontaktEmail: email,
       editUebersteuerung: fiktiv ? undefined : loadLeadEdits(slug),
+      ...(ausdruckFuerSlug(slug) ? { ausdruck: ausdruckFuerSlug(slug) } : {}),
     },
   });
   return { slug, ordner, protokoll };
@@ -206,7 +217,7 @@ export async function baueUndSchreibeEinzelnenEntwurf(
 
   mkdirSync(zielordner, { recursive: true });
 
-  if (engineFuerLead(lead.placeId) === "v2") {
+  if (engineFuerLead(lead.placeId, undefined, entry.slug) === "v2") {
     const { ordner } = await baueUndSchreibeV2Entwurf(lead, entry.slug, entry.cuisine, entry.gestaltung?.stimmung, { email, api, zielordner });
     if (zielordner === docsDir) {
       merkeVeroeffentlichung({ placeId: lead.placeId, slug: entry.slug, archetyp: entry.gestaltung?.archetyp ?? "" });
@@ -252,6 +263,28 @@ async function run() {
   if (fehler) {
     console.log(`\n${fehler}\n`);
     process.exitCode = 1;
+    return;
+  }
+
+  // --beispiel beispiel-<küche>: nur diese eine Beispielseite nach docs/ bauen
+  // (z. B. nach einer Gestaltungsänderung). Übersicht, übrige Seiten und
+  // Kundenentwürfe bleiben unangetastet.
+  if (args.beispiel) {
+    const lead = DEMO_LEADS.find((l) => `beispiel-${l.kueche}` === args.beispiel);
+    if (!lead) {
+      console.log(`\nUnbekannte Beispielseite "${args.beispiel}". Möglich: ${DEMO_LEADS.map((l) => `beispiel-${l.kueche}`).join(", ")}\n`);
+      process.exitCode = 1;
+      return;
+    }
+    const gestaltung = themeForLead(lead, lead.kueche);
+    if (engineFuerLead(lead.placeId, ladeEngineWahl(), args.beispiel) === "v2") {
+      await baueUndSchreibeV2Entwurf(lead, args.beispiel, lead.kueche, gestaltung?.stimmung, { email: args.email, api: args.api, zielordner: docsDir, fiktiv: true });
+    } else {
+      const fontCss = await ladeSchriften(path.join(docsDir, "assets", "fonts"));
+      schreibeSeiten([{ lead, cuisine: lead.kueche, gestaltung, slug: args.beispiel }], docsDir, { kontaktEmail: args.email, fontCss, veroeffentlicht: true, apiUrl: args.api, bildUrl: remoteImageUrl, fiktiv: true });
+    }
+    const ausdruck = ausdruckFuerSlug(args.beispiel);
+    console.log(`\n✅ Beispielseite "${args.beispiel}" neu gebaut${ausdruck ? ` (Ausdruck: ${ausdruck})` : ""}. Nur dieser Ordner wurde geschrieben: ${path.join(docsDir, args.beispiel)}\n`);
     return;
   }
 
@@ -311,8 +344,8 @@ async function run() {
   // (Dashboard-Toggle bzw. ENGINE_STANDARD) entscheidet pro Lead, welche
   // der beiden Engines tatsächlich schreibt.
   const wahl = ladeEngineWahl();
-  const v1Entries = entries.filter((e) => engineFuerLead(e.lead.placeId, wahl) !== "v2");
-  const v2Entries = entries.filter((e) => engineFuerLead(e.lead.placeId, wahl) === "v2");
+  const v1Entries = entries.filter((e) => engineFuerLead(e.lead.placeId, wahl, e.slug) !== "v2");
+  const v2Entries = entries.filter((e) => engineFuerLead(e.lead.placeId, wahl, e.slug) === "v2");
 
   if (v1Entries.length) schreibeSeiten(v1Entries, docsDir, gemeinsam);
 
@@ -352,8 +385,8 @@ async function run() {
     slug: `beispiel-${lead.kueche}`,
     menu: menuForCuisine(lead.kueche),
   }));
-  const demoV1 = demoEntries.filter((e) => engineFuerLead(e.lead.placeId, wahl) !== "v2");
-  const demoV2 = demoEntries.filter((e) => engineFuerLead(e.lead.placeId, wahl) === "v2");
+  const demoV1 = demoEntries.filter((e) => engineFuerLead(e.lead.placeId, wahl, e.slug) !== "v2");
+  const demoV2 = demoEntries.filter((e) => engineFuerLead(e.lead.placeId, wahl, e.slug) === "v2");
 
   if (demoV1.length) schreibeSeiten(demoV1, docsDir, { ...gemeinsam, fiktiv: true });
 
