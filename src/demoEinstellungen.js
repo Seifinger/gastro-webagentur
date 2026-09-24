@@ -22,7 +22,8 @@ import { ladeStimmungsWahl, stimmungFuerLead, speichereStimmung } from "./stimmu
 import { stimmungenFuer } from "./stimmungen.js";
 import { loadLeadEdits, saveLeadEdits } from "./leadEdits.js";
 import { themeForLead } from "./landingPageGenerator.js";
-import { AUSDRUECKE, STANDARD_JE_KUECHE } from "../v2/build/ausdruck.js";
+import { AUSDRUECKE, STANDARD_JE_KUECHE, ausdruckFuerSlug, stimmungFuerSlug } from "../v2/build/ausdruck.js";
+import { DEMO_LEADS } from "./demoLeads.js";
 import { sloganFuer } from "../v2/build/texte.js";
 
 /** Die drei Farbschemata einer Küche: die Stimmungen traditionell, abend, hell. */
@@ -49,9 +50,26 @@ export function farbschemataFuer(kueche) {
     .map(({ id, label, archetyp }) => ({ id, label, archetyp }));
 }
 
-/** Vorlage = Küche + Ausdruck; Standard der Küche, sofern nicht abweichend gewählt. */
+/**
+ * Die neue Vorlage einer Küche ist ihre Beispielseite (z. B. "Wirtshaus zur
+ * Alten Linde" für Bayerisch): deren Ausdruck (v2/ausdruck-wahl.json), sonst
+ * der Standard je Küche.
+ */
+export function vorlageStandard(kueche) {
+  return ausdruckFuerSlug(`beispiel-${kueche}`) ?? STANDARD_JE_KUECHE[kueche] ?? "gesellig";
+}
+
+/** Das Farbschema der Beispielseite – Ausgangspunkt, solange keins gewählt ist. */
+export function farbschemaStandard(kueche) {
+  const demo = DEMO_LEADS.find((l) => l.kueche === kueche);
+  const id = stimmungFuerSlug(`beispiel-${kueche}`) ?? (demo ? themeForLead(demo, kueche).stimmung : null);
+  const liste = farbschemataFuer(kueche);
+  return liste.some((f) => f.id === id) ? id : liste[0].id;
+}
+
+/** Vorlage = Küche + Ausdruck; Vorlage der Küche, sofern nicht abweichend gewählt. */
 export function vorlageFuer(kueche, abweichung = "") {
-  const standard = STANDARD_JE_KUECHE[kueche] ?? "gesellig";
+  const standard = vorlageStandard(kueche);
   const ausdruck = abweichung && AUSDRUECKE[abweichung] ? abweichung : standard;
   const profil = AUSDRUECKE[ausdruck];
   return {
@@ -100,9 +118,8 @@ export function demoEinstellungen(slug, optionen = {}) {
   const farbschemata = farbschemataFuer(kueche);
   const gewaehlt = stimmungFuerLead(lead, kueche, ladeStimmungsWahl());
   const gueltigGewaehlt = farbschemata.some((f) => f.id === gewaehlt) ? gewaehlt : null;
-  // Ohne Wahl: die Stimmung, die der Seed ergibt – aber nur eine der drei.
-  const seed = themeForLead(lead, kueche).stimmung;
-  const farbschemaId = gueltigGewaehlt ?? (farbschemata.some((f) => f.id === seed) ? seed : farbschemata[0].id);
+  // Ohne Wahl: das Farbschema der Beispielseite dieser Küche.
+  const farbschemaId = gueltigGewaehlt ?? farbschemaStandard(kueche);
 
   const sloganEigen = String(edits.texte?.slogan ?? "").trim();
   return {

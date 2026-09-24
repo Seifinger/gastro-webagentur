@@ -67,10 +67,11 @@ test("ohne eigene Fotos: nur Konzeptbilder der Küchenrichtung, gekennzeichnet",
   assert.ok(existsSync(path.join(ZIEL, BAYER.slug, "medien", "hero.jpg")));
 });
 
-test("andere Küche mit anderer Bildsprache: Japanisch → editorial (Titelblatt)", async () => {
+test("andere Küche mit anderer Bildsprache: Japanisch → Vorlage der Sakura-Beispielseite (Kino, Omakase)", async () => {
   const html = await bau(SUSHI.slug);
-  assert.match(html, /<meta name="v2-ausdruck" content="editorial">/);
-  assert.match(html, /<meta name="v2-hero" content="titelblatt">/);
+  assert.match(html, /<meta name="v2-ausdruck" content="kino">/);
+  assert.match(html, /<meta name="v2-designsystem" content="japanisch--omakase">/);
+  assert.match(html, /class="buehne-herkunft">Konzeptbild</);
   assert.match(sichtbar(html), /Sushi Kaito/);
   assert.doesNotMatch(sichtbar(html), /(?<!\d)4,9(?!\d)|1\.203|auf Google/);
 });

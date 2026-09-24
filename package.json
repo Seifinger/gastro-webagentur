@@ -10,6 +10,7 @@
     "dashboard:passwort": "node scripts/passwortHash.mjs",
     "pages": "node src/generateLandingPages.js",
     "publish-site": "node src/publishSite.js",
+    "demo:migration": "node scripts/demoMigration.mjs",
     "wirt": "node src/wirtServer.js",
     "resonanz": "node src/resonanzServer.js",
     "test": "node --test --test-concurrency=1 test/*.test.js",

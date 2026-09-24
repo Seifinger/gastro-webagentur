@@ -2,12 +2,13 @@ import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { richteTestLeadsEin } from "./hilfen/testLead.js";
 import { KUECHEN } from "../src/cuisineOverrides.js";
-import { STANDARD_JE_KUECHE } from "../v2/build/ausdruck.js";
+import { STANDARD_JE_KUECHE, ausdruckFuerSlug } from "../v2/build/ausdruck.js";
 import {
   demoEinstellungen,
   speichereDemoEinstellungen,
   farbschemataFuer,
   vorlageFuer,
+  farbschemaStandard,
   setzeDemoStatus,
 } from "../src/demoEinstellungen.js";
 import { loadLeadEdits } from "../src/leadEdits.js";
@@ -19,12 +20,16 @@ before(() => {
 });
 after(() => umgebung.aufraeumen());
 
-test("Küchenzuordnung → richtige neue Vorlage (Standard je Küche)", () => {
+test("Küchenzuordnung → richtige neue Vorlage: die der Beispielseite (Wirtshaus zur Alten Linde für Bayerisch)", () => {
   for (const kueche of KUECHEN) {
     const v = vorlageFuer(kueche);
-    assert.equal(v.ausdruck, STANDARD_JE_KUECHE[kueche], kueche);
-    assert.equal(v.id, `${kueche}/${STANDARD_JE_KUECHE[kueche]}`);
+    assert.equal(v.ausdruck, ausdruckFuerSlug(`beispiel-${kueche}`) ?? STANDARD_JE_KUECHE[kueche], kueche);
+    assert.equal(v.id, `${kueche}/${v.ausdruck}`);
   }
+  assert.equal(vorlageFuer("bayerisch").ausdruck, "gesellig");
+  assert.equal(vorlageFuer("thailaendisch").ausdruck, "kino", "Thai-Beispielseite ist Kino");
+  assert.equal(farbschemaStandard("bayerisch"), "wirtshaus", "Farbschema der Beispielseite");
+  assert.equal(farbschemaStandard("chinesisch"), "teehaus");
   assert.equal(vorlageFuer("bayerisch", "kino").ausdruck, "kino");
   assert.equal(vorlageFuer("bayerisch", "unsinn").ausdruck, "gesellig");
 });

@@ -47,7 +47,7 @@ import { ladeStimmungsWahl, speichereStimmung, stimmungFuerLead } from "./stimmu
 import { ladeManifest, slugFuerPlaceId, placeIdFuerSlug } from "./entwurfsManifest.js";
 // v2-Engine (Stage 7b): einziger Eingriff in v1 – eigene Routen, Engine-Spalte, Design-Tokens.
 import { v2Handler, ergaenzeLeadsV2, v2HtmlInjektion, textVorschauV2 } from "../v2/integration/dashboardV2.js";
-import { farbschemataFuer } from "./demoEinstellungen.js";
+import { farbschemataFuer, farbschemaStandard } from "./demoEinstellungen.js";
 import { anmeldungPruefen, anmeldungAktiv } from "./dashboardAnmeldung.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -123,7 +123,6 @@ function leadsMitZusatz() {
       const farbschemata = farbschemataFuer(kueche);
       const gewaehlt = stimmungFuerLead(lead, kueche, stimmungsWahl);
       const gewaehlteStimmung = farbschemata.some((f) => f.id === gewaehlt) ? gewaehlt : undefined;
-      const seed = themeForLead(lead, kueche).stimmung;
 
       return {
         ...lead,
@@ -131,7 +130,7 @@ function leadsMitZusatz() {
         kuecheManuell: Boolean(zuordnungen[lead.placeId]),
         // Ohne eigene Wahl entscheidet der Seed – das Dashboard zeigt dann,
         // welche Stimmung dabei herauskommt, statt eines leeren Feldes.
-        stimmung: gewaehlteStimmung ?? (farbschemata.some((f) => f.id === seed) ? seed : farbschemata[0].id),
+        stimmung: gewaehlteStimmung ?? farbschemaStandard(kueche),
         stimmungManuell: Boolean(gewaehlteStimmung),
         stimmungen: farbschemata,
         slug: slug ?? "",

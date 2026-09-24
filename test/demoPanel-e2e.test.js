@@ -90,12 +90,31 @@ test("Demo-Panel: speichern übersteht Reload, Vorschau zeigt Wahl, Veröffentli
     assert.ok(git.some((g) => g.startsWith("commit")) && git.includes("push"), "commit und push liefen");
     assert.match(readFileSync(path.join(DOCS, "index.html"), "utf-8"), /Wo man sich trifft/);
 
-    // Slogan nach Veröffentlichung ändern → neu veröffentlichen → öffentliche Fassung neu.
+    // "Öffentliche URL" (statischer Server auf docs/) im Browser: erste Fassung.
+    const oeffentlich = createServer((req, res) => {
+      const datei = path.join(REPO, "docs", decodeURIComponent(new URL(req.url, "http://x").pathname).replace(/\/$/, "/index.html"));
+      if (!datei.startsWith(path.join(REPO, "docs")) || !existsSync(datei)) { res.writeHead(404); return res.end(); }
+      res.writeHead(200, { "Content-Type": datei.endsWith(".html") ? "text/html; charset=utf-8" : "application/octet-stream" });
+      res.end(readFileSync(datei));
+    });
+    await new Promise((f) => oeffentlich.listen(0, "127.0.0.1", f));
+    const demoUrl = `http://127.0.0.1:${oeffentlich.address().port}/${LEAD.slug}/`;
+    const gast = await kontext.newPage();
+    await gast.goto(demoUrl);
+    assert.equal(await gast.locator(".buehne-slogan").textContent(), "Wo man sich trifft");
+
+    // Slogan und Farbschema nach Veröffentlichung ändern → neu veröffentlichen → öffentliche Fassung neu.
+    await tab.locator('.demo-schema:has(input[value="biergarten"])').click();
     await tab.locator("#demo-slogan").fill("Neuer Slogan nach dem Livegang");
     await tab.locator("#demo-veroeffentlichen").click();
     await tab.locator("#demo-status.laeuft, #demo-status.ok").first().waitFor();
     await tab.waitForFunction(() => /Online/.test(document.getElementById("demo-status")?.textContent ?? "") && !document.getElementById("demo-veroeffentlichen").disabled, null, { timeout: 120_000 });
     assert.match(readFileSync(path.join(DOCS, "index.html"), "utf-8"), /Neuer Slogan nach dem Livegang/);
+    await gast.reload();
+    assert.equal(await gast.locator(".buehne-slogan").textContent(), "Neuer Slogan nach dem Livegang");
+    assert.equal(await gast.locator('meta[name="v2-designsystem"]').getAttribute("content"), "bayerisch--biergarten");
+    assert.match(await gast.locator(".entwurf-hinweis").first().textContent(), /Konzept-Demo/);
+    await new Promise((f) => oeffentlich.close(f));
   } finally {
     await browser.close();
     await new Promise((f) => server.close(f));

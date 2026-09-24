@@ -31,8 +31,8 @@ Weitere Befunde:
 | Stabile Lead-ID | `placeId` (Google Place ID, darf dauerhaft gespeichert werden) |
 | Slug/URL | Manifest `data/landingpages/entwuerfe.json` – einmal vergeben, nie neu berechnet |
 | Küche | `data/kuechen.json` (bestehend) |
-| Farbschema | `data/stimmungen.json` (bestehend), nur noch die **drei** Stimmungen der Küche (traditionell/abend/hell), nicht die Editorial-Varianten aus v1 |
-| Vorlage | `STANDARD_JE_KUECHE` in `v2/build/ausdruck.js`; eine Abweichung je Lead liegt in `lead-edits.demo.vorlage` (nicht mehr im öffentlichen `v2/ausdruck-wahl.json`) |
+| Farbschema | `data/stimmungen.json` (bestehend), nur noch die **drei** Stimmungen der Küche (traditionell/abend/hell), nicht die Editorial-Varianten aus v1. Ohne Wahl gilt das Farbschema der Beispielseite |
+| Vorlage | die Vorlage der Beispielseite der Küche (Ausdruck aus `v2/ausdruck-wahl.json`, sonst `STANDARD_JE_KUECHE`); eine Abweichung je Lead liegt in `lead-edits.demo.vorlage` (nicht im öffentlichen `v2/ausdruck-wahl.json`) |
 | Slogan | `lead-edits.texte.slogan` (war im Builder schon vorgesehen) |
 | Name/Adresse | `lead-edits.demo.name`/`demo.adresse` als `{ wert, quelle, bestaetigtAm }`. Ein Google-Abruf überschreibt nur die CSV, nie diese bestätigten Werte |
 | Status, Build, Veröffentlichung | Manifest-Eintrag je Slug (`status`, `letzterBuild`, `veroeffentlichung`) |
@@ -58,3 +58,22 @@ Weitere Befunde:
 
 ### Dashboard-Host (Teil 6)
 Siehe `docs-intern/HOSTING.md`.
+
+## Umsetzung (Stand nach dem Umbau)
+
+| Baustein | Datei(en) |
+|---|---|
+| Einstellungen je Demo | `src/demoEinstellungen.js` |
+| Konzept-Modus der Vorlage | `v2/build/konzept.js`, `siteBuilder.js` (`optionen.konzept`), `mediaGenerator.js` (`konzeptVon`) |
+| Ein Erzeugungsweg | `v2/integration/demoBau.js` (`baueDemo`) – Dashboard-Vorschau, `publish-site --only`, Veröffentlichen-Knopf, Migration |
+| Dashboard | `v2/integration/demoDashboard.js` + `demoPanel.browser.js` (in `bearbeiten.html`) |
+| Veröffentlichen mit Nachweis | `src/veroeffentlichung.js` (`starteVeroeffentlichung`, `pruefeOeffentlich`) |
+| Anmeldung | `src/dashboardAnmeldung.js`, `npm run dashboard:passwort` |
+| Hosting | `Dockerfile`, `deploy/start.sh`, `fly.toml`, `docs-intern/HOSTING.md` |
+| Migration | `npm run demo:migration -- --plan / --sichern / --vorschau <slug> / --freigeben <slug>` |
+
+Geänderte Abläufe:
+- `npm run publish-site` ohne Option baut nur noch die Beispielseiten und die Übersicht. `docs/` wird dabei nicht mehr gelöscht, Lead-Demos werden nicht mehr gesammelt überschrieben.
+- `--only <slug>` baut über die neue Vorlage und veröffentlicht nur mit bestätigtem Namen.
+- `npm run pages` (lokale v1-Entwürfe unter `/entwurf/…`) bleibt als alter Vorschauweg bestehen, ist aber kein Veröffentlichungsweg mehr. Die Demo-Vorschau im Dashboard läuft über „Vorschau bauen“ (`/v2/leads/<slug>/`).
+- Altpfade (v1-Gestaltung, `lokalisiereEigeneBilder`, der v1-Zweig für Leads in `publishSite`) sind für Leads entfernt bzw. stillgelegt. Die v1-Dateien bleiben, solange `npm run pages` sie nutzt.
