@@ -31,6 +31,7 @@ import { creativeHandler } from "./creativeDashboard.js";
 import { AUSDRUECKE, AUSDRUCK_AUS } from "../build/ausdruck.js";
 import { demoEinstellungen, speichereDemoEinstellungen } from "../../src/demoEinstellungen.js";
 import { baueDemo, bauParameter } from "./demoBau.js";
+import { demoHandler } from "./demoDashboard.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.join(__dirname, "..", "..");
@@ -139,10 +140,13 @@ function ausdruckInfo(slug) {
 export function leadDetailV2(slug) {
   const k = leadKontext(slug);
   if (!k) return null;
-  const { lead, gestaltung } = k;
+  const { lead } = k;
+  // Dasselbe Farbschema wie Demo und Vorschau (demoEinstellungen), nicht der Seed.
+  const e = demoEinstellungen(slug);
+  const gestaltung = themeForLead(lead, e.kueche, e.farbschema.id);
   const ds = ladeDesignsystem(gestaltung.cuisine, gestaltung.stimmung);
   const bericht = v2Bericht(slug);
-  const medien = loeseMedien({ slug, gestaltung, ds, leadEdits: loadLeadEdits(slug) });
+  const medien = loeseMedien({ slug, gestaltung, ds, leadEdits: loadLeadEdits(slug), konzeptVon: `beispiel-${e.kueche}` });
   return {
     slug,
     name: lead.name,
@@ -335,21 +339,6 @@ const DASHBOARD_SKRIPT = `
 const BEARBEITEN_SKRIPT = `
 (function () {
   function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-  /** Ausdruck je Lead: Standard der K\u00FCche, eine der vier Richtungen oder bewusst ohne. */
-  function ausdruckWahl(a) {
-    if (!a) return "";
-    var vorschlag = a.optionen.filter(function (o) { return o.id === a.vorschlag; })[0];
-    var gewaehlt = a.quelle === "gewaehlt" ? a.ausdruck : a.quelle === "aus" ? "${AUSDRUCK_AUS}" : "";
-    var optionen = '<option value=""' + (gewaehlt ? "" : " selected") + '>Standard der K\u00FCche' + (vorschlag ? ": " + esc(vorschlag.label) : " (keiner)") + '</option>' +
-      a.optionen.map(function (o) {
-        return '<option value="' + esc(o.id) + '"' + (gewaehlt === o.id ? " selected" : "") + '>' + esc(o.label) + ' \u2013 ' + esc(o.passtZu) + '</option>';
-      }).join("") +
-      '<option value="${AUSDRUCK_AUS}"' + (gewaehlt === "${AUSDRUCK_AUS}" ? " selected" : "") + '>Ohne Ausdruck (bisherige v2-Seite)</option>';
-    return '<p class="v2-ausdruck"><label for="v2-ausdruck"><b>Ausdruck (Gestaltung):</b></label> ' +
-      '<select id="v2-ausdruck">' + optionen + '</select> <span id="v2-ausdruck-hinweis"></span><br>' +
-      '<small>Aktuell: ' + esc(a.ausdruck ? a.optionen.filter(function (o) { return o.id === a.ausdruck; })[0].label : "ohne") +
-      ' (' + ({ gewaehlt: "gew\u00E4hlt", standard: "Standard der K\u00FCche", aus: "bewusst ohne", keiner: "kein Standard" })[a.quelle] + ')</small></p>';
-  }
   var slug = new URLSearchParams(location.search).get("lead");
   if (!slug) return;
   fetch("/api/v2/lead/" + encodeURIComponent(slug)).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
@@ -373,20 +362,9 @@ const BEARBEITEN_SKRIPT = `
       (d.v2Entwurf ? ' · <a href="' + d.v2Entwurf + '" target="_blank" rel="noopener">v2-Entwurf ansehen</a>' : ' · noch kein v2-Entwurf gebaut') +
       ' · <a href="' + ds.dokument + '" target="_blank" rel="noopener">Designsystem-Dokument</a>' +
       (d.judge ? ' · Judge: ' + d.judge.ergebnis : '') + '</p>' +
-      '<p><b>Foto-Anleitung (Bild-Kanon):</b> ' + ds.bildKanon.licht + '; ' + ds.bildKanon.perspektive + '.</p>' +
-      ausdruckWahl(d.ausdruck);
+      '<p><b>Foto-Anleitung (Bild-Kanon):</b> ' + ds.bildKanon.licht + '; ' + ds.bildKanon.perspektive + '.</p>';
     var raster = document.getElementById("raster");
     raster.parentNode.insertBefore(panel, raster);
-    var wahl = panel.querySelector("#v2-ausdruck");
-    if (wahl) wahl.addEventListener("change", function () {
-      var hinweis = panel.querySelector("#v2-ausdruck-hinweis");
-      hinweis.textContent = "speichert \u2026";
-      fetch("/intern/v2/lead/" + encodeURIComponent(slug) + "/ausdruck", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ausdruck: wahl.value })
-      }).then(function (r) { return r.json(); }).then(function (r) {
-        hinweis.textContent = r.ok === false ? r.fehler : "gespeichert \u2013 wirkt beim n\u00E4chsten Bau (\u201Ev2 bauen\u201C) und beim Ver\u00F6ffentlichen";
-      });
-    });
     function badges() {
       d.medien.forEach(function (m) {
         var marke = document.querySelector('.platz[data-rolle="' + m.rolle + '"] .marke');
@@ -400,10 +378,10 @@ const BEARBEITEN_SKRIPT = `
 `;
 
 export function v2HtmlInjektion(html, seite) {
-  const skript = seite === "bearbeiten" ? "/v2/bearbeiten.js" : "/v2/dashboard.js";
+  const skripte = seite === "bearbeiten" ? ["/v2/bearbeiten.js", "/v2/demo-panel.js"] : ["/v2/dashboard.js"];
   return html
     .replace("</head>", '<link rel="stylesheet" href="/v2/dashboard.css">\n</head>')
-    .replace("</body>", `<script src="${skript}"></script>\n</body>`);
+    .replace("</body>", `${skripte.map((s) => `<script src="${s}"></script>`).join("\n")}\n</body>`);
 }
 
 /* ------------------------------------------------------------------ */
@@ -450,6 +428,8 @@ const LEAD_DETAIL = /^\/api\/v2\/lead\/([^/]+)$/;
 export async function v2Handler(req, res, pathname) {
   // Briefing und Creative Direction je Restaurant (Art-Direction-Runde)
   if (await creativeHandler(req, res, pathname)) return true;
+  // Demo-Steuerung je Lead (Vorlage, Farbschema, Slogan, Veröffentlichen)
+  if (await demoHandler(req, res, pathname)) return true;
   if (pathname === "/v2/dashboard.css") return sende(res, 200, dashboardCss(), "text/css; charset=utf-8"), true;
   if (pathname === "/v2/dashboard.js") return sende(res, 200, DASHBOARD_SKRIPT, "text/javascript; charset=utf-8"), true;
   if (pathname === "/v2/bearbeiten.js") return sende(res, 200, BEARBEITEN_SKRIPT, "text/javascript; charset=utf-8"), true;

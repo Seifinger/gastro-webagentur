@@ -44,10 +44,10 @@ import { erzeugeTextVorschlag, letzterVorschlag, vergissVorschlag } from "./prom
 import { veroeffentlicheEntwurf } from "./veroeffentlichung.js";
 import { resonanzUebersicht } from "./resonanzStore.js";
 import { ladeStimmungsWahl, speichereStimmung, stimmungFuerLead } from "./stimmungsWahl.js";
-import { stimmungenFuer } from "./stimmungen.js";
 import { ladeManifest, slugFuerPlaceId, placeIdFuerSlug } from "./entwurfsManifest.js";
 // v2-Engine (Stage 7b): einziger Eingriff in v1 – eigene Routen, Engine-Spalte, Design-Tokens.
 import { v2Handler, ergaenzeLeadsV2, v2HtmlInjektion, textVorschauV2 } from "../v2/integration/dashboardV2.js";
+import { farbschemataFuer } from "./demoEinstellungen.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -117,7 +117,12 @@ function leadsMitZusatz() {
       const alter = ageInDays(lead);
 
       const kueche = kuecheFuerLead(lead, zuordnungen);
-      const gewaehlteStimmung = stimmungFuerLead(lead, kueche, stimmungsWahl);
+      // Nur die drei Farbschemata der Küche (demoEinstellungen.js) – dieselbe
+      // Auswahl wie im Demo-Panel.
+      const farbschemata = farbschemataFuer(kueche);
+      const gewaehlt = stimmungFuerLead(lead, kueche, stimmungsWahl);
+      const gewaehlteStimmung = farbschemata.some((f) => f.id === gewaehlt) ? gewaehlt : undefined;
+      const seed = themeForLead(lead, kueche).stimmung;
 
       return {
         ...lead,
@@ -125,13 +130,9 @@ function leadsMitZusatz() {
         kuecheManuell: Boolean(zuordnungen[lead.placeId]),
         // Ohne eigene Wahl entscheidet der Seed – das Dashboard zeigt dann,
         // welche Stimmung dabei herauskommt, statt eines leeren Feldes.
-        stimmung: gewaehlteStimmung ?? themeForLead(lead, kueche).stimmung,
+        stimmung: gewaehlteStimmung ?? (farbschemata.some((f) => f.id === seed) ? seed : farbschemata[0].id),
         stimmungManuell: Boolean(gewaehlteStimmung),
-        stimmungen: stimmungenFuer(kueche).map(({ id, label, archetyp }) => ({
-          id,
-          label,
-          archetyp,
-        })),
+        stimmungen: farbschemata,
         slug: slug ?? "",
         entwurf: slug ? `${ENTWURF_PREFIX}${slug}/` : "",
         demoUrl,
@@ -557,6 +558,9 @@ export const handler = async (req, res) => {
   if (pathname === "/api/stimmung" && req.method === "POST") {
     try {
       const { placeId, kueche, stimmung } = JSON.parse(await leseKoerper(req));
+      if (stimmung && !farbschemataFuer(kueche).some((f) => f.id === stimmung)) {
+        throw new Error(`"${stimmung}" ist keins der drei Farbschemata für ${kueche}.`);
+      }
       speichereStimmung(placeId, kueche, stimmung ?? "");
       sendeJson(res, 200, { ok: true });
     } catch (error) {
