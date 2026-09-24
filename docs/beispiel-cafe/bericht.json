@@ -5,13 +5,14 @@
   "stimmung": "third-wave",
   "archetyp": "hell",
   "seed": 2329699373,
-  "heroVariante": "typo",
+  "heroVariante": "titelblatt",
   "heroVarianten": [
     "typo",
     "karte",
     "streifen",
     "spalte-bild"
   ],
+  "ausdruck": "editorial",
   "highlights": [
     "0-1",
     "0-2",
@@ -29,9 +30,21 @@
   "korrekturen": [],
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1546069901-ba9599a7e63c",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {
@@ -86,6 +99,14 @@
         ],
         "vorher": "Hausgemachter Kuchen und gemütliche Stunden – direkt am Musterplatz in Altötting.",
         "nachher": "Hausgemachter Kuchen – direkt am Musterplatz in Altötting."
+      },
+      {
+        "pfad": "einladungText",
+        "regeln": [
+          "klischee-gemuetlich"
+        ],
+        "vorher": "Hausgemachter Kuchen und gemütliche Stunden.",
+        "nachher": "Hausgemachter Kuchen."
       }
     ],
     "hinweise": [],

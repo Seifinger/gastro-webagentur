@@ -1,7 +1,7 @@
 {
   "site": "beispiel-tuerkisch",
-  "designsystem": "tuerkisch--bosporus-nacht",
-  "heroVariante": "spalte-bild",
+  "designsystem": "tuerkisch--basar",
+  "heroVariante": "buehne",
   "runden": [
     {
       "runde": 1,
@@ -18,7 +18,7 @@
     },
     {
       "stufe": "designsystem",
-      "id": "tuerkisch--bosporus-nacht"
+      "id": "tuerkisch--basar"
     },
     {
       "stufe": "copy",
@@ -31,15 +31,27 @@
   },
   "medien": {
     "hero": {
-      "herkunft": "platzhalter",
-      "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1544025162-d76694265947",
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "typ": "bild"
+    },
+    "heroVideo": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "typ": "video"
+    },
+    "heroMobil": {
+      "herkunft": "ki",
+      "kennzeichnung": "KI-generiert",
+      "quelle": "eigene:P3 vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
       "typ": "bild"
     },
     "haus": {
       "herkunft": "platzhalter",
       "kennzeichnung": "Platzhalter",
-      "quelle": "stock:photo-1555396273-367ea4eb4db5",
+      "quelle": "stock:photo-1554118811-1e0d58224f24",
       "typ": "bild"
     },
     "team": {
@@ -73,5 +85,5 @@
       "typ": "bild"
     }
   },
-  "zeitpunkt": "2026-09-23T05:39:31.095Z"
+  "zeitpunkt": "2026-09-24T14:47:31.709Z"
 }
