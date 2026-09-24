@@ -5,7 +5,7 @@ import { ausdruckFuerSlug } from "../v2/build/ausdruck.js";
 test("Ausdruck-Wahl: versionierte Zuordnung je Slug, Unbekanntes wird ignoriert", () => {
   assert.equal(ausdruckFuerSlug("beispiel-bayerisch"), "gesellig");
   assert.equal(ausdruckFuerSlug("beispiel-italienisch"), "gesellig");
-  assert.equal(ausdruckFuerSlug("beispiel-griechisch"), null, "ohne Eintrag keine ausdrückliche Wahl (der Standard kommt aus ausdruckZumBauen)");
+  assert.equal(ausdruckFuerSlug("beispiel-gibt-es-nicht"), null, "ohne Eintrag keine ausdrückliche Wahl (der Standard kommt aus ausdruckZumBauen)");
   assert.equal(ausdruckFuerSlug("_hinweis"), null);
   assert.equal(ausdruckFuerSlug("x", "/gibt/es/nicht.json"), null);
 });
