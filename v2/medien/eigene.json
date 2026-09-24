@@ -198,5 +198,30 @@
       "webm": "v2/medien/eigene/beispiel-thailaendisch/heroVideo.webm",
       "eingetragen": "2026-09-24T18:53:05.329Z"
     }
+  },
+  "beispiel-indisch": {
+    "hero": {
+      "datei": "v2/medien/eigene/beispiel-indisch/hero.jpg",
+      "herkunft": "ki",
+      "quelle": "Querbild vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "fokus": "65% 70%",
+      "eingetragen": "2026-09-24T18:55:46.924Z"
+    },
+    "heroMobil": {
+      "datei": "v2/medien/eigene/beispiel-indisch/heroMobil.jpg",
+      "herkunft": "ki",
+      "quelle": "Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "fokus": "50% 70%",
+      "eingetragen": "2026-09-24T18:55:46.925Z"
+    },
+    "heroVideo": {
+      "datei": "v2/medien/eigene/beispiel-indisch/heroVideo.mp4",
+      "herkunft": "ki",
+      "quelle": "Video vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026 – einmalige Wiedergabe",
+      "fokus": "55% 70%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-indisch/heroVideo.webm",
+      "eingetragen": "2026-09-24T18:55:46.926Z"
+    }
   }
 }

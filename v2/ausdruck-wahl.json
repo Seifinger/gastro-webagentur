@@ -28,5 +28,9 @@
   "beispiel-thailaendisch": {
     "ausdruck": "handwerk",
     "stimmung": "streetfood-nacht"
+  },
+  "beispiel-indisch": {
+    "ausdruck": "gesellig",
+    "stimmung": "gewuerzmarkt"
   }
 }
