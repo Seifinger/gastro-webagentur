@@ -44,10 +44,11 @@ import { erzeugeTextVorschlag, letzterVorschlag, vergissVorschlag } from "./prom
 import { veroeffentlicheEntwurf } from "./veroeffentlichung.js";
 import { resonanzUebersicht } from "./resonanzStore.js";
 import { ladeStimmungsWahl, speichereStimmung, stimmungFuerLead } from "./stimmungsWahl.js";
-import { stimmungenFuer } from "./stimmungen.js";
 import { ladeManifest, slugFuerPlaceId, placeIdFuerSlug } from "./entwurfsManifest.js";
 // v2-Engine (Stage 7b): einziger Eingriff in v1 – eigene Routen, Engine-Spalte, Design-Tokens.
 import { v2Handler, ergaenzeLeadsV2, v2HtmlInjektion, textVorschauV2 } from "../v2/integration/dashboardV2.js";
+import { farbschemataFuer, farbschemaStandard } from "./demoEinstellungen.js";
+import { anmeldungPruefen, anmeldungAktiv } from "./dashboardAnmeldung.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -117,7 +118,11 @@ function leadsMitZusatz() {
       const alter = ageInDays(lead);
 
       const kueche = kuecheFuerLead(lead, zuordnungen);
-      const gewaehlteStimmung = stimmungFuerLead(lead, kueche, stimmungsWahl);
+      // Nur die drei Farbschemata der Küche (demoEinstellungen.js) – dieselbe
+      // Auswahl wie im Demo-Panel.
+      const farbschemata = farbschemataFuer(kueche);
+      const gewaehlt = stimmungFuerLead(lead, kueche, stimmungsWahl);
+      const gewaehlteStimmung = farbschemata.some((f) => f.id === gewaehlt) ? gewaehlt : undefined;
 
       return {
         ...lead,
@@ -125,13 +130,9 @@ function leadsMitZusatz() {
         kuecheManuell: Boolean(zuordnungen[lead.placeId]),
         // Ohne eigene Wahl entscheidet der Seed – das Dashboard zeigt dann,
         // welche Stimmung dabei herauskommt, statt eines leeren Feldes.
-        stimmung: gewaehlteStimmung ?? themeForLead(lead, kueche).stimmung,
+        stimmung: gewaehlteStimmung ?? farbschemaStandard(kueche),
         stimmungManuell: Boolean(gewaehlteStimmung),
-        stimmungen: stimmungenFuer(kueche).map(({ id, label, archetyp }) => ({
-          id,
-          label,
-          archetyp,
-        })),
+        stimmungen: farbschemata,
         slug: slug ?? "",
         entwurf: slug ? `${ENTWURF_PREFIX}${slug}/` : "",
         demoUrl,
@@ -341,13 +342,42 @@ function leseKoerper(req) {
   });
 }
 
+/**
+ * Mit Anmeldung braucht es keinen Token mehr: Die Seiten fragen dann nicht
+ * danach (leerer Token im localStorage), und oben rechts gibt es "Abmelden".
+ */
+function mitSitzung(html) {
+  if (!anmeldungAktiv()) return html;
+  return html
+    .replace("</head>", `<script>try{if(localStorage.getItem("dashboardToken")===null)localStorage.setItem("dashboardToken","")}catch(e){}</script>\n</head>`)
+    .replace("</body>", `<form method="post" action="/abmelden" style="position:fixed;top:10px;right:12px;margin:0"><button type="submit">Abmelden</button></form>\n</body>`);
+}
+
+/**
+ * Ein Fehler in einer einzelnen Route darf den Server nie beenden – online
+ * wäre das Dashboard sonst bis zum nächsten Neustart weg.
+ */
 export const handler = async (req, res) => {
+  try {
+    await routen(req, res);
+  } catch (fehler) {
+    console.error(`Fehler bei ${req.method} ${req.url}:`, fehler);
+    if (!res.headersSent) sendeJson(res, 500, { ok: false, fehler: "Interner Fehler im Dashboard." });
+    else res.end();
+  }
+};
+
+const routen = async (req, res) => {
   const { pathname, searchParams } = new URL(
     req.url,
     `http://${req.headers.host ?? "localhost"}`,
   );
 
-  if (brauchtToken(pathname, req.method) && !tokenGueltig(tokenAusAnfrage(req))) {
+  // Online-Betrieb: Anmeldung vor allem anderen (dashboardAnmeldung.js). Dann
+  // ersetzt die Sitzung den Token; lokal ohne Passwort bleibt alles wie bisher.
+  if (await anmeldungPruefen(req, res, pathname)) return;
+
+  if (!anmeldungAktiv() && brauchtToken(pathname, req.method) && !tokenGueltig(tokenAusAnfrage(req))) {
     sendeJson(res, 401, {
       ok: false,
       fehler: "Ungültiger oder fehlender Dashboard-Token. Bitte im Dashboard neu anmelden.",
@@ -359,13 +389,13 @@ export const handler = async (req, res) => {
 
   if (pathname === "/" || pathname === "/index.html") {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(v2HtmlInjektion(readFileSync(dashboardHtmlPath, "utf-8"), "dashboard"));
+    res.end(mitSitzung(v2HtmlInjektion(readFileSync(dashboardHtmlPath, "utf-8"), "dashboard")));
     return;
   }
 
   if (pathname === "/bearbeiten.html") {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(v2HtmlInjektion(readFileSync(bearbeitenHtmlPath, "utf-8"), "bearbeiten"));
+    res.end(mitSitzung(v2HtmlInjektion(readFileSync(bearbeitenHtmlPath, "utf-8"), "bearbeiten")));
     return;
   }
 
@@ -557,6 +587,9 @@ export const handler = async (req, res) => {
   if (pathname === "/api/stimmung" && req.method === "POST") {
     try {
       const { placeId, kueche, stimmung } = JSON.parse(await leseKoerper(req));
+      if (stimmung && !farbschemataFuer(kueche).some((f) => f.id === stimmung)) {
+        throw new Error(`"${stimmung}" ist keins der drei Farbschemata für ${kueche}.`);
+      }
       speichereStimmung(placeId, kueche, stimmung ?? "");
       sendeJson(res, 200, { ok: true });
     } catch (error) {
@@ -604,7 +637,9 @@ export const handler = async (req, res) => {
 // importiert denselben Handler und hängt ihn an einen eigenen Port, statt
 // dem laufenden Dashboard den Platz wegzunehmen.
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  if (!process.env.DASHBOARD_TOKEN) {
+  if (anmeldungAktiv()) {
+    console.log("\n🔒 Anmeldung aktiv (DASHBOARD_PASSWORT_HASH): alle Seiten und Daten nur nach Login.\n");
+  } else if (!process.env.DASHBOARD_TOKEN) {
     console.log(
       "\n⚠️  Dashboard läuft ohne Zugriffsschutz - nicht für den Einsatz außerhalb von localhost geeignet.\n" +
         "   DASHBOARD_TOKEN in der .env setzen, um die /intern/-Routen abzusichern (siehe .env.example).\n",

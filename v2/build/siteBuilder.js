@@ -48,6 +48,7 @@ import { BUEHNE_CSS, BUEHNE_SKRIPT } from "./buehneStil.js";
 import { renderTisch, renderHausBand, renderAnfahrt, renderFussAusdruck, ABFOLGE_CSS, ABFOLGE_SKRIPT } from "./sektionen/abfolge.js";
 import { renderAtmosphaere, ATMOSPHAERE_CSS, ATMOSPHAERE_SKRIPT } from "./atmosphaere.js";
 import { renderReservierung, renderKontakt, renderBestellweg, renderFuss, renderEntwurfsleiste } from "./sektionen/service.js";
+import { konzeptLead, konzeptTexte } from "./konzept.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const OUTPUT_DIR = path.join(__dirname, "..", "output");
@@ -205,6 +206,9 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   const { ds, protokoll: korrekturProtokoll } = wendeKorrekturenAn(dsDatei, optionen.korrekturen);
   // Opt-in (Gestaltungs-Umbau): ohne Ausdruck bleibt die Ausgabe Byte für Byte wie bisher.
   const ausdruck = ausdruckFuer(optionen.ausdruck);
+  // Konzept-Demo für einen echten Betrieb (konzept.js) – nur mit Ausdruck.
+  const konzept = Boolean(optionen.konzept) && Boolean(ausdruck);
+  if (konzept) lead = konzeptLead(lead);
 
   // Gate 1: Kontraste
   const kontrastFehler = pruefeKontraste(ds);
@@ -230,7 +234,8 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   // er auf die Seite kommt (COPY-PRINZIPIEN.md). Was er nicht automatisch
   // bereinigen kann, stoppt den Build.
   const verfeinern = optionen.texteVerfeinern ?? verfeinereTexte;
-  const { texte, bericht: copyBericht } = verfeinern(texteFuer({ ds, menu, lead, eigeneTexte }), ds);
+  const rohTexte = texteFuer({ ds, menu, lead, eigeneTexte });
+  const { texte, bericht: copyBericht } = verfeinern(konzept ? konzeptTexte(rohTexte, { lead, menu, eigeneTexte }) : rohTexte, ds);
   if (copyBericht?.verbleibend?.length) {
     throw new BuildAbbruch("copy", copyBericht.verbleibend.map((v) => `${v.pfad}: ${v.regeln.join(", ")} („${v.text.slice(0, 60)}“)`));
   }
@@ -253,7 +258,10 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   const betont = ds.layout.betonterMoment;
   const apiUrl = String(optionen.apiUrl ?? "").replace(/\/+$/, "");
   const aktionen = aktionsziele({ lead, apiUrl, fiktiv });
-  const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv, aktionen, ausdruck };
+  // Konzept: Der Weg zum Haus führt über das Google-Maps-Profil (Place ID) –
+  // statt Note und Rezensionen auf der Seite.
+  if (konzept && optionen.googleMapsUrl) aktionen.route = { art: "extern", href: optionen.googleMapsUrl };
+  const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv, aktionen, ausdruck, konzept };
 
   const sektionen = {
     highlights: (tief) => renderHighlights({ ...ctx, betont: betont === "highlights", tief }),
@@ -275,7 +283,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
     raum: () => renderHausBand(ctx),
     herkunft: () => renderHausBand(ctx),
     reservierung: () => sektionen.reservierung(true),
-    kontakt: () => renderAnfahrt({ ...ctx, oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS }),
+    kontakt: () => renderAnfahrt({ ...ctx, oeffnungszeiten: konzept ? [] : optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS }),
   };
   const hauptteil = ausdruck
     ? ausdruck.abfolge.filter((id) => ausdruckSektionen[id]).map((id) => ausdruckSektionen[id]()).join("\n\n")
@@ -308,8 +316,8 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   ].filter(Boolean).join(" ");
 
   const ort = lead.ort || "";
-  const titel = `${texte.name}${ort ? ` – ${menu.konzept ?? menu.label} in ${ort}` : ""}`;
-  const beschreibung = `${texte.name}${ort ? ` in ${ort}` : ""}: ${menu.konzept ?? menu.label}. ${texte.claim} Tisch reservieren oder zur Abholung vorbestellen.`;
+  const titel = konzept ? `${texte.name} – Konzept-Demo` : `${texte.name}${ort ? ` – ${menu.konzept ?? menu.label} in ${ort}` : ""}`;
+  const beschreibung = konzept ? texte.entwurfsleiste : `${texte.name}${ort ? ` in ${ort}` : ""}: ${menu.konzept ?? menu.label}. ${texte.claim} Tisch reservieren oder zur Abholung vorbestellen.`;
 
   const html = `<!DOCTYPE html>
 <html lang="de">
@@ -321,8 +329,8 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
 <meta name="engine" content="${ENGINE_KENNUNG}">
 <meta name="v2-designsystem" content="${escapeHtml(ds.id)}">
 <meta name="v2-hero" content="${heroVariante}">
-${ausdruck ? `<meta name="v2-ausdruck" content="${ausdruck.id}">\n` : ""}<meta name="theme-color" content="${ds.farben.rollen.grund.hex}">
-${optionen.veroeffentlicht ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<link rel="icon" href="${favicon(ds)}">
+${ausdruck ? `<meta name="v2-ausdruck" content="${ausdruck.id}">\n` : ""}${konzept ? '<meta name="demo-art" content="konzept">\n' : ""}${optionen.buildId ? `<meta name="demo-build" content="${escapeHtml(optionen.buildId)}">\n` : ""}<meta name="theme-color" content="${ds.farben.rollen.grund.hex}">
+${optionen.veroeffentlicht || konzept ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<link rel="icon" href="${favicon(ds)}">
 <style>
 ${fontCss}
 ${cssVariablen(ds)}
@@ -333,13 +341,13 @@ ${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_C
 </head>
 <body class="${bodyKlassen}">
 ${ausdruck ? "" : optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : ""}
-${ausdruck ? renderKopfAusdruck({ ...ctx, hinweis: optionen.veroeffentlicht ? renderEntwurfsleiste({ texte, fiktiv }) : "" }) : renderKopfzeile(ctx)}${ausdruck ? `\n${renderAtmosphaere(ctx)}` : ""}
+${ausdruck ? renderKopfAusdruck({ ...ctx, hinweis: optionen.veroeffentlicht || konzept ? renderEntwurfsleiste({ texte, fiktiv }) : "" }) : renderKopfzeile(ctx)}${ausdruck ? `\n${renderAtmosphaere(ctx)}` : ""}
 <main>
 ${ausdruck ? `${renderErsterBildschirm(ctx)}\n${renderEinladung(ctx)}` : renderHero(heroVariante, ctx)}
 ${ausdruck ? "" : renderLeiste(ctx)}
 ${hauptteil}
 </main>
-${renderBestellweg({ ...(ausdruck ? { ...ctx, ds: { ...ds, layout: { ...ds.layout, primaerAktion: ausdruck.hauptaktion === "reservieren" ? "reservation" : "order" } } } : ctx), oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS })}
+${renderBestellweg({ ...(ausdruck ? { ...ctx, ds: { ...ds, layout: { ...ds.layout, primaerAktion: ausdruck.hauptaktion === "reservieren" ? "reservation" : "order" } } } : ctx), oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS, ...(konzept ? { abholHinweis: texte.kontakt.abholzeitBeispiel } : {}) })}
 ${ausdruck ? renderFussAusdruck(ctx) : renderFuss(ctx)}
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${abholzeitSkript()}</script>

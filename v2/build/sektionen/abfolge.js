@@ -77,7 +77,9 @@ export function renderAnfahrt({ texte, lead, aktionen, oeffnungszeiten, fiktiv }
     aktionen?.anrufen ? `<a class="btn btn-ghost" href="${e(aktionen.anrufen.href)}">${e(aktionen.anrufen.text)}</a>` : "",
   ].join("");
   // Mehrere Zeitfenster untereinander statt umbrechend nebeneinander.
-  const zeiten = oeffnungszeiten
+  const zeiten = !oeffnungszeiten?.length
+    ? `<p class="anfahrt-zeiten-offen">${e(t.zeitenOffen ?? "")}</p>`
+    : oeffnungszeiten
     .map((z) => `<div><span class="tage">${e(z.tage)}</span><span class="fenster">${String(z.zeiten).split(" & ").map((f) => `<span>${e(f)}</span>`).join("")}</span></div>`)
     .join("");
   return `<section class="sektion anfahrt" id="kontakt">
@@ -89,7 +91,7 @@ export function renderAnfahrt({ texte, lead, aktionen, oeffnungszeiten, fiktiv }
       <p class="anfahrt-hinweis">${e(t.abholung)}</p>
     </div>
     <div class="anfahrt-zeiten auftritt">
-      <h3>${e(t.oeffnungszeiten)}${fiktiv ? "" : ` <span class="marke-klein marke-klein--signal">${e(texte.platzhalter)}</span>`}</h3>
+      <h3>${e(t.oeffnungszeiten)}${fiktiv || !oeffnungszeiten?.length ? "" : ` <span class="marke-klein marke-klein--signal">${e(texte.platzhalter)}</span>`}</h3>
       ${zeiten}
     </div>
   </div>

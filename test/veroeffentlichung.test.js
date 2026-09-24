@@ -37,7 +37,7 @@ async function mitFakes({ baueEntwurf, gitAufruf }, fn) {
   }
 }
 
-test("veroeffentlicheEntwurf: add, status, commit, push laufen in der richtigen Reihenfolge", async () => {
+test("veroeffentlicheEntwurf: add, status, commit, Abgleich mit dem Remote, push laufen in der richtigen Reihenfolge", async () => {
   const aufrufe = [];
 
   await mitFakes(
@@ -56,11 +56,12 @@ test("veroeffentlicheEntwurf: add, status, commit, push laufen in der richtigen 
     },
   );
 
-  assert.equal(aufrufe.length, 4);
+  assert.equal(aufrufe.length, 5);
   assert.deepEqual(aufrufe[0], ["add", "docs/mein-slug"]);
   assert.deepEqual(aufrufe[1], ["status", "--porcelain", "--", "docs/mein-slug"]);
   assert.deepEqual(aufrufe[2], ["commit", "-m", "Entwurf für mein-slug aktualisiert"]);
-  assert.deepEqual(aufrufe[3], ["push"]);
+  assert.deepEqual(aufrufe[3], ["pull", "--rebase", "--autostash"]);
+  assert.deepEqual(aufrufe[4], ["push"]);
 });
 
 test("veroeffentlicheEntwurf: ohne Änderungen wird nicht committet oder gepusht", async () => {

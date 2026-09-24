@@ -32,7 +32,7 @@ export const KI_DIR = path.join(REPO, "v2", "output", "medien");
 export const UPLOADS_DIR = path.join(REPO, "public", "uploads");
 
 export const ROLLEN = ["hero", "haus", "team", "bestseller"];
-export const KENNZEICHNUNG = { eigen: "eigenes Foto", ki: "KI-generiert", platzhalter: "Platzhalter" };
+export const KENNZEICHNUNG = { eigen: "eigenes Foto", ki: "KI-generiert", platzhalter: "Platzhalter", konzept: "Konzeptbild" };
 
 const FORMATE = { hero: "16:9", heroMobil: "4:5", haus: "4:3", team: "4:3", bestseller: "4:3", gericht: "4:3", heroVideo: "16:9", heroVideoMobil: "9:16" };
 
@@ -275,10 +275,15 @@ function medium({ herkunft, src, datei = null, quelle, typ = "bild", zeigeBadge,
  * Badges auf der Seite: KI-Material immer (Transparenz), Platzhalter nur an
  * den drei Haus-Fotos (Foto-Aufgabenliste wie in v1), eigene Fotos nie.
  */
-export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remoteImageUrl, eigene = ladeEigeneMedien(), leadEdits = loadLeadEdits(slug), kiDir = KI_DIR, offline = false, ds = null }) {
+export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remoteImageUrl, eigene = ladeEigeneMedien(), leadEdits = loadLeadEdits(slug), kiDir = KI_DIR, offline = false, ds = null, konzeptVon = null }) {
   const eigeneSeite = eigene[slug] ?? {};
   const uploads = leadEdits?.bilder ?? {};
   const ki = ladeKiMedien(slug, kiDir);
+  // Konzept-Demo (v2/DEMO-UMBAU.md): Hat ein echter Lead kein eigenes
+  // Titelbild, trägt die Bühne die Medien der Küchenrichtung (Beispielseite),
+  // gekennzeichnet als "Konzeptbild" – nie als Foto des Betriebs. Sobald ein
+  // eigenes Titelbild da ist, bleibt der Konzeptsatz ganz weg (kein Mischen).
+  const konzept = konzeptVon && !eigeneSeite.hero && !uploads.hero && !ki.hero ? eigene[konzeptVon] ?? {} : {};
   const badgeFuer = (rolle, herkunft) => herkunft === "ki" || (herkunft === "platzhalter" && ["haus", "team", "bestseller"].includes(rolle) && !fiktiv);
 
   const stockId = { hero: [gestaltung.heroImage, "hero"], haus: [gestaltung.hausBild, "ambiente"], team: [gestaltung.teamBild, "ambiente"] };
@@ -294,6 +299,11 @@ export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remote
       const lokal = path.join(UPLOADS_DIR, String(upload).replace(/^\/?uploads\//, ""));
       const vorhanden = existsSync(lokal);
       return medium({ herkunft: "eigen", src: vorhanden ? `medien/${rolle}${path.extname(lokal) || ".jpg"}` : upload, datei: vorhanden ? lokal : null, quelle: "dashboard-upload", typ: /\.(mp4|webm)$/i.test(String(upload)) ? "video" : "bild", zeigeBadge: false });
+    }
+    const kz = konzept[rolle];
+    if (kz) {
+      const endung = path.extname(kz.datei);
+      return medium({ herkunft: "konzept", src: `medien/${rolle.replace(":", "-")}${endung}`, datei: path.join(REPO, kz.datei), quelle: `konzept:${konzeptVon}`, typ: /\.(mp4|webm)$/i.test(endung) ? "video" : "bild", zeigeBadge: true, fokus: kz.fokus, wiedergabe: kz.wiedergabe, webm: kz.webm ? { src: `medien/${rolle.replace(":", "-")}.webm`, datei: path.join(REPO, kz.webm) } : null });
     }
     const k = ki[rolle];
     if (k && existsSync(path.join(kiDir, slug, k.datei))) {
@@ -312,11 +322,11 @@ export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remote
     hero: loese("hero", { stock: stockId.hero }),
     haus: loese("haus", { stock: stockId.haus }),
     team: loese("team", { stock: stockId.team }),
-    bestseller: eigeneSeite.bestseller || uploads.bestseller || ki.bestseller ? loese("bestseller") : null,
-    heroVideo: eigeneSeite.heroVideo || uploads.heroVideo || ki.heroVideo ? loese("heroVideo") : null,
+    bestseller: eigeneSeite.bestseller || uploads.bestseller || ki.bestseller || konzept.bestseller ? loese("bestseller") : null,
+    heroVideo: eigeneSeite.heroVideo || uploads.heroVideo || ki.heroVideo || konzept.heroVideo ? loese("heroVideo") : null,
     // Eigene Ausschnitte fürs Handy (Bühne der Seiten mit Ausdruck) – nur, wenn wirklich geliefert.
-    heroMobil: eigeneSeite.heroMobil || uploads.heroMobil || ki.heroMobil ? loese("heroMobil") : null,
-    heroVideoMobil: eigeneSeite.heroVideoMobil || uploads.heroVideoMobil || ki.heroVideoMobil ? loese("heroVideoMobil") : null,
+    heroMobil: eigeneSeite.heroMobil || uploads.heroMobil || ki.heroMobil || konzept.heroMobil ? loese("heroMobil") : null,
+    heroVideoMobil: eigeneSeite.heroVideoMobil || uploads.heroVideoMobil || ki.heroVideoMobil || konzept.heroVideoMobil ? loese("heroVideoMobil") : null,
     gericht: (g) => (g ? loese(`gericht:${g.id}`, { stock: g.bild ? [g.bild, "gericht"] : null }) : null),
   };
   return medien;

@@ -104,7 +104,7 @@ export function renderKontakt({ texte, lead, oeffnungszeiten, tief }) {
  * welchen Öffnungszeiten gerechnet wird. Fest eingebaute Zeiten wären beim
  * ersten Aufruf schon veraltet.
  */
-export function renderBestellweg({ ds, texte, aktionen, oeffnungszeiten }) {
+export function renderBestellweg({ ds, texte, aktionen, oeffnungszeiten, abholHinweis = "" }) {
   const b = texte.bestellung;
   const bestellen = (k) => `<button class="btn ${k}" id="bar-order" type="button">${e(b.bestellen)}</button>`;
   const reservieren = (k) => `<a class="btn ${k}" href="#reservierung">${e(b.reservieren)}</a>`;
@@ -127,7 +127,7 @@ ${leiste}
     <div id="cart-lines"></div>
     <form id="order-form" novalidate>
       <div class="field-grid field-grid--eins">
-        ${feld({ id: "ord-abholzeit", name: "abholzeit", label: b.abholzeit, pflicht: true, fehler: b.fehlerAbholzeit, optionen: `<option value="">${e(texte.reservierung.felder.bitteWaehlen)}</option>`, extra: abholzeitAttribute({ oeffnungszeiten }, e) })}
+        ${feld({ id: "ord-abholzeit", name: "abholzeit", label: b.abholzeit, pflicht: true, fehler: b.fehlerAbholzeit, optionen: `<option value="">${e(texte.reservierung.felder.bitteWaehlen)}</option>`, extra: abholzeitAttribute({ oeffnungszeiten }, e) })}${abholHinweis ? `\n        <p class="hint abholzeit-beispiel">${e(abholHinweis)}</p>` : ""}
         ${feld({ id: "ord-name", name: "name", label: texte.reservierung.felder.name, pflicht: true, fehler: texte.reservierung.fehler.name, auto: "name" })}
         ${feld({ id: "ord-telefon", name: "telefon", label: texte.reservierung.felder.telefon, typ: "tel", pflicht: true, fehler: texte.reservierung.fehler.telefon, auto: "tel" })}
         ${feld({ id: "ord-hinweis", name: "hinweis", label: b.hinweis, typ: "textarea", optional: texte.reservierung.felder.optional, platzhalter: b.hinweisPlatzhalter })}
