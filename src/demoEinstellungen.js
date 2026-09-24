@@ -30,6 +30,19 @@ export const FARBSCHEMA_ARCHETYPEN = ["traditionell", "abend", "hell"];
 
 export const SLOGAN_MAX_ZEICHEN = 60;
 
+export const LAUFENDE_ZUSTAENDE = ["baut", "wird-veroeffentlicht"];
+// Länger als ein Bau plus die Online-Prüfung (15 Minuten) dauern darf.
+const UNTERBROCHEN_NACH_MS = 30 * 60_000;
+
+/** Ein "läuft" von vor einer halben Stunde ist ein abgebrochener Vorgang (z. B. Neustart). */
+function aktuellerStatus(status, jetzt = Date.now()) {
+  if (!status) return { zustand: "neu" };
+  if (LAUFENDE_ZUSTAENDE.includes(status.zustand) && jetzt - Date.parse(status.zeitpunkt ?? 0) > UNTERBROCHEN_NACH_MS) {
+    return { ...status, zustand: "fehler", fehler: "Der Vorgang wurde unterbrochen (z. B. durch einen Neustart des Dashboards). Bitte erneut starten." };
+  }
+  return status;
+}
+
 export function farbschemataFuer(kueche) {
   return stimmungenFuer(kueche)
     .filter((s) => FARBSCHEMA_ARCHETYPEN.includes(s.archetyp))
@@ -106,7 +119,7 @@ export function demoEinstellungen(slug, optionen = {}) {
     adresse: angabe(demo.adresse, lead.adresse),
     telefon: angabe(demo.telefon, lead.telefon),
     googleMapsUrl: googleMapsUrl(lead),
-    status: manifestEintrag?.demoStatus ?? { zustand: "neu" },
+    status: aktuellerStatus(manifestEintrag?.demoStatus),
     veroeffentlichtAm: manifestEintrag?.veroeffentlichtAm ?? "",
   };
 }
@@ -184,7 +197,13 @@ export function speichereDemoEinstellungen(slug, aenderung = {}, { jetzt = new D
   const { verlauf: _v2, ...kandidat } = neu;
   if (JSON.stringify(alt) !== JSON.stringify(kandidat)) saveLeadEdits(slug, neu);
 
-  setzeDemoStatus(placeId, { zustand: "gespeichert", zeitpunkt: jetzt.toISOString() });
+  // Läuft gerade ein Bau, bleibt dessen Zustand stehen – vermerkt wird nur,
+  // dass die gespeicherte Fassung neuer ist als die gerade gebaute.
+  if (LAUFENDE_ZUSTAENDE.includes(vorher.status.zustand)) {
+    setzeDemoStatus(placeId, { ...vorher.status, geaendertWaehrendVorgang: true });
+  } else {
+    setzeDemoStatus(placeId, { zustand: "gespeichert", zeitpunkt: jetzt.toISOString() });
+  }
   return demoEinstellungen(slug);
 }
 
