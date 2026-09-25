@@ -348,13 +348,13 @@ Die Namenserkennung liegt bei Lokalen ohne Stichwort daneben. Im Dashboard gibt 
 
 ### QR-Code und Anschreiben
 
-> **Wichtig:** Der QR-Code zeigt auf die **veröffentlichte** Adresse (`docs/` auf `main`). Ein Entwurf, der nur lokal mit `npm run pages` gebaut wurde, ist darüber noch nicht erreichbar – der QR läuft dann in eine 404-Seite. Das Dashboard weist im Pitch-Fenster darauf hin und blendet den QR-Code aus, solange der Entwurf nicht in `docs/` liegt. Vor einem Termin also: `npm run publish-site`, `docs/` committen, nach `main` pushen.
+> **Wichtig:** Konzept-Demos stehen nicht im Netz. Der QR-Code im Pitch-Fenster zeigt nur auf eine **laufende Präsentation im WLAN** (siehe „Was öffentlich ist“) und ist sonst ausgeblendet; das Anschreiben enthält keinen Link, sondern bietet an, den Entwurf persönlich zu zeigen.
 
 
 In der Spalte **Pitch** öffnet „QR & Text" ein Fenster mit:
 
-- einem **QR-Code** auf die Demo-Adresse des Lokals – zum Zeigen auf dem Handy oder zum Ausdrucken
-- der Adresse zum Kopieren
+- einem **QR-Code** auf die laufende Präsentation im WLAN – zum Zeigen auf dem Handy vor Ort (ohne laufende Präsentation ausgeblendet, mit Hinweis)
+- der Präsentationsadresse zum Kopieren
 - einem **Anschreiben-Entwurf**, der den konkreten Befund aus der Analyse aufgreift („keine eigene Website hinterlegt", „auf dem Handy schwer zu bedienen" …)
 
 Der Text ist ein Entwurf zum Prüfen und Anpassen, kein Serienbrief. Unaufgeforderte Werbe-E-Mails an Gewerbetreibende sind in Deutschland nur eingeschränkt zulässig (§ 7 UWG) – der unproblematische Weg ist, den QR-Code beim Besuch vor Ort zu zeigen.
@@ -405,41 +405,34 @@ Jede v2-Seite mit Ausdruck (alle Beispielseiten und Lead-Demos) besteht aus zwei
 - **Bestellen im Header:** mit Betriebsserver „Bestellen“, ohne „Probebestellung“, bei `lead-edits.bestellung.aktiv = false` gar nicht (die Karte bleibt verlinkt). Konzept-Demos schicken nie etwas an einen Server.
 - Alle Links sind relativ (`speisekarte/index.html`, `../index.html`) und funktionieren lokal (auch `file://`), unter `https://<user>.github.io/<repo>/<slug>/` und auf einer eigenen Domain.
 
-## Entwürfe öffentlich zeigen (GitHub Pages, kostenlos)
+## Was öffentlich ist – und wie du einem Wirt seine Demo zeigst
 
-Damit du einem Wirt vorab einen Link schicken kannst, einen QR-Code aufs Handy bringst oder er den Entwurf abends jemandem zeigen kann, lässt sich eine öffentliche Fassung erzeugen:
+GitHub Pages (`main:/docs`) ist **ohne Zugriffsschutz**: Alles dort ist für jeden abrufbar. `robots.txt` und `noindex` verhindern nur das Indexieren, nicht den Zugriff. Seit 25.09.2026 gilt deshalb (`src/oeffentlichkeit.js`):
 
-```bash
-npm run publish-site -- --limit 12 --kontakt "Dein Name · deine@mail.de"
-git add docs && git commit -m "Entwürfe veröffentlichen" && git push
-```
-
-Einmalig einrichten: auf GitHub unter **Settings → Pages** als Quelle **„Deploy from a branch"** wählen, Branch `main`, Ordner `/docs`. Nach ein bis zwei Minuten liegt alles unter
-`https://seifinger.github.io/gastro-webagentur/`.
-
-Der Ordner `docs/` wird bei jedem Lauf **komplett neu gebaut** – nimmst du einen Lead aus der Auswahl, verschwindet sein Entwurf beim nächsten Push auch wirklich aus dem Netz. Es gelten dieselben Filter wie bei `npm run pages` (`--region`, `--limit`, `--min-score`, `--cuisine`).
-
-### Unterschiede zur lokalen Fassung
-
-| | `npm run pages` | `npm run publish-site` |
+| Typ | Was | Wo |
 |---|---|---|
-| Ordner | `data/landingpages/` (nicht in Git) | `docs/` (wird committet) |
-| Bilder | lokal heruntergeladen, **offline nutzbar** | direkt von Unsplash geladen, hält das Repository klein |
-| Schriften | lokal | lokal (rund 880 KB für alle sieben Familien, wegen DSGVO nicht von Googles Servern) |
-| Hinweis | keiner | Leiste „Unverbindlicher Gestaltungsentwurf – **nicht** die offizielle Website von …" |
-| Suchmaschinen | – | `noindex, nofollow` auf jeder Seite |
-| Übersicht | mit Lead-Score und Priorität | neutrale Showcase-Seite **ohne** interne Vertriebsdaten |
+| A | die zwölf **fiktiven** Beispielseiten (`beispiel-<küche>`) und die Übersicht | öffentlich unter `docs/` (`npm run publish-site`) |
+| B | **Konzept-Demos für echte Betriebe** | nur lokal (`v2/output/leads/<slug>/`, gitignoriert) und im Dashboard – nie in `docs/` |
+| C | echte Kundenwebsite nach Beauftragung | eigener, späterer Workflow (noch nicht umgesetzt) |
 
-### Wichtig vor dem Veröffentlichen
+Jeder Weg, der nach `docs/` schreibt (Standard-Build, `--only`, Dashboard, `demo:migration`, v1), prüft das und lehnt Lead-Demos ab. Interne Build-Berichte (`bericht.json`, `zyklus.json`) der Beispielseiten landen in `v2/output/berichte/`, nicht in `docs/`.
 
-Die Seiten tragen Namen und Adresse echter Lokale, die davon nichts wissen. Deshalb:
+### Demo vor Ort auf dem Handy zeigen
 
-- Jede Seite trägt oben eine deutlich sichtbare Leiste, dass es **nicht** die offizielle Website des Lokals ist.
-- Jede Seite ist auf `noindex` gesetzt, damit sie nicht in Google auftaucht und dem Lokal die eigenen Suchergebnisse streitig macht.
-- Die URL (`seifinger.github.io/...`) ist erkennbar nicht die des Restaurants.
-- Die öffentliche Übersicht zeigt **keine** Lead-Scores und Prioritäten.
+1. Im Dashboard beim Lead **„Bilder“** öffnen → Demo-Panel: Küche, Vorlage und eines der drei Farbschemata wählen, optional den Slogan ändern, **„Konzept-Demo lokal bauen“**. Vorschau Desktop und Handy stehen daneben, dazu der Medienstatus (Video Desktop/Mobil, Poster, Herkunft, was fehlt).
+2. Laptop und Handy ins **selbe WLAN** bringen (oder den Handy-Hotspot für den Laptop nutzen).
+3. **„Präsentation im WLAN starten“**: Das Panel zeigt einen QR-Code mit der Netzwerkadresse des Laptops (z. B. `http://192.168.1.23:3010/…/`), nie `localhost`. Der QR funktioniert auf jedem Handy im selben Netz.
+4. Danach **„Präsentation beenden“** – spätestens nach zwei Stunden endet sie von selbst, der Link ist dann tot.
 
-Die `robots.txt` liegt zwar mit im Ordner, wird auf `github.io` aber nur im Wurzelverzeichnis der Domain ausgewertet – die Absicherung leistet hier das `noindex` im Seitenkopf. Wenn ein Wirt möchte, dass sein Entwurf verschwindet, nimm ihn aus der Auswahl und pushe neu.
+Ohne Dashboard: `npm run publish-site -- --only <slug>` (lokal bauen), dann `npm run praesentation -- <slug> [minuten]` – der QR-Code erscheint im Terminal.
+
+Grenzen, ehrlich: Die Präsentation ist **nicht im Internet** und liefert nur diese eine Demo aus, hat aber **kein Passwort und kein HTTPS**. Wer im selben Netz den Link kennt, kann sie während der Laufzeit öffnen. Gäste-WLANs mit Client-Isolation lassen Geräte nicht miteinander sprechen – dann den Handy-Hotspot nehmen. Ein Link zum Mitgeben (Wirt schaut abends allein) ginge erst mit einem geschützten Host, etwa dem vorbereiteten Dashboard-Host (`docs-intern/HOSTING.md`).
+
+### Früher öffentliche Lead-Demos
+
+Bis 24.09.2026 lagen 74 Lead-Demos öffentlich unter `docs/`. Sie wurden mit `npm run demo:migration -- --abschalten` gesichert (lokal nach `data/sicherung/`, samt Liste der früheren URLs) und aus `docs/` entfernt. Jede frühere Adresse und jeder alte QR-Code zeigt jetzt `docs/404.html`: einen neutralen Hinweis der Agentur, ohne Restaurantnamen. `v2/abgeschaltete-demos.json` hält nur SHA-256-Werte der Slugs, damit das Dashboard „abgeschaltet am …“ anzeigen kann, ohne die Namen im Repo zu nennen.
+
+Das Entfernen aus `docs/` löscht **nicht** die Git-Historie (die alten Seiten bleiben in früheren Commits abrufbar), nicht den Pages-Cache (bis ca. 10 Minuten) und keine Kopien, die andere gespeichert haben.
 
 ## Resonanz: wurde der Entwurf überhaupt angesehen?
 

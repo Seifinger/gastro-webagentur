@@ -7,7 +7,6 @@ import QRCode from "qrcode";
 import { readAllLeads } from "./csvImport.js";
 import {
   landingPagesDir,
-  docsDir,
   siteBaseUrl,
   absenderName,
   dashboardHost,
@@ -41,7 +40,8 @@ import {
   uploadsDir,
 } from "./bildUpload.js";
 import { erzeugeTextVorschlag, letzterVorschlag, vergissVorschlag } from "./promptEdits.js";
-import { veroeffentlicheEntwurf } from "./veroeffentlichung.js";
+import { MELDUNG_NICHT_OEFFENTLICH, alteOeffentlicheDemo } from "./oeffentlichkeit.js";
+import { praesentationStatus, istPraesentationsUrl } from "./praesentation.js";
 import { resonanzUebersicht } from "./resonanzStore.js";
 import { ladeStimmungsWahl, speichereStimmung, stimmungFuerLead } from "./stimmungsWahl.js";
 import { ladeManifest, slugFuerPlaceId, placeIdFuerSlug } from "./entwurfsManifest.js";
@@ -109,12 +109,13 @@ function leadsMitZusatz() {
   return readAllLeads()
     .map((lead) => {
       const slug = slugFuerPlaceId(manifest, lead.placeId);
-      const demoUrl = slug ? `${siteBaseUrl}/${slug}/` : "";
-      // Ein Entwurf ist erst dann per QR-Code erreichbar, wenn er auch im
-      // veröffentlichten Ordner liegt. Sonst schickt der QR den Wirt auf
-      // eine 404-Seite – vor seinen Augen, mitten im Gespräch.
-      const veroeffentlicht =
-        Boolean(slug) && existsSync(path.join(docsDir, slug, "index.html"));
+      // Lead-Demos sind nicht (mehr) öffentlich (src/oeffentlichkeit.js): kein
+      // Link ins Netz im Anschreiben, kein QR auf GitHub Pages. Gezeigt wird
+      // vor Ort über die Präsentation im WLAN (src/praesentation.js).
+      const altDemo = alteOeffentlicheDemo(slug);
+      const praesentation = praesentationStatus();
+      const demoUrl = praesentation.aktiv && praesentation.slug === slug ? praesentation.url : "";
+      const veroeffentlicht = false;
       const alter = ageInDays(lead);
 
       const kueche = kuecheFuerLead(lead, zuordnungen);
@@ -137,7 +138,10 @@ function leadsMitZusatz() {
         entwurf: slug ? `${ENTWURF_PREFIX}${slug}/` : "",
         demoUrl,
         veroeffentlicht,
-        anschreiben: anschreiben(lead, demoUrl, absenderName),
+        altDemo,
+        praesentationAktiv: Boolean(demoUrl),
+        // Der Anschreiben-Text verweist nie auf eine Adresse im Netz – die Präsentation ist nur vor Ort erreichbar.
+        anschreiben: anschreiben(lead, "", absenderName),
         // Google erlaubt laut Nutzungsbedingungen nur ein zeitlich begrenztes
         // Zwischenspeichern von Place-Daten – der Wirt bekommt einen
         // Frühwarn-Hinweis, bevor die Frist abläuft (siehe leadFreshness.js).
@@ -552,15 +556,10 @@ const routen = async (req, res) => {
 
   const veroeffentlichenTreffer = VEROEFFENTLICHEN.exec(pathname);
   if (veroeffentlichenTreffer && req.method === "POST") {
-    const slug = decodeURIComponent(veroeffentlichenTreffer[1]);
-    try {
-      const ergebnis = await veroeffentlicheEntwurf(slug);
-      sendeJson(res, 200, { ok: true, ...ergebnis });
-    } catch (fehler) {
-      // Merge-Konflikt, kein Internetzugang, unbekannter Slug: alles landet
-      // hier – die Route darf dabei nie den Server mitreißen.
-      sendeJson(res, 400, { ok: false, fehler: fehler.message });
-    }
+    // Lead-Demos werden nicht mehr veröffentlicht (src/oeffentlichkeit.js):
+    // 410 statt Bau und Git-Push. Die Route bleibt, damit ältere Oberflächen
+    // eine verständliche Meldung statt eines 404 bekommen.
+    sendeJson(res, 410, { ok: false, fehler: MELDUNG_NICHT_OEFFENTLICH });
     return;
   }
 
@@ -600,7 +599,9 @@ const routen = async (req, res) => {
 
   if (pathname === "/api/qr") {
     const ziel = searchParams.get("url");
-    if (!ziel || !ziel.startsWith(siteBaseUrl)) {
+    // Erlaubt: Seiten unter SITE_BASE_URL (Beispielseiten) und die gerade
+    // laufende Präsentation im WLAN – nie localhost oder beliebige Adressen.
+    if (!ziel || !(ziel.startsWith(siteBaseUrl) || istPraesentationsUrl(ziel))) {
       sendeJson(res, 400, { fehler: "Unerwartete Adresse" });
       return;
     }

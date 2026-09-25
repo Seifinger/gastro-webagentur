@@ -4,7 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { baueUndSchreibeEinzelnenEntwurf } from "./publishSite.js";
 import { randomBytes } from "node:crypto";
-import { siteBaseUrl } from "./config.js";
+import { siteBaseUrl, docsDir } from "./config.js";
+import { pruefeOeffentlicheAusgabe } from "./oeffentlichkeit.js";
 import { ladeManifest, placeIdFuerSlug } from "./entwurfsManifest.js";
 import { setzeDemoStatus } from "./demoEinstellungen.js";
 
@@ -62,6 +63,9 @@ export function neueBuildId(jetzt = new Date()) {
  * öffentliche Fassung ist unverändert – ein erneuter Versuch reicht.
  */
 export async function veroeffentlicheEntwurf(slug, { buildId = neueBuildId() } = {}) {
+  // Konzept-Demos echter Betriebe werden nicht veröffentlicht (src/oeffentlichkeit.js).
+  // Der Ablauf bleibt für einen späteren, eigenen Kunden-Workflow (Typ C) stehen.
+  pruefeOeffentlicheAusgabe(docsDir, slug);
   const { ordner } = await baueEntwurfHook.aktuell(slug, { buildId });
   const relOrdner = path.relative(repoRoot, ordner);
 
@@ -132,6 +136,7 @@ export function laeuftGerade(slug) {
  * @returns {{ gestartet: true, buildId: string, fertig: Promise<object> }}
  */
 export function starteVeroeffentlichung(slug, { pruefOptionen = {} } = {}) {
+  pruefeOeffentlicheAusgabe(docsDir, slug);
   if (laufend.has(slug)) throw new Error("Für diese Demo läuft bereits ein Bau oder eine Veröffentlichung.");
   const placeId = placeIdFuerSlug(ladeManifest(), slug);
   if (!placeId) throw new Error(`Kein Lead für Slug "${slug}" gefunden.`);

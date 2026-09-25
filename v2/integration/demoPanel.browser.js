@@ -1,6 +1,8 @@
 // Demo-Panel in bearbeiten.html (ausgeliefert unter /v2/demo-panel.js,
 // Server: v2/integration/demoDashboard.js). Küche, Vorlage, drei
-// Farbschemata, Slogan, bestätigte Angaben, Vorschau und Veröffentlichen.
+// Farbschemata, Slogan, bestätigte Angaben, lokaler Bau mit Vorschau (Desktop
+// und Handy), Medienstatus, Status der früheren öffentlichen Adresse und die
+// Präsentation im WLAN. Veröffentlichen gibt es für Lead-Demos nicht mehr.
 (function () {
   "use strict";
   var slug = new URLSearchParams(location.search).get("lead");
@@ -8,10 +10,10 @@
 
   var ZUSTAND = {
     neu: ["Noch nicht gespeichert", "neutral"],
-    gespeichert: ["Gespeichert – noch nicht veröffentlicht", "neutral"],
+    gespeichert: ["Gespeichert – nur lokal", "neutral"],
     baut: ["Build läuft …", "laeuft"],
-    "wird-veroeffentlicht": ["Veröffentlichung läuft – warte auf GitHub Pages …", "laeuft"],
-    online: ["Online", "ok"],
+    "wird-veroeffentlicht": ["Früher: Veröffentlichung gestartet", "neutral"],
+    online: ["Früher veröffentlicht – inzwischen abgeschaltet", "neutral"],
     fehler: ["Fehler", "fehler"],
   };
 
@@ -54,6 +56,11 @@
     ".demo-vorschau dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0 0 14px}.demo-vorschau dt{font-weight:600}",
     ".demo-vorschau dd{margin:0}.demo-hindernis{color:#8a2416}",
     ".demo-rahmen{width:100%;height:520px;border:1px solid var(--line,#ddd);border-radius:4px;background:#fff}",
+    ".demo-geraete{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}.demo-geraet{flex:1 1 320px}.demo-geraet--mobil{flex:0 0 auto}",
+    ".demo-rahmen--mobil{width:390px;max-width:100%;height:700px}",
+    ".demo-medien{width:100%;border-collapse:collapse;font-size:14px;margin:0 0 8px}.demo-medien td,.demo-medien th{border-bottom:1px solid var(--line,#eee);padding:4px 6px;text-align:left}",
+    ".demo-fehlt{color:#8a2416}.demo-da{color:#1d5a2c}",
+    ".demo-praes{margin:14px 0;padding:14px;border:1px dashed var(--line,#ccc);border-radius:6px}.demo-praes img{width:180px;height:180px;background:#fff;padding:6px;border:1px solid var(--line,#ddd)}",
   ].join("\n");
   document.head.appendChild(stil);
 
@@ -76,8 +83,7 @@
     } else if (s.online) {
       teile.push(' · zuletzt online: <a href="' + esc(s.online.url) + '" target="_blank" rel="noopener">' + esc(zeit(s.online.zeitpunkt)) + "</a>");
     }
-    if (s.zustand === "fehler") teile.push("<br>" + esc(s.fehler || "") + ' <button type="button" id="demo-wiederholen">Wiederholen</button>');
-    if (s.geaendertWaehrendVorgang) teile.push("<br>Nach dem Start geändert – danach erneut veröffentlichen.");
+    if (s.zustand === "fehler") teile.push("<br>" + esc(s.fehler || ""));
     teile.push("</span>");
     return teile.join("");
   }
@@ -85,7 +91,7 @@
   function angabe(feld, titel, a) {
     return '<div class="demo-angabe' + (a.bestaetigt ? " bestaetigt" : "") + '" data-feld="' + feld + '">' +
       '<div><b>' + esc(titel) + ':</b> ' + (a.wert ? esc(a.wert) : "<em>keine Angabe</em>") + "</div>" +
-      '<div class="demo-quelle">' + (a.bestaetigt ? "Bestätigt am " + esc(zeit(a.bestaetigtAm)) + (a.notiz ? " · Quelle: " + esc(a.notiz) : "") : esc(a.quelle || "–") + " – erscheint erst nach Bestätigung auf der Demo" + (feld === "name" ? " (Pflicht fürs Veröffentlichen)" : "")) + "</div>" +
+      '<div class="demo-quelle">' + (a.bestaetigt ? "Bestätigt am " + esc(zeit(a.bestaetigtAm)) + (a.notiz ? " · Quelle: " + esc(a.notiz) : "") : esc(a.quelle || "–") + " – erscheint erst nach Bestätigung auf der Demo") + "</div>" +
       '<div class="demo-zeile"><input type="text" data-wert value="' + esc(a.wert) + '" aria-label="' + esc(titel) + '">' +
       '<input type="text" data-notiz placeholder="Quelle, z. B. Impressum, Schild" value="' + esc(a.notiz || "") + '" aria-label="Quelle">' +
       '<button type="button" data-bestaetigen>' + (a.bestaetigt ? "Ändern" : "Bestätigen") + "</button>" +
@@ -107,7 +113,24 @@
       var punkte = f.farben ? ["grund", "tint", "akzent", "text"].map(function (k) { return '<i style="background:' + esc(f.farben[k]) + '"></i>'; }).join("") : "";
       return '<label class="demo-schema' + (aktiv ? " aktiv" : "") + '"><input type="radio" name="farbschema" value="' + esc(f.id) + '"' + (aktiv ? " checked" : "") + ">" + punkte + "<br><b>" + esc(f.label) + "</b><br><small>" + esc(f.archetyp) + "</small></label>";
     }).join("");
-    var medien = d.medien.filter(function (m) { return m.herkunft; }).map(function (m) { return esc(m.rolle) + ": " + esc(m.kennzeichnung); }).join(" · ") || "–";
+    var ms = d.medienStatus || { zeilen: [], fehlend: [] };
+    var medien = '<table class="demo-medien" id="demo-medien"><tr><th>Bühne</th><th>Status</th><th>Herkunft</th></tr>' +
+      ms.zeilen.map(function (z) {
+        return "<tr><td>" + esc(z.label) + "</td><td class=\"" + (z.vorhanden ? "demo-da\">vorhanden" + (z.wiedergabe ? " (" + esc(z.wiedergabe) + ")" : "") : "demo-fehlt\">fehlt") + "</td><td>" + esc(z.kennzeichnung || "–") + "</td></tr>";
+      }).join("") + "</table>" +
+      (ms.fehlend.length ? '<p class="demo-hilfe">' + ms.fehlend.map(esc).join("<br>") + "</p>" : "");
+    var alt = d.altDemo || { status: "nie" };
+    var altText = alt.status === "online" ? '<span class="demo-hindernis">Unter der früheren Adresse steht noch eine öffentliche Demo (docs/). Abschalten: npm run demo:migration -- --abschalten</span>'
+      : alt.status === "abgeschaltet" ? "Früher öffentlich, abgeschaltet am " + esc(alt.seit) + " – die alte Adresse zeigt nur noch den neutralen Hinweis der Agentur."
+      : "Nie öffentlich.";
+    var pr = d.praesentation || { aktiv: false };
+    var praes = '<div class="demo-praes" id="demo-praes"><b>Präsentation im WLAN</b><p class="demo-hilfe">Zeigt die lokal gebaute Demo auf einem Handy im selben WLAN oder Hotspot – nicht im Internet, ohne Passwort, nur solange sie läuft (höchstens ' + esc(d.praesentationDauer) + ' Min.).</p>' +
+      (pr.aktiv
+        ? '<p><img alt="QR-Code zur Präsentation" src="/api/qr?url=' + encodeURIComponent(pr.url) + '"></p><p><a href="' + esc(pr.url) + '" target="_blank" rel="noopener">' + esc(pr.url) + "</a><br>läuft bis " + esc(zeit(pr.bis)) + '</p><button type="button" id="demo-praes-stop">Präsentation beenden</button>'
+        : (pr.andere ? '<p class="demo-hilfe">Gerade läuft eine Präsentation für ' + esc(pr.andere) + " – ein Start hier beendet sie.</p>" : "") +
+          '<button type="button" id="demo-praes-start"' + (d.vorschau ? "" : " disabled") + ">Präsentation im WLAN starten</button>" + (d.vorschau ? "" : '<p class="demo-hilfe">Erst „Konzept-Demo lokal bauen“.</p>')) +
+      "</div>";
+    var g = d.gebaut;
     var o = d.oeffentlich;
 
     panel.innerHTML =
@@ -119,20 +142,20 @@
       '<div class="demo-feld"><label for="demo-slogan">Slogan</label><input type="text" id="demo-slogan" name="slogan" maxlength="60" value="' + esc(d.slogan.wert) + '" placeholder="' + esc(d.slogan.standard) + '"><p class="demo-hilfe">Leer lassen = Vorlagenstandard („' + esc(d.slogan.standard) + '“).</p></div>' +
       '<div class="demo-feld"><span class="demo-label">Angaben zum Betrieb</span>' + angabe("name", "Name", d.name) + angabe("adresse", "Adresse", d.adresse) + angabe("telefon", "Telefon", d.telefon) + "</div>" +
       '<div class="demo-knoepfe"><button type="submit" class="knopf-primaer" id="demo-speichern"' + (laeuft ? " disabled" : "") + ">Speichern</button>" +
-      '<button type="button" id="demo-vorschau-bauen"' + (laeuft ? " disabled" : "") + ">Vorschau bauen</button>" +
-      '<button type="button" id="demo-veroeffentlichen"' + (laeuft || d.hindernisse.length ? " disabled" : "") + ">Speichern und veröffentlichen</button></div>" +
+      '<button type="button" id="demo-vorschau-bauen"' + (laeuft ? " disabled" : "") + ">Konzept-Demo lokal bauen</button></div>" +
       '<p class="demo-hilfe" id="demo-meldung" role="status">' + esc(meldung) + "</p>" +
       '</form><aside class="demo-vorschau" aria-label="Vorschau">' +
       "<dl><dt>Vorlage</dt><dd>" + esc(d.vorlage.label) + " (" + esc(d.vorlage.id) + ")</dd>" +
       "<dt>Farbschema</dt><dd>" + esc(d.farbschema.label) + "</dd>" +
       "<dt>Name</dt><dd>" + esc(o.name) + (d.name.bestaetigt ? "" : " <em>(unbestätigt)</em>") + "</dd>" +
       "<dt>Slogan</dt><dd>" + esc(d.slogan.wert || d.slogan.standard) + (d.slogan.manuell ? "" : " <em>(Standard)</em>") + "</dd>" +
-      "<dt>Medien</dt><dd>" + medien + "</dd>" +
+      "<dt>Gebaut</dt><dd>" + (g ? esc(g.ausdruck || "ohne Vorlage") + " · " + esc(g.designsystem) + " · " + esc(g.heroVariante) : "<em>noch nicht</em>") + "</dd>" +
+      "<dt>Frühere Adresse</dt><dd id=\"demo-alt\">" + altText + "</dd>" +
       "<dt>Adresse (öffentlich)</dt><dd>" + (o.adresse ? esc(o.adresse) : "<em>nicht auf der Demo</em>") + "</dd>" +
       "<dt>Telefon (öffentlich)</dt><dd>" + (o.telefon ? esc(o.telefon) : "<em>nicht auf der Demo</em>") + "</dd>" +
       "<dt>Google</dt><dd>" + (d.google.rating ? esc(String(d.google.rating).replace(".", ",")) + " (" + esc(d.google.anzahl) + ") – nur hier im Dashboard; auf der Demo nur der " : "Auf der Demo nur der ") + (o.googleMapsUrl ? '<a href="' + esc(o.googleMapsUrl) + '" target="_blank" rel="noopener">Link zum Maps-Profil</a>' : "Maps-Link (keine Place ID)") + "</dd></dl>" +
-      (d.hindernisse.length ? '<p class="demo-hindernis">' + d.hindernisse.map(esc).join("<br>") + "</p>" : "") +
-      (d.vorschau ? '<p><a href="' + esc(d.vorschau) + '" target="_blank" rel="noopener">Vorschau in neuem Tab</a></p><iframe class="demo-rahmen" title="Vorschau der Demo" src="' + esc(d.vorschau) + "?t=" + Date.now() + '"></iframe>' : '<p class="demo-hilfe">Noch keine Vorschau gebaut.</p>') +
+      medien + praes +
+      (d.vorschau ? '<p><a href="' + esc(d.vorschau) + '" target="_blank" rel="noopener">Vorschau in neuem Tab</a></p><div class="demo-geraete"><div class="demo-geraet"><b>Desktop</b><iframe class="demo-rahmen" title="Vorschau der Demo, Desktop" src="' + esc(d.vorschau) + "?t=" + Date.now() + '"></iframe></div><div class="demo-geraet demo-geraet--mobil"><b>Handy</b><iframe class="demo-rahmen demo-rahmen--mobil" title="Vorschau der Demo, Handy" src="' + esc(d.vorschau) + "?t=" + Date.now() + '"></iframe></div></div>' : '<p class="demo-hilfe">Noch keine Konzept-Demo gebaut.</p>') +
       "</aside></div>";
     binde();
     plane(laeuft);
@@ -150,7 +173,7 @@
     if (m) m.textContent = text;
     return post("/intern/v2/demo/" + encodeURIComponent(slug) + "/" + pfad, nutzlast).then(function (r) {
       if (r.demo) daten = r.demo;
-      meldung = r.ok ? ({ speichern: "Gespeichert.", vorschau: "Vorschau gebaut.", veroeffentlichen: "Veröffentlichung gestartet – der Status aktualisiert sich." })[pfad] : "Fehler: " + (r.fehler || r.status);
+      meldung = r.ok ? ({ speichern: "Gespeichert.", vorschau: "Konzept-Demo lokal gebaut.", praesentation: nutzlast.aktion === "stop" ? "Präsentation beendet." : "Präsentation läuft." })[pfad] : "Fehler: " + (r.fehler || r.status);
       render();
     }).catch(function (fehler) {
       meldung = "Fehler: " + fehler.message;
@@ -169,12 +192,10 @@
       });
     });
     document.getElementById("demo-vorschau-bauen").addEventListener("click", function () { aktion("vorschau", formDaten(), "Baut die Vorschau …"); });
-    document.getElementById("demo-veroeffentlichen").addEventListener("click", function () {
-      if (!confirm("Speichern und veröffentlichen? Die Demo wird öffentlich unter ihrer bisherigen Adresse erreichbar.")) return;
-      aktion("veroeffentlichen", formDaten(), "Startet …");
-    });
-    var wiederholen = document.getElementById("demo-wiederholen");
-    if (wiederholen) wiederholen.addEventListener("click", function () { aktion("veroeffentlichen", {}, "Startet erneut …"); });
+    var start = document.getElementById("demo-praes-start");
+    if (start) start.addEventListener("click", function () { aktion("praesentation", { aktion: "start" }, "Startet die Präsentation …"); });
+    var stop = document.getElementById("demo-praes-stop");
+    if (stop) stop.addEventListener("click", function () { aktion("praesentation", { aktion: "stop" }, "Beendet …"); });
     Array.prototype.forEach.call(panel.querySelectorAll(".demo-angabe"), function (zeile) {
       var feld = zeile.getAttribute("data-feld");
       zeile.querySelector("[data-bestaetigen]").addEventListener("click", function () {

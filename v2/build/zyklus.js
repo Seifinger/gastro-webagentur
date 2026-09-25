@@ -23,6 +23,7 @@ import { starteBrowser } from "./browser.js";
 import { verfeinereTexte, humanisiereTexte } from "./copyRefiner.js";
 import { texteFuer } from "./texte.js";
 import { menuForCuisine } from "./v1Funktionen.js";
+import { pruefeOeffentlicheAusgabe } from "../../src/oeffentlichkeit.js";
 
 export const MAX_RUNDEN = 3;
 export const JUDGE_DIR = path.join(OUTPUT_DIR, "judge");
@@ -60,6 +61,9 @@ export async function baueImZyklus({ lead, kueche, stimmung, judge = true, optio
   const gestaltung = themeForLead(lead, kueche, stimmung);
   const id = `${gestaltung.cuisine}--${gestaltung.stimmung}`;
   const siteId = slug ?? siteSlug(lead, gestaltung.cuisine, gestaltung.stimmung);
+  // Unterste gemeinsame Ebene aller Bauwege: Nach docs/ (GitHub Pages) kommen
+  // nur die fiktiven Beispielseiten, nie eine Demo für einen echten Betrieb.
+  if (zielDir) pruefeOeffentlicheAusgabe(zielDir, siteId);
   const stufen = [];
   const eigenerBrowser = judge && !browser && beurteileFn === beurteile;
   if (eigenerBrowser) browser = await starteBrowser();
@@ -157,7 +161,7 @@ export async function baueImZyklus({ lead, kueche, stimmung, judge = true, optio
       medien: letzte.bericht.medien,
       zeitpunkt: new Date().toISOString(),
     };
-    writeFileSync(path.join(letzte.ordner, "zyklus.json"), `${JSON.stringify(protokoll, null, 2)}\n`);
+    writeFileSync(path.join(letzte.berichtOrdner ?? letzte.ordner, "zyklus.json"), `${JSON.stringify(protokoll, null, 2)}\n`);
     return { ...letzte, protokoll };
   } finally {
     if (eigenerBrowser) await browser?.close().catch(() => {});

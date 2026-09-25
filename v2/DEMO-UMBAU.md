@@ -77,3 +77,14 @@ Geänderte Abläufe:
 - `--only <slug>` baut über die neue Vorlage und veröffentlicht nur mit bestätigtem Namen.
 - `npm run pages` (lokale v1-Entwürfe unter `/entwurf/…`) bleibt als alter Vorschauweg bestehen, ist aber kein Veröffentlichungsweg mehr. Die Demo-Vorschau im Dashboard läuft über „Vorschau bauen“ (`/v2/leads/<slug>/`).
 - Altpfade (v1-Gestaltung, `lokalisiereEigeneBilder`, der v1-Zweig für Leads in `publishSite`) sind für Leads entfernt bzw. stillgelegt. Die v1-Dateien bleiben, solange `npm run pages` sie nutzt.
+
+## Öffentlich vs. lokal (Stand 25.09.2026)
+
+Ist-Befund vor der Umstellung (aus `main:/docs` geprüft): 74 Lead-Demos öffentlich, alle am 23.09. über den alten Pfad (v2 **ohne** Ausdruck) gebaut – alte Kopfzeile, Hero-Varianten `spalte-bild`/`tafel`/`passepartout`/…, Stockfoto statt Bühne, kein Video, keine Konzept-Kennzeichnung oben, Google-Note und Bewertungsanzahl im statischen HTML (74), erfundene Haus-Geschichte (46), dazu `bericht.json`/`zyklus.json` je Ordner. Frische Konzept-Demos über `baueDemo` stimmten dagegen schon mit den Beispielseiten überein (Ausdruck, Designsystem, Bühne, Video/Poster, Abfolge, Skripte). Ursache der Abweichung: Die öffentlichen Seiten wurden nach dem Vorlagen-Umbau nie neu gebaut.
+
+Entscheidung und Umsetzung:
+- Typ A (fiktive Beispiele) bleibt öffentlich; Typ B (Konzept-Demos echter Betriebe) nie in `docs/`; Typ C (Kundenwebsite) später. Durchgesetzt in `src/oeffentlichkeit.js`, geprüft in `baueImZyklus`, `baueUndSchreibeEinzelnenEntwurf`, `schreibeSeiten`, `veroeffentlicheEntwurf`/`starteVeroeffentlichung`, Dashboard-Routen (410) und `demo:migration --freigeben`.
+- Altbestand: `npm run demo:migration -- --abschalten` (Sicherung nach `data/sicherung/` mit URL-Liste, Entfernen, `docs/404.html` als neutraler Hinweis, Hashes in `v2/abgeschaltete-demos.json`).
+- Zeigen vor Ort: Präsentation im WLAN (`src/praesentation.js`), eine Demo, Zufallspfad, Ablauf nach 2 Stunden, QR mit LAN-Adresse. Kein Passwort, kein HTTPS, nicht im Internet – so wird sie auch benannt.
+- Medien: Kennzeichnung „Konzeptmaterial“; Medienstatus (Video Desktop/Mobil, Poster quer/hoch, Herkunft, Fehlendes) im Build-Bericht und Dashboard. Videos laufen ohne ausdrückliche `wiedergabe: "schleife"` einmal und bleiben auf dem letzten Bild stehen. Konzeptmaterial kommt nur aus der Beispielseite der eigenen Küche; fehlt ein Video, steht das Poster.
+- Verfügbar je Küche (alle zwölf gleich): Poster quer, Poster hoch, Video quer (MP4+WebM, einmal). Es fehlt überall ein Hochformat-Video – auf dem Handy steht das Hochformat-Poster.

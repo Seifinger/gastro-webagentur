@@ -99,14 +99,18 @@ function posterBild(medium, mobil, alt) {
 
 /**
  * Video über dem Poster – erst per Skript geladen (preload="none", data-src).
- * Wiedergabe "einmal": keine Schleife, bleibt auf dem letzten Bild stehen.
+ * Wiedergabe "einmal" (Standard): keine Schleife, bleibt auf dem letzten Bild
+ * stehen. Nur wiedergabe: "schleife" spielt als Loop.
  * Hochformat-Poster ohne Hochformat-Video: nur auf breiten Bildschirmen.
  */
 function videoFuer(medien) {
   const video = medien.heroVideo;
   const videoMobil = medien.heroVideoMobil;
   if (!video?.src) return "";
-  const einmal = video.wiedergabe === "einmal";
+  // Schleife nur für Medien, die ausdrücklich dafür geschnitten sind
+  // (wiedergabe: "schleife"). Alles andere läuft einmal und bleibt auf dem
+  // letzten Bild stehen – ein nicht nahtloser Loop würde sichtbar springen.
+  const einmal = video.wiedergabe !== "schleife";
   const nurBreit = !videoMobil?.src && Boolean(medien.heroMobil?.src);
   return `<video class="buehne-video" muted${einmal ? "" : " loop"} playsinline preload="none" aria-hidden="true" data-src="${e(video.src)}"${video.webm?.src ? ` data-src-webm="${e(video.webm.src)}"` : ""}${videoMobil?.src ? ` data-src-mobil="${e(videoMobil.src)}"` : ""}${einmal ? " data-einmal" : ""}${nurBreit ? " data-nur-breit" : ""}></video>`;
 }

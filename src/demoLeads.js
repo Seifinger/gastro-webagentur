@@ -1,6 +1,6 @@
-// Frei erfundene Lokale für die öffentliche Startseite. Die echten Entwürfe
-// liegen zwar auch im Netz, aber unverlinkt und unter einer Adresse mit
-// Kennung – erreichbar nur über den QR-Code oder Link, den du herausgibst.
+// Frei erfundene Lokale für die öffentliche Startseite (Typ A, siehe
+// src/oeffentlichkeit.js). Konzept-Demos für echte Betriebe liegen nicht im
+// Netz – sie werden lokal gebaut und vor Ort über die Präsentation im WLAN gezeigt.
 //
 // Bewusst ohne Telefonnummer: eine ausgedachte Nummer könnte bei einem
 // echten Anschluss klingeln. Die Straße ist als Musteradresse erkennbar.

@@ -54,7 +54,7 @@ test("Aktionen folgen dem Ausdruck: gesellig → Reservieren zuerst (Kopf, Einla
 test("Video nur mit Poster und erst per Skript (preload=none, data-src)", () => {
   const medien = {
     hero: { src: "medien/hero.jpg", herkunft: "ki", kennzeichnung: "KI-generiert" },
-    heroVideo: { src: "medien/heroVideo.mp4", herkunft: "ki", typ: "video" },
+    heroVideo: { src: "medien/heroVideo.mp4", herkunft: "ki", typ: "video", wiedergabe: "schleife" },
     heroVideoMobil: { src: "medien/heroVideoMobil.mp4", herkunft: "ki", typ: "video" },
     haus: null,
     team: null,
@@ -65,6 +65,13 @@ test("Video nur mit Poster und erst per Skript (preload=none, data-src)", () => 
   assert.match(html, /<video class="buehne-video" muted loop playsinline preload="none" aria-hidden="true" data-src="medien\/heroVideo.mp4" data-src-mobil="medien\/heroVideoMobil.mp4"><\/video>/);
   assert.ok(!/<video[^>]*\ssrc=/.test(html), "kein src im Markup – das Poster lädt zuerst");
   assert.match(html, /<span class="buehne-herkunft">KI-generiert<\/span>/);
+});
+
+test("Video ohne Angabe zur Wiedergabe: einmal statt erzwungener Schleife", () => {
+  const medien = { hero: { src: "medien/hero.jpg", herkunft: "eigen" }, heroVideo: { src: "medien/heroVideo.mp4", herkunft: "eigen", typ: "video" }, haus: null, team: null, bestseller: null, gericht: () => null };
+  const video = bau({ medien }).html.match(/<video class="buehne-video"[^>]*>/)[0];
+  assert.ok(!/\sloop\b/.test(video), "kein loop ohne wiedergabe: schleife");
+  assert.match(video, /data-einmal/);
 });
 
 test("Lint: Verlauf in der Bühne nur als geprüfter Schleier-Token", () => {

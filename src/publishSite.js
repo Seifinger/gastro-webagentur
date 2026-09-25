@@ -8,7 +8,6 @@ import { menuForCuisine } from "./menuCatalog.js";
 import { themeForLead } from "./landingPageGenerator.js";
 import { DEMO_LEADS } from "./demoLeads.js";
 import { loadLeadEdits } from "./leadEdits.js";
-import { merkeVeroeffentlichung } from "./entwurfsManifest.js";
 import {
   parseArgs,
   pruefeKueche,
@@ -19,7 +18,8 @@ import { ladeEngineWahl, engineFuerLead as engineAusWahl } from "../v2/integrati
 import { ausdruckZumBauen, stimmungFuerSlug } from "../v2/build/ausdruck.js";
 import { ladeEigeneMedien } from "../v2/assets-pipeline/mediaGenerator.js";
 import { demoEinstellungen } from "./demoEinstellungen.js";
-import { baueDemo, veroeffentlichungsHindernisse } from "../v2/integration/demoBau.js";
+import { baueDemo } from "../v2/integration/demoBau.js";
+import { pruefeOeffentlicheAusgabe } from "./oeffentlichkeit.js";
 
 /** Vorschaubild der Übersicht: das eigene Titelbild der Seite, sonst das Stockfoto. */
 function vorschauBild(slug, gestaltung) {
@@ -27,6 +27,9 @@ function vorschauBild(slug, gestaltung) {
   return eigen ? `./${slug}/medien/hero${path.extname(eigen.datei)}` : remoteImageUrl(gestaltung.heroImage, "hero");
 }
 import { baueImZyklus } from "../v2/build/zyklus.js";
+import { OUTPUT_DIR } from "../v2/build/siteBuilder.js";
+
+const LEADS_DIR = path.join(OUTPUT_DIR, "leads");
 
 /**
  * Baut einen Entwurf über die v2-Engine nach zielordner/<slug>/ – dieselbe
@@ -156,22 +159,19 @@ function buildShowcasePage(entries, kontakt) {
 /**
  * Baut genau eine Lead-Demo aus der neuen Vorlage (v2/integration/demoBau.js)
  * und schreibt sie nach zielordner/<slug>/ – ohne den Rest anzufassen.
- * Grundlage für "npm run publish-site -- --only <slug>", den
- * Veröffentlichen-Knopf (src/veroeffentlichung.js) und die Migration.
+ * Grundlage für "npm run publish-site -- --only <slug>" (lokal nach
+ * v2/output/leads/).
  *
- * - Der Slug kommt aus dem Manifest und wird nie neu berechnet: Auch wenn sich
- *   der Name ändert, bleiben URL und QR-Code gleich.
+ * - Der Slug kommt aus dem Manifest und wird nie neu berechnet.
  * - Gebaut wird in einen Temp-Ordner daneben; erst ein vollständiger Bau
  *   ersetzt zielordner/<slug>. Ein Abbruch lässt die bisherige Fassung stehen.
- * - Nach docs/ (öffentlich) nur mit bestätigtem Namen (Teil 4).
+ * - Nie nach docs/ (öffentlich): src/oeffentlichkeit.js lehnt das ab.
  */
-export async function baueUndSchreibeEinzelnenEntwurf(slug, { email = "", api = "", zielordner = docsDir, buildId = "" } = {}) {
+export async function baueUndSchreibeEinzelnenEntwurf(slug, { email = "", api = "", zielordner = docsDir, buildId = "", fontsDir, fontsPfad } = {}) {
+  // Lead-Demos gehen nie nach docs/ (src/oeffentlichkeit.js) – nur lokal.
+  pruefeOeffentlicheAusgabe(zielordner, slug);
   const einstellungen = demoEinstellungen(slug);
   if (!einstellungen) throw new Error(`Kein Lead für Slug "${slug}" gefunden.`);
-  if (zielordner === docsDir) {
-    const hindernisse = veroeffentlichungsHindernisse(einstellungen);
-    if (hindernisse.length) throw new Error(`Nicht veröffentlicht: ${hindernisse.join(" ")}`);
-  }
 
   mkdirSync(zielordner, { recursive: true });
   const temp = mkdtempSync(path.join(zielordner, `.bau-${slug.slice(0, 40)}-`));
@@ -181,8 +181,8 @@ export async function baueUndSchreibeEinzelnenEntwurf(slug, { email = "", api = 
       apiUrl: api,
       buildId,
       kontaktEmail: email,
-      fontsDir: path.join(zielordner, "assets", "fonts"),
-      fontsPfad: "../assets/fonts",
+      fontsDir: fontsDir ?? path.join(zielordner, "assets", "fonts"),
+      fontsPfad: fontsPfad ?? "../assets/fonts",
     });
     const neu = path.join(temp, slug);
     if (!existsSync(path.join(neu, "index.html"))) throw new Error("Der Bau hat keine index.html erzeugt.");
@@ -199,13 +199,26 @@ export async function baueUndSchreibeEinzelnenEntwurf(slug, { email = "", api = 
     rmSync(temp, { recursive: true, force: true });
   }
 
-  // Nur ein echter Lauf nach docs/ ist eine Veröffentlichung. Ein Bau in ein
-  // anderes Verzeichnis (Vorschau, Tests) darf den festgehaltenen Stand des
-  // Kunden nicht verschieben.
-  if (zielordner === docsDir) {
-    merkeVeroeffentlichung({ placeId: einstellungen.placeId, slug, archetyp: einstellungen.farbschema.archetyp });
-  }
   return { slug, ordner: path.join(zielordner, slug), einstellungen };
+}
+
+/**
+ * Räumt interne Build-Berichte aus den Beispielseiten unter docs/ (ältere
+ * Läufe haben sie dort abgelegt). Neue Läufe schreiben sie nach
+ * v2/output/berichte/ (siteBuilder.berichtOrdnerFuer).
+ */
+export function entferneDiagnoseAusDocs(dir = docsDir) {
+  const entfernt = [];
+  for (const lead of DEMO_LEADS) {
+    for (const datei of ["bericht.json", "zyklus.json"]) {
+      const pfad = path.join(dir, `beispiel-${lead.kueche}`, datei);
+      if (existsSync(pfad)) {
+        rmSync(pfad);
+        entfernt.push(path.relative(dir, pfad));
+      }
+    }
+  }
+  return entfernt;
 }
 
 async function run() {
@@ -243,19 +256,18 @@ async function run() {
     return;
   }
 
-  // --only <slug>: ausschließlich diesen einen Entwurf veröffentlichen. Der
-  // gesamte übrige docs/-Ordner (die anderen Entwürfe, die Demo-Seiten, die
-  // Übersichtsseite) bleibt dabei unangetastet – anders als beim
-  // vollständigen Lauf unten, der docs/ komplett neu aufbaut.
+  // --only <slug>: die Konzept-Demo dieses einen Leads LOKAL bauen
+  // (v2/output/leads/<slug>/, im Dashboard unter /v2/leads/<slug>/). Nach
+  // docs/ kommt sie nicht – siehe src/oeffentlichkeit.js.
   if (args.only) {
     try {
       const { slug, ordner } = await baueUndSchreibeEinzelnenEntwurf(args.only, {
-        cuisine: args.cuisine,
         email: args.email,
-        api: args.api,
-        resonanz: args.resonanz,
+        zielordner: LEADS_DIR,
+        fontsDir: path.join(OUTPUT_DIR, "assets", "fonts"),
+        fontsPfad: "../../assets/fonts",
       });
-      console.log(`\n✅ Entwurf "${slug}" veröffentlicht (nur dieser Ordner wurde geschrieben).`);
+      console.log(`\n✅ Konzept-Demo "${slug}" lokal gebaut – nicht veröffentlicht. Zeigen: Dashboard → „Präsentation im WLAN“.`);
       console.log(`   Ordner: ${ordner}\n`);
     } catch (error) {
       console.log(`\n${error.message}\n`);
@@ -264,11 +276,8 @@ async function run() {
     return;
   }
 
-  // Gesamtlauf: nur die erfundenen Beispielseiten und die Übersicht. Lead-
-  // Demos werden nie mehr gesammelt überschrieben (v2/DEMO-UMBAU.md, Teil 3):
-  // einzeln per --only <slug>, aus dem Dashboard oder über die Migration mit
-  // Vorschau und Freigabe (npm run demo:migration). docs/ wird dabei nicht
-  // mehr gelöscht – bestehende Lead-Seiten und ihre QR-Ziele bleiben stehen.
+  // Gesamtlauf: nur die erfundenen Beispielseiten (Typ A) und die Übersicht.
+  // Lead-Demos werden nie nach docs/ geschrieben (src/oeffentlichkeit.js).
   mkdirSync(docsDir, { recursive: true });
   const wahl = ladeEngineWahl();
   const demoEntries = DEMO_LEADS.map((lead) => ({
@@ -299,10 +308,11 @@ async function run() {
   }
 
   writeFileSync(path.join(docsDir, "index.html"), buildShowcasePage(demoEntries, args.kontakt), "utf-8");
+  entferneDiagnoseAusDocs();
   writeFileSync(path.join(docsDir, ".nojekyll"), "", "utf-8");
   writeFileSync(path.join(docsDir, "robots.txt"), "User-agent: *\nDisallow: /\n", "utf-8");
 
-  console.log(`\n✅ ${demoEntries.length} Beispielseiten und die Übersicht gebaut. Lead-Demos: einzeln mit --only <slug> oder über npm run demo:migration.`);
+  console.log(`\n✅ ${demoEntries.length} Beispielseiten und die Übersicht gebaut. Lead-Demos bleiben lokal (Dashboard oder --only <slug>).`);
   console.log(`   Ordner: ${docsDir}\n`);
 }
 

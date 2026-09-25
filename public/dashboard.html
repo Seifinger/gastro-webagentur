@@ -356,9 +356,9 @@
 
     <div class="pitch-raster">
       <div class="qr-feld">
-        <p class="qr-warnung">Dieser Entwurf ist <strong>noch nicht veröffentlicht</strong> – die QR-Codes
-           führen gerade auf eine 404-Seite. Erst <code>npm run publish-site</code> ausführen,
-           dann <code>docs/</code> committen und nach <code>main</code> pushen.</p>
+        <p class="qr-warnung">Gerade läuft <strong>keine Präsentation</strong> für diesen Lead. Konzept-Demos
+           stehen nicht im Internet: Unter <a id="pitch-panel" href="#">Bilder → Demo</a> die Demo lokal bauen und
+           „Präsentation im WLAN starten“. Der QR-Code funktioniert dann auf jedem Handy im selben WLAN/Hotspot.</p>
         <div class="qr-paar">
           <div class="qr-stueck">
             <img id="pitch-qr" alt="QR-Code zum Entwurf, mit Bewegungseffekten">
@@ -369,13 +369,13 @@
             <p class="qr-label">Ohne Bewegung</p>
           </div>
         </div>
-        <p>Zwei Varianten desselben Entwurfs – praktisch, um vor Ort situativ zu zeigen,
-           was beim Wirt besser ankommt.</p>
+        <p>Zwei Varianten derselben Präsentation (mit/ohne Bewegung). Nur im selben WLAN erreichbar
+           und nur, solange die Präsentation läuft.</p>
       </div>
 
       <div>
         <div class="pitch-block">
-          <label for="pitch-url">Adresse des Entwurfs</label>
+          <label for="pitch-url">Adresse der Präsentation (nur im selben WLAN)</label>
           <div class="pitch-zeile">
             <input id="pitch-url" type="text" readonly>
             <button type="button" data-kopieren="pitch-url">Kopieren</button>
@@ -646,7 +646,7 @@ function applyFiltersAndRender() {
       <td>${l.entwurf ? `<a class="entwurf" href="${esc(l.entwurf)}" target="_blank" rel="noopener">ansehen</a>` : "-"}</td>
       ${resonanzAktiv ? `<td class="resonanz-spalte">${resonanzZelle(l)}</td>` : ""}
       <td>${l.slug ? `<a class="bearbeiten" href="/bearbeiten.html?lead=${encodeURIComponent(l.slug)}">Bilder</a>` : "-"}</td>
-      <td>${l.demoUrl ? `<button class="pitch" data-pitch="${esc(l.placeId)}">QR &amp; Text</button>` : "-"}</td>
+      <td>${l.slug ? `<button class="pitch" data-pitch="${esc(l.placeId)}">QR &amp; Text</button>` : "-"}</td>
       <td>${esc(l.ort)}</td>
       <td>${esc(l.adresse)}</td>
       <td>${esc(l.telefon)}</td>
@@ -754,27 +754,31 @@ function oeffnePitch(placeId) {
   document.getElementById("pitch-titel").textContent = lead.name || "Entwurf";
   // ?vorschau=1 wie im "Entwurf öffnen"-Link unten: der eigene Blick in die
   // Leiste darf nicht als Öffnung durch den Wirt in die Resonanz-Zahlen einfließen.
-  document.getElementById("pitch-vorschau").src = lead.veroeffentlicht ? `${lead.demoUrl}?vorschau=1` : "about:blank";
-  document.getElementById("pitch-url").value = lead.demoUrl;
-  document.getElementById("pitch-qr").src = `/api/qr?url=${encodeURIComponent(lead.demoUrl)}`;
+  // Konzept-Demos sind nicht öffentlich: Vorschau aus dem lokalen Bau, QR nur
+  // auf eine laufende Präsentation im WLAN (src/praesentation.js).
+  const lokal = lead.v2?.gebaut ? lead.v2.entwurf : "";
+  document.getElementById("pitch-vorschau").src = lokal || "about:blank";
+  document.getElementById("pitch-url").value = lead.demoUrl || "– keine Präsentation aktiv –";
+  document.getElementById("pitch-qr").src = lead.demoUrl ? `/api/qr?url=${encodeURIComponent(lead.demoUrl)}` : "";
   // Zweiter QR-Code auf dieselbe Seite, nur mit ?bewegung=aus (siehe
   // motion.js) – zum situativen Zeigen mit oder ohne Bewegungseffekte.
-  document.getElementById("pitch-qr-ruhig").src =
-    `/api/qr?url=${encodeURIComponent(lead.demoUrl + "?bewegung=aus")}`;
+  document.getElementById("pitch-qr-ruhig").src = lead.demoUrl
+    ? `/api/qr?url=${encodeURIComponent(lead.demoUrl + "?bewegung=aus")}` : "";
+  document.getElementById("pitch-panel").href = `/bearbeiten.html?lead=${encodeURIComponent(lead.slug)}#demo-panel`;
   document.getElementById("pitch-betreff").value = lead.anschreiben.betreff;
   document.getElementById("pitch-text").value = lead.anschreiben.text;
   // Der eigene Kontrollblick auf den Entwurf darf nicht als Öffnung durch den
   // Wirt zählen, sonst ist der Resonanz-Filter wertlos. Das Beacon steigt bei
   // ?vorschau=1 aus (siehe resonanzBeacon.js); der Link im Anschreiben und die
   // QR-Codes bleiben bewusst ohne den Parameter.
-  document.getElementById("pitch-oeffnen").href = `${lead.demoUrl}?vorschau=1`;
+  document.getElementById("pitch-oeffnen").href = lead.demoUrl ? `${lead.demoUrl}?vorschau=1` : lokal || "#";
 
   const mailto = `mailto:?subject=${encodeURIComponent(lead.anschreiben.betreff)}&body=${encodeURIComponent(lead.anschreiben.text)}`;
   document.getElementById("pitch-mail").href = mailto;
 
   document
     .querySelector(".pitch-raster")
-    .classList.toggle("nicht-veroeffentlicht", !lead.veroeffentlicht);
+    .classList.toggle("nicht-veroeffentlicht", !lead.demoUrl);
 
   document.getElementById("pitch").classList.add("offen");
 }

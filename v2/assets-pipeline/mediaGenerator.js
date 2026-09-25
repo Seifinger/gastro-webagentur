@@ -32,7 +32,7 @@ export const KI_DIR = path.join(REPO, "v2", "output", "medien");
 export const UPLOADS_DIR = path.join(REPO, "public", "uploads");
 
 export const ROLLEN = ["hero", "haus", "team", "bestseller"];
-export const KENNZEICHNUNG = { eigen: "eigenes Foto", ki: "KI-generiert", platzhalter: "Platzhalter", konzept: "Konzeptbild" };
+export const KENNZEICHNUNG = { eigen: "eigenes Foto", ki: "KI-generiert", platzhalter: "Platzhalter", konzept: "Konzeptmaterial" };
 
 const FORMATE = { hero: "16:9", heroMobil: "4:5", haus: "4:3", team: "4:3", bestseller: "4:3", gericht: "4:3", heroVideo: "16:9", heroVideoMobil: "9:16" };
 
@@ -281,7 +281,7 @@ export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remote
   const ki = ladeKiMedien(slug, kiDir);
   // Konzept-Demo (v2/DEMO-UMBAU.md): Hat ein echter Lead kein eigenes
   // Titelbild, trägt die Bühne die Medien der Küchenrichtung (Beispielseite),
-  // gekennzeichnet als "Konzeptbild" – nie als Foto des Betriebs. Sobald ein
+  // gekennzeichnet als "Konzeptmaterial" – nie als Foto oder Film des Betriebs. Sobald ein
   // eigenes Titelbild da ist, bleibt der Konzeptsatz ganz weg (kein Mischen).
   const konzept = konzeptVon && !eigeneSeite.hero && !uploads.hero && !ki.hero ? eigene[konzeptVon] ?? {} : {};
   const badgeFuer = (rolle, herkunft) => herkunft === "ki" || (herkunft === "platzhalter" && ["haus", "team", "bestseller"].includes(rolle) && !fiktiv);
@@ -339,8 +339,44 @@ function platzhalterSvgSync(ds, rolle) {
 
 /** Übersicht je Rolle für das Dashboard (Stage 7b). */
 export function medienUebersicht(medien) {
-  const zeile = (rolle, m) => (m ? { rolle, herkunft: m.herkunft, kennzeichnung: m.kennzeichnung, quelle: m.quelle, typ: m.typ } : { rolle, herkunft: null, kennzeichnung: "–" });
-  return ["hero", "haus", "team", "bestseller", "heroVideo"].map((rolle) => zeile(rolle, medien[rolle]));
+  const zeile = (rolle, m) => (m ? { rolle, herkunft: m.herkunft, kennzeichnung: m.kennzeichnung, quelle: m.quelle, typ: m.typ, ...(m.wiedergabe ? { wiedergabe: m.wiedergabe } : {}) } : { rolle, herkunft: null, kennzeichnung: "–" });
+  return ["hero", "heroMobil", "heroVideo", "heroVideoMobil", "haus", "team", "bestseller"].map((rolle) => zeile(rolle, medien[rolle]));
+}
+
+const BUEHNE_ROLLEN = [
+  ["heroVideo", "Video Desktop (quer)"],
+  ["heroVideoMobil", "Video Mobil (hoch)"],
+  ["hero", "Poster quer"],
+  ["heroMobil", "Poster hoch"],
+];
+
+/**
+ * Medienstatus der Bühne (Dashboard, Build-Bericht): was vorhanden ist, woher
+ * es kommt, wie ein Video abgespielt wird – und was fehlt und wie die Seite
+ * dann reagiert. Es wird nie ein anderes Medium still als Ersatz eingesetzt.
+ */
+export function medienStatus(medien) {
+  const zeilen = BUEHNE_ROLLEN.map(([rolle, label]) => {
+    const m = medien?.[rolle];
+    const echt = m?.src && m.quelle !== "platzhalter:svg";
+    return {
+      rolle,
+      label,
+      vorhanden: Boolean(echt),
+      herkunft: echt ? m.herkunft : null,
+      kennzeichnung: echt ? m.kennzeichnung : "",
+      quelle: echt ? m.quelle : "",
+      ...(echt && m.wiedergabe ? { wiedergabe: m.wiedergabe } : {}),
+      ...(echt && m.webm ? { webm: true } : {}),
+    };
+  });
+  const hat = (r) => zeilen.find((z) => z.rolle === r).vorhanden;
+  const fehlend = [];
+  if (!hat("heroVideo")) fehlend.push("Video Desktop fehlt – die Bühne zeigt das Poster (kein Ersatzvideo).");
+  if (!hat("heroVideoMobil")) fehlend.push(hat("heroMobil") ? "Video Mobil fehlt – auf dem Handy steht das Hochformat-Poster (kein gestrecktes Querformat-Video)." : "Video Mobil fehlt.");
+  if (!hat("hero")) fehlend.push("Poster quer fehlt – neutrale Fläche statt Foto.");
+  if (!hat("heroMobil")) fehlend.push("Poster hoch fehlt – auf dem Handy wird das Querformat-Poster beschnitten.");
+  return { zeilen, fehlend };
 }
 
 export { hashText };

@@ -1,4 +1,5 @@
 import { mkdirSync, writeFileSync } from "node:fs";
+import { pruefeOeffentlicheAusgabe } from "./oeffentlichkeit.js";
 import path from "node:path";
 import { readAllLeads } from "./csvImport.js";
 import {
@@ -175,6 +176,8 @@ export async function ladeSchriften(fontsDir, cssPfad = "../assets/fonts") {
 }
 
 export function schreibeSeiten(entries, zielordner, optionen = {}) {
+  // Nach docs/ nur die fiktiven Beispielseiten (src/oeffentlichkeit.js).
+  for (const entry of entries) pruefeOeffentlicheAusgabe(zielordner, entry.slug);
   for (const entry of entries) {
     const html = buildLandingPage(entry.lead, {
       ...optionen,
