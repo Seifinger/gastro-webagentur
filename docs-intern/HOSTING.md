@@ -2,7 +2,7 @@
 
 **Stand:** 24.09.2026. Die Preise stammen aus Suchergebnissen und sind vor der Buchung auf der Anbieterseite zu prüfen.
 
-GitHub Pages liefert weiterhin **nur die öffentlichen, statischen Demos** aus (`main:/docs`). Das Dashboard ist ein Node-Server mit Dateispeicher (`data/`), Git-Push und API-Schlüsseln. Es braucht einen eigenen Host, auf dem es serverseitig geschützt läuft.
+GitHub Pages liefert nur die **fiktiven Beispielseiten** aus (`main:/docs`); Konzept-Demos echter Betriebe werden seit 25.09.2026 nicht mehr veröffentlicht (`src/oeffentlichkeit.js`, README „Was öffentlich ist“). Das Dashboard ist ein Node-Server mit Dateispeicher (`data/`), Git-Push und API-Schlüsseln. Es braucht einen eigenen Host, auf dem es serverseitig geschützt läuft.
 
 ## Architekturvergleich
 
@@ -55,7 +55,10 @@ Quellen:
 
 **Offen, weil Zugänge fehlen:** Einen echten Online-Test (Deploy, Login über HTTPS, Push nach `main`, Auslieferung durch Pages) konnte ich ohne Fly-Konto und ohne GitHub-Token nicht machen. Lokal geprüft ist das Startskript mit Klon, `npm ci`, Start, `/gesund`, Login und dem Token außerhalb der Repo-Konfiguration. Das Image selbst konnte ich nicht bauen, weil in dieser Umgebung kein Docker-Daemon läuft.
 
-## Veröffentlichen vom Host aus
+## Veröffentlichen vom Host aus (abgeschaltet für Lead-Demos)
+
+> Seit 25.09.2026 lehnt der Ablauf jeden Lead-Slug ab (410 im Dashboard). Er bleibt nur als Grundlage für einen späteren Kunden-Workflow (Typ C) im Code. Eine online abrufbare, geschützte Vorschau für einen Lead wäre auf diesem Host möglich (Sitzung + Freigabe je Lead, serverseitig geprüft) – umgesetzt ist bisher nur die Präsentation im WLAN.
+
 Der Knopf „Speichern und veröffentlichen“ läuft so ab:
 1. Die Demo wird in einen Temp-Ordner gebaut und erst nach vollständigem Bau nach `docs/<slug>` getauscht.
 2. Danach folgen `git commit`, `git pull --rebase` und `git push` nach `main`.

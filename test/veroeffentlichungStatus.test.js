@@ -5,10 +5,10 @@ import { fileURLToPath } from "node:url";
 import { richteTestLeadsEin } from "./hilfen/testLead.js";
 import { starteVeroeffentlichung, baueEntwurfHook, gitAufrufHook, abrufHook, pruefeOeffentlich, laeuftGerade } from "../src/veroeffentlichung.js";
 import { demoEinstellungen, speichereDemoEinstellungen } from "../src/demoEinstellungen.js";
-import { siteBaseUrl } from "../src/config.js";
 
-// Veröffentlichen aus dem Dashboard: Der Status sagt nur "online", wenn die
-// öffentliche URL nachweislich die neue Fassung (Build-ID) ausliefert.
+// Veröffentlichen aus dem Dashboard ist für Lead-Demos abgeschaltet
+// (src/oeffentlichkeit.js). Der Online-Nachweis bleibt für einen späteren
+// Kunden-Workflow (Typ C) erhalten und getestet.
 
 const LEAD = { slug: "testdemo-status-0aaa111", placeId: "ChIJtestStatus01", name: "Trattoria Da Test", ort: "Altötting" };
 const repoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -26,64 +26,21 @@ async function mit({ bau, git, abruf }, fn) {
   try { return await fn(); } finally { [baueEntwurfHook.aktuell, gitAufrufHook.aktuell, abrufHook.aktuell] = alt; }
 }
 
-test("Erfolg: baut → wird-veroeffentlicht → online erst, wenn die URL die neue Build-ID liefert", async () => {
-  const gesehen = [];
-  let abrufe = 0;
+test("starteVeroeffentlichung: Lead-Demos werden abgelehnt – Status bleibt, kein Bau, kein Git, kein Abruf", async () => {
+  const aufrufe = [];
+  const vorher = demoEinstellungen(LEAD.slug).status;
   await mit({
-    abruf: async (url) => {
-      abrufe += 1;
-      gesehen.push(demoEinstellungen(LEAD.slug).status.zustand);
-      const id = new URL(url).searchParams.get("pruefung");
-      // Die ersten beiden Abrufe liefern noch die alte Fassung (Pages baut noch).
-      return abrufe < 3 ? { status: 200, text: '<meta name="demo-build" content="alt">' } : { status: 200, text: `<meta name="demo-build" content="${id}">` };
-    },
+    bau: async (slug) => { aufrufe.push(["bau", slug]); return { slug, ordner: path.join(repoRoot, "docs", slug) }; },
+    git: async (a) => { aufrufe.push(["git", ...a]); return { stdout: "" }; },
+    abruf: async (url) => { aufrufe.push(["abruf", url]); return { status: 200, text: "" }; },
   }, async () => {
-    const { buildId, fertig } = starteVeroeffentlichung(LEAD.slug, { pruefOptionen: { ...schnell, grenzeMs: 1000 } });
-    assert.equal(laeuftGerade(LEAD.slug), true);
-    const ende = await fertig;
-    assert.equal(ende.zustand, "online");
-    assert.equal(ende.online.buildId, buildId);
-    assert.equal(ende.online.url, `${siteBaseUrl}/${LEAD.slug}/`);
+    assert.throws(() => starteVeroeffentlichung(LEAD.slug, { pruefOptionen: schnell }), /nicht mehr veröffentlicht/);
   });
-  assert.ok(gesehen.every((z) => z === "wird-veroeffentlicht"), "vor dem Nachweis nie 'online'");
-  assert.equal(demoEinstellungen(LEAD.slug).status.zustand, "online");
+  assert.deepEqual(aufrufe, []);
   assert.equal(laeuftGerade(LEAD.slug), false);
-});
-
-test("Push gelungen, aber Seite kommt nicht an: Fehler statt Erfolgsmeldung; die zuletzt nachgewiesene Fassung bleibt vermerkt", async () => {
-  const vorher = demoEinstellungen(LEAD.slug).status.online;
-  await mit({}, async () => {
-    const ende = await starteVeroeffentlichung(LEAD.slug, { pruefOptionen: schnell }).fertig;
-    assert.equal(ende.zustand, "fehler");
-    assert.match(ende.fehler, /liefert .* die neue Fassung noch nicht aus/);
-    assert.deepEqual(ende.online, vorher);
-  });
-});
-
-test("Baufehler: Fehler mit Ursache, kein Git-Befehl, Wiederholen möglich", async () => {
-  const git = [];
-  await mit({ bau: async () => { throw new Error("Nicht veröffentlicht: Der Name ist noch nicht bestätigt."); }, git: async (a) => { git.push(a); return { stdout: "" }; } }, async () => {
-    const ende = await starteVeroeffentlichung(LEAD.slug, { pruefOptionen: schnell }).fertig;
-    assert.equal(ende.zustand, "fehler");
-    assert.equal(ende.schritt, "bauen");
-    assert.match(ende.fehler, /Name ist noch nicht bestätigt/);
-  });
-  assert.equal(git.length, 0);
-  assert.equal(laeuftGerade(LEAD.slug), false, "danach kann erneut gestartet werden");
-});
-
-test("je Demo nur ein Vorgang gleichzeitig; Speichern während des Baus überschreibt den Zustand nicht", async () => {
-  let freigeben;
-  const halt = new Promise((r) => { freigeben = r; });
-  await mit({ bau: async (slug) => { await halt; return { slug, ordner: path.join(repoRoot, "docs", slug) }; } }, async () => {
-    const lauf = starteVeroeffentlichung(LEAD.slug, { pruefOptionen: schnell });
-    assert.throws(() => starteVeroeffentlichung(LEAD.slug), /läuft bereits/);
-    const d = speichereDemoEinstellungen(LEAD.slug, { slogan: "Neu während des Baus" });
-    assert.equal(d.status.zustand, "baut");
-    assert.equal(d.status.geaendertWaehrendVorgang, true);
-    freigeben();
-    await lauf.fertig;
-  });
+  assert.deepEqual(demoEinstellungen(LEAD.slug).status, vorher);
+  // Speichern der Einstellungen funktioniert weiter.
+  assert.equal(speichereDemoEinstellungen(LEAD.slug, { slogan: "Lokal gebaut" }).slogan.wert, "Lokal gebaut");
 });
 
 test("pruefeOeffentlich: nur die exakte Build-ID zählt, Netzfehler werden überbrückt", async () => {

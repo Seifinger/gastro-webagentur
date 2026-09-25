@@ -50,6 +50,8 @@ import { renderTisch, renderHausBand, renderAnfahrt, renderFussAusdruck, ABFOLGE
 import { renderAtmosphaere, ATMOSPHAERE_CSS, ATMOSPHAERE_SKRIPT } from "./atmosphaere.js";
 import { renderReservierung, renderKontakt, renderBestellweg, renderFuss, renderEntwurfsleiste } from "./sektionen/service.js";
 import { konzeptLead, konzeptTexte } from "./konzept.js";
+import { liegtInDocs } from "../../src/oeffentlichkeit.js";
+import { medienStatus } from "../assets-pipeline/mediaGenerator.js";
 import { karteAusDaten, gerichtZuIndex, gerichtLink, auswahlFuerStartseite, KARTE_PFAD, START_PFAD } from "./speisekarte.js";
 import { renderAuswahl, renderKarteSeite, kategorieBilder, KARTE_CSS, KARTE_SEITE_SKRIPT } from "./sektionen/speisekarte.js";
 
@@ -503,6 +505,7 @@ ${renderFussAusdruck(ctxKarte)}
       lint: { fehler: 0, warnungen: lintErgebnis.warnungen },
       korrekturen: korrekturProtokoll,
       medien: Object.fromEntries(genutzt.map(([rolle, m]) => [rolle, { herkunft: m.herkunft, kennzeichnung: m.kennzeichnung, quelle: m.quelle, typ: m.typ ?? "bild" }])),
+      ...(ausdruck ? { medienStatus: medienStatus(medien) } : {}),
       copy: copyBericht,
       raster: SPACING_SKALA,
     },
@@ -511,6 +514,13 @@ ${renderFussAusdruck(ctxKarte)}
 
 export function siteSlug(lead, kueche, stimmung) {
   return lead.slug ?? slugify(`${lead.name}-${kueche}-${stimmung ?? ""}`);
+}
+
+export const BERICHTE_DIR = path.join(OUTPUT_DIR, "berichte");
+
+/** Wohin bericht.json/zyklus.json gehören: neben die Seite, außer die Seite liegt in docs/. */
+export function berichtOrdnerFuer(zielDir, slug) {
+  return liegtInDocs(zielDir) ? path.join(BERICHTE_DIR, slug) : path.join(zielDir, slug);
 }
 
 /** Baut und schreibt nach v2/output/sites/<slug>/index.html (+ bericht.json). */
@@ -529,6 +539,11 @@ export function schreibeSite(parameter, { zielDir = SITES_DIR, slug } = {}) {
     mkdirSync(path.dirname(path.join(ordner, pfad)), { recursive: true });
     writeFileSync(path.join(ordner, pfad), html, "utf-8");
   }
-  writeFileSync(path.join(ordner, "bericht.json"), `${JSON.stringify(ergebnis.bericht, null, 2)}\n`, "utf-8");
-  return { ...ergebnis, ordner };
+  // Interne Diagnose (Designsystem, Seed, Lint, Copy-Umschreibungen, Medienquellen)
+  // gehört nicht auf eine öffentliche Seite: Bei einem Ziel in docs/ landet sie
+  // unter v2/output/berichte/<slug>/ (gitignoriert).
+  const berichtOrdner = berichtOrdnerFuer(zielDir, path.basename(ordner));
+  mkdirSync(berichtOrdner, { recursive: true });
+  writeFileSync(path.join(berichtOrdner, "bericht.json"), `${JSON.stringify(ergebnis.bericht, null, 2)}\n`, "utf-8");
+  return { ...ergebnis, ordner, berichtOrdner };
 }

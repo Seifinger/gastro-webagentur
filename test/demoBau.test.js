@@ -61,7 +61,7 @@ test("Google-Inhalte nicht im statischen HTML: keine Note, keine Anzahl, unbest�
 
 test("ohne eigene Fotos: nur Konzeptbilder der Küchenrichtung, gekennzeichnet", async () => {
   const html = await bau(BAYER.slug);
-  assert.match(html, /class="buehne-herkunft">Konzeptbild</);
+  assert.match(html, /class="buehne-herkunft">Konzeptmaterial</);
   const bericht = JSON.parse(readFileSync(path.join(ZIEL, BAYER.slug, "bericht.json"), "utf-8"));
   assert.match(JSON.stringify(bericht.medien), /konzept:beispiel-bayerisch/);
   assert.ok(existsSync(path.join(ZIEL, BAYER.slug, "medien", "hero.jpg")));
@@ -71,7 +71,7 @@ test("andere Küche mit anderer Bildsprache: Japanisch → Vorlage der Sakura-Be
   const html = await bau(SUSHI.slug);
   assert.match(html, /<meta name="v2-ausdruck" content="kino">/);
   assert.match(html, /<meta name="v2-designsystem" content="japanisch--omakase">/);
-  assert.match(html, /class="buehne-herkunft">Konzeptbild</);
+  assert.match(html, /class="buehne-herkunft">Konzeptmaterial</);
   assert.match(sichtbar(html), /Sushi Kaito/);
   assert.doesNotMatch(sichtbar(html), /(?<!\d)4,9(?!\d)|1\.203|auf Google/);
 });

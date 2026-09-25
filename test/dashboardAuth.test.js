@@ -99,9 +99,10 @@ test("mit gesetztem DASHBOARD_TOKEN: /intern/-Route mit korrektem Token funktion
         });
         const ergebnis = await antwort.json();
 
-        assert.equal(antwort.status, 200);
-        assert.equal(ergebnis.ok, true);
-        assert.equal(ergebnis.veraendert, true);
+        // Anmeldung bestanden (kein 401); die Route selbst veröffentlicht
+        // keine Lead-Demos mehr (src/oeffentlichkeit.js) und antwortet mit 410.
+        assert.equal(antwort.status, 410);
+        assert.match(ergebnis.fehler, /nicht mehr veröffentlicht/);
       }),
     ),
   ));
@@ -114,10 +115,9 @@ test("mit gesetztem DASHBOARD_TOKEN: der Token wird auch als Cookie akzeptiert",
           method: "POST",
           headers: { Cookie: "dashboard_token=geheim-123" },
         });
-        const ergebnis = await antwort.json();
+        await antwort.json();
 
-        assert.equal(antwort.status, 200);
-        assert.equal(ergebnis.ok, true);
+        assert.equal(antwort.status, 410, "Token akzeptiert – die Route selbst lehnt das Veröffentlichen ab");
       }),
     ),
   ));
@@ -173,15 +173,15 @@ test("mit gesetztem DASHBOARD_TOKEN: rein lesende Routen bleiben ungeschützt", 
     }),
   ));
 
-test("ohne gesetztes DASHBOARD_TOKEN: die Veroeffentlichen-Route funktioniert wie vor dieser Änderung (Regression)", () =>
+test("ohne gesetztes DASHBOARD_TOKEN: die Veroeffentlichen-Route ist ohne Token erreichbar und lehnt ab (410)", () =>
   mitToken(undefined, () =>
     mitFakes(gueltigeFakes, () =>
       mitServer(async (basis) => {
         const antwort = await fetch(`${basis}/intern/lead/token-test/veroeffentlichen`, { method: "POST" });
         const ergebnis = await antwort.json();
 
-        assert.equal(antwort.status, 200);
-        assert.equal(ergebnis.ok, true);
+        assert.equal(antwort.status, 410);
+        assert.equal(ergebnis.ok, false);
       }),
     ),
   ));
@@ -191,7 +191,7 @@ test("ohne gesetztes DASHBOARD_TOKEN: eine leere DASHBOARD_TOKEN-Variable zählt
     mitFakes(gueltigeFakes, () =>
       mitServer(async (basis) => {
         const antwort = await fetch(`${basis}/intern/lead/token-test/veroeffentlichen`, { method: "POST" });
-        assert.equal(antwort.status, 200);
+        assert.equal(antwort.status, 410);
       }),
     ),
   ));
