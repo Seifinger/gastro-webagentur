@@ -1,4 +1,5 @@
 import { createServer } from "node:http";
+import { timingSafeEqual, createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -27,10 +28,22 @@ import {
   bestaetigeNoShow,
   abholEinstellungen,
   uhrHook,
+  verschiebeReservierung,
+  findeUeberGastToken,
+  widerrufeGastZugang,
+  setzeGastKontakt,
+  betriebsKontakt,
+  setzeDemoBetrieb,
 } from "./betriebStore.js";
 import { benachrichtigeBetrieb, oeffentlicherVapidSchluessel } from "./pushNotify.js";
 import { benachrichtigeUeberTelegram } from "./telegramNotify.js";
-import { informiereUeberVerzoegerung, versendeRechnung } from "./kundenBenachrichtigung.js";
+import {
+  versendeRechnung,
+  stelleGastMeldungenZu,
+  versucheGastMeldungErneut,
+  gastEmailEinrichtung,
+} from "./kundenBenachrichtigung.js";
+import { statusFuerGast, wirtGastHinweis, gastPhase, titelFuer } from "./gastStatus.js";
 import { beobachteAbholung, lernUebersicht } from "./wartezeitLernStore.js";
 import { vermerkeNoShow, warnhinweisNoetig } from "./zuverlaessigkeitStore.js";
 import { erzeugeNoShowRechnung } from "./rechnungGenerator.js";
@@ -38,6 +51,7 @@ import { erzeugeNoShowRechnung } from "./rechnungGenerator.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const seite = path.join(__dirname, "..", "public", "wirt.html");
 const serviceWorker = path.join(__dirname, "..", "public", "sw.js");
+const statusSeite = path.join(__dirname, "..", "public", "status.html");
 
 const VERZOEGERUNG = /^\/intern\/bestellung\/([^/]+)\/verzoegerung$/;
 const STORNIEREN = /^\/oeffentlich\/bestellung\/([^/]+)\/stornieren$/;
@@ -52,6 +66,10 @@ const argv = process.argv.slice(2);
 const slug = parseFlag(argv, "--betrieb", process.env.BETRIEB || "mein-lokal");
 // Bewusst nicht PORT: das gehört dem persönlichen Dashboard auf 3000.
 const port = Number(parseFlag(argv, "--port", process.env.WIRT_PORT || 3200));
+// Präsentation/Probelauf: keine Status-Links, keine Gast-E-Mails. Die Wahl
+// wird am Betrieb gespeichert und gilt bis --kein-demo.
+if (argv.includes("--demo")) setzeDemoBetrieb(slug, true);
+if (argv.includes("--kein-demo")) setzeDemoBetrieb(slug, false);
 
 /**
  * Die öffentlichen Endpunkte nimmt jeder Gast an, der die Seite offen hat.
@@ -69,6 +87,34 @@ function zuSchnell(adresse) {
   zugriffe.set(adresse, liste);
   return liste.length > BREMSE_MAX;
 }
+
+// Falsche Status-Links: eigene, strengere Bremse gegen Durchprobieren.
+const FEHLVERSUCHE_FENSTER_MS = 10 * 60_000;
+const FEHLVERSUCHE_MAX = 10;
+const fehlversuche = new Map();
+
+function zuVieleFehlversuche(adresse, neu = false) {
+  const jetzt = Date.now();
+  const liste = (fehlversuche.get(adresse) ?? []).filter((t) => jetzt - t < FEHLVERSUCHE_FENSTER_MS);
+  if (neu) liste.push(jetzt);
+  fehlversuche.set(adresse, liste);
+  return liste.length >= FEHLVERSUCHE_MAX;
+}
+
+/** Für Tests: beide Bremsen leeren (sie gelten je Adresse, im Test immer 127.0.0.1). */
+export function setzeBremsenZurueck() {
+  zugriffe.clear();
+  fehlversuche.clear();
+}
+
+// Statusseite und -antwort: nie zwischenspeichern, nie als Referrer
+// weitergeben, nie in Suchmaschinen.
+const PRIVAT = {
+  "Cache-Control": "no-store, max-age=0",
+  "Referrer-Policy": "no-referrer",
+  "X-Robots-Tag": "noindex, nofollow",
+  "X-Content-Type-Options": "nosniff",
+};
 
 function json(res, status, daten, extra = {}) {
   res.writeHead(status, {
@@ -104,24 +150,33 @@ function koerper(req) {
   });
 }
 
+function gastHinweisFuer(art, id) {
+  const daten = ladeBetrieb(slug);
+  const eintrag = (art === "reservierung" ? daten.reservierungen : daten.bestellungen).find((e) => e.id === id);
+  return eintrag ? wirtGastHinweis(art, eintrag, daten.gastMeldungen ?? []) : null;
+}
+
 function uebersicht() {
   const daten = ladeBetrieb(slug);
   const heute = new Date().toISOString().slice(0, 10);
 
   // Kein automatischer Filter, nur ein Hinweis fürs Dashboard – die
   // Entscheidung, eine Bestellung trotzdem anzunehmen, bleibt beim Wirt.
+  const meldungen = daten.gastMeldungen ?? [];
   const bestellungenMitHinweis = daten.bestellungen.map((b) => ({
     ...b,
     unzuverlaessig: b.telefon
       ? warnhinweisNoetig(slug, b.telefon, daten.noShowWarnSchwelle ?? 2)
       : false,
+    gast: wirtGastHinweis("bestellung", b, meldungen),
   }));
+  const reservierungenMitHinweis = daten.reservierungen.map((r) => ({ ...r, gast: wirtGastHinweis("reservierung", r, meldungen) }));
 
   return {
     betrieb: slug,
     tische: daten.tische,
     plaetzeGesamt: gesamtPlaetze(daten),
-    reservierungen: daten.reservierungen.sort(
+    reservierungen: reservierungenMitHinweis.sort(
       (a, b) => `${a.datum}${a.uhrzeit}`.localeCompare(`${b.datum}${b.uhrzeit}`),
     ),
     bestellungen: bestellungenMitHinweis.sort((a, b) => b.eingegangen.localeCompare(a.eingegangen)),
@@ -137,8 +192,60 @@ function uebersicht() {
     noShowStornofensterMinuten: daten.noShowStornofensterMinuten ?? 30,
     noShowWarnSchwelle: daten.noShowWarnSchwelle ?? 2,
     bankverbindung: daten.bankverbindung ?? "",
+    gastKontakt: { anzeigeName: daten.anzeigeName ?? "", telefon: daten.telefon ?? "" },
+    gastEmail: gastEmailEinrichtung(),
+    demoBetrieb: Boolean(daten.demoBetrieb),
     heute,
     jetztIso: new Date().toISOString(),
+  };
+}
+
+/**
+ * Optionaler Schutz für Dashboard und Wirt-Aktionen: Ist WIRT_PASSWORT
+ * gesetzt, verlangt alles außer den öffentlichen Gast-Routen (/oeffentlich/,
+ * /status) eine Anmeldung per HTTP-Basic (Benutzername beliebig). Sobald
+ * der Server öffentlich erreichbar ist – und das muss er für Status-Links –,
+ * gehört das Passwort gesetzt; sonst sind Gastdaten unter /api/betrieb offen.
+ */
+export function wirtZugangErlaubt(req) {
+  const passwort = String(process.env.WIRT_PASSWORT ?? "");
+  if (!passwort) return true;
+  const kopf = String(req.headers.authorization ?? "");
+  if (!kopf.startsWith("Basic ")) return false;
+  const roh = Buffer.from(kopf.slice(6), "base64").toString("utf-8");
+  const angegeben = roh.slice(roh.indexOf(":") + 1);
+  const a = createHash("sha256").update(angegeben).digest();
+  const b = createHash("sha256").update(passwort).digest();
+  return timingSafeEqual(a, b);
+}
+
+export function istOeffentlicheRoute(pathname, method) {
+  return method === "OPTIONS" || pathname.startsWith("/oeffentlich/") || pathname === "/status" || pathname === "/sw.js";
+}
+
+export function verweigereZugang(res) {
+  res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Wirt-Dashboard", charset="UTF-8"', "Content-Type": "text/plain; charset=utf-8" });
+  res.end("Anmeldung erforderlich");
+}
+
+/**
+ * Was der Gast direkt nach dem Absenden zurückbekommt: Referenz, Status
+ * „eingegangen“ und – falls vorhanden – der Token für seinen Status-Link.
+ * Den Link baut die Seite aus ihrer apiUrl zusammen (…/status#TOKEN); der
+ * Token steht damit nur im Fragment und erreicht keine Server-Logs.
+ */
+function gastAntwort(art, eintrag) {
+  // Was mit der Eingangsmail tatsächlich passiert ist – die Seite sagt dem
+  // Gast nur „schicken wir“, wenn sie dem Versanddienst übergeben wurde.
+  const eingang = (ladeBetrieb(slug).gastMeldungen ?? []).filter((m) => m.bezugId === eintrag.id).at(-1);
+  const zustand = eingang?.versand?.zustand ?? "";
+  return {
+    emailVersand: zustand === "uebergeben" && eingang.versand.kanal === "email" ? "aktiv" : zustand === "fehlgeschlagen" ? "fehlgeschlagen" : zustand === "nicht-eingerichtet" ? "nicht-eingerichtet" : "",
+    nummer: eintrag.nummer,
+    status: gastPhase(art, eintrag),
+    statusText: titelFuer(art, gastPhase(art, eintrag)),
+    statusToken: eintrag.gastToken || "",
+    rueckfrageTelefon: betriebsKontakt(slug).telefon,
   };
 }
 
@@ -147,6 +254,11 @@ function uebersicht() {
 // belegen – siehe dashboardServer.js für dasselbe Muster.
 export const handler = async (req, res) => {
   const { pathname, searchParams } = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
+
+  if (!istOeffentlicheRoute(pathname, req.method) && !wirtZugangErlaubt(req)) {
+    verweigereZugang(res);
+    return;
+  }
 
   if (req.method === "OPTIONS") {
     res.writeHead(204, CORS);
@@ -162,6 +274,18 @@ export const handler = async (req, res) => {
 
   // Ohne Auslieferung von der Wurzel aus reicht der Geltungsbereich des
   // Service Workers nicht bis zu den Push-Registrierungen von wirt.html.
+  // Die persönliche Statusseite. Der Token steht im Fragment (#…) und wird
+  // vom Skript der Seite per POST an /oeffentlich/status geschickt.
+  if (pathname === "/status" && req.method === "GET") {
+    res.writeHead(200, {
+      "Content-Type": "text/html; charset=utf-8",
+      ...PRIVAT,
+      "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+    });
+    res.end(readFileSync(statusSeite, "utf-8"));
+    return;
+  }
+
   if (pathname === "/sw.js") {
     res.writeHead(200, { "Content-Type": "application/javascript; charset=utf-8" });
     res.end(readFileSync(serviceWorker, "utf-8"));
@@ -180,6 +304,28 @@ export const handler = async (req, res) => {
     try {
       const daten = await koerper(req);
 
+      if (pathname === "/oeffentlich/status") {
+        if (zuVieleFehlversuche(adresse)) {
+          json(res, 429, { ok: false, fehler: "Zu viele ungültige Aufrufe. Bitte später erneut versuchen." }, { ...CORS, ...PRIVAT });
+          return;
+        }
+        const treffer = findeUeberGastToken(slug, String(daten.token ?? ""));
+        if (!treffer) {
+          zuVieleFehlversuche(adresse, true);
+          json(res, 404, { ok: false, fehler: "Dieser Status-Link ist ungültig oder abgelaufen." }, { ...CORS, ...PRIVAT });
+          return;
+        }
+        const { art, eintrag, daten: stand } = treffer;
+        const letzte = (stand.gastMeldungen ?? []).filter((m) => m.bezugId === eintrag.id).at(-1);
+        const status = statusFuerGast(art, eintrag, {
+          betrieb: betriebsKontakt(slug, stand),
+          letzteAenderung: letzte?.erstellt ?? eintrag.eingegangen,
+          zeitzone: stand.zeitzone,
+        });
+        json(res, 200, { ok: true, status }, { ...CORS, ...PRIVAT });
+        return;
+      }
+
       if (pathname === "/oeffentlich/reservierung") {
         const r = legeReservierungAn(slug, daten, "online");
         // Von Hand eingetragene Reservierungen (quelle "manuell") lösen
@@ -193,7 +339,8 @@ export const handler = async (req, res) => {
         if (!push.versucht) {
           await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
         }
-        json(res, 200, { ok: true, reservierung: { id: r.id, datum: r.datum, uhrzeit: r.uhrzeit } }, CORS);
+        await stelleGastMeldungenZu(slug);
+        json(res, 200, { ok: true, reservierung: { id: r.id, datum: r.datum, uhrzeit: r.uhrzeit, ...gastAntwort("reservierung", r) } }, { ...CORS, ...PRIVAT });
         return;
       }
 
@@ -204,7 +351,8 @@ export const handler = async (req, res) => {
         if (!push.versucht) {
           await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
         }
-        json(res, 200, { ok: true, bestellung: { id: b.id, nummer: b.nummer } }, CORS);
+        await stelleGastMeldungenZu(slug);
+        json(res, 200, { ok: true, bestellung: { id: b.id, ...gastAntwort("bestellung", b) } }, { ...CORS, ...PRIVAT });
         return;
       }
 
@@ -237,6 +385,7 @@ export const handler = async (req, res) => {
       if (stornierenTreffer) {
         const id = decodeURIComponent(stornierenTreffer[1]);
         const { kostenfrei, minutenBisAbholung } = storniereBestellung(slug, id);
+        await stelleGastMeldungenZu(slug);
         json(
           res,
           200,
@@ -328,7 +477,15 @@ export const handler = async (req, res) => {
         return;
       }
       if (pathname === "/api/reservierung/status") {
-        json(res, 200, { ok: true, reservierung: setzeReservierungStatus(slug, eingabe.id, eingabe.status) });
+        const reservierung = setzeReservierungStatus(slug, eingabe.id, eingabe.status);
+        await stelleGastMeldungenZu(slug);
+        json(res, 200, { ok: true, reservierung, gast: gastHinweisFuer("reservierung", reservierung.id) });
+        return;
+      }
+      if (pathname === "/api/reservierung/verschieben") {
+        const reservierung = verschiebeReservierung(slug, eingabe.id, { datum: eingabe.datum, uhrzeit: eingabe.uhrzeit, grund: eingabe.grund });
+        await stelleGastMeldungenZu(slug);
+        json(res, 200, { ok: true, reservierung, gast: gastHinweisFuer("reservierung", reservierung.id) });
         return;
       }
       if (pathname === "/api/reservierung/tisch") {
@@ -336,7 +493,9 @@ export const handler = async (req, res) => {
         return;
       }
       if (pathname === "/api/bestellung/bestaetigen") {
-        json(res, 200, { ok: true, bestellung: bestaetigeBestellung(slug, eingabe.id, eingabe.abholzeit) });
+        const bestellung = bestaetigeBestellung(slug, eingabe.id, eingabe.abholzeit);
+        await stelleGastMeldungenZu(slug);
+        json(res, 200, { ok: true, bestellung, gast: gastHinweisFuer("bestellung", bestellung.id) });
         return;
       }
       if (pathname === "/api/bestellung/status") {
@@ -352,7 +511,28 @@ export const handler = async (req, res) => {
           }
         }
 
-        json(res, 200, { ok: true, bestellung });
+        await stelleGastMeldungenZu(slug);
+        json(res, 200, { ok: true, bestellung, gast: gastHinweisFuer("bestellung", bestellung.id) });
+        return;
+      }
+
+      /* ----- Intern: Gastbenachrichtigung ----- */
+
+      if (pathname === "/intern/gast-kontakt") {
+        json(res, 200, { ok: true, ...setzeGastKontakt(slug, eingabe) });
+        return;
+      }
+
+      if (pathname === "/intern/gastmeldung/erneut") {
+        const meldung = await versucheGastMeldungErneut(slug, String(eingabe.id ?? ""));
+        json(res, 200, { ok: true, meldung: { id: meldung.id, typ: meldung.typ, versand: meldung.versand } });
+        return;
+      }
+
+      if (pathname === "/intern/gastlink/widerrufen") {
+        const art = eingabe.art === "reservierung" ? "reservierung" : "bestellung";
+        widerrufeGastZugang(slug, art, String(eingabe.id ?? ""));
+        json(res, 200, { ok: true, gast: gastHinweisFuer(art, String(eingabe.id ?? "")) });
         return;
       }
 
@@ -433,20 +613,18 @@ export const handler = async (req, res) => {
       const verzoegerungTreffer = VERZOEGERUNG.exec(pathname);
       if (verzoegerungTreffer) {
         const id = decodeURIComponent(verzoegerungTreffer[1]);
-        const grund = String(eingabe.grund ?? "").trim();
-        const bestellung = bestaetigeBestellung(slug, id, eingabe.neueZeit);
+        // Erst speichern (daraus entsteht genau eine Gastmeldung), dann
+        // zustellen. Scheitert die Zustellung, bleibt die neue Zeit trotzdem
+        // gespeichert – und die Statusseite zeigt sie sofort.
+        const bestellung = bestaetigeBestellung(slug, id, eingabe.neueZeit, { grund: eingabe.grund ?? "" });
+        await stelleGastMeldungenZu(slug);
+        const gast = gastHinweisFuer("bestellung", id);
+        const zustand = gast.letzteMeldung?.zustand ?? "";
+        // "kanal" bleibt als knappe Antwort fürs Dashboard: nur "email"/"sms",
+        // wenn die Nachricht dem Anbieter wirklich übergeben wurde.
+        const kanal = zustand === "uebergeben" ? gast.letzteMeldung.kanal : "keiner";
 
-        const nachricht = grund
-          ? `Ihre Bestellung ${bestellung.nummer}: neue Abholzeit ${bestellung.bestaetigteAbholzeit} (${grund}).`
-          : `Ihre Bestellung ${bestellung.nummer}: neue Abholzeit ${bestellung.bestaetigteAbholzeit}.`;
-
-        const { kanal } = await informiereUeberVerzoegerung({
-          telefon: bestellung.telefon,
-          email: bestellung.email,
-          nachricht,
-        });
-
-        json(res, 200, { ok: true, bestellung, kanal });
+        json(res, 200, { ok: true, bestellung, kanal, gast });
         return;
       }
     } catch (fehler) {

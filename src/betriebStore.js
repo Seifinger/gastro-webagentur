@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { randomUUID } from "node:crypto";
+import { randomUUID, randomInt } from "node:crypto";
 import {
   berechneAbholzeiten,
   pruefeAbholwunsch,
@@ -11,6 +11,16 @@ import {
   STANDARD_OEFFNUNGSZEITEN,
   ZEITZONE_STANDARD,
 } from "./abholzeiten.js";
+import {
+  ereignisAusAenderung,
+  gastToken,
+  tokenHash,
+  istTokenFormat,
+  linkAbgelaufen,
+  neuesGeheimnis,
+  pruefeEmail,
+  referenzVon,
+} from "./gastStatus.js";
 
 // Datenhaltung eines Betriebs: Tischplan, Reservierungen, Bestellungen.
 // Eine JSON-Datei je Betrieb – das reicht für ein Haus mit ein paar Dutzend
@@ -54,6 +64,15 @@ function leererBetrieb() {
     noShowStornofensterMinuten: NO_SHOW_STORNOFENSTER_MINUTEN_DEFAULT,
     noShowWarnSchwelle: NO_SHOW_WARN_SCHWELLE_DEFAULT,
     bankverbindung: "",
+    // Für Statusseite und Gast-E-Mails: wie das Haus heißt und unter welcher
+    // Nummer Gäste nachfragen können (siehe setzeGastKontakt).
+    anzeigeName: "",
+    telefon: "",
+    // Protokoll der Gast-Ereignisse samt Versandstand (siehe
+    // vermerkeGastMeldungen und kundenBenachrichtigung.js).
+    gastMeldungen: [],
+    // Demo-/Präsentationsbetrieb: keine Status-Links, keine Gast-E-Mails.
+    demoBetrieb: false,
   };
 }
 
@@ -67,6 +86,13 @@ export function ladeBetrieb(slug) {
 }
 
 export function speichereBetrieb(slug, daten) {
+  // Gast-Ereignisse entstehen aus dem Unterschied zwischen dem, was auf der
+  // Platte steht, und dem, was gleich darauf steht – also nur aus einer
+  // tatsächlich gespeicherten Änderung, egal über welchen Weg (v1-Dashboard,
+  // v2-Küchenstatus, Telegram-Knopf). Dieselbe Schreiboperation hält Änderung
+  // und Ereignis fest; es gibt keinen Zwischenstand, in dem das eine ohne
+  // das andere existiert.
+  vermerkeGastMeldungen(betriebExistiert(slug) ? ladeBetrieb(slug) : null, daten);
   mkdirSync(betriebeDir, { recursive: true });
   writeFileSync(datei(slug), `${JSON.stringify(daten, null, 2)}\n`, "utf-8");
   return daten;
@@ -413,17 +439,20 @@ function pruefeReservierung(daten, eingabe, { ignoriereId, quelle } = {}) {
 }
 
 export function legeReservierungAn(slug, eingabe, quelle = "online") {
+  const email = pruefeEmail(eingabe.email);
+
   return aendere(slug, (daten) => {
     const { personen, warnung } = pruefeReservierung(daten, eingabe, { quelle });
 
     const reservierung = {
       id: randomUUID(),
+      nummer: `RES-${randomInt(1000, 10000)}`,
       datum: eingabe.datum,
       uhrzeit: eingabe.uhrzeit,
       personen,
       name: String(eingabe.name).trim(),
       telefon: String(eingabe.telefon ?? "").trim(),
-      email: String(eingabe.email ?? "").trim(),
+      email,
       wunsch: String(eingabe.wunsch ?? "").trim(),
       tischId: null,
       quelle,
@@ -432,10 +461,14 @@ export function legeReservierungAn(slug, eingabe, quelle = "online") {
       eingegangen: new Date().toISOString(),
     };
 
+    // Was der Wirt selbst einträgt, weiß der Gast schon am Telefon – nur
+    // Online-Anfragen bekommen einen Status-Link.
+    const gastToken = quelle === "online" ? richteGastZugangEin(slug, daten, "reservierung", reservierung) : "";
+
     daten.reservierungen.push(reservierung);
     // Die Warnung hängt nicht an der Reservierung – sie gilt der Lage im
     // Raum, nicht dieser einen Gruppe, und löst sich mit jeder Absage auf.
-    return { ...reservierung, warnung };
+    return { ...reservierung, warnung, gastToken };
   });
 }
 
@@ -501,6 +534,7 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
   if (positionen.length === 0) throw new Error("Die Bestellung ist leer.");
   if (!String(eingabe.name ?? "").trim()) throw new Error("Bitte einen Namen angeben.");
   if (!String(eingabe.abholzeit ?? "").trim() && !eingabe.abholZeitpunkt) throw new Error("Bitte eine Abholzeit angeben.");
+  const email = pruefeEmail(eingabe.email);
 
   const sauber = positionen.map((p) => ({
     name: String(p.name ?? "").trim(),
@@ -537,7 +571,7 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
 
     const bestellung = {
       id: randomUUID(),
-      nummer: `AB-${String(Math.floor(1000 + Math.random() * 9000))}`,
+      nummer: `AB-${randomInt(1000, 10000)}`,
       positionen: sauber,
       gesamt: sauber.reduce((summe, p) => summe + p.preis * p.menge, 0),
       // Wunsch des Gastes; was tatsächlich gilt, bestätigt der Wirt. Die
@@ -548,7 +582,7 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
       bestaetigteAbholzeit: "",
       name: String(eingabe.name).trim(),
       telefon: String(eingabe.telefon ?? "").trim(),
-      email: String(eingabe.email ?? "").trim(),
+      email,
       hinweis: String(eingabe.hinweis ?? "").trim(),
       status: "neu",
       eingegangen: jetzt.toISOString(),
@@ -561,8 +595,9 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
       noShowBetrag: null,
     };
 
+    const gastToken = richteGastZugangEin(slug, daten, "bestellung", bestellung);
     daten.bestellungen.push(bestellung);
-    return bestellung;
+    return { ...bestellung, gastToken };
   });
 }
 
@@ -646,13 +681,18 @@ export function bestaetigeNoShow(slug, id, betrag, jetzt = new Date()) {
  * Der Wirt bestätigt die Abholzeit – entweder die gewünschte oder eine
  * andere. Ohne diesen Schritt weiß der Gast nicht, ob seine Zeit machbar ist.
  */
-export function bestaetigeBestellung(slug, id, abholzeit) {
+export function bestaetigeBestellung(slug, id, abholzeit, { grund } = {}) {
   const zeit = String(abholzeit ?? "").trim();
   if (!zeit) throw new Error("Bitte eine Abholzeit bestätigen.");
 
   return aendere(slug, (daten) => {
     const b = daten.bestellungen.find((x) => x.id === id);
     if (!b) throw new Error("Bestellung nicht gefunden.");
+    if (b.status === "storniert") throw new Error("Diese Bestellung wurde vom Gast storniert.");
+    if (b.status === "abgeholt") throw new Error("Diese Bestellung wurde bereits abgeholt.");
+    // Der Grund gehört zur Zeitänderung, die gerade gespeichert wird – eine
+    // Bestätigung ohne neue Zeit lässt einen früheren Grund stehen.
+    if (grund !== undefined || zeit !== b.bestaetigteAbholzeit) b.aenderungsGrund = String(grund ?? "").trim().slice(0, 200);
     b.bestaetigteAbholzeit = zeit;
     b.status = "bestaetigt";
     return b;
@@ -732,5 +772,200 @@ export function setzeTelegramChatId(slug, chatId) {
   return aendere(slug, (daten) => {
     daten.telegramChatId = sauber;
     return sauber;
+  });
+}
+
+/* ---------- Gastbenachrichtigung: Status-Link und Ereignisse ---------- */
+
+const geheimnisDatei = path.join(betriebeDir, ".gast-status-geheimnis");
+let geheimnisCache = null;
+
+/**
+ * Das Geheimnis, aus dem die Status-Links hergeleitet werden. Vorrang hat
+ * GAST_STATUS_GEHEIMNIS aus der Umgebung (im Hosting als Secret); sonst
+ * wird einmalig eines erzeugt und neben den Betriebsdaten abgelegt
+ * (data/betrieb/ ist nicht im Git). Wer es austauscht, macht alle bisherigen
+ * Status-Links ungültig – so lassen sich im Notfall alle auf einmal sperren.
+ */
+export function gastGeheimnis() {
+  const ausUmgebung = String(process.env.GAST_STATUS_GEHEIMNIS ?? "").trim();
+  if (ausUmgebung) {
+    if (ausUmgebung.length < 32) throw new Error("GAST_STATUS_GEHEIMNIS muss mindestens 32 Zeichen lang sein.");
+    return ausUmgebung;
+  }
+  if (geheimnisCache) return geheimnisCache;
+  try {
+    geheimnisCache = readFileSync(geheimnisDatei, "utf-8").trim();
+  } catch {
+    geheimnisCache = "";
+  }
+  if (geheimnisCache.length < 32) {
+    geheimnisCache = neuesGeheimnis();
+    mkdirSync(betriebeDir, { recursive: true });
+    writeFileSync(geheimnisDatei, `${geheimnisCache}\n`, { encoding: "utf-8", mode: 0o600 });
+  }
+  return geheimnisCache;
+}
+
+/**
+ * Legt am Eintrag den Gastzugang an und gibt den Status-Token zurück. Der
+ * Token selbst wird nicht gespeichert – nur sein Hash zum Nachschlagen.
+ * Demo-Betriebe bekommen keinen (keine echten Status-Links im Demo-Modus).
+ */
+function richteGastZugangEin(slug, daten, art, eintrag) {
+  if (daten.demoBetrieb) return "";
+  const token = gastToken(gastGeheimnis(), { slug, art, id: eintrag.id, version: 1 });
+  eintrag.gastZugang = { version: 1, hash: tokenHash(token), erstellt: uhrHook.jetzt().toISOString(), widerrufenAm: "" };
+  return token;
+}
+
+/** Leitet den (unveränderten) Status-Token eines Eintrags erneut her – für E-Mails. */
+export function gastTokenFuer(slug, art, eintrag) {
+  if (!eintrag?.gastZugang || eintrag.gastZugang.widerrufenAm) return "";
+  return gastToken(gastGeheimnis(), { slug, art, id: eintrag.id, version: eintrag.gastZugang.version });
+}
+
+/**
+ * Sucht zum Token die passende Reservierung/Bestellung. Gibt null zurück bei
+ * unbekanntem, widerrufenem oder abgelaufenem Link – bewusst ohne zu sagen,
+ * welcher Fall vorliegt.
+ */
+export function findeUeberGastToken(slug, token, jetzt = uhrHook.jetzt()) {
+  if (!istTokenFormat(token)) return null;
+  const hash = tokenHash(token);
+  const daten = ladeBetrieb(slug);
+  for (const [art, liste] of [["reservierung", daten.reservierungen], ["bestellung", daten.bestellungen]]) {
+    const eintrag = liste.find((e) => e.gastZugang?.hash === hash);
+    if (!eintrag) continue;
+    if (eintrag.gastZugang.widerrufenAm) return null;
+    // Zweite Sicherung: der Token muss sich auch aus dem Geheimnis ergeben.
+    if (gastTokenFuer(slug, art, eintrag) !== token) return null;
+    if (linkAbgelaufen(art, eintrag, jetzt)) return null;
+    return { art, eintrag, daten };
+  }
+  return null;
+}
+
+function eintragFinden(daten, art, id) {
+  const liste = art === "reservierung" ? daten.reservierungen : art === "bestellung" ? daten.bestellungen : null;
+  if (!liste) throw new Error(`Unbekannte Art "${art}".`);
+  const eintrag = liste.find((e) => e.id === id);
+  if (!eintrag) throw new Error(art === "reservierung" ? "Reservierung nicht gefunden." : "Bestellung nicht gefunden.");
+  return eintrag;
+}
+
+/** Sperrt den Status-Link eines Eintrags dauerhaft (z. B. auf Wunsch des Gastes). */
+export function widerrufeGastZugang(slug, art, id) {
+  return aendere(slug, (daten) => {
+    const eintrag = eintragFinden(daten, art, id);
+    if (!eintrag.gastZugang) throw new Error("Für diesen Eintrag gibt es keinen Status-Link.");
+    eintrag.gastZugang.widerrufenAm ||= uhrHook.jetzt().toISOString();
+    eintrag.gastZugang.hash = "";
+    return eintrag;
+  });
+}
+
+/** Name und Rückfragenummer des Hauses für Statusseite und Gast-E-Mails. */
+export function setzeGastKontakt(slug, { anzeigeName, telefon } = {}) {
+  const name = String(anzeigeName ?? "").trim().slice(0, 120);
+  const nummer = String(telefon ?? "").trim().slice(0, 40);
+  if (nummer && !/^[+\d][\d\s/()-]{3,}$/.test(nummer)) throw new Error("Bitte eine gültige Telefonnummer angeben.");
+  return aendere(slug, (daten) => {
+    daten.anzeigeName = name;
+    daten.telefon = nummer;
+    return { anzeigeName: name, telefon: nummer };
+  });
+}
+
+export function betriebsKontakt(slug, daten = ladeBetrieb(slug)) {
+  return { name: daten.anzeigeName || slug, telefon: daten.telefon || "" };
+}
+
+/**
+ * Der Wirt verschiebt eine Reservierung auf einen anderen Termin – der
+ * einzige vorgesehene Weg, Datum/Uhrzeit nachträglich zu ändern. Der
+ * ursprünglich angefragte Termin bleibt nachvollziehbar gespeichert, die
+ * Reservierung gilt mit dem neuen Termin als bestätigt. Kapazität und
+ * Tischverteilung werden wie bei einer Eingabe des Wirts geprüft.
+ */
+export function verschiebeReservierung(slug, id, { datum, uhrzeit, grund } = {}) {
+  return aendere(slug, (daten) => {
+    const r = eintragFinden(daten, "reservierung", id);
+    if (r.status === "abgesagt") throw new Error("Eine abgesagte Reservierung kann nicht verschoben werden.");
+    if (r.datum === datum && r.uhrzeit === uhrzeit) throw new Error("Das ist bereits der aktuelle Termin.");
+    const { warnung } = pruefeReservierung(daten, { ...r, datum, uhrzeit }, { ignoriereId: id, quelle: "manuell" });
+    r.urspruenglich ??= { datum: r.datum, uhrzeit: r.uhrzeit };
+    r.datum = datum;
+    r.uhrzeit = uhrzeit;
+    r.status = "bestaetigt";
+    // Der zugewiesene Tisch galt für den alten Termin.
+    r.tischId = null;
+    r.aenderungsGrund = String(grund ?? "").trim().slice(0, 200);
+    r.geaendertAm = uhrHook.jetzt().toISOString();
+    return { ...r, warnung };
+  });
+}
+
+// Ältere Meldungen fallen irgendwann heraus – das Protokoll soll den
+// Versandstand zeigen, kein Archiv personenbezogener Vorgänge werden.
+const MELDUNGEN_MAX = 500;
+
+/**
+ * Vergleicht den gespeicherten mit dem neuen Stand und hängt für jede
+ * gast-relevante Änderung eine Meldung an (siehe ereignisAusAenderung).
+ * Die Meldung trägt nur, was für Versand und Statusanzeige nötig ist – die
+ * E-Mail-Adresse bleibt am Eintrag und wird nicht kopiert.
+ */
+function vermerkeGastMeldungen(vorherDaten, daten) {
+  if (!daten || typeof daten !== "object") return;
+  const zeitzone = daten.zeitzone || ZEITZONE_STANDARD;
+  const jetzt = uhrHook.jetzt().toISOString();
+  for (const [art, schluessel] of [["reservierung", "reservierungen"], ["bestellung", "bestellungen"]]) {
+    const vorher = new Map((vorherDaten?.[schluessel] ?? []).map((e) => [e.id, e]));
+    for (const eintrag of daten[schluessel] ?? []) {
+      const ereignis = ereignisAusAenderung(art, vorher.get(eintrag.id), eintrag, { zeitzone });
+      if (!ereignis) continue;
+      daten.gastMeldungen ??= [];
+      daten.gastMeldungen.push({
+        id: randomUUID(),
+        art,
+        bezugId: eintrag.id,
+        referenz: referenzVon(art, eintrag),
+        typ: ereignis.typ,
+        zeitGeaendert: Boolean(ereignis.zeitGeaendert),
+        vorherUhrzeit: ereignis.vorherUhrzeit ?? "",
+        sicht: ereignis.sicht,
+        erstellt: jetzt,
+        versand: {
+          kanal: "",
+          // Ob wirklich ein Kanal greift (E-Mail eingerichtet? SMS-Anbieter?),
+          // entscheidet erst die Zustellung – ohne jede Kontaktangabe nie.
+          zustand: daten.demoBetrieb ? "demo" : eintrag.email || eintrag.telefon ? "ausstehend" : "keine-adresse",
+          versuche: 0,
+          letzterVersuch: "",
+          fehler: "",
+          anbieterId: "",
+        },
+      });
+    }
+  }
+  if (daten.gastMeldungen?.length > MELDUNGEN_MAX) daten.gastMeldungen = daten.gastMeldungen.slice(-MELDUNGEN_MAX);
+}
+
+/** Ändert den Versandstand einer Meldung (für kundenBenachrichtigung.js). */
+export function aendereGastMeldung(slug, meldungId, fn) {
+  return aendere(slug, (daten) => {
+    const meldung = (daten.gastMeldungen ?? []).find((m) => m.id === meldungId);
+    if (!meldung) throw new Error("Meldung nicht gefunden.");
+    const bezug = (meldung.art === "reservierung" ? daten.reservierungen : daten.bestellungen).find((e) => e.id === meldung.bezugId);
+    return fn(meldung, bezug, daten);
+  });
+}
+
+/** Schaltet den Demo-Modus eines Betriebs (keine Status-Links, keine Gastmails). */
+export function setzeDemoBetrieb(slug, aktiv) {
+  return aendere(slug, (daten) => {
+    daten.demoBetrieb = Boolean(aktiv);
+    return daten.demoBetrieb;
   });
 }

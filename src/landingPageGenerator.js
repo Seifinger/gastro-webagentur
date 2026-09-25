@@ -21,7 +21,7 @@ import { renderHighlights } from "./sections/highlights.js";
 import { renderMenu } from "./sections/menu.js";
 import { renderAmbiente, renderContact, renderKontaktZeilen, renderOeffnungszeiten, FOTO_SLOTS } from "./sections/contact.js";
 import { renderStimmen } from "./sections/testimonials.js";
-import { renderReservation } from "./sections/reservation.js";
+import { renderReservation, STATUS_LINK_HINWEIS, EMAIL_ZWECK } from "./sections/reservation.js";
 import { abholzeitSkript, abholzeitAttribute, STANDARD_OEFFNUNGSZEITEN } from "./abholzeiten.js";
 import { renderFooter } from "./sections/footer.js";
 
@@ -759,7 +759,48 @@ const PAGE_SCRIPT = `
     if (!byId("confirm").classList.contains("open")) byId("overlay").classList.remove("open");
   }
 
-  function showConfirm(title, text, rows, mailto, fehler) {
+  /**
+   * Der pers\u00F6nliche Status-Link: nur, wenn der Betriebsserver einen
+   * Zugriffsschl\u00FCssel zur\u00FCckgegeben hat (nie in der Vorschau). Der
+   * Schl\u00FCssel steht im Fragment (#) und geht so an keinen Server-Log.
+   */
+  function statusUrl(teil) {
+    return data.apiUrl && teil && teil.statusToken ? data.apiUrl + "/status#" + teil.statusToken : "";
+  }
+
+  function zeigeStatusLink(url) {
+    var link = byId("confirm-status");
+    if (!link && url) {
+      link = document.createElement("a");
+      link.id = "confirm-status";
+      link.className = "btn btn-ghost btn-block";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Status sp\u00E4ter erneut ansehen";
+      link.style.marginTop = "10px";
+      byId("confirm-mail").parentNode.insertBefore(link, byId("confirm-mail"));
+    }
+    if (!link) return;
+    link.href = url || "#";
+    link.style.display = url ? "inline-flex" : "none";
+  }
+
+  /** Was nach dem Absenden \u00FCber E-Mail und Status-Link gesagt wird \u2013 ehrlich. */
+  function kanalSatz(email, teil) {
+    if (email && teil.emailVersand === "aktiv") {
+      return " Best\u00E4tigung und \u00C4nderungen schicken wir an " + email + ".";
+    }
+    if (email && teil.emailVersand === "fehlgeschlagen") {
+      return " Die E-Mail an " + email + " konnte gerade nicht verschickt werden \u2013 den aktuellen Stand sehen Sie \u00FCber Ihren Status-Link.";
+    }
+    if (email) {
+      return " Der E-Mail-Versand ist bei diesem Restaurant noch nicht eingerichtet \u2013 den aktuellen Stand sehen Sie \u00FCber Ihren Status-Link.";
+    }
+    return " Ohne E-Mail-Adresse sehen Sie \u00C4nderungen nur, wenn Sie Ihren Status-Link erneut \u00F6ffnen. Bei R\u00FCckfragen rufen wir Sie an.";
+  }
+
+  function showConfirm(title, text, rows, mailto, fehler, status) {
+    zeigeStatusLink(fehler ? "" : status);
     byId("confirm-title").textContent = title;
     byId("confirm-text").textContent = text;
     byId("confirm").className = fehler ? "confirm-box hat-fehler" : "confirm-box";
@@ -1148,6 +1189,8 @@ const PAGE_SCRIPT = `
       });
       var summe = euro(total());
       var stueck = String(anzahl());
+      // \u00C4ltere Seiten haben im Bestellformular kein E-Mail-Feld.
+      var bestellEmail = form.elements.email ? String(form.elements.email.value).trim() : "";
 
       sende("/oeffentlich/bestellung", {
         positionen: positionen,
@@ -1156,6 +1199,7 @@ const PAGE_SCRIPT = `
         abholZeitpunkt: abholArt ? form.elements.abholzeit.value : "",
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
+        email: bestellEmail,
         hinweis: form.elements.hinweis.value,
         noShowZustimmung: noShowAktiv ? true : false
       }, byId("order-submit")).then(function (ergebnis) {
@@ -1164,21 +1208,28 @@ const PAGE_SCRIPT = `
         var echteNummer = ergebnis.demo ? nummer : ergebnis.bestellung.nummer;
         // Ohne Betriebsserver (Beispielseite, Entwurf) ist nichts passiert \\u2013
         // die Best\\u00E4tigung sagt das ehrlich, statt Erfolg vorzut\\u00E4uschen.
+        var teil = ergebnis.demo ? {} : ergebnis.bestellung;
         var text = ergebnis.demo
           ? "Das ist eine Vorschau: Ihre Bestellung wurde nicht verschickt und wird nicht zubereitet. Auf der fertigen Website landet sie direkt in der K\\u00FCche des Restaurants." + telefonSatz("Zum Bestellen")
-          : "Ihre Bestellung liegt in der K\\u00FCche. Die Abholzeit best\\u00E4tigen wir Ihnen gleich \\u2013 falls es knapp wird, melden wir uns telefonisch.";
+          : "Anfrage eingegangen \\u2013 wartet noch auf Best\\u00E4tigung durch das Restaurant. Die Abholzeit gilt erst, wenn das Restaurant sie best\\u00E4tigt." + kanalSatz(bestellEmail, teil);
         var zeilen = [
           [ergebnis.demo ? "Abholung" : "Abholung (gew\\u00FCnscht)", zeit],
           ["Positionen", stueck],
           ["Gesamt", summe],
         ];
-        if (!ergebnis.demo) zeilen.unshift(["Bestellnummer", echteNummer]);
+        if (!ergebnis.demo) {
+          zeilen.unshift(["Status", teil.statusText || "Eingegangen \\u2013 noch nicht best\\u00E4tigt"]);
+          zeilen.unshift(["Bestellnummer", echteNummer]);
+          if (teil.rueckfrageTelefon || data.telefon) zeilen.push(["R\\u00FCckfragen", teil.rueckfrageTelefon || data.telefon]);
+        }
 
         showConfirm(
           ergebnis.demo ? "Vorschau \\u2013 nichts bestellt" : "Bestellung eingegangen",
           text,
           zeilen,
-          mailtoLink("Abholbestellung " + echteNummer + " \\u2013 " + data.name, body)
+          mailtoLink("Abholbestellung " + echteNummer + " \\u2013 " + data.name, body),
+          false,
+          statusUrl(teil)
         );
 
         cart = {};
@@ -1212,6 +1263,7 @@ const PAGE_SCRIPT = `
 
       var uhrzeit = form.elements.uhrzeit.value;
       var personenText = form.elements.personen.value;
+      var resEmail = String(form.elements.email.value).trim();
       // "4 Personen" -> 4, damit das Lokal eine Zahl bekommt.
       var personenZahl = parseInt(personenText, 10) || 1;
 
@@ -1221,22 +1273,31 @@ const PAGE_SCRIPT = `
         personen: personenZahl,
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
-        email: form.elements.email.value,
+        email: resEmail,
         wunsch: form.elements.wunsch.value
       }, form.querySelector("button[type=submit]")).then(function (ergebnis) {
+        var teil = ergebnis.demo ? {} : ergebnis.reservierung;
+        // Die Referenz vergibt der Server \\u2013 dieselbe steht in E-Mail und Statusseite.
+        var echteNummer = teil.nummer || nummer;
         var zeilen = [
           ["Datum", datum],
           ["Uhrzeit", uhrzeit],
           ["Personen", personenText],
         ];
-        if (!ergebnis.demo) zeilen.unshift(["Reservierungsnr.", nummer]);
+        if (!ergebnis.demo) {
+          zeilen.unshift(["Status", teil.statusText || "Anfrage eingegangen \\u2013 noch nicht best\\u00E4tigt"]);
+          zeilen.unshift(["Reservierungsnr.", echteNummer]);
+          if (teil.rueckfrageTelefon || data.telefon) zeilen.push(["R\\u00FCckfragen", teil.rueckfrageTelefon || data.telefon]);
+        }
         showConfirm(
           ergebnis.demo ? "Vorschau \\u2013 nichts gesendet" : "Anfrage eingegangen",
           ergebnis.demo
             ? "Das ist eine Vorschau: Ihre Anfrage wurde nicht verschickt, es ist kein Tisch reserviert. Auf der fertigen Website geht sie direkt an das Restaurant." + telefonSatz("Zum Reservieren")
-            : "Vielen Dank! Wir haben Ihren Tisch vorgemerkt und best\\u00E4tigen Ihnen die Reservierung in K\\u00FCrze.",
+            : "Anfrage eingegangen \\u2013 wartet noch auf Best\\u00E4tigung durch das Restaurant. Ihr Tisch ist erst reserviert, wenn das Restaurant best\\u00E4tigt." + kanalSatz(resEmail, teil),
           zeilen,
-          mailtoLink("Tischreservierung " + nummer + " \\u2013 " + data.name, body)
+          mailtoLink("Tischreservierung " + echteNummer + " \\u2013 " + data.name, body),
+          false,
+          statusUrl(teil)
         );
 
         form.reset();
@@ -1546,7 +1607,7 @@ ${(() => {
 
     stimmen: renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social.layout, handschrift),
 
-    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant, handschrift }),
+    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant, handschrift, statusHinweis: apiUrl ? STATUS_LINK_HINWEIS : "" }),
 
     kontakt: renderContact({ kontaktZeilen, hoursRows, strasse: strasseAusAdresse(adresse), ort, handschrift }),
   };
@@ -1597,6 +1658,12 @@ ${
           <span class="error">Bitte geben Sie eine Telefonnummer an.</span>
         </div>
         <div class="field">
+          <label for="ord-email">E-Mail-Adresse für Bestätigung und Änderungen <span class="hint">(optional)</span></label>
+          <input type="email" id="ord-email" name="email" autocomplete="email" inputmode="email" maxlength="254">
+          <span class="hint">${EMAIL_ZWECK}</span>
+          <span class="error">Bitte prüfen Sie die E-Mail-Adresse.</span>
+        </div>
+        <div class="field">
           <label for="ord-hinweis">Hinweis <span class="hint">(optional)</span></label>
           <textarea id="ord-hinweis" name="hinweis" placeholder="Allergien, Sonderwünsche ..."></textarea>
         </div>
@@ -1611,7 +1678,12 @@ ${
       <div class="drawer-foot" style="margin:24px -22px -22px">
         <div class="totals"><span>Gesamt</span><span id="cart-total">0,00 €</span></div>
         <button class="btn btn-primary btn-block" id="order-submit" type="submit">Abholung verbindlich bestellen</button>
-        <p class="hint" style="margin-top:10px;text-align:center">Bezahlung bei Abholung, bar oder mit Karte.</p>
+        <p class="hint" style="margin-top:10px;text-align:center">Bezahlung bei Abholung, bar oder mit Karte.</p>${
+          apiUrl
+            ? `
+        <p class="hint" style="margin-top:6px;text-align:center">${escapeHtml(STATUS_LINK_HINWEIS)}</p>`
+            : ""
+        }
       </div>
     </form>
   </div>

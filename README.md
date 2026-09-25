@@ -501,6 +501,12 @@ Der Hinweis „Entwurfsansicht" verschwindet dann, weil die Anfrage wirklich bei
 
 **Wichtig:** Das braucht einen laufenden Server. GitHub Pages liefert nur statische Dateien aus – die dort veröffentlichten Entwürfe bleiben also ohne `--api` und damit in der Vorschau-Fassung. Für einen echten Kunden läuft der Wirt-Server auf seinem eigenen Hosting (oder deinem), und die Seite zeigt auf diese Adresse.
 
+### Gastbenachrichtigung
+
+Nach dem Absenden bekommt jeder Gast Referenznummer, den ehrlichen Stand „eingegangen – noch nicht bestätigt“ und einen persönlichen **Status-Link** (`/status#…` auf dem Wirt-Server). Wer freiwillig eine E-Mail-Adresse angibt, erhält Eingang, Bestätigung, Ablehnung, geänderte Zeiten und „bereit zur Abholung“ zusätzlich als transaktionale E-Mail (Resend). Ohne E-Mail oder ohne eingerichteten Versand zeigt das Dashboard nach Ablehnung oder Zeitänderung: „Gast nicht automatisch informiert – bitte unter … anrufen.“ Die Meldungen entstehen beim Speichern der Statusänderung – v1-Dashboard, v2-Küchenstatus und Telegram-Knöpfe lösen deshalb nie doppelte Mails aus.
+
+Sobald der Wirt-Server öffentlich erreichbar ist, **`WIRT_PASSWORT` setzen** (schützt Dashboard und Wirt-Aktionen). Einrichtung, Umgebungsvariablen, Sicherheit, Datenschutz-Baustein und der sichere Versandtest an die eigene Adresse (`npm run gast:mailtest -- --an …`): [docs-intern/GASTBENACHRICHTIGUNG.md](docs-intern/GASTBENACHRICHTIGUNG.md).
+
 ## v2-Pipeline (parallel zu v1)
 
 Neben dem bewährten Generator (v1, `src/`) gibt es eine zweite Engine unter [`v2/`](v2/README.md). Jede v2-Seite durchläuft **Referenz → Designsystem → Build → Judge → Anbindung**: echte Restaurant- und Refero-Referenzen je Küche×Stimmung, daraus ein Designsystem-Dokument (Farben mit Aufgaben, Typo-Skala ohne Inter/Roboto, 8-px-Raster, verbotene Muster), ein Build mit harten Gates (WCAG AA, drei Hero-Aufbauten je Stimmung, Anti-Slop-Lint, Textregeln) und ein Design-Judge im Browser, der bis zu drei Korrekturrunden anstößt. Reservierung, Warenkorb und No-Show-Schutz sind dasselbe Skript wie in v1, deshalb funktionieren v2-Seiten mit dem Wirt-Server wie v1-Seiten.

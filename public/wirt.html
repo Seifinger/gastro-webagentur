@@ -22,6 +22,11 @@
     --transition-fast: .12s ease; --transition-base: .22s ease;
   }
   * { box-sizing: border-box; }
+  /* Gastbenachrichtigung: was der Gast weiß – und wann der Wirt anrufen muss. */
+  .gastinfo { font-size: .82rem; color: var(--muted); margin-top: 6px; }
+  .gastinfo .zustand-fehler { color: var(--danger); }
+  .anruf { margin-top: 8px; padding: 8px 10px; border-radius: var(--radius-sm); font-weight: 700; font-size: .88rem;
+           color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); border: 1px solid var(--danger); }
   body { margin: 0; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.55;
          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 18px; }
@@ -86,6 +91,9 @@
      sonst leicht die Zeile verloren, in der man gerade tippt. */
   tbody tr:hover { background: rgba(255,255,255,.025); }
   tr.abgesagt td { opacity: .45; text-decoration: line-through; }
+  /* Status und Kontakt bleiben lesbar: Gerade nach einer Absage steht dort,
+     ob der Gast angerufen werden muss – und unter welcher Nummer. */
+  tr.abgesagt td.status-zelle, tr.abgesagt td.kontakt-zelle { opacity: 1; text-decoration: none; }
 
   /* Farbige Chips statt Pastell-auf-Weiß: dieselbe Bedeutung je Klasse,
      nur als getönte Fläche auf dunklem Grund statt als helle Kachel. */
@@ -257,6 +265,21 @@
         </div>
       </div>
 
+      <div class="balken" id="gast-block">
+        <label style="margin-bottom:8px">Gastbenachrichtigung</label>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">
+          Jeder Gast bekommt nach dem Absenden einen persönlichen Status-Link. Wer eine E-Mail-Adresse angibt, erhält
+          Bestätigung, Ablehnung und geänderte Zeiten zusätzlich per E-Mail. Name und Telefonnummer unten erscheinen
+          auf der Statusseite und in den E-Mails.
+        </div>
+        <p id="gast-email-stand" style="font-size:.88rem;margin:0 0 10px"></p>
+        <div class="felder" style="grid-template-columns:repeat(2,1fr);gap:10px">
+          <div><label for="gast-name">Name des Hauses</label><input type="text" id="gast-name" placeholder="z. B. Trattoria da Luigi"></div>
+          <div><label for="gast-telefon">Telefon für Rückfragen</label><input type="tel" id="gast-telefon" placeholder="030 123456"></div>
+        </div>
+        <button class="knopf klein" type="button" id="gast-speichern" style="margin-top:10px">Speichern</button>
+      </div>
+
       <div class="balken" id="telegram-block">
         <label for="telegram-chatid" style="margin-bottom:8px">Telegram als Rückkanal</label>
         <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">
@@ -327,6 +350,14 @@ async function ruf(pfad, daten) {
   return ergebnis;
 }
 
+// Rückmeldung nach einer Wirt-Aktion: was mit der Gastnachricht passiert ist.
+function meldeGast(gast, grundtext) {
+  if (gast?.anrufNoetig) return melde(`${grundtext} ${gast.anrufText}`, false, true);
+  const m = gast?.letzteMeldung;
+  if (m && m.zustand === "uebergeben") return melde(`${grundtext} E-Mail an den Versanddienst übergeben.`);
+  melde(grundtext);
+}
+
 function datumDeutsch(iso) {
   if (!iso) return "";
   const [j, m, t] = iso.split("-");
@@ -335,6 +366,42 @@ function datumDeutsch(iso) {
 
 function euro(wert) {
   return Number(wert).toFixed(2).replace(".", ",") + " €";
+}
+
+/* ---------- Gastbenachrichtigung ---------- */
+
+// Nie „Gast informiert“: höchstens „an den Versanddienst übergeben“. Nach
+// Ablehnung oder geänderter Zeit ohne übergebene Nachricht steht der
+// Anruf-Hinweis unübersehbar da.
+function gastInfo(gast, art, id) {
+  if (!gast) return "";
+  const teile = [];
+  if (gast.statusLink === "aktiv") teile.push("Status-Link aktiv");
+  if (gast.statusLink === "widerrufen") teile.push("Status-Link gesperrt");
+  teile.push(gast.emailAngegeben ? "E-Mail angegeben" : "keine E-Mail");
+  const m = gast.letzteMeldung;
+  const zustand = m
+    ? `<div class="${m.zustand === "fehlgeschlagen" || m.zustand === "nicht-eingerichtet" ? "zustand-fehler" : ""}">Letzte Meldung (${esc(m.typText || m.typ)}): ${esc(m.zustandText)}${m.fehler ? ` – ${esc(m.fehler)}` : ""}</div>`
+    : "";
+  const knoepfe = [
+    m && m.erneutMoeglich ? `<button class="knopf klein stumm" data-gast-erneut="${esc(m.id)}">Nachricht erneut senden</button>` : "",
+    gast.statusLink === "aktiv" ? `<button class="knopf klein stumm" data-gast-sperren="${esc(id)}" data-art="${esc(art)}">Status-Link sperren</button>` : "",
+  ].filter(Boolean).join(" ");
+  return `<div class="gastinfo">${esc(teile.join(" · "))}${zustand}${knoepfe ? `<div class="aktionen" style="margin-top:6px">${knoepfe}</div>` : ""}</div>` +
+    (gast.anrufNoetig ? `<div class="anruf" role="alert">📞 ${esc(gast.anrufText)}</div>` : "");
+}
+
+function renderGastEinstellungen() {
+  const e = stand.gastEmail || {};
+  document.getElementById("gast-email-stand").innerHTML = stand.demoBetrieb
+    ? "<strong>Demo-Betrieb:</strong> Es werden keine Status-Links erzeugt und keine E-Mails verschickt."
+    : e.eingerichtet
+      ? "E-Mail-Versand: eingerichtet."
+      : `<strong style="color:var(--danger)">${esc(e.grund || "E-Mail nicht eingerichtet.")}</strong> Gäste sehen den Stand nur über ihren Status-Link.`;
+  const name = document.getElementById("gast-name");
+  const tel = document.getElementById("gast-telefon");
+  if (document.activeElement !== name) name.value = stand.gastKontakt?.anzeigeName ?? "";
+  if (document.activeElement !== tel) tel.value = stand.gastKontakt?.telefon ?? "";
 }
 
 /* ---------- Reservierungen ---------- */
@@ -390,10 +457,11 @@ function renderReservierungen() {
           <td>${r.personen}</td>
           <td>${tischOptionen(r)}</td>
           <td><span class="marke ${esc(r.quelle)}">${r.quelle === "online" ? "Online" : "Von Hand"}</span></td>
-          <td><span class="marke ${esc(r.status)}">${({ neu: "Neu", bestaetigt: "Bestätigt", abgesagt: "Abgesagt" })[r.status]}</span></td>
-          <td>${r.telefon ? `<a href="tel:${esc(r.telefon.replace(/[^\\d+]/g, ""))}">${esc(r.telefon)}</a>` : "–"}</td>
+          <td class="status-zelle"><span class="marke ${esc(r.status)}">${({ neu: "Neu", bestaetigt: "Bestätigt", abgesagt: "Abgesagt" })[r.status]}</span>${r.urspruenglich ? `<div class="gastinfo">verschoben (angefragt: ${esc(datumDeutsch(r.urspruenglich.datum))}, ${esc(r.urspruenglich.uhrzeit)})</div>` : ""}${r.quelle === "online" ? gastInfo(r.gast, "reservierung", r.id) : ""}</td>
+          <td class="kontakt-zelle">${r.telefon ? `<a href="tel:${esc(r.telefon.replace(/[^\\d+]/g, ""))}">${esc(r.telefon)}</a>` : "–"}</td>
           <td><div class="aktionen">
             ${r.status !== "bestaetigt" ? `<button class="knopf klein" data-res-status="bestaetigt" data-id="${esc(r.id)}">Bestätigen</button>` : ""}
+            ${r.status !== "abgesagt" ? `<button class="knopf klein stumm" data-res-verschieben="${esc(r.id)}" data-datum="${esc(r.datum)}" data-uhrzeit="${esc(r.uhrzeit)}">Termin ändern</button>` : ""}
             ${r.status !== "abgesagt" ? `<button class="knopf klein gefahr" data-res-status="abgesagt" data-id="${esc(r.id)}">Absagen</button>` : ""}
           </div></td>
         </tr>`).join("")}
@@ -434,6 +502,7 @@ function renderBestellungen() {
       <div class="summe"><span>Gesamt</span><span>${euro(b.gesamt)}</span></div>
       ${b.hinweis ? `<p class="hinweis-gast">Hinweis: ${esc(b.hinweis)}</p>` : ""}
       ${b.noShowBestaetigtAm ? `<p class="hinweis-gast">Ausfallpauschale bestätigt: ${euro(b.noShowBetrag)}</p>` : ""}
+      ${gastInfo(b.gast, "bestellung", b.id)}
 
       <div class="abholblock">
         <div class="wunsch">Gewünschte Abholzeit: <strong>${esc(b.abholzeit)}</strong>${
@@ -652,6 +721,7 @@ async function lade() {
   renderLernenSchalter();
   renderNoShowEinstellungen();
   renderTelegram();
+  renderGastEinstellungen();
 }
 
 document.querySelectorAll("nav button").forEach((knopf) => {
@@ -675,22 +745,41 @@ document.addEventListener("click", async (e) => {
 
   try {
     if (ziel.dataset.resStatus) {
-      await ruf("/api/reservierung/status", { id: ziel.dataset.id, status: ziel.dataset.resStatus });
+      const ergebnis = await ruf("/api/reservierung/status", { id: ziel.dataset.id, status: ziel.dataset.resStatus });
       await lade();
-      melde(ziel.dataset.resStatus === "abgesagt" ? "Reservierung abgesagt." : "Reservierung bestätigt.");
+      meldeGast(ergebnis.gast, ziel.dataset.resStatus === "abgesagt" ? "Reservierung abgesagt." : "Reservierung bestätigt.");
+    } else if (ziel.dataset.resVerschieben) {
+      const datum = prompt("Neues Datum (JJJJ-MM-TT):", ziel.dataset.datum);
+      if (datum === null) return;
+      const uhrzeit = prompt("Neue Uhrzeit (HH:MM):", ziel.dataset.uhrzeit);
+      if (uhrzeit === null) return;
+      const grund = prompt("Grund für den Gast (optional):", "") ?? "";
+      const ergebnis = await ruf("/api/reservierung/verschieben", { id: ziel.dataset.resVerschieben, datum: datum.trim(), uhrzeit: uhrzeit.trim(), grund });
+      document.getElementById("tag").value = datum.trim();
+      await lade();
+      meldeGast(ergebnis.gast, "Termin geändert und bestätigt.");
+    } else if (ziel.dataset.gastErneut) {
+      const ergebnis = await ruf("/intern/gastmeldung/erneut", { id: ziel.dataset.gastErneut });
+      await lade();
+      melde(ergebnis.meldung.versand.zustand === "uebergeben" ? "Nachricht an den Versanddienst übergeben." : "Erneuter Versand gescheitert – bitte anrufen.", ergebnis.meldung.versand.zustand !== "uebergeben");
+    } else if (ziel.dataset.gastSperren) {
+      if (!confirm("Status-Link dieses Gastes dauerhaft sperren? Der Gast kann den Stand dann nicht mehr abrufen.")) return;
+      await ruf("/intern/gastlink/widerrufen", { id: ziel.dataset.gastSperren, art: ziel.dataset.art });
+      await lade();
+      melde("Status-Link gesperrt.");
     } else if (ziel.dataset.tischWeg) {
       await ruf("/api/tisch/loeschen", { id: ziel.dataset.tischWeg });
       await lade();
       melde("Tisch entfernt.");
     } else if (ziel.dataset.bestaetigen) {
       const feld = document.querySelector(`.abhol-zeit[data-id="${ziel.dataset.bestaetigen}"]`);
-      await ruf("/api/bestellung/bestaetigen", { id: ziel.dataset.bestaetigen, abholzeit: feld.value });
+      const ergebnis = await ruf("/api/bestellung/bestaetigen", { id: ziel.dataset.bestaetigen, abholzeit: feld.value });
       await lade();
-      melde("Abholzeit bestätigt. Geben Sie dem Gast Bescheid.");
+      meldeGast(ergebnis.gast, "Abholzeit bestätigt.");
     } else if (ziel.dataset.bestStatus) {
-      await ruf("/api/bestellung/status", { id: ziel.dataset.id, status: ziel.dataset.bestStatus });
+      const ergebnis = await ruf("/api/bestellung/status", { id: ziel.dataset.id, status: ziel.dataset.bestStatus });
       await lade();
-      melde("Bestellung aktualisiert.");
+      meldeGast(ergebnis.gast, "Bestellung aktualisiert.");
     } else if (ziel.dataset.kopiere) {
       await navigator.clipboard.writeText(ziel.dataset.kopiere);
       melde("Nachricht kopiert.");
@@ -700,12 +789,7 @@ document.addEventListener("click", async (e) => {
       const grund = document.querySelector(`.verzoegerung-grund[data-id="${id}"]`).value;
       const ergebnis = await ruf(`/intern/bestellung/${encodeURIComponent(id)}/verzoegerung`, { neueZeit, grund });
       await lade();
-      const meldungJeKanal = {
-        sms: "Gast per SMS informiert.",
-        email: "Gast per E-Mail informiert.",
-        keiner: "Kein automatischer Kanal verfügbar – bitte telefonisch informieren.",
-      };
-      melde(meldungJeKanal[ergebnis.kanal] ?? "Abholzeit aktualisiert.", false, ergebnis.kanal === "keiner");
+      meldeGast(ergebnis.gast, "Neue Abholzeit gespeichert, Statusseite aktualisiert.");
     } else if (ziel.dataset.noshow) {
       const id = ziel.dataset.noshow;
       const vereinbart = Number(ziel.dataset.betrag) || 0;
@@ -795,6 +879,19 @@ document.getElementById("wartezeit-speichern").addEventListener("click", async (
     await ruf("/intern/wartezeit", { minuten });
     await lade();
     melde(minuten === 0 ? "Zusatz-Wartezeit aufgehoben." : `Zusatz-Wartezeit: +${minuten} Minuten.`);
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+document.getElementById("gast-speichern").addEventListener("click", async () => {
+  try {
+    await ruf("/intern/gast-kontakt", {
+      anzeigeName: document.getElementById("gast-name").value.trim(),
+      telefon: document.getElementById("gast-telefon").value.trim(),
+    });
+    await lade();
+    melde("Angaben für die Gastbenachrichtigung gespeichert.");
   } catch (fehler) {
     melde(fehler.message, true);
   }

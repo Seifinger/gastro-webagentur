@@ -16,7 +16,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-export { RESERVATION_SLOTS } from "../../src/sections/reservation.js";
+export { RESERVATION_SLOTS, STATUS_LINK_HINWEIS, EMAIL_ZWECK } from "../../src/sections/reservation.js";
 export { abholzeitSkript, abholzeitAttribute } from "../../src/abholzeiten.js";
 export {
   themeForLead,
@@ -91,7 +91,7 @@ export const PFLICHT_IDS = [
 
 /** Formularfelder (name-Attribute), die das Skript liest. */
 export const PFLICHT_FELDER = {
-  "order-form": ["abholzeit", "name", "telefon", "hinweis"],
+  "order-form": ["abholzeit", "name", "telefon", "email", "hinweis"],
   "reservation-form": ["datum", "uhrzeit", "personen", "name", "telefon", "email", "wunsch"],
 };
 

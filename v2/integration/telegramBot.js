@@ -18,6 +18,8 @@
 
 import { fileURLToPath } from "node:url";
 import { ladeBetrieb } from "../../src/betriebStore.js";
+import { stelleGastMeldungenZu } from "../../src/kundenBenachrichtigung.js";
+import { wirtGastHinweis } from "../../src/gastStatus.js";
 import {
   alleBetriebe,
   betriebFuerChat,
@@ -243,6 +245,14 @@ async function verarbeiteKnopf(knopf, betriebe) {
     } else {
       throw new Error("Unbekannter Knopf");
     }
+    // Gastmeldung zustellen (entstanden beim Speichern, wie bei einem Klick
+    // im Dashboard). Ein doppelt gedrückter Knopf ändert nichts und
+    // verschickt deshalb auch nichts.
+    await stelleGastMeldungenZu(slug);
+    const stand = ladeBetrieb(slug);
+    const eintrag = (art === "r" ? stand.reservierungen : stand.bestellungen).find((x) => x.id === id);
+    const gast = eintrag ? wirtGastHinweis(art === "r" ? "reservierung" : "bestellung", eintrag, stand.gastMeldungen ?? []) : null;
+    if (gast?.anrufNoetig) text += `\n⚠️ ${gast.anrufText}`;
     await api("editMessageText", { chat_id: chatId, message_id: knopf.message.message_id, text, ...(markup ? { reply_markup: markup } : {}) });
     await quittung("Erledigt");
     return { aktion: `${art}:${aktion}`, slug, id };

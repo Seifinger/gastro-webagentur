@@ -8,7 +8,7 @@
 // Der Ton richtet sich nach dem Sprachkanon des Designsystems: das Abendhaus
 // sagt weniger, das helle Haus antwortet zuerst auf „was, wann, wie schnell“.
 
-import { ortsbezug, strasseAusAdresse } from "./v1Funktionen.js";
+import { ortsbezug, strasseAusAdresse, EMAIL_ZWECK, STATUS_LINK_HINWEIS } from "./v1Funktionen.js";
 
 // Slogan der Bühne (nur Seiten mit Ausdruck): höchstens sechs Wörter, keine
 // Behauptung über das Haus (kein "seit 1890", kein "bestes"), nur eine
@@ -141,7 +141,8 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
         personen: "Personen",
         name: "Name",
         telefon: "Telefon",
-        email: "E-Mail",
+        email: "E-Mail-Adresse für Bestätigung und Änderungen",
+        emailZweck: EMAIL_ZWECK,
         wunsch: "Anmerkungen",
         optional: "(optional)",
         bitteWaehlen: "Bitte wählen",
@@ -182,6 +183,7 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
       reservieren: "Reservieren",
       mailBestaetigung: "Bestätigung per E-Mail senden",
       vorschauHinweis: "Vorschau: Auf dieser Seite wird nichts verschickt. Auf der fertigen Website geht die Anfrage direkt an das Restaurant.",
+      statusHinweis: STATUS_LINK_HINWEIS,
       fehlerAbholzeit: "Bitte wählen Sie eine Abholzeit.",
     },
 

@@ -6,6 +6,15 @@ export const RESERVATION_SLOTS = [
   ...timeSlots(17 * 60, 21 * 60 + 30, 30),
 ];
 
+// Unter beiden Formularen, sobald ein Betriebsserver angebunden ist: was
+// der Status-Link kann und was nicht (er ist keine Push-Nachricht). v1 und
+// v2 zeigen denselben Satz.
+export const STATUS_LINK_HINWEIS =
+  "Nach dem Absenden erhalten Sie einen persönlichen Status-Link. Er zeigt Bestätigung oder Änderungen nur, wenn Sie ihn erneut öffnen – aktiv benachrichtigen wir Sie nur, wenn Sie eine E-Mail-Adresse angeben. Die Adresse nutzen wir ausschließlich für diese Anfrage.";
+
+// Zweck des freiwilligen E-Mail-Felds – direkt am Feld.
+export const EMAIL_ZWECK = "Nur für Nachrichten zu dieser Anfrage – kein Newsletter, keine Werbung.";
+
 /**
  * Die Reservierungs-Sektion mit Vorteils-Liste und Formular.
  *
@@ -14,7 +23,7 @@ export const RESERVATION_SLOTS = [
  * @param {string|null} [ctx.handschrift] - preset.layout.handschrift. Mit
  *   Handschrift tragen die Pluspunkte den gezeichneten Haken statt des ✓.
  */
-export function renderReservation({ widgetVariant, handschrift }) {
+export function renderReservation({ widgetVariant, handschrift, statusHinweis = "" }) {
   // Der gezeichnete Haken ersetzt das gesetzte ✓ auf jeder Seite, nicht nur
   // dort, wo ein Archetyp eine eigene Handschrift mitbringt (vgl. hero.js).
   const k = haken();
@@ -44,7 +53,7 @@ export function renderReservation({ widgetVariant, handschrift }) {
         <p${handschrift === "abend" ? ' class="reserve-intro"' : ' style="color:var(--ink-soft);font-size:18px"'}>Wählen Sie Datum, Uhrzeit und Personenzahl – wir halten Ihren Tisch bereit.</p>
         <ul class="reserve-pluspunkte">
           <li><span class="k">${k}</span><span>Rund um die Uhr buchbar, auch außerhalb der Öffnungszeiten</span></li>
-          <li><span class="k">${k}</span><span>Sofortige Bestätigung, ganz ohne Anruf</span></li>
+          <li><span class="k">${k}</span><span>Bestätigung durch das Restaurant – per E-Mail oder über Ihren Status-Link</span></li>
           <li><span class="k">${k}</span><span>Sonderwünsche wie Kinderstuhl oder Allergien direkt mitteilen</span></li>
         </ul>
       </div>
@@ -83,15 +92,19 @@ export function renderReservation({ widgetVariant, handschrift }) {
             <span class="error">Bitte geben Sie eine Telefonnummer an.</span>
           </div>
           <div class="field">
-            <label for="res-email">E-Mail <span class="hint">(optional)</span></label>
-            <input type="email" id="res-email" name="email" autocomplete="email">
+            <label for="res-email">E-Mail-Adresse für Bestätigung und Änderungen <span class="hint">(optional)</span></label>
+            <input type="email" id="res-email" name="email" autocomplete="email" inputmode="email" maxlength="254">
+            <span class="hint">${EMAIL_ZWECK}</span>
           </div>
           <div class="field field-wide">
             <label for="res-wunsch">Anmerkungen <span class="hint">(optional)</span></label>
             <textarea id="res-wunsch" name="wunsch" placeholder="Kinderstuhl, Allergien, Tisch am Fenster ..."></textarea>
           </div>
         </div>
-        <button class="btn btn-primary btn-block" type="submit" style="margin-top:24px">Reservierung anfragen</button>
+        <button class="btn btn-primary btn-block" type="submit" style="margin-top:24px">Reservierung anfragen</button>${
+          statusHinweis ? `
+        <p class="hint" style="margin-top:10px">${escapeHtml(statusHinweis)}</p>` : ""
+        }
       </form>
     </div>
   </div>

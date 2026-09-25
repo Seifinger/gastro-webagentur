@@ -30,6 +30,7 @@ import {
   setzeKuechenStatus,
 } from "./wirtAdapter.js";
 import { benachrichtige, telegramKonfiguriert, starteDienst } from "./telegramBot.js";
+import { stelleGastMeldungenZu } from "../../src/kundenBenachrichtigung.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const WIRT_HTML = path.join(__dirname, "..", "..", "public", "wirt.html");
@@ -173,7 +174,7 @@ const STORNO = /^\/oeffentlich\/bestellung\/([^/]+)\/stornieren$/;
  */
 export async function erzeugeHandlerV2({ slug, v1TelegramErsetzen = true } = {}) {
   process.env.BETRIEB ??= slug;
-  const { handler: v1 } = await import("../../src/wirtServer.js");
+  const { handler: v1, wirtZugangErlaubt, istOeffentlicheRoute, verweigereZugang } = await import("../../src/wirtServer.js");
   if (v1TelegramErsetzen && telegramKonfiguriert()) {
     // Der v1-Rückkanal schickt nur „Neue Bestellung …“ als Text. Der v2-Bot
     // schickt dasselbe mit Knöpfen – beide zusammen wären doppelt.
@@ -184,6 +185,13 @@ export async function erzeugeHandlerV2({ slug, v1TelegramErsetzen = true } = {})
 
   return async (req, res) => {
     const { pathname } = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
+
+    // Dieselbe Anmeldung wie in v1 (WIRT_PASSWORT) – auch für die Routen,
+    // die diese Hülle selbst beantwortet. Schriften sind unkritisch.
+    if (!istOeffentlicheRoute(pathname, req.method) && !pathname.startsWith("/v2/assets/fonts/") && !wirtZugangErlaubt(req)) {
+      verweigereZugang(res);
+      return;
+    }
 
     if (pathname === "/" || pathname === "/index.html") {
       const { v2Design } = ladeBetriebV2(betrieb);
@@ -227,7 +235,13 @@ export async function erzeugeHandlerV2({ slug, v1TelegramErsetzen = true } = {})
         }
         if (pathname === "/v2/intern/telegram/tagesuebersicht") return json(res, 200, { ok: true, ...setzeTagesuebersicht(betrieb, e) });
         if (pathname === "/v2/intern/design") return json(res, 200, { ok: true, design: setzeBetriebsDesign(betrieb, e) });
-        if (pathname === "/v2/intern/bestellung/kuechenstatus") return json(res, 200, { ok: true, bestellung: setzeKuechenStatus(betrieb, e.id, e.status) });
+        if (pathname === "/v2/intern/bestellung/kuechenstatus") {
+          const bestellung = setzeKuechenStatus(betrieb, e.id, e.status);
+          // Dieselbe Zustellung wie im v1-Dashboard: Die Meldung ist beim
+          // Speichern entstanden, hier wird sie nur verschickt.
+          await stelleGastMeldungenZu(betrieb);
+          return json(res, 200, { ok: true, bestellung });
+        }
       } catch (fehler) {
         return json(res, 400, { ok: false, fehler: fehler.message });
       }
