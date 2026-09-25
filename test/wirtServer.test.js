@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 const SLUG = "__test-wirt-server";
 process.env.BETRIEB = SLUG;
 const { handler } = await import("../src/wirtServer.js");
+const { gibNoShowRegelFrei } = await import("./hilfen/rechtstexte.js");
 const { ladeBetrieb, speichereBetrieb, legeTischAn, uhrHook } = await import("../src/betriebStore.js");
 
 // Feste Uhr (Donnerstag, 24.09.2026, 17:00 Berlin): "18:30" ist dann eine
@@ -605,6 +606,8 @@ test("eine abgeholte Bestellung fließt ohne aktiviertes Lernsystem nicht in die
 /* ---------- No-Show-Schutz ---------- */
 
 async function aktiviereNoShow(basis, betrag = 10, fenster = 30, schwelle = 2) {
+  // Nur mit freigegebener No-Show-Regel einschaltbar (rechtstexte.js).
+  gibNoShowRegelFrei(SLUG, { betrag, stornofensterMinuten: fenster });
   await fetch(`${basis}/intern/no-show-schutz`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -659,6 +662,7 @@ test("eine Bestellung mit Häkchen wird angenommen, die Zustimmung wird gespeich
         name: "Testgast",
         telefon: "0170 999",
         noShowZustimmung: true,
+        noShowVersion: "v1",
       }),
     });
     const { bestellung } = await antwort.json();
@@ -682,6 +686,7 @@ test("Stornieren über /oeffentlich/bestellung/:id/stornieren meldet, ob es geb�
         abholzeit: "18:30",
         name: "Testgast",
         noShowZustimmung: true,
+        noShowVersion: "v1",
       }),
     });
     const { bestellung } = await bestellAntwort.json();
@@ -713,6 +718,7 @@ test("'Kunde nicht erschienen' erzeugt mit gemocktem E-Mail-Hook eine Rechnung u
         telefon: "0170 555",
         email: "gast@beispiel.de",
         noShowZustimmung: true,
+        noShowVersion: "v1",
       }),
     });
     const { bestellung } = await bestellAntwort.json();
@@ -756,6 +762,7 @@ test("'Kunde nicht erschienen' meldet rechnungVersendet:false ohne konfigurierte
         abholzeit: "18:30",
         name: "Testgast",
         noShowZustimmung: true,
+        noShowVersion: "v1",
       }),
     });
     const { bestellung } = await bestellAntwort.json();
@@ -786,6 +793,7 @@ test("der Warnhinweis im Dashboard erscheint erst ab der eingestellten Schwelle"
           name: "Testgast",
           telefon: "0170 777",
           noShowZustimmung: true,
+        noShowVersion: "v1",
         }),
       });
       return (await antwort.json()).bestellung;

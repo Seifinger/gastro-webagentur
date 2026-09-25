@@ -34,7 +34,28 @@ import {
   setzeGastKontakt,
   betriebsKontakt,
   setzeDemoBetrieb,
+  legeRechtsdokumentEntwurfAn,
+  bearbeiteRechtsdokument,
+  kopiereRechtsdokument,
+  gibRechtsdokumentFrei,
+  zieheRechtsdokumentZurueck,
+  loescheRechtsdokumentEntwurf,
+  rechtsdokumentFassung,
+  setzeReservierungsNoShow,
+  setzeLaunchVermerk,
 } from "./betriebStore.js";
+import {
+  DOKUMENT_ARTEN,
+  gueltigeFassung,
+  oeffentlicheRechtslage,
+  noShowBestellungAktiv,
+  noShowReservierungAktiv,
+  launchPruefung,
+  rechtstextSeite,
+  freigabeHindernisse,
+} from "./rechtstexte.js";
+import { zeitraum, auswertung, heuteAnstehend, anfragenJe100Aufrufe, ZEITZONE_STANDARD } from "./statistik.js";
+import { seitenaufrufe } from "./seitenaufrufe.js";
 import { benachrichtigeBetrieb, oeffentlicherVapidSchluessel } from "./pushNotify.js";
 import { benachrichtigeUeberTelegram } from "./telegramNotify.js";
 import {
@@ -56,6 +77,7 @@ const statusSeite = path.join(__dirname, "..", "public", "status.html");
 const VERZOEGERUNG = /^\/intern\/bestellung\/([^/]+)\/verzoegerung$/;
 const STORNIEREN = /^\/oeffentlich\/bestellung\/([^/]+)\/stornieren$/;
 const NO_SHOW = /^\/intern\/bestellung\/([^/]+)\/no-show$/;
+const RECHTSTEXT = /^\/rechtstexte\/([a-z-]+)(?:\/(v\d+))?(\.txt)?$/;
 
 function parseFlag(argv, name, standard) {
   const i = argv.indexOf(name);
@@ -193,6 +215,10 @@ function uebersicht() {
     noShowWarnSchwelle: daten.noShowWarnSchwelle ?? 2,
     bankverbindung: daten.bankverbindung ?? "",
     gastKontakt: { anzeigeName: daten.anzeigeName ?? "", telefon: daten.telefon ?? "" },
+    // Wirkt der No-Show-Schutz wirklich? Nur mit gültiger freigegebener Regel.
+    noShowRegel: noShowBestellungAktiv(daten, uhrHook.jetzt())?.version ?? "",
+    noShowFreigegebeneRegel: gueltigeFassung(daten.rechtsdokumente, "noshow-bestellung", uhrHook.jetzt())?.version ?? "",
+    reservierungNoShowAktiv: Boolean(noShowReservierungAktiv(daten, uhrHook.jetzt())),
     gastEmail: gastEmailEinrichtung(),
     demoBetrieb: Boolean(daten.demoBetrieb),
     heute,
@@ -220,7 +246,7 @@ export function wirtZugangErlaubt(req) {
 }
 
 export function istOeffentlicheRoute(pathname, method) {
-  return method === "OPTIONS" || pathname.startsWith("/oeffentlich/") || pathname === "/status" || pathname === "/sw.js";
+  return method === "OPTIONS" || pathname.startsWith("/oeffentlich/") || pathname === "/status" || pathname === "/sw.js" || pathname.startsWith("/rechtstexte/");
 }
 
 export function verweigereZugang(res) {
@@ -283,6 +309,45 @@ export const handler = async (req, res) => {
       "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
     });
     res.end(readFileSync(statusSeite, "utf-8"));
+    return;
+  }
+
+  // Rechtstexte des Restaurants: nur freigegebene Fassungen, nie Entwürfe.
+  const rechtstext = req.method === "GET" ? RECHTSTEXT.exec(pathname) : null;
+  if (rechtstext) {
+    const [, pfad, version, txt] = rechtstext;
+    const art = Object.keys(DOKUMENT_ARTEN).find((a) => DOKUMENT_ARTEN[a].pfad === pfad);
+    const daten = ladeBetrieb(slug);
+    const aktuell = art ? gueltigeFassung(daten.rechtsdokumente, art, uhrHook.jetzt()) : null;
+    const dok = art ? (version ? rechtsdokumentFassung(daten, art, version) : aktuell) : null;
+    const kopf = { "Cache-Control": "no-cache", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer" };
+    if (!art || (version && !dok)) {
+      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8", ...kopf });
+      res.end("Nicht gefunden");
+      return;
+    }
+    if (txt) {
+      if (!dok) {
+        res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8", ...kopf });
+        res.end("Noch keine freigegebene Fassung");
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${pfad}-${dok.version}.txt"`,
+        ...kopf,
+      });
+      res.end(`${dok.titel}\n${betriebsKontakt(slug, daten).name} · Fassung ${dok.version} · gültig ab ${dok.gueltigAb}\n\n${dok.inhalt}${dok.zustimmungstext ? `\n\nBestätigungstext: ${dok.zustimmungstext}` : ""}\n\nSHA-256: ${dok.inhaltHash}\n`);
+      return;
+    }
+    res.writeHead(dok || !version ? 200 : 404, { "Content-Type": "text/html; charset=utf-8", ...kopf, "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'" });
+    res.end(rechtstextSeite({
+      art,
+      dok,
+      betriebName: betriebsKontakt(slug, daten).name,
+      aktuell: !dok || dok === aktuell,
+      txtPfad: dok ? `/rechtstexte/${pfad}/${dok.version}.txt` : "",
+    }));
     return;
   }
 
@@ -366,18 +431,23 @@ export const handler = async (req, res) => {
       }
 
       if (pathname === "/oeffentlich/no-show-einstellungen") {
-        const stand = ladeBetrieb(slug);
+        // Ältere Seiten fragen hier. Aktiv nur mit gültiger freigegebener Regel.
+        const regel = noShowBestellungAktiv(ladeBetrieb(slug), uhrHook.jetzt());
         json(
           res,
           200,
-          {
-            ok: true,
-            aktiv: Boolean(stand.noShowSchutzAktiv),
-            gebuehrBetrag: stand.noShowGebuehrBetrag ?? 0,
-            stornofensterMinuten: stand.noShowStornofensterMinuten ?? 30,
-          },
+          regel
+            ? { ok: true, aktiv: true, version: regel.version, text: regel.zustimmungstext, gebuehrBetrag: regel.parameter.betrag, stornofensterMinuten: regel.parameter.stornofensterMinuten }
+            : { ok: true, aktiv: false },
           CORS,
         );
+        return;
+      }
+
+      // Was die Formulare vor dem Absenden anzeigen und bestätigen lassen:
+      // nur freigegebene, gültige Fassungen dieses Restaurants.
+      if (pathname === "/oeffentlich/rechtstexte") {
+        json(res, 200, { ok: true, ...oeffentlicheRechtslage(ladeBetrieb(slug), uhrHook.jetzt()) }, CORS);
         return;
       }
 
@@ -427,6 +497,10 @@ export const handler = async (req, res) => {
       json(res, 400, { ok: false, fehler: fehler.message }, CORS);
       return;
     }
+    // Unbekannter öffentlicher Pfad: Der Körper ist schon gelesen – nicht
+    // weiterreichen (das bliebe hängen), sondern ehrlich 404.
+    json(res, 404, { ok: false, fehler: "Nicht gefunden" }, CORS);
+    return;
   }
 
   /* ----- Dashboard des Wirts ----- */
@@ -448,6 +522,40 @@ export const handler = async (req, res) => {
   // sehen können, was bereits gelernt wurde.
   if (pathname === "/api/wartezeit-lernen") {
     json(res, 200, { eintraege: lernUebersicht(slug) });
+    return;
+  }
+
+  if (pathname === "/api/statistik") {
+    try {
+      const daten = ladeBetrieb(slug);
+      const zeitzone = daten.zeitzone || ZEITZONE_STANDARD;
+      const jetzt = uhrHook.jetzt();
+      const z = zeitraum(searchParams.get("zeitraum") || "monat", jetzt, zeitzone, { von: searchParams.get("von"), bis: searchParams.get("bis") });
+      const ergebnis = auswertung(daten, z);
+      const aufrufe = seitenaufrufe(slug, daten, z);
+      json(res, 200, { ok: true, betrieb: slug, ...ergebnis, heute: heuteAnstehend(daten, jetzt, zeitzone), seitenaufrufe: aufrufe, verhaeltnis: anfragenJe100Aufrufe(ergebnis, aufrufe) }, PRIVAT);
+    } catch (fehler) {
+      json(res, 400, { ok: false, fehler: fehler.message }, PRIVAT);
+    }
+    return;
+  }
+
+  if (pathname === "/api/rechtstexte") {
+    const daten = ladeBetrieb(slug);
+    const jetzt = uhrHook.jetzt();
+    json(res, 200, {
+      ok: true,
+      arten: Object.entries(DOKUMENT_ARTEN).map(([art, a]) => ({ art, titel: a.titel, pfad: a.pfad, gueltig: gueltigeFassung(daten.rechtsdokumente, art, jetzt)?.version ?? "" })),
+      dokumente: (daten.rechtsdokumente ?? []).map((d) => ({ ...d, hindernisse: d.status === "entwurf" ? freigabeHindernisse(d, { freigegebenVon: "x", pruefvermerk: "x", geprueftBestaetigt: true }) : [] })),
+      noShowBestellung: { eingeschaltet: Boolean(daten.noShowSchutzAktiv), wirksam: noShowBestellungAktiv(daten, jetzt)?.version ?? "" },
+      noShowReservierung: { eingeschaltet: Boolean(daten.reservierungNoShowAktiv), wirksam: noShowReservierungAktiv(daten, jetzt)?.version ?? "" },
+      launch: launchPruefung(daten, {
+        wirtPasswortGesetzt: Boolean(process.env.WIRT_PASSWORT),
+        oeffentlicheUrl: process.env.WIRT_OEFFENTLICHE_URL ?? "",
+        emailEingerichtet: gastEmailEinrichtung().eingerichtet,
+        jetzt,
+      }),
+    }, PRIVAT);
     return;
   }
 
@@ -533,6 +641,42 @@ export const handler = async (req, res) => {
         const art = eingabe.art === "reservierung" ? "reservierung" : "bestellung";
         widerrufeGastZugang(slug, art, String(eingabe.id ?? ""));
         json(res, 200, { ok: true, gast: gastHinweisFuer(art, String(eingabe.id ?? "")) });
+        return;
+      }
+
+      /* ----- Intern: Rechtstexte und Prüfliste ----- */
+
+      if (pathname === "/intern/rechtstexte/entwurf") {
+        json(res, 200, { ok: true, dokument: legeRechtsdokumentEntwurfAn(slug, eingabe.art, { parameter: eingabe.parameter }) });
+        return;
+      }
+      if (pathname === "/intern/rechtstexte/bearbeiten") {
+        json(res, 200, { ok: true, dokument: bearbeiteRechtsdokument(slug, eingabe.id, eingabe) });
+        return;
+      }
+      if (pathname === "/intern/rechtstexte/kopieren") {
+        json(res, 200, { ok: true, dokument: kopiereRechtsdokument(slug, eingabe.id) });
+        return;
+      }
+      if (pathname === "/intern/rechtstexte/freigeben") {
+        json(res, 200, { ok: true, dokument: gibRechtsdokumentFrei(slug, eingabe.id, eingabe) });
+        return;
+      }
+      if (pathname === "/intern/rechtstexte/zurueckziehen") {
+        json(res, 200, { ok: true, dokument: zieheRechtsdokumentZurueck(slug, eingabe.id) });
+        return;
+      }
+      if (pathname === "/intern/rechtstexte/loeschen") {
+        loescheRechtsdokumentEntwurf(slug, eingabe.id);
+        json(res, 200, { ok: true });
+        return;
+      }
+      if (pathname === "/intern/reservierung-no-show") {
+        json(res, 200, { ok: true, aktiv: setzeReservierungsNoShow(slug, eingabe.aktiv === true) });
+        return;
+      }
+      if (pathname === "/intern/launch-vermerk") {
+        json(res, 200, { ok: true, vermerke: setzeLaunchVermerk(slug, eingabe.punkt, eingabe) });
         return;
       }
 
@@ -656,6 +800,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   });
 
   server.listen(port, dashboardHost, () => {
+    // Launch-Blocker: Ist der Server von außen erreichbar, muss das
+    // Dashboard geschützt sein – sonst liegen Gastdaten und Nachweise offen.
+    if (!process.env.WIRT_PASSWORT && !["127.0.0.1", "localhost", "::1"].includes(dashboardHost)) {
+      console.log("\n⛔ WIRT_PASSWORT ist nicht gesetzt, der Server lauscht aber auf " + dashboardHost + ".");
+      console.log("   Dashboard, Statistik und Nachweise sind damit für jeden im Netz lesbar. Vor dem Livegang setzen!");
+    }
     console.log(`\n🍽️  Wirt-Dashboard für "${slug}": http://${dashboardHost}:${port}`);
     console.log(`    Reservierungen der Seite gehen an: http://${dashboardHost}:${port}/oeffentlich/\n`);
   });

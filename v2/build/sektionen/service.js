@@ -18,6 +18,7 @@ import {
   kuechenMarke,
   KONTAKT_IKONEN,
   gedeck,
+  rechtlichesHtml,
 } from "../v1Funktionen.js";
 
 const e = escapeHtml;
@@ -70,6 +71,7 @@ export function renderReservierung({ ds, texte, betont, tief, aktionen, ausdruck
           ${feld({ id: "res-email", name: "email", label: f.email, typ: "email", optional: f.optional, auto: "email", zusatz: f.emailZweck, extra: ' inputmode="email" maxlength="254"' })}
           ${feld({ id: "res-wunsch", name: "wunsch", label: f.wunsch, typ: "textarea", optional: f.optional, breit: true, platzhalter: f.wunschPlatzhalter })}
       </div>
+      ${rechtlichesHtml("reservierung", aktionen?.apiUrl)}
       <button class="btn btn-primary btn-block formular-absenden" type="submit">${e(t.absenden)}</button>
       ${vorschauHinweis(aktionen, texte)}
     </form>
@@ -148,13 +150,14 @@ ${leiste}
         ${feld({ id: "ord-email", name: "email", label: texte.reservierung.felder.email, typ: "email", optional: texte.reservierung.felder.optional, auto: "email", zusatz: texte.reservierung.felder.emailZweck, extra: ' inputmode="email" maxlength="254"' })}
         ${feld({ id: "ord-hinweis", name: "hinweis", label: b.hinweis, typ: "textarea", optional: texte.reservierung.felder.optional, platzhalter: b.hinweisPlatzhalter })}
       </div>
+      ${rechtlichesHtml("bestellung", aktionen?.apiUrl)}
       <div class="field noshow" id="ord-noshow-feld" style="display:none">
         <label class="noshow-label"><input type="checkbox" id="ord-noshow" name="noShowZustimmung"><span id="ord-noshow-text"></span></label>
         <span class="error">${e(b.noShowFehler)}</span>
       </div>
       <div class="drawer-foot">
         <div class="totals"><span>${e(b.gesamt)}</span><span id="cart-total">0,00 €</span></div>
-        <button class="btn btn-primary btn-block" id="order-submit" type="submit">${e(b.absenden)}</button>
+        <button class="btn btn-primary btn-block" id="order-submit" type="submit">${e(aktionen?.modus === "live" ? b.absenden : b.absendenVorschau ?? b.absenden)}</button>
         <p class="hint drawer-hinweis">${e(b.bezahlung)}</p>
         ${vorschauHinweis(aktionen, texte)}
       </div>
@@ -174,7 +177,13 @@ ${leiste}
 </div>`;
 }
 
-export function renderFuss({ texte, lead, cuisine }) {
+/** Impressum/Datenschutz des Restaurants (nur mit Betriebsserver). */
+export function rechtsLinkHtml(aktionen) {
+  const r = aktionen?.rechtstexte;
+  return r ? `\n      <a href="${e(r.impressum)}" target="_blank" rel="noopener">Impressum</a>\n      <a href="${e(r.datenschutz)}" target="_blank" rel="noopener">Datenschutz</a>` : "";
+}
+
+export function renderFuss({ texte, lead, cuisine, aktionen }) {
   const telefon = lead.telefon || "";
   const telHref = telefon.replace(/[^\d+]/g, "");
   return `<footer class="fuss auf-tint">
@@ -186,7 +195,7 @@ export function renderFuss({ texte, lead, cuisine }) {
     <nav class="fuss-nav" aria-label="${e(texte.fuss.navigation)}">
       <a href="#karte">${e(texte.nav.karte)}</a>
       <a href="#reservierung">${e(texte.nav.reservierung)}</a>
-      <a href="#kontakt">${e(texte.nav.kontakt)}</a>
+      <a href="#kontakt">${e(texte.nav.kontakt)}</a>${rechtsLinkHtml(aktionen)}
     </nav>
     <div class="fuss-kontakt">${telefon ? `<a href="tel:${e(telHref)}">${e(telefon)}</a>` : ""}</div>
     <p class="fuss-hinweis">${e(texte.fuss.hinweis)}</p>

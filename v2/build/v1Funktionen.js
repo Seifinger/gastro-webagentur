@@ -17,6 +17,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 export { RESERVATION_SLOTS, STATUS_LINK_HINWEIS, EMAIL_ZWECK } from "../../src/sections/reservation.js";
+export { rechtlichesHtml, RECHTLICHES_CSS, ZAHLUNGSPFLICHTIG_BESTELLEN, PROBEBESTELLUNG_ABSENDEN } from "../../src/sections/rechtliches.js";
 export { abholzeitSkript, abholzeitAttribute } from "../../src/abholzeiten.js";
 export {
   themeForLead,

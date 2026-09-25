@@ -15,6 +15,7 @@
 // über die Website an – dann gibt es keinen Bestellen-Knopf, die Karte bleibt
 // erreichbar.
 
+import { rechtsLinks } from "../../src/sections/rechtliches.js";
 export function aktionsziele({ lead = {}, apiUrl = "", fiktiv = false, bestellung = true, karteHref = "" } = {}) {
   const modus = String(apiUrl ?? "").trim() ? "live" : "vorschau";
   const telefon = fiktiv ? "" : String(lead.telefon ?? "").trim();
@@ -22,6 +23,10 @@ export function aktionsziele({ lead = {}, apiUrl = "", fiktiv = false, bestellun
   const adresse = String(lead.adresse ?? "").trim();
   return {
     modus,
+    // Impressum/Datenschutz DES RESTAURANTS – nur mit Betriebsserver.
+    rechtstexte: rechtsLinks(apiUrl),
+    // Für die Rechtshinweise am Formular (sections/rechtliches.js).
+    apiUrl: modus === "live" ? String(apiUrl).trim().replace(/\/+$/, "") : "",
     reservieren: { art: modus, href: "#reservierung" },
     bestellen: bestellung ? { art: modus, href: karteHref || "#karte" } : null,
     ...(karteHref ? { karte: { href: karteHref } } : {}),

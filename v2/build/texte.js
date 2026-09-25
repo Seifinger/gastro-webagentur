@@ -8,7 +8,7 @@
 // Der Ton richtet sich nach dem Sprachkanon des Designsystems: das Abendhaus
 // sagt weniger, das helle Haus antwortet zuerst auf „was, wann, wie schnell“.
 
-import { ortsbezug, strasseAusAdresse, EMAIL_ZWECK, STATUS_LINK_HINWEIS } from "./v1Funktionen.js";
+import { ortsbezug, strasseAusAdresse, EMAIL_ZWECK, STATUS_LINK_HINWEIS, ZAHLUNGSPFLICHTIG_BESTELLEN, PROBEBESTELLUNG_ABSENDEN } from "./v1Funktionen.js";
 
 // Slogan der Bühne (nur Seiten mit Ausdruck): höchstens sechs Wörter, keine
 // Behauptung über das Haus (kein "seit 1890", kein "bestes"), nur eine
@@ -174,7 +174,10 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
       hinweis: "Hinweis",
       hinweisPlatzhalter: "Allergien, Sonderwünsche …",
       gesamt: "Gesamt",
-      absenden: "Abholung verbindlich bestellen",
+      // Bestellsituation nach § 312j Abs. 3 BGB: Die Schaltfläche nennt die
+      // Zahlungspflicht ausdrücklich (fachlich prüfen lassen).
+      absenden: ZAHLUNGSPFLICHTIG_BESTELLEN,
+      absendenVorschau: PROBEBESTELLUNG_ABSENDEN,
       bezahlung: "Bezahlung bei Abholung, bar oder mit Karte.",
       noShowFehler: "Bitte stimmen Sie zu, um die Bestellung abzuschicken.",
       warenkorb: "Warenkorb",

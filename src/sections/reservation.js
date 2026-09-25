@@ -23,7 +23,7 @@ export const EMAIL_ZWECK = "Nur für Nachrichten zu dieser Anfrage – kein News
  * @param {string|null} [ctx.handschrift] - preset.layout.handschrift. Mit
  *   Handschrift tragen die Pluspunkte den gezeichneten Haken statt des ✓.
  */
-export function renderReservation({ widgetVariant, handschrift, statusHinweis = "" }) {
+export function renderReservation({ widgetVariant, handschrift, statusHinweis = "", rechtliches = "" }) {
   // Der gezeichnete Haken ersetzt das gesetzte ✓ auf jeder Seite, nicht nur
   // dort, wo ein Archetyp eine eigene Handschrift mitbringt (vgl. hero.js).
   const k = haken();
@@ -101,6 +101,7 @@ export function renderReservation({ widgetVariant, handschrift, statusHinweis = 
             <textarea id="res-wunsch" name="wunsch" placeholder="Kinderstuhl, Allergien, Tisch am Fenster ..."></textarea>
           </div>
         </div>
+        ${rechtliches}
         <button class="btn btn-primary btn-block" type="submit" style="margin-top:24px">Reservierung anfragen</button>${
           statusHinweis ? `
         <p class="hint" style="margin-top:10px">${escapeHtml(statusHinweis)}</p>` : ""

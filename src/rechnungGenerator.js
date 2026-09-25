@@ -54,6 +54,10 @@ export function erzeugeNoShowRechnung({ betrieb, bestellung, betrag, bankverbind
     doc.text("Zustimmung des Kunden");
     doc.text(bestellung.noShowZustimmung?.text ?? "(kein Zustimmungstext hinterlegt)");
     doc.text(`Zugestimmt am: ${datumUhrzeit(bestellung.noShowZustimmung?.zeitpunkt)}`);
+    if (bestellung.noShowZustimmung?.version) {
+      doc.text(`Bestätigte Fassung der No-Show-Regel: ${bestellung.noShowZustimmung.version} (SHA-256 ${String(bestellung.noShowZustimmung.inhaltHash ?? "").slice(0, 16)}…)`);
+    }
+    doc.text("Ihnen bleibt der Nachweis, dass kein oder ein wesentlich geringerer Schaden entstanden ist.");
     doc.moveDown();
 
     doc.fontSize(14).text(`Ausfallpauschale: ${euro(betrag)}`);

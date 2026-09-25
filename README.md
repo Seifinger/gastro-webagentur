@@ -505,6 +505,15 @@ Der Hinweis „Entwurfsansicht" verschwindet dann, weil die Anfrage wirklich bei
 
 Nach dem Absenden bekommt jeder Gast Referenznummer, den ehrlichen Stand „eingegangen – noch nicht bestätigt“ und einen persönlichen **Status-Link** (`/status#…` auf dem Wirt-Server). Wer freiwillig eine E-Mail-Adresse angibt, erhält Eingang, Bestätigung, Ablehnung, geänderte Zeiten und „bereit zur Abholung“ zusätzlich als transaktionale E-Mail (Resend). Ohne E-Mail oder ohne eingerichteten Versand zeigt das Dashboard nach Ablehnung oder Zeitänderung: „Gast nicht automatisch informiert – bitte unter … anrufen.“ Die Meldungen entstehen beim Speichern der Statusänderung – v1-Dashboard, v2-Küchenstatus und Telegram-Knöpfe lösen deshalb nie doppelte Mails aus.
 
+### Statistik und Rechtstexte
+
+Das Wirt-Dashboard hat zwei weitere Reiter:
+
+- **Statistik:** Online- und manuelle Reservierungen getrennt, Bestellungen je Status, Bestellwert (ausdrücklich kein bezahlter Umsatz). Zeiträume sind Tag, Woche, Monat, Quartal, Jahr oder frei wählbar; gezählt wird nach Eingang, die Übersicht „Was steht heute an?“ steht getrennt davon. Website-Aufrufe zeigt das Dashboard erst, wenn eine echte Messquelle beim Host der Kundenseite läuft; bis dahin steht dort „noch nicht messbar“.
+- **Rechtstexte:** Impressum, Datenschutz, Bestell- und Reservierungsbedingungen sowie No-Show-Regeln je Restaurant, versioniert und mit Freigabe. Die Vorlagen sind nur Entwürfe, keine Rechtsberatung. Formulare verlangen Bestätigungen nur für freigegebene Fassungen und prüfen sie serverseitig. No-Show bleibt aus, bis eine Regel freigegeben ist.
+
+Details, Bestandsaufnahme, Checkliste der zu liefernden Angaben und Launch-Blocker: [docs-intern/STATISTIK-UND-RECHTSTEXTE.md](docs-intern/STATISTIK-UND-RECHTSTEXTE.md).
+
 Sobald der Wirt-Server öffentlich erreichbar ist, **`WIRT_PASSWORT` setzen** (schützt Dashboard und Wirt-Aktionen). Einrichtung, Umgebungsvariablen, Sicherheit, Datenschutz-Baustein und der sichere Versandtest an die eigene Adresse (`npm run gast:mailtest -- --an …`): [docs-intern/GASTBENACHRICHTIGUNG.md](docs-intern/GASTBENACHRICHTIGUNG.md).
 
 ## v2-Pipeline (parallel zu v1)

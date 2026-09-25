@@ -39,6 +39,7 @@ import {
   escapeHtml,
   jsonForScript,
   remoteImageUrl,
+  RECHTLICHES_CSS,
 } from "./v1Funktionen.js";
 import { renderKopfzeile, renderHero, renderLeiste, HERO_AUFBAUTEN } from "./sektionen/kopf.js";
 import { renderHighlights, renderKarte, renderAmbiente, renderStimmen } from "./sektionen/inhalt.js";
@@ -384,7 +385,7 @@ ${fontCss}
 ${cssVariablen(ds)}
 ${STIL}
 ${BEWEGUNG_CSS}
-${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}\n${ABFOLGE_CSS}\n${ATMOSPHAERE_CSS}\n${KARTE_CSS}` : ""}
+${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}\n${ABFOLGE_CSS}\n${ATMOSPHAERE_CSS}\n${KARTE_CSS}` : ""}${apiUrl ? RECHTLICHES_CSS : ""}
 </style>
 </head>
 <body class="${bodyKlassen}">
@@ -446,7 +447,7 @@ ${darstellungsCss}
 ${ausdruckVariablen(ausdruck, ds)}
 ${BUEHNE_CSS}
 ${ABFOLGE_CSS}
-${KARTE_CSS}
+${KARTE_CSS}${apiUrl ? RECHTLICHES_CSS : ""}
 </style>
 </head>
 <body class="${bodyKlassen} seite-karte">

@@ -22,6 +22,7 @@ import { renderMenu } from "./sections/menu.js";
 import { renderAmbiente, renderContact, renderKontaktZeilen, renderOeffnungszeiten, FOTO_SLOTS } from "./sections/contact.js";
 import { renderStimmen } from "./sections/testimonials.js";
 import { renderReservation, STATUS_LINK_HINWEIS, EMAIL_ZWECK } from "./sections/reservation.js";
+import { rechtlichesHtml, rechtsLinks, RECHTLICHES_CSS, ZAHLUNGSPFLICHTIG_BESTELLEN, PROBEBESTELLUNG_ABSENDEN } from "./sections/rechtliches.js";
 import { abholzeitSkript, abholzeitAttribute, STANDARD_OEFFNUNGSZEITEN } from "./abholzeiten.js";
 import { renderFooter } from "./sections/footer.js";
 
@@ -590,7 +591,6 @@ const PAGE_SCRIPT = `
 (function () {
   var data = window.PAGE_DATA;
   var cart = {};
-  var noShowEinstellungen = null;
   // Warenkorb \u00FCber mehrere Seiten (Startseite \u2194 Speisekarte): nur, wenn
   // die Seite ihre Karte mitliefert (PAGE_DATA.warenkorb). Name und Preis
   // kommen dann immer aus dieser Karte, nie aus einem alten Speicherstand.
@@ -913,35 +913,69 @@ const PAGE_SCRIPT = `
   }
 
   /**
-   * Holt beim Laden der Seite die aktuellen No-Show-Einstellungen des
-   * Betriebs (falls das Lokal die Funktion eingeschaltet hat) und zeigt bei
-   * Bedarf die Zustimmungs-Checkbox mit dem exakten, serverseitig
-   * mitgeführten Text an. Ohne apiUrl (Vorschau) oder ohne aktivierten
-   * Schutz bleibt das Formular unverändert wie zuvor.
+   * Rechtstexte des Restaurants (nur mit Betriebsserver). Der Server nennt
+   * die aktuell g\\u00FCltigen, freigegebenen Fassungen: Bedingungen und
+   * No-Show-Regel bekommen je ein eigenes, nicht vorangekreuztes Feld mit
+   * Link zum Volltext. Ohne freigegebene Fassung bleibt das Feld weg \\u2013
+   * und der Server verlangt dann auch nichts. Mitgeschickt wird nur die
+   * Version, die der Gast gesehen hat; passt sie nicht mehr, lehnt der
+   * Server ab und die Felder werden neu geladen.
    */
-  function ladeNoShowEinstellungen() {
-    if (!data.apiUrl) return;
+  function zeigeBestaetigung(feldId, textId, dok, linkText) {
+    var feld = byId(feldId);
+    if (!feld) return;
+    var box = feld.querySelector("input[type=checkbox]");
+    if (!dok) {
+      feld.hidden = true;
+      feld.style.display = "none";
+      feld.removeAttribute("data-version");
+      if (box) box.checked = false;
+      return;
+    }
+    var text = byId(textId);
+    text.textContent = dok.zustimmungstext + " ";
+    var link = document.createElement("a");
+    link.href = data.apiUrl + dok.pfad;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = "(" + linkText + ", Fassung " + dok.version + ")";
+    text.appendChild(link);
+    // Eine neue Fassung muss neu best\\u00E4tigt werden.
+    if (box && feld.getAttribute("data-version") !== dok.version) box.checked = false;
+    feld.setAttribute("data-version", dok.version);
+    feld.hidden = false;
+    feld.style.display = "block";
+  }
 
-    fetch(data.apiUrl + "/oeffentlich/no-show-einstellungen", {
+  function ladeRechtslage() {
+    if (!data.apiUrl) return;
+    fetch(data.apiUrl + "/oeffentlich/rechtstexte", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: "{}"
     })
       .then(function (antwort) { return antwort.json(); })
-      .then(function (ergebnis) {
-        if (!ergebnis || !ergebnis.aktiv) return;
-        noShowEinstellungen = ergebnis;
-
-        var betrag = Number(ergebnis.gebuehrBetrag || 0).toFixed(2).replace(".", ",");
-        byId("ord-noshow-text").textContent =
-          "Ich stimme zu: Bei Nichtabholung ohne Stornierung bis " + ergebnis.stornofensterMinuten +
-          " Minuten vor der Abholzeit wird eine Ausfallpauschale von " + betrag + " \\u20AC in Rechnung gestellt.";
-        byId("ord-noshow-feld").style.display = "block";
+      .then(function (lage) {
+        if (!lage || !lage.ok) return;
+        zeigeBestaetigung("ord-bedingungen-feld", "ord-bedingungen-text", lage.bestellung.bedingungen, "Bestellbedingungen lesen");
+        zeigeBestaetigung("ord-noshow-feld", "ord-noshow-text", lage.bestellung.noShow, "No-Show-Regel lesen");
+        zeigeBestaetigung("res-bedingungen-feld", "res-bedingungen-text", lage.reservierung.bedingungen, "Reservierungsbedingungen lesen");
+        zeigeBestaetigung("res-noshow-feld", "res-noshow-text", lage.reservierung.noShow, "No-Show-Regel lesen");
       })
       .catch(function () {
-        // Ohne Antwort bleibt die Checkbox einfach aus - keine Bestellung
-        // darf an einem nicht erreichbaren Einstellungs-Abruf scheitern.
+        // Ohne Antwort bleiben die Felder aus. Verlangt der Server eine
+        // Best\\u00E4tigung, lehnt er ab \\u2013 dann wird hier neu geladen.
       });
+  }
+
+  /** Gibt die best\\u00E4tigte Version zur\\u00FCck ("" = nicht n\\u00F6tig) oder null, wenn ein Pflichtfeld fehlt. */
+  function bestaetigteVersion(feldId) {
+    var feld = byId(feldId);
+    if (!feld || !feld.getAttribute("data-version")) return "";
+    var box = feld.querySelector("input[type=checkbox]");
+    var ok = Boolean(box && box.checked);
+    feld.classList.toggle("invalid", !ok);
+    return ok ? feld.getAttribute("data-version") : null;
   }
 
   /*
@@ -1104,7 +1138,7 @@ const PAGE_SCRIPT = `
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    ladeNoShowEinstellungen();
+    ladeRechtslage();
     Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function (button) {
       button.addEventListener("click", function () {
         addToCart(button.getAttribute("data-add"), button.getAttribute("data-name"), Number(button.getAttribute("data-preis")));
@@ -1158,13 +1192,11 @@ const PAGE_SCRIPT = `
       aktualisiereAbholzeiten();
       if (!validate(form, ["name", "telefon", "abholzeit"])) return;
 
-      var noShowFeld = byId("ord-noshow-feld");
-      var noShowAktiv = noShowEinstellungen && noShowEinstellungen.aktiv;
-      if (noShowAktiv) {
-        var angehakt = byId("ord-noshow").checked;
-        noShowFeld.className = angehakt ? "field" : "field invalid";
-        if (!angehakt) return;
-      }
+      // Bedingungen und No-Show-Regel: getrennt, beide nur, wenn der Betrieb
+      // sie freigegeben hat.
+      var bedingungenVersion = bestaetigteVersion("ord-bedingungen-feld");
+      var noShowVersion = bestaetigteVersion("ord-noshow-feld");
+      if (bedingungenVersion === null || noShowVersion === null) return;
 
       var nummer = referenz("AB");
       var abholWahl = form.elements.abholzeit.options[form.elements.abholzeit.selectedIndex];
@@ -1201,7 +1233,8 @@ const PAGE_SCRIPT = `
         telefon: form.elements.telefon.value,
         email: bestellEmail,
         hinweis: form.elements.hinweis.value,
-        noShowZustimmung: noShowAktiv ? true : false
+        bestaetigungen: { bedingungen: bedingungenVersion, noShow: noShowVersion },
+        noShowZustimmung: noShowVersion ? true : false
       }, byId("order-submit")).then(function (ergebnis) {
         // Die Abholzeit ist zun\\u00E4chst nur ein Wunsch: ob sie machbar ist,
         // best\\u00E4tigt die K\\u00FCche.
@@ -1241,6 +1274,7 @@ const PAGE_SCRIPT = `
         abhol.geladenUm = 0;
         ladeAbholKonfig();
         aktualisiereAbholzeiten();
+        ladeRechtslage();
         zeigeFehler(fehler.message);
       });
     });
@@ -1249,6 +1283,9 @@ const PAGE_SCRIPT = `
       event.preventDefault();
       var form = event.target;
       if (!validate(form, ["datum", "uhrzeit", "personen", "name", "telefon"])) return;
+      var resBedingungen = bestaetigteVersion("res-bedingungen-feld");
+      var resNoShow = bestaetigteVersion("res-noshow-feld");
+      if (resBedingungen === null || resNoShow === null) return;
 
       var nummer = referenz("RES");
       var datum = form.elements.datum.value.split("-").reverse().join(".");
@@ -1274,7 +1311,8 @@ const PAGE_SCRIPT = `
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
         email: resEmail,
-        wunsch: form.elements.wunsch.value
+        wunsch: form.elements.wunsch.value,
+        bestaetigungen: { bedingungen: resBedingungen, noShow: resNoShow }
       }, form.querySelector("button[type=submit]")).then(function (ergebnis) {
         var teil = ergebnis.demo ? {} : ergebnis.reservierung;
         // Die Referenz vergibt der Server \\u2013 dieselbe steht in E-Mail und Statusseite.
@@ -1303,6 +1341,7 @@ const PAGE_SCRIPT = `
         form.reset();
         dateInput.value = iso;
       }).catch(function (fehler) {
+        ladeRechtslage();
         zeigeFehler(fehler.message);
       });
     });
@@ -1547,7 +1586,7 @@ ${fontCss}
 }${accentBoldBlock}
 ${PAGE_STYLES}
 ${signaturStil}
-${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}${handschriftStil}
+${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}${handschriftStil}${apiUrl ? RECHTLICHES_CSS : ""}
 </style>
 </head>
 <body${bodyKlassen ? ` class="${bodyKlassen}"` : ""}>
@@ -1607,7 +1646,7 @@ ${(() => {
 
     stimmen: renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social.layout, handschrift),
 
-    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant, handschrift, statusHinweis: apiUrl ? STATUS_LINK_HINWEIS : "" }),
+    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant, handschrift, statusHinweis: apiUrl ? STATUS_LINK_HINWEIS : "", rechtliches: rechtlichesHtml("reservierung", apiUrl) }),
 
     kontakt: renderContact({ kontaktZeilen, hoursRows, strasse: strasseAusAdresse(adresse), ort, handschrift }),
   };
@@ -1668,6 +1707,7 @@ ${
           <textarea id="ord-hinweis" name="hinweis" placeholder="Allergien, Sonderwünsche ..."></textarea>
         </div>
       </div>
+      ${rechtlichesHtml("bestellung", apiUrl)}
       <div class="field" id="ord-noshow-feld" style="display:none;margin-top:14px">
         <label style="display:flex;align-items:flex-start;gap:8px;font-weight:400;text-transform:none;letter-spacing:normal">
           <input type="checkbox" id="ord-noshow" name="noShowZustimmung" style="margin-top:3px">
@@ -1677,7 +1717,7 @@ ${
       </div>
       <div class="drawer-foot" style="margin:24px -22px -22px">
         <div class="totals"><span>Gesamt</span><span id="cart-total">0,00 €</span></div>
-        <button class="btn btn-primary btn-block" id="order-submit" type="submit">Abholung verbindlich bestellen</button>
+        <button class="btn btn-primary btn-block" id="order-submit" type="submit">${apiUrl ? ZAHLUNGSPFLICHTIG_BESTELLEN : PROBEBESTELLUNG_ABSENDEN}</button>
         <p class="hint" style="margin-top:10px;text-align:center">Bezahlung bei Abholung, bar oder mit Karte.</p>${
           apiUrl
             ? `
@@ -1706,7 +1746,7 @@ ${
   }
 </div>
 
-${renderFooter({ name, adresse, telefon, cuisine: gestaltung.cuisine, handschrift })}
+${renderFooter({ name, adresse, telefon, cuisine: gestaltung.cuisine, handschrift, rechtsLinks: rechtsLinks(apiUrl) })}
 
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${abholzeitSkript()}</script>
