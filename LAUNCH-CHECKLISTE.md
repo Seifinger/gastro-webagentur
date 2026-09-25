@@ -60,7 +60,7 @@
    - Sind Host und Resend als Unterauftragsverarbeiter korrekt eingeordnet?
 2. **Drittland:**
    - Reichen die Garantien von Resend (USA), Fly.io (USA-Firma, Region Frankfurt), Telegram (VAE) und den Web-Push-Diensten?
-   - Oder sollen Telegram- und Push-Nachrichten keine Gastnamen und Telefonnummern mehr enthalten (O-13)?
+   - Telegram-Nachrichten enthalten seit 25.09.2026 keine Gastnamen und Telefonnummern mehr; Web-Push noch schon (O-13). Offene Fragen zu Telegram: `v2/integration/TELEGRAM-DATENSCHUTZ.md`, Abschnitt 9.
 3. **Speicherdauer:**
    - Wie lange dürfen bzw. müssen Reservierungen, Bestellungen, Kontaktdaten und Bestätigungsnachweise aufbewahrt werden?
    - Welche Fristen gelten für No-Show-Rechnungen (steuerlich)?

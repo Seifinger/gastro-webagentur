@@ -180,6 +180,29 @@
   .warnbox ul { margin: 0; padding: 12px 16px 14px 34px; color: #f5d37a; font-size: .88rem; line-height: 1.5; }
   .warnbox li + li { margin-top: 7px; }
   .warnbox .wann { font-weight: 700; }
+
+  /* Reiter „Telegram“ */
+  .tg-gruppe { border: none; padding: 0; margin: 16px 0 0; }
+  .tg-gruppe legend { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 4px; padding: 0; }
+  label.tg-wahl, label.tg-schalter { display: flex; gap: 8px; align-items: center; text-transform: none; letter-spacing: 0; font-weight: 400;
+                                     font-size: .95rem; color: var(--text); margin: 6px 0; }
+  label.tg-wahl input:disabled + span { color: var(--muted); }
+  .tg-zeile { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 6px 0; }
+  .tg-zeile label.tg-schalter { margin: 0; }
+  .tg-zeile input[type="number"], .tg-zeitfelder input[type="number"] { width: 90px; }
+  .tg-zeitfelder { display: flex; gap: 14px; flex-wrap: wrap; margin: 4px 0 8px 28px; }
+  .tg-leise { color: var(--muted); font-size: .85rem; margin: 6px 0 0; }
+  .tg-warn { background: color-mix(in srgb, var(--warn) 12%, var(--card)); border-left: 3px solid var(--warn); color: var(--text);
+             padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 10px; font-size: .9rem; }
+  .tg-heute { font-size: 1.05rem; margin: 4px 0; }
+  .tg-tage { margin-top: 10px; max-width: 560px; }
+  .tg-tage td { padding: 6px 10px; font-size: .9rem; }
+  .tg-karten { display: grid; gap: 14px; grid-template-columns: 1fr; margin-top: 14px; }
+  @media (min-width: 780px) { .tg-karten.zwei { grid-template-columns: repeat(2, 1fr); } }
+  .tg-code { font-family: ui-monospace, Menlo, monospace; font-size: 1.15rem; letter-spacing: .08em; background: var(--bg);
+             padding: 3px 8px; border-radius: var(--radius-sm); border: 1px solid var(--line); }
+  .tg-vorgang { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+  .tg-vorgang.problem { color: var(--danger); }
 </style>
 </head>
 <body>
@@ -201,6 +224,7 @@
     <button data-tab="tischplan">Tischplan</button>
     <button data-tab="statistik">Statistik</button>
     <button data-tab="rechtstexte">Rechtstexte</button>
+    <button data-tab="telegram">Telegram</button>
   </nav>
 
   <main class="tafel">
@@ -312,19 +336,6 @@
         <button class="knopf klein" type="button" id="gast-speichern" style="margin-top:10px">Speichern</button>
       </div>
 
-      <div class="balken" id="telegram-block">
-        <label for="telegram-chatid" style="margin-bottom:8px">Telegram als Rückkanal</label>
-        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">
-          Für Geräte ohne funktionierendes Web Push: Telegram-Bot öffnen, <code>/start</code> senden – die dort
-          angezeigte Chat-ID hier eintragen. Greift automatisch, sobald auf keinem Gerät Push-Benachrichtigungen
-          aktiv sind.
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <input type="text" id="telegram-chatid" placeholder="z. B. 123456789" style="max-width:200px">
-          <button class="knopf klein" type="button" id="telegram-speichern">Speichern</button>
-        </div>
-      </div>
-
       <div id="best-liste"></div>
     </section>
 
@@ -359,6 +370,74 @@
       </div>
       <div id="launch-liste"></div>
       <div id="rechtstexte-liste"><p class="leer">Wird geladen …</p></div>
+    </section>
+
+    <section id="tab-telegram" hidden>
+      <div class="balken">
+        <strong>Telegram ist ein zusätzlicher Alarm- und Aktionskanal.</strong>
+        <div class="tg-leise">
+          Maßgeblich bleibt dieses Dashboard: Jede Reservierung und Bestellung steht hier – auch wenn Telegram gerade
+          schweigt. An Telegram gehen nur Betrieb, Referenznummer, Termin bzw. Abholzeit, Personenzahl und Status –
+          keine Namen, Telefonnummern, E-Mail-Adressen, Wünsche oder Bestellpositionen.
+        </div>
+      </div>
+
+      <div id="tg-warnungen"></div>
+      <div class="balken" id="tg-zeiten"><p class="leer">Wird geladen …</p></div>
+
+      <form class="balken" id="tg-form">
+        <label style="margin-bottom:6px">Einstellungen für diesen Betrieb</label>
+        <label class="tg-schalter"><input type="checkbox" id="tg-aktiv"> Telegram-Benachrichtigungen einschalten</label>
+        <fieldset class="tg-gruppe">
+          <legend>Was soll gemeldet werden?</legend>
+          <label class="tg-wahl"><input type="radio" name="tg-arten" value="beide"> Reservierungen und Bestellungen</label>
+          <label class="tg-wahl"><input type="radio" name="tg-arten" value="reservierungen"> nur Reservierungen</label>
+          <label class="tg-wahl"><input type="radio" name="tg-arten" value="bestellungen"> nur Bestellungen</label>
+        </fieldset>
+        <fieldset class="tg-gruppe">
+          <legend>Wann dürfen Nachrichten kommen?</legend>
+          <label class="tg-wahl"><input type="radio" name="tg-zeitfenster" value="oeffnungszeiten"> Nach Öffnungszeiten (empfohlen)</label>
+          <div class="tg-zeitfelder">
+            <div><label for="tg-vorlauf">Vorlauf vor Öffnung (Min.)</label><input type="number" id="tg-vorlauf" min="0" max="180" step="5"></div>
+            <div><label for="tg-nachlauf">Nachlauf nach Schließung (Min.)</label><input type="number" id="tg-nachlauf" min="0" max="180" step="5"></div>
+          </div>
+          <label class="tg-wahl"><input type="radio" name="tg-zeitfenster" value="rund-um-die-uhr"> Rund um die Uhr – auch nachts, an Ruhetagen und im Urlaub</label>
+        </fieldset>
+        <fieldset class="tg-gruppe">
+          <legend>Erinnerung an Unbestätigtes (einmal je Vorgang)</legend>
+          <div class="tg-zeile"><label class="tg-schalter"><input type="checkbox" id="tg-erinnerung-res"> Reservierungen: erinnern nach</label><input type="number" id="tg-frist-res" min="1" max="60" aria-label="Minuten bis zur Erinnerung an Reservierungen"> Minuten</div>
+          <div class="tg-zeile"><label class="tg-schalter"><input type="checkbox" id="tg-erinnerung-best"> Bestellungen: erinnern nach</label><input type="number" id="tg-frist-best" min="1" max="60" aria-label="Minuten bis zur Erinnerung an Bestellungen"> Minuten</div>
+          <p class="tg-leise">
+            Die Frist ist eine interne Erinnerung für Ihr Team – Gäste bekommen keine Zusage, dass innerhalb dieser Zeit
+            geantwortet wird. Sie beginnt, sobald Telegram den Vorgang gemeldet hat. Außerhalb der Telegram-Zeiten wird
+            nicht erinnert; eine fällige Erinnerung kommt dann genau einmal im nächsten Zeitfenster.
+          </p>
+        </fieldset>
+        <fieldset class="tg-gruppe" id="tg-uebersicht-gruppe" hidden>
+          <legend>Tagesübersicht</legend>
+          <div class="tg-zeile"><label class="tg-schalter"><input type="checkbox" id="tg-uebersicht"> täglich ab</label><input type="time" id="tg-uebersicht-zeit" aria-label="Uhrzeit der Tagesübersicht"> Uhr</div>
+          <p class="tg-leise">Kommt frühestens mit Beginn des ersten Zeitfensters des Tages – nie außerhalb der Telegram-Zeiten.</p>
+        </fieldset>
+        <button class="knopf" type="submit" style="margin-top:16px">Einstellungen speichern</button>
+      </form>
+
+      <div class="balken" id="tg-chats" hidden></div>
+
+      <div class="balken" id="telegram-block" hidden>
+        <label for="telegram-chatid" style="margin-bottom:8px">Telegram als Rückkanal (Chat-ID von Hand)</label>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">
+          Für Geräte ohne funktionierendes Web Push: Telegram-Bot öffnen, <code>/start</code> senden – die dort
+          angezeigte Chat-ID hier eintragen. Greift automatisch, sobald auf keinem Gerät Push-Benachrichtigungen
+          aktiv sind – und nur in den Telegram-Zeiten oben. Verknüpfen per Code, getrennte Chats und Erinnerungen
+          gibt es mit dem Telegram-Bot (<code>npm run v2:wirt -- --telegram</code>).
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <input type="text" id="telegram-chatid" placeholder="z. B. 123456789" style="max-width:200px">
+          <button class="knopf klein" type="button" id="telegram-speichern">Speichern</button>
+        </div>
+      </div>
+
+      <div class="balken" id="tg-probleme"></div>
     </section>
 
     <section id="tab-tischplan" hidden>
@@ -522,7 +601,7 @@ function renderReservierungen() {
           <td>${r.personen}</td>
           <td>${tischOptionen(r)}</td>
           <td><span class="marke ${esc(r.quelle)}">${r.quelle === "online" ? "Online" : "Von Hand"}</span></td>
-          <td class="status-zelle"><span class="marke ${esc(r.status)}">${({ neu: "Neu", bestaetigt: "Bestätigt", abgesagt: "Abgesagt" })[r.status]}</span>${r.urspruenglich ? `<div class="gastinfo">verschoben (angefragt: ${esc(datumDeutsch(r.urspruenglich.datum))}, ${esc(r.urspruenglich.uhrzeit)})</div>` : ""}${r.quelle === "online" ? gastInfo(r.gast, "reservierung", r.id) : ""}${nachweisZeile(r)}</td>
+          <td class="status-zelle"><span class="marke ${esc(r.status)}">${({ neu: "Neu", bestaetigt: "Bestätigt", abgesagt: "Abgesagt" })[r.status]}</span>${r.urspruenglich ? `<div class="gastinfo">verschoben (angefragt: ${esc(datumDeutsch(r.urspruenglich.datum))}, ${esc(r.urspruenglich.uhrzeit)})</div>` : ""}${r.quelle === "online" ? gastInfo(r.gast, "reservierung", r.id) : ""}${telegramZeile(r)}${nachweisZeile(r)}</td>
           <td class="kontakt-zelle">${r.telefon ? `<a href="tel:${esc(r.telefon.replace(/[^\\d+]/g, ""))}">${esc(r.telefon)}</a>` : "–"}</td>
           <td><div class="aktionen">
             ${r.status !== "bestaetigt" ? `<button class="knopf klein" data-res-status="bestaetigt" data-id="${esc(r.id)}">Bestätigen</button>` : ""}
@@ -568,6 +647,7 @@ function renderBestellungen() {
       ${b.hinweis ? `<p class="hinweis-gast">Hinweis: ${esc(b.hinweis)}</p>` : ""}
       ${b.noShowBestaetigtAm ? `<p class="hinweis-gast">Ausfallpauschale bestätigt: ${euro(b.noShowBetrag)}</p>` : ""}
       ${gastInfo(b.gast, "bestellung", b.id)}
+      ${telegramZeile(b)}
       ${nachweisZeile(b)}
 
       <div class="abholblock">
@@ -780,7 +860,9 @@ async function lade() {
   document.getElementById("betrieb-name").textContent = `Betrieb: ${stand.betrieb}`;
   document.getElementById("zaehler").innerHTML = `
     <span class="pill${stand.offeneReservierungen ? " aktiv" : ""}">${stand.offeneReservierungen} neue Reservierung(en)</span>
-    <span class="pill${stand.offeneBestellungen ? " aktiv" : ""}">${stand.offeneBestellungen} offene Bestellung(en)</span>`;
+    <span class="pill${stand.offeneBestellungen ? " aktiv" : ""}">${stand.offeneBestellungen} offene Bestellung(en)</span>${
+      stand.telegramHinweis ? `<span class="pill aktiv" title="${esc(stand.telegramHinweis)}">⚠ Telegram</span>` : ""}`;
+  document.querySelector('nav button[data-tab="telegram"]').textContent = stand.telegramHinweis ? "Telegram ⚠" : "Telegram";
 
   if (!document.getElementById("tag").value) document.getElementById("tag").value = stand.heute;
   if (!document.getElementById("m-datum").value) document.getElementById("m-datum").value = stand.heute;
@@ -799,11 +881,12 @@ async function lade() {
 document.querySelectorAll("nav button").forEach((knopf) => {
   knopf.addEventListener("click", () => {
     document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("aktiv", b === knopf));
-    ["reservierungen", "bestellungen", "tischplan", "statistik", "rechtstexte"].forEach((name) => {
+    ["reservierungen", "bestellungen", "tischplan", "statistik", "rechtstexte", "telegram"].forEach((name) => {
       document.getElementById(`tab-${name}`).hidden = name !== knopf.dataset.tab;
     });
     if (knopf.dataset.tab === "statistik") ladeStatistik();
     if (knopf.dataset.tab === "rechtstexte") ladeRechtstexte();
+    if (knopf.dataset.tab === "telegram") ladeTelegram();
   });
 });
 
@@ -1292,7 +1375,265 @@ document.addEventListener("change", async (e) => {
   await ladeRechtstexte();
 });
 
-setInterval(lade, 20000);
+/* ---------- Telegram ---------- */
+
+// Die v2-Hülle (npm run v2:wirt) meldet sich über window.wirtV2: nur dort
+// gibt es den Bot mit Verknüpfung per Code, Chat-Modi und Testnachricht.
+const TG_V2 = Boolean(window.wirtV2 && window.wirtV2.telegram);
+const TG_ART = { reservierung: "Reservierungen", bestellung: "Bestellungen" };
+let tgStand = null;
+let tgKanaele = null;
+let tgCodes = {};
+let tgFormGeaendert = false;
+
+function $(id) { return document.getElementById(id); }
+
+// Zeiten in der Zeitzone des Betriebs – nicht in der des Geräts.
+function uhr(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit", timeZone: stand.zeitzone || undefined });
+}
+
+function tgZeitpunkt(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short", timeZone: stand.zeitzone || undefined });
+}
+
+// Was Telegram mit einem Vorgang gemacht hat – nur, wenn der Betrieb Telegram nutzt.
+function telegramZeile(v) {
+  const t = v.telegram;
+  if (!t || !t.eingang) return "";
+  const e = t.eingang;
+  const r = t.erinnerung || {};
+  const teile = [];
+  let problem = false;
+  if (e.zustand === "gesendet") teile.push(`gemeldet ${uhr(e.gesendetAm)}`);
+  else if (e.zustand === "nachgeholt") teile.push(`nachgemeldet ${uhr(e.gesendetAm)}${e.sammel ? " (Sammelmeldung)" : ""}`);
+  else if (e.zustand === "zurueckgestellt") teile.push(e.grund === "keine-oeffnungszeiten" ? "nicht gemeldet – keine Öffnungszeiten hinterlegt" : "wird im nächsten Zeitfenster gemeldet");
+  else if (e.zustand === "wiederholen") { teile.push("Versand fehlgeschlagen, neuer Versuch folgt"); problem = true; }
+  else if (e.zustand === "fehlgeschlagen") { teile.push(`Versand fehlgeschlagen${e.fehler ? ` (${e.fehler})` : ""}`); problem = true; }
+  else if (e.zustand === "unklar") { teile.push("Versand unklar (Dienst wurde unterbrochen)"); problem = true; }
+  else if (e.zustand === "sendet") teile.push("wird gesendet …");
+  else return "";
+  if (r.zustand === "gesendet") teile.push(`erinnert ${uhr(r.gesendetAm)}`);
+  else if (r.zustand === "geplant" && v.status === "neu") teile.push("Erinnerung geplant");
+  else if (r.zustand === "fehlgeschlagen") { teile.push("Erinnerung fehlgeschlagen"); problem = true; }
+  return `<div class="tg-vorgang${problem ? " problem" : ""}">Telegram: ${esc(teile.join(" · "))}</div>`;
+}
+
+async function ladeTelegram() {
+  try {
+    const antwort = await fetch("/api/telegram/benachrichtigung");
+    const daten = await antwort.json();
+    if (!antwort.ok || daten.ok === false) throw new Error(daten.fehler || "Telegram-Stand nicht lesbar");
+    tgStand = daten;
+    tgKanaele = TG_V2 ? await (await fetch("/v2/api/telegram")).json() : null;
+    renderTelegramReiter();
+  } catch (fehler) {
+    $("tg-zeiten").innerHTML = `<p class="fehler">${esc(fehler.message)}</p>`;
+  }
+}
+
+function renderTelegramReiter() {
+  renderTelegramWarnungen();
+  renderTelegramZeiten();
+  renderTelegramFormular();
+  renderTelegramChats();
+  renderTelegramProbleme();
+  $("telegram-block").hidden = TG_V2;
+}
+
+function renderTelegramWarnungen() {
+  const s = tgStand;
+  const hart = [];
+  const weich = [];
+  if (s.demo) weich.push("Demo-Betrieb: Es wird nichts an Telegram gesendet.");
+  if (!s.einstellungen.aktiv) weich.push("Telegram-Benachrichtigungen sind ausgeschaltet. Befehle und Knöpfe im Chat funktionieren weiter.");
+  if (s.fenster.zustand === "keine-oeffnungszeiten") hart.push(...s.fenster.warnungen);
+  else weich.push(...s.fenster.warnungen);
+  if (s.einstellungen.zeitfenster === "rund-um-die-uhr") weich.push("Rund um die Uhr ist eingeschaltet: Telegram meldet auch nachts, an Ruhetagen und im Urlaub.");
+  if (!s.bots.standard && s.einstellungen.modus !== "zwei-bots") weich.push("Auf dem Server ist kein Telegram-Bot eingerichtet (TELEGRAM_BOT_TOKEN fehlt) – es kann nichts gesendet werden.");
+  if (s.bots.doppelt.length) weich.push("Zwei Bot-Tokens sind identisch – für „zwei eigene Bots“ braucht jeder Bot seinen eigenen Token.");
+  if (s.einstellungen.aktiv && !s.demo) {
+    for (const art of ["reservierung", "bestellung"]) {
+      const z = s.ziele[art];
+      if (!z.ok && !["aus", "art-aus", "demo"].includes(z.grund)) weich.push(`${TG_ART[art]}: ${z.grundText}`);
+    }
+  }
+  $("tg-warnungen").innerHTML =
+    hart.map((w) => `<div class="fehler" role="alert"><strong>Konfiguration prüfen:</strong> ${esc(w)}</div>`).join("") +
+    weich.map((w) => `<div class="tg-warn">${esc(w)}</div>`).join("");
+}
+
+function renderTelegramZeiten() {
+  const f = tgStand.fenster;
+  const tage = f.tage.length
+    ? `<table class="tg-tage"><tbody>${f.tage.map((t) => `<tr><td><strong>${esc(t.wochentagKurz)}</strong> ${esc(datumDeutsch(t.datum).slice(0, 6))}</td><td>${
+        t.fenster.length ? t.fenster.map((x) => esc(`${x.von} – ${x.bis}${x.bisFolgetag ? " (Folgetag)" : ""}`)).join(" und ") : '<span style="color:var(--muted)">keine Nachrichten (geschlossen)</span>'
+      }${t.ausnahme ? ' <span class="entwurf-marke">Ausnahme</span>' : ""}</td></tr>`).join("")}</tbody></table>`
+    : "";
+  const vor = tgStand.einstellungen.vorlaufMinuten;
+  const nach = tgStand.einstellungen.nachlaufMinuten;
+  $("tg-zeiten").innerHTML = `
+    <label style="margin-bottom:6px">Telegram-Zeiten</label>
+    <p class="tg-heute"><strong>${esc(f.heuteText)}</strong></p>
+    <p style="margin:0">${esc(f.jetztText)}</p>
+    ${tage}
+    <p class="tg-leise">${f.zustand === "ok" ? `Öffnungszeiten des Betriebs, ${vor} Minuten vorher bis ${nach} Minuten danach · ` : ""}Zeitzone ${esc(f.zeitzone)}.
+      Außerhalb dieser Zeiten sendet Telegram nichts. Was dann eingeht, steht sofort hier im Dashboard und wird im nächsten
+      Zeitfenster nachgemeldet – bei vielen offenen Vorgängen als eine Sammelmeldung.</p>`;
+}
+
+function setzeWahl(name, wert) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach((r) => (r.checked = r.value === wert));
+}
+
+function renderTelegramFormular() {
+  const form = $("tg-form");
+  if (tgFormGeaendert || form.contains(document.activeElement)) return;
+  const e = tgStand.einstellungen;
+  $("tg-aktiv").checked = e.aktiv;
+  setzeWahl("tg-arten", e.arten);
+  setzeWahl("tg-zeitfenster", e.zeitfenster);
+  $("tg-vorlauf").value = e.vorlaufMinuten;
+  $("tg-nachlauf").value = e.nachlaufMinuten;
+  $("tg-erinnerung-res").checked = e.erinnerungReservierung;
+  $("tg-erinnerung-best").checked = e.erinnerungBestellung;
+  $("tg-frist-res").value = e.fristReservierungMinuten;
+  $("tg-frist-best").value = e.fristBestellungMinuten;
+  $("tg-uebersicht-gruppe").hidden = !TG_V2;
+  if (TG_V2 && tgKanaele) {
+    $("tg-uebersicht").checked = Boolean(tgKanaele.tagesuebersicht);
+    $("tg-uebersicht-zeit").value = tgKanaele.uhrzeit || "09:00";
+  }
+}
+
+function tgKarte(kanal) {
+  const c = tgKanaele.kanaele[kanal];
+  const apiKanal = kanal === "gemeinsam" ? "alle" : kanal;
+  const titel = { gemeinsam: "Chat für Reservierungen und Bestellungen", reservierung: "Chat für Reservierungen", bestellung: "Chat für Bestellungen" }[kanal];
+  const botText = c.bot === "standard" ? "" : ` · über ${c.botName ? `@${c.botName}` : c.bot === "reservierung" ? "den Reservierungs-Bot" : "den Bestell-Bot"}`;
+  const code = tgCodes[apiKanal] || (c.offenerCode ? { code: c.offenerCode } : null);
+  const kannUebernehmen = kanal !== "gemeinsam" && tgKanaele.kanaele.gemeinsam.verbunden && !c.verbunden && c.bot === "standard";
+  return `<div class="karte">
+    <h3>${esc(titel)}</h3>
+    <div class="meta">${c.verbunden ? `<span class="frei-marke">verbunden</span>${c.verknuepftAm ? ` seit ${esc(tgZeitpunkt(c.verknuepftAm))}` : ""}${c.uebernommen ? " (bisheriger Chat übernommen)" : ""}` : '<span class="entwurf-marke">nicht verbunden</span>'}${esc(botText)}</div>
+    ${code ? `<p style="margin:0 0 10px">Im gewünschten Chat senden: <span class="tg-code">/start ${esc(code.code)}</span><br><span class="tg-leise">30 Minuten gültig, nur einmal nutzbar${code.botLink ? ` · <a href="${esc(code.botLink)}" target="_blank" rel="noopener">direkt im Bot öffnen</a>` : ""}</span></p>` : ""}
+    ${c.andereBots && c.andereBots.length ? `<p class="tg-leise">Die Verknüpfung aus dem anderen Modus bleibt gespeichert.</p>` : ""}
+    <div class="aktionen">
+      <button class="knopf klein" type="button" data-tg-code="${esc(apiKanal)}">${c.verbunden ? "Neuen Code erzeugen" : "Code zum Verbinden erzeugen"}</button>
+      ${kannUebernehmen ? `<button class="knopf klein stumm" type="button" data-tg-uebernehmen="${esc(kanal)}">Bisherigen Chat übernehmen</button>` : ""}
+      ${c.verbunden ? `<button class="knopf klein stumm" type="button" data-tg-test="${esc(apiKanal)}">Testnachricht senden</button>` : ""}
+      ${c.verbunden ? `<button class="knopf klein gefahr" type="button" data-tg-trennen="${esc(apiKanal)}">Verbindung trennen</button>` : ""}
+    </div>
+  </div>`;
+}
+
+function renderTelegramChats() {
+  const ziel = $("tg-chats");
+  ziel.hidden = !TG_V2;
+  if (!TG_V2 || !tgKanaele) return;
+  const k = tgKanaele;
+  const bots = tgStand.bots;
+  const modi = [
+    ["ein-chat", "Ein Chat für alles", "Wie bisher: Reservierungen und Bestellungen im selben Chat."],
+    ["zwei-chats", "Zwei Chats mit einem Bot (empfohlen)", "Ein Chat nur für Reservierungen, ein anderer nur für Bestellungen – z. B. Service und Küche."],
+    ["zwei-bots", "Zwei eigene Bots", bots.zweiBotsVerfuegbar ? "Ein eigener Reservierungs-Bot und ein eigener Bestell-Bot mit je eigenem Token." : "Auf dem Server nicht eingerichtet (es fehlen die beiden Bot-Tokens)."],
+  ];
+  const karten = k.modus === "ein-chat" ? ["gemeinsam"] : ["reservierung", "bestellung"];
+  ziel.innerHTML = `
+    <label style="margin-bottom:6px">Chats</label>
+    <fieldset class="tg-gruppe" style="margin-top:0">
+      <legend>Wohin sollen die Nachrichten gehen?</legend>
+      ${modi.map(([wert, titel, text]) => `<label class="tg-wahl"><input type="radio" name="tg-modus" value="${wert}"${k.modus === wert ? " checked" : ""}${wert === "zwei-bots" && !bots.zweiBotsVerfuegbar && k.modus !== "zwei-bots" ? " disabled" : ""}> <span><strong>${esc(titel)}</strong> – ${esc(text)}</span></label>`).join("")}
+      <button class="knopf klein stumm" type="button" id="tg-modus-speichern" style="margin-top:6px">Chat-Modus übernehmen</button>
+      <p class="tg-leise">Beim Wechsel wird keine Verknüpfung gelöscht. Nachrichten gehen immer nur an den Chat, der im gewählten Modus verbunden ist – nie ersatzweise woandershin.${k.modus === "zwei-chats" ? " Tipp: zwei Telegram-Gruppen anlegen (z. B. „Reservierungen“ und „Küche“), den Bot in beide holen und in jeder Gruppe ihren Code senden." : ""}</p>
+    </fieldset>
+    <div class="tg-karten${karten.length > 1 ? " zwei" : ""}">${karten.map(tgKarte).join("")}</div>`;
+}
+
+function renderTelegramProbleme() {
+  const s = tgStand;
+  const z = s.zustand || {};
+  const zeilen = [];
+  if (z.letzterErfolg) zeilen.push(`Letzte erfolgreiche Zustellung: ${esc(tgZeitpunkt(z.letzterErfolg))}`);
+  if (z.letzterFehler && (!z.letzterErfolg || z.letzterFehler.zeit > z.letzterErfolg)) zeilen.push(`<span style="color:var(--danger)">Letzter Fehler: ${esc(tgZeitpunkt(z.letzterFehler.zeit))} – ${esc(z.letzterFehler.text)}</span>`);
+  const liste = s.probleme.length
+    ? `<ul class="pruefliste">${s.probleme.map((p) => `<li><strong>${esc(p.referenz)}</strong><span style="flex:1">${esc(p.anlass)}: ${esc({ wiederholen: "neuer Versuch folgt", fehlgeschlagen: "fehlgeschlagen", unklar: "unklar (Dienst unterbrochen)" }[p.zustand] || p.zustand)}${p.fehler ? ` – ${esc(p.fehler)}` : ""}</span><span class="tg-leise">${esc(tgZeitpunkt(p.zeit))}</span></li>`).join("")}</ul>`
+    : "";
+  $("tg-probleme").innerHTML = `<label style="margin-bottom:6px">Zustellung</label>${zeilen.length ? zeilen.map((x) => `<div style="font-size:.9rem">${x}</div>`).join("") : '<p class="tg-leise" style="margin:0">Noch nichts über Telegram zugestellt.</p>'}${liste}
+    <p class="tg-leise">Scheitert eine Zustellung, versucht der Dienst es bis zu dreimal. Die Anfrage des Gastes bleibt davon unberührt.</p>`;
+}
+
+$("tg-form").addEventListener("input", () => (tgFormGeaendert = true));
+$("tg-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const wahl = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value;
+  const daten = {
+    aktiv: $("tg-aktiv").checked,
+    arten: wahl("tg-arten"),
+    zeitfenster: wahl("tg-zeitfenster"),
+    vorlaufMinuten: Number($("tg-vorlauf").value),
+    nachlaufMinuten: Number($("tg-nachlauf").value),
+    erinnerungReservierung: $("tg-erinnerung-res").checked,
+    erinnerungBestellung: $("tg-erinnerung-best").checked,
+    fristReservierungMinuten: Number($("tg-frist-res").value),
+    fristBestellungMinuten: Number($("tg-frist-best").value),
+  };
+  if (daten.zeitfenster === "rund-um-die-uhr" && tgStand.einstellungen.zeitfenster !== "rund-um-die-uhr" &&
+      !confirm("Rund um die Uhr: Telegram meldet dann auch nachts, an Ruhetagen und im Urlaub. Wirklich so einstellen?")) return;
+  try {
+    await ruf("/intern/telegram/benachrichtigung", daten);
+    if (TG_V2) await ruf("/v2/intern/telegram/tagesuebersicht", { aktiv: $("tg-uebersicht").checked, uhrzeit: $("tg-uebersicht-zeit").value || undefined });
+    tgFormGeaendert = false;
+    document.activeElement?.blur();
+    await ladeTelegram();
+    await lade();
+    melde("Telegram-Einstellungen gespeichert.");
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+document.addEventListener("click", async (e) => {
+  const k = e.target.closest("button");
+  if (!k || !$("tab-telegram").contains(k)) return;
+  try {
+    if (k.id === "tg-modus-speichern") {
+      const modus = document.querySelector('input[name="tg-modus"]:checked')?.value;
+      await ruf("/intern/telegram/benachrichtigung", { modus });
+      tgCodes = {};
+      melde("Chat-Modus übernommen. Bestehende Verknüpfungen bleiben gespeichert.");
+    } else if (k.dataset.tgCode) {
+      const c = await ruf("/v2/intern/telegram/code", { kanal: k.dataset.tgCode });
+      tgCodes[k.dataset.tgCode] = c;
+      if (!c.botEingerichtet) melde("Code erzeugt – aber der zuständige Bot ist auf dem Server nicht eingerichtet.", false, true);
+      else melde(`Code ${c.code} erzeugt – im gewünschten Chat „/start ${c.code}“ senden.`);
+    } else if (k.dataset.tgTest) {
+      const r = await ruf("/v2/intern/telegram/test", { kanal: k.dataset.tgTest });
+      melde(`Testnachricht an den Chat für ${r.gesendetAn} übergeben.`);
+    } else if (k.dataset.tgTrennen) {
+      if (!confirm("Diesen Chat trennen? Dorthin kommen dann keine Telegram-Nachrichten mehr.")) return;
+      await ruf("/v2/intern/telegram/trennen", { kanal: k.dataset.tgTrennen });
+      delete tgCodes[k.dataset.tgTrennen];
+      melde("Verbindung getrennt.");
+    } else if (k.dataset.tgUebernehmen) {
+      await ruf("/v2/intern/telegram/uebernehmen", { kanal: k.dataset.tgUebernehmen });
+      melde("Bisherigen Chat übernommen.");
+    } else {
+      return;
+    }
+    await ladeTelegram();
+    await lade();
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+setInterval(() => {
+  lade();
+  if (!$("tab-telegram").hidden) ladeTelegram();
+}, 20000);
 </script>
 
 </body>

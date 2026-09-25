@@ -554,9 +554,9 @@ Das ist derselbe Wirt-Server mit allen Funktionen, aber in Farben und Schriften 
 
 1. Bei **@BotFather** in Telegram `/newbot` senden und den Token in die `.env` eintragen: `TELEGRAM_BOT_TOKEN=…` (optional `TELEGRAM_BOT_NAME=…` für einen Direktlink).
 2. Wirt-Server mit Bot starten: `npm run v2:wirt -- --betrieb <slug> --telegram`. Bei mehreren Betrieben stattdessen einmal `npm run v2:telegram`.
-3. Der Wirt klickt im Wirt-Dashboard unter „Telegram“ auf **„Verbindungs-Code erzeugen“** und sendet dem Bot `/start CODE`.
+3. Der Wirt öffnet im Wirt-Dashboard den Reiter **„Telegram“**, wählt den Chat-Modus (ein Chat · **zwei Chats mit einem Bot** · zwei eigene Bots), erzeugt je Chat einen Code und sendet dem Bot `/start CODE`.
 
-Danach kommen neue Reservierungen, Bestellungen und Stornierungen mit Knöpfen (Bestätigen/Absagen, In Zubereitung → Bereit → Abgeholt) in den Chat, dazu morgens eine Tagesübersicht. Betriebe ohne Telegram arbeiten wie bisher nur über das Dashboard. Details: [`v2/integration/TELEGRAM-SETUP.md`](v2/integration/TELEGRAM-SETUP.md).
+Telegram ist ein zusätzlicher Alarmkanal; maßgeblich bleibt das Dashboard. Gemeldet wird nur in den **Telegram-Zeiten** des Betriebs (Öffnungszeiten ± 30 Minuten, einstellbar; „rund um die Uhr“ nur auf ausdrücklichen Wunsch). Was außerhalb eingeht, wird im nächsten Zeitfenster nachgemeldet – bei vielen Vorgängen als eine Sammelmeldung. Unbestätigtes wird nach 2 Minuten (einstellbar) **einmal** erinnert. Die Nachrichten enthalten nur Referenz, Termin bzw. Abholzeit, Personenzahl und Status – keine Namen, Telefonnummern oder Wünsche. Ohne eigene Öffnungszeiten sendet der Bot nichts automatisch und das Dashboard warnt. Details: [`v2/integration/TELEGRAM-SETUP.md`](v2/integration/TELEGRAM-SETUP.md), Datenschutz: [`v2/integration/TELEGRAM-DATENSCHUTZ.md`](v2/integration/TELEGRAM-DATENSCHUTZ.md).
 
 ## Tests ausführen
 

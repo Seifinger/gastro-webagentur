@@ -399,6 +399,9 @@ export const berechneAbholzeiten = kern.berechne;
 export const pruefeAbholwunsch = kern.pruefe;
 export const zeitpunktFuerUhrzeit = kern.zeitpunktFuerUhrzeit;
 export const uhrzeitIn = kern.uhrzeit;
+// Für die Telegram-Zeitfenster (telegramZeitfenster.js) – dieselbe Umrechnung,
+// außerhalb von abholzeitKern, damit das Skript der Seiten unverändert bleibt.
+export const datumIn = kern.datum;
 
 /** Derselbe Kern für den Browser: setzt window.Abholzeiten. */
 export function abholzeitSkript() {

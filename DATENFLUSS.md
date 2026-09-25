@@ -11,7 +11,7 @@
 | Agentur-Dashboard | `npm run dashboard` (`src/dashboardServer.js` + `v2/integration/dashboardV2.js`, `demoDashboard.js`, `creativeDashboard.js`, `kundenDashboard.js`) | `DASHBOARD_HOST:DASHBOARD_PORT`, Standard `127.0.0.1:3000`; online `0.0.0.0:8080` (Fly, `fly.toml`) | Leads, Demos, Kundenprojekte, Bearbeiten-Editor | **Online:** Pflicht-Anmeldung (`DASHBOARD_PASSWORT_HASH`, scrypt, Sitzung HttpOnly/SameSite=Strict, CSRF-Prüfung, 10 Fehlversuche/15 min). **Lokal:** nur `localhost` als Host, keine Schreibaktionen von fremden Seiten, `/intern/*` optional mit `DASHBOARD_TOKEN` |
 | Präsentation im WLAN | aus dem Dashboard (`src/praesentation.js`) | eigener Port im LAN, zeitlich begrenzt | eine Demo vor Ort zeigen | zufälliger Pfad-Token, Ablaufzeit, nur GET/HEAD |
 | Wirt-Server | `npm run wirt` bzw. `npm run v2:wirt` (`src/wirtServer.js`, `v2/integration/wirtServerV2.js`) – ein Prozess je Betrieb | Standard `127.0.0.1:3200`; für Gäste muss er öffentlich erreichbar sein | Reservierungen, Bestellungen, Tischplan, Statusseite, Rechtstexte, Statistik | **Gastrouten** `/oeffentlich/*`, `/status`, `/rechtstexte/*`: offen, mit Bremsen. **Alles andere:** `WIRT_PASSWORT` (HTTP-Basic, 10 Fehlversuche/15 min, Herkunftsprüfung). Ohne Passwort nur direkt über localhost |
-| Telegram-Bot | `--telegram` im Wirt-Prozess oder eigener Prozess | ausgehend (Long-Polling), kein offener Port | Benachrichtigung des Wirts, Knöpfe | Knöpfe wirken nur für den verknüpften Chat, Verknüpfung per Einmal-Code (30 min) |
+| Telegram-Bot | `--telegram` im Wirt-Prozess oder eigener Prozess | ausgehend (Long-Polling, ein Abruf je Bot-Token), kein offener Port | Benachrichtigung des Wirts in den Telegram-Zeiten, Nachmelden, eine Erinnerung, Knöpfe | Knöpfe wirken nur für Betrieb, Chat und Bot, die für diese Art konfiguriert sind, und nur für zulässige Statuswechsel; Verknüpfung per Einmal-Code je Kanal (30 min, 5 Fehlversuche je Chat) |
 | Resonanz-Sammler | `npm run resonanz` (`src/resonanzServer.js`) | Standard `127.0.0.1:3300` | Aufrufzähler veröffentlichter Entwürfe (derzeit ohne veröffentlichte Lead-Demos kaum genutzt) | nur existierende Entwürfe, Bremse, keine Adresse auf der Platte |
 | Öffentliche Beispielseiten | `npm run publish-site` → `docs/` → GitHub Pages | `seifinger.github.io/gastro-webagentur` | fiktive Beispielseiten der Agentur | statisch; Prüfung `src/oeffentlichkeit.js` verhindert Lead-Demos |
 | Kundenseite (später) | `baueKundenfassung` → `v2/output/kunden/<id>/` | noch nicht veröffentlicht | Website des Restaurants | Veröffentlichen ist nicht implementiert (`veroeffentlichungsPlan`) |
@@ -44,7 +44,7 @@
 | Google Places API | Suchbegriffe, Regionen | `npm start` (Lead-Suche) | `GOOGLE_PLACES_API_KEY` | USA/EU |
 | Anthropic | Wunschtext, Lead-Name, Karte (Texte für Demos) | „Vorschlag generieren“ im Dashboard | `ANTHROPIC_API_KEY` | USA |
 | Resend | E-Mail-Adresse des Gastes, Betreff, Statustext, Link | Statuswechsel mit E-Mail-Angabe | `RESEND_API_KEY`, `GAST_EMAIL_ABSENDER`, `WIRT_OEFFENTLICHE_URL` | USA |
-| Telegram | **Gastname, Telefon, Termin/Bestellung** an den Chat des Wirts | neue Anfrage, Tagesübersicht | `TELEGRAM_BOT_TOKEN`, Verknüpfung | Telegram FZ-LLC (VAE) |
+| Telegram | Betrieb, Referenznummer, Datum/Uhrzeit bzw. Abholzeit, Personenzahl, Status – **keine** Namen, Telefonnummern, E-Mails, Wünsche, Positionen (`v2/integration/TELEGRAM-DATENSCHUTZ.md`) | neue Anfrage (nur in den Telegram-Zeiten), Nachmeldung, Erinnerung, Tagesübersicht | `TELEGRAM_BOT_TOKEN` (optional `…_RESERVIERUNG`, `…_BESTELLUNG`), Verknüpfung | Telegram FZ-LLC (VAE) |
 | Web-Push-Dienste (Google FCM, Mozilla, Apple) | verschlüsselte Nachricht mit Gastname/Termin an das Wirt-Gerät | neue Anfrage | `VAPID_*` | USA |
 | GitHub (Repo, Pages) | Code, fiktive Beispielseiten | `git push`, `publish-site` | – | USA; **Repo öffentlich** |
 | Fly.io (Dashboard-Host, wenn eingerichtet) | alle Dashboard-Daten auf dem Volume | Betrieb | `fly.toml` | USA-Firma, Region `fra` |
@@ -66,7 +66,7 @@ Schriften sind lokal eingebunden, auf den Seiten gibt es keine Tracker und keine
    - Preise gegen die Bestellkarte
    - Bestätigungen gegen die gültigen Fassungen
 4. Der Server speichert atomar in `data/betrieb/<slug>.json`. Ist die Datei beschädigt, speichert er **nicht** und antwortet mit 503 und „bitte telefonisch“.
-5. Aus der Änderung entsteht genau eine Gastmeldung. Zugestellt wird sie per Resend, falls eingerichtet. Der Wirt erfährt es über Web-Push, ersatzweise über Telegram.
+5. Aus der Änderung entsteht genau eine Gastmeldung. Zugestellt wird sie per Resend, falls eingerichtet. Der Wirt erfährt es über Web-Push und/oder Telegram – Telegram nur in den Telegram-Zeiten des Betriebs, sonst im nächsten Zeitfenster; eine Telegram-Störung ändert an der Anfrage nichts.
 6. Der Gast bekommt Nummer, Status „eingegangen“ und den Status-Link (Token im Fragment `#…`, nie in Server-Logs).
 7. Der Wirt sieht die Anfrage im Dashboard (Basic-Anmeldung) und bestätigt, verschiebt oder lehnt ab. Aus der Änderung entsteht wieder genau eine Meldung.
 

@@ -73,7 +73,8 @@ async function warteAuf(pruefung, ms = 5000) {
 }
 
 test("E2E Pilotseiten: Reservierung (Trattoria) und Bestellung (Rösterei) bis Wirt-Dashboard und Telegram", { timeout: 180_000 }, async (t) => {
-  speichereBetrieb(SLUG, { tische: [], reservierungen: [], bestellungen: [], pushSubscriptions: [] });
+  // Telegram bewusst „rund um die Uhr“: Die Reservierung läuft mit echter Uhrzeit.
+  speichereBetrieb(SLUG, { tische: [], reservierungen: [], bestellungen: [], pushSubscriptions: [], telegramBenachrichtigung: { zeitfenster: "rund-um-die-uhr" } });
   legeTischAn(SLUG, { name: "Fenster", plaetze: 6 });
 
   const altToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -154,10 +155,11 @@ test("E2E Pilotseiten: Reservierung (Trattoria) und Bestellung (Rösterei) bis W
     assert.equal(b.abholArt, "asap");
     assert.equal(b.abholzeit, "17:20");
 
-    // 4. Telegram (Mock) für beide, mit Knöpfen; Bestätigen wirkt zurück
-    assert.ok(await warteAuf(() => aufrufe.some((a) => a.methode === "sendMessage" && a.daten.text.includes("Lucia Gast"))));
-    assert.ok(await warteAuf(() => aufrufe.some((a) => a.methode === "sendMessage" && a.daten.text.includes("Kornfeld Gast"))));
-    const nachricht = aufrufe.find((a) => a.methode === "sendMessage" && a.daten.text.includes("Lucia Gast"));
+    // 4. Telegram (Mock) für beide, mit Knöpfen, ohne Gastdaten; Bestätigen wirkt zurück
+    assert.ok(await warteAuf(() => aufrufe.some((a) => a.methode === "sendMessage" && a.daten.text.includes(r.nummer))));
+    assert.ok(await warteAuf(() => aufrufe.some((a) => a.methode === "sendMessage" && a.daten.text.includes(b.nummer))));
+    assert.ok(!aufrufe.some((a) => /Lucia Gast|Kornfeld Gast|030 555|Cappuccino/.test(a.daten.text ?? "")), "keine Gastdaten in Telegram");
+    const nachricht = aufrufe.find((a) => a.methode === "sendMessage" && a.daten.text.includes(r.nummer));
     assert.equal(nachricht.daten.chat_id, "4242");
     await bot.verarbeiteUpdate({ callback_query: { id: "k", data: nachricht.daten.reply_markup.inline_keyboard[0][0].callback_data, message: { chat: { id: 4242 }, message_id: 1 } } }, { betriebe: [SLUG] });
     const danach = await (await fetch(`${wirt.url}/api/betrieb`)).json();

@@ -73,7 +73,7 @@ Regeln:
 ### Vom Restaurant zu liefern
 
 - **Impressum:** vollständiger Name bzw. Firma, Rechtsform, vertretungsberechtigte Person, ladungsfähige Anschrift, Telefon, E-Mail, ggf. Handelsregister, USt-IdNr., ggf. Verantwortlicher nach § 18 MStV, Angabe zur Verbraucherstreitbeilegung (§ 36 VSBG).
-- **Datenschutz:** Verantwortlicher, ggf. DSB, Host des Wirt-Servers (Anbieter, Sitz, Serverstandort), Agentur als Auftragsverarbeiter (ja/nein), Mail-Dienst, Benachrichtigungswege des Wirts (Web-Push, Telegram – enthalten Gastname und Telefon), Speicherdauern, zuständige Aufsichtsbehörde, Datum.
+- **Datenschutz:** Verantwortlicher, ggf. DSB, Host des Wirt-Servers (Anbieter, Sitz, Serverstandort), Agentur als Auftragsverarbeiter (ja/nein), Mail-Dienst, Benachrichtigungswege des Wirts (Web-Push – enthält Gastname; Telegram – nur Referenz, Termin, Personenzahl, Status, siehe `v2/integration/TELEGRAM-DATENSCHUTZ.md`), Speicherdauern, zuständige Aufsichtsbehörde, Datum.
 - **Bestellbedingungen:** Annahmefrist, Zahlungsarten, Stornoweg, **Allergen- und Zusatzstoffinformationen** (fehlen in der Speisekarte der Website), Aussage zum Widerrufsrecht, § 36 VSBG.
 - **Reservierungsbedingungen:** Haltezeit bei Verspätung, Absageweg, Gruppenregeln.
 - **No-Show-Regel(n):** Betrag bzw. Berechnungsweise, Stornofrist, Stornoweg, **Begründung, dass der Betrag den typischen Schaden nicht übersteigt** (intern), Nachweisweg (Reservierung).
@@ -136,7 +136,7 @@ Keine dieser Daten liegen in `docs/`, GitHub Pages oder Git (`data/betrieb/` und
 - **Agentur**, wenn sie den Wirt-Server hostet, wartet oder Zugriff hat: voraussichtlich Auftragsverarbeiter (Art. 28 DSGVO). Das gilt auch dann, wenn sie die Daten „nicht aktiv liest“ – Zugriffsmöglichkeit und Hosting genügen in der Regel. AVV mit jedem Betrieb.
 - **Host** (z. B. Fly.io, Hetzner): Unterauftragsverarbeiter der Agentur bzw. Auftragsverarbeiter des Betriebs; Serverstandort und Drittland prüfen.
 - **Resend** (USA): Auftragsverarbeiter für E-Mails; Drittlandübermittlung und Garantien prüfen.
-- **Telegram / Web-Push-Dienste:** Die Benachrichtigung an den Wirt enthält Gastname und Telefonnummer. Rolle und Drittland klären oder den Inhalt kürzen.
+- **Telegram / Web-Push-Dienste:** Telegram bekommt nur Referenz, Termin/Abholzeit, Personenzahl und Status (gekürzt, 25.09.2026). Web-Push enthält weiter den Gastnamen. Rolle und Drittland klären (`v2/integration/TELEGRAM-DATENSCHUTZ.md`).
 
 ## Verbraucherrecht (fachlich zu prüfen)
 

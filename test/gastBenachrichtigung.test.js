@@ -335,7 +335,7 @@ test("10. v1-Dashboard, v2-Küchenstatus und Telegram-Knöpfe: keine widersprüc
   });
 });
 
-test("10b. Telegram-Ablehnung ohne Kanal: Hinweis zum Anrufen steht in der Telegram-Nachricht", async () => {
+test("10b. Telegram-Ablehnung ohne Kanal: Hinweis zum Anrufen steht in der Telegram-Nachricht – ohne Telefonnummer", async () => {
   await mitServer(handler, async (basis) => {
     const { reservierung: r } = await reservieren(basis, { email: "" });
     const gesendet = [];
@@ -345,7 +345,9 @@ test("10b. Telegram-Ablehnung ohne Kanal: Hinweis zum Anrufen steht in der Teleg
     };
     await knopf(`r:ab:${r.id}`);
     const bearbeitet = gesendet.find((g) => g.methode === "editMessageText");
-    assert.match(bearbeitet.daten.text, /Gast nicht automatisch informiert – bitte unter 0170 1111111 anrufen\./);
+    // Der Hinweis steht da – die Telefonnummer des Gastes nicht (die steht im Dashboard).
+    assert.match(bearbeitet.daten.text, /Gast nicht automatisch informiert – bitte anrufen \(Nummer im Wirt-Dashboard\)\./);
+    assert.doesNotMatch(bearbeitet.daten.text, /0170|Erika/);
   });
 });
 

@@ -306,6 +306,9 @@ test("GET /api/betrieb liefert die aktuelle Telegram-Chat-ID mit", async () => {
 test(
   "ohne funktionierendes Web Push springt Telegram als Fallback ein",
   mitTelegramToken(async () => {
+    // Telegram meldet nur in den Telegram-Zeiten – dafür braucht der Betrieb
+    // eigene Öffnungszeiten (die Platzhalter der Seite gelten dafür nicht).
+    speichereBetrieb(SLUG, { ...ladeBetrieb(SLUG), oeffnungszeiten: [{ tage: "Montag – Sonntag", zeiten: "11:00 – 23:00" }] });
     await mitServer(async (basis) => {
       await fetch(`${basis}/intern/telegram/chat-id`, {
         method: "POST",
@@ -321,6 +324,7 @@ test(
         telegramAufrufe.push({ chatId, text });
       };
 
+      let nummer;
       try {
         const antwort = await fetch(`${basis}/oeffentlich/bestellung`, {
           method: "POST",
@@ -329,9 +333,12 @@ test(
             positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }],
             abholzeit: "18:30",
             name: "Testgast",
+            telefon: "0170 9999999",
+            hinweis: "ohne Nüsse (Allergie)",
           }),
         });
         assert.equal(antwort.status, 200);
+        nummer = (await antwort.json()).bestellung.nummer;
       } finally {
         telegramSendenHook.aktuell = altTelegram;
       }
@@ -339,6 +346,41 @@ test(
       assert.equal(telegramAufrufe.length, 1);
       assert.equal(telegramAufrufe[0].chatId, "555");
       assert.match(telegramAufrufe[0].text, /Neue Bestellung/);
+      assert.ok(telegramAufrufe[0].text.includes(nummer), "Bestellnummer als Verweis");
+      assert.match(telegramAufrufe[0].text, /Abholung 18:30 Uhr/);
+      // Datensparsam: kein Name, keine Nummer, kein Hinweis, keine Positionen.
+      for (const verboten of ["Testgast", "0170", "Nüsse", "Pizza", "9,90"]) assert.ok(!telegramAufrufe[0].text.includes(verboten), verboten);
+    });
+  }),
+);
+
+test(
+  "Telegram-Rückkanal: außerhalb der Telegram-Zeiten und ohne Öffnungszeiten wird nichts gesendet",
+  mitTelegramToken(async () => {
+    await mitServer(async (basis) => {
+      await fetch(`${basis}/intern/telegram/chat-id`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chatId: "555" }) });
+      const telegramAufrufe = [];
+      const altTelegram = telegramSendenHook.aktuell;
+      telegramSendenHook.aktuell = async (chatId, text) => telegramAufrufe.push({ chatId, text });
+      const bestellen = () =>
+        fetch(`${basis}/oeffentlich/bestellung`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }], abholzeit: "18:30", name: "Testgast" }) });
+      try {
+        // Keine eigenen Öffnungszeiten: keine scheinbar korrekte Rechnung, kein stilles „rund um die Uhr“.
+        assert.equal((await bestellen()).status, 200);
+        assert.equal(telegramAufrufe.length, 0);
+        // Öffnet erst um 18:00 (Fenster ab 17:30) – um 17:00 wird angenommen, aber nicht gemeldet.
+        speichereBetrieb(SLUG, { ...ladeBetrieb(SLUG), oeffnungszeiten: [{ tage: "Montag – Sonntag", zeiten: "11:00 – 14:00 & 18:00 – 23:00" }] });
+        const spaet = await fetch(`${basis}/oeffentlich/reservierung`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ datum: "2026-09-26", uhrzeit: "19:00", personen: 2, name: "Spät" }) });
+        assert.equal(spaet.status, 200);
+        assert.equal(telegramAufrufe.length, 0);
+        // Wirt wählt bewusst „rund um die Uhr“.
+        const e = await fetch(`${basis}/intern/telegram/benachrichtigung`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ zeitfenster: "rund-um-die-uhr" }) });
+        assert.equal(e.status, 200);
+        assert.equal((await bestellen()).status, 200);
+        assert.equal(telegramAufrufe.length, 1);
+      } finally {
+        telegramSendenHook.aktuell = altTelegram;
+      }
     });
   }),
 );

@@ -68,7 +68,8 @@ async function warteAuf(pruefung, ms = 5000) {
 
 test("E2E: v2-Seite → Reservierungsformular → Wirt-Dashboard → Telegram (Mock)", { timeout: 120_000 }, async () => {
   // Betrieb mit Tischplan, Telegram-Chat per Code verknüpft
-  speichereBetrieb(SLUG, { tische: [], reservierungen: [], bestellungen: [], pushSubscriptions: [] });
+  // Telegram bewusst „rund um die Uhr“: Der Test läuft zu beliebiger Tageszeit.
+  speichereBetrieb(SLUG, { tische: [], reservierungen: [], bestellungen: [], pushSubscriptions: [], telegramBenachrichtigung: { zeitfenster: "rund-um-die-uhr" } });
   legeTischAn(SLUG, { name: "Stammtisch", plaetze: 8 });
 
   const altToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -147,11 +148,12 @@ test("E2E: v2-Seite → Reservierungsformular → Wirt-Dashboard → Telegram (M
     assert.equal(r.quelle, "online");
     assert.equal(uebersicht.offeneReservierungen, 1);
 
-    // 4. Telegram hätte gesendet – an den verknüpften Chat, mit Knöpfen
-    assert.ok(await warteAuf(() => aufrufe.some((a) => a.methode === "sendMessage" && a.daten.text.includes(gast.name))), "Telegram-Nachricht ausgelöst");
-    const nachricht = aufrufe.find((a) => a.methode === "sendMessage" && a.daten.text.includes(gast.name));
+    // 4. Telegram hätte gesendet – an den verknüpften Chat, mit Knöpfen, ohne Gastdaten
+    assert.ok(await warteAuf(() => aufrufe.some((a) => a.methode === "sendMessage" && a.daten.text.includes(r.nummer))), "Telegram-Nachricht ausgelöst");
+    const nachricht = aufrufe.find((a) => a.methode === "sendMessage" && a.daten.text.includes(r.nummer));
     assert.equal(nachricht.daten.chat_id, "31337");
     assert.match(nachricht.daten.text, /3 Personen/);
+    for (const wert of Object.values(gast)) assert.ok(!nachricht.daten.text.includes(wert), `„${wert}“ gehört nicht in Telegram`);
     assert.equal(nachricht.daten.reply_markup.inline_keyboard[0][0].callback_data, `r:ok:${r.id}`);
 
     // 5. Bestätigen aus Telegram → Dashboard zeigt „bestätigt“

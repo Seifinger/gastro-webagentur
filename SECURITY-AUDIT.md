@@ -211,12 +211,12 @@ Prioritäten:
 | O-05 | P2 | Der Dashboard-Host bekommt laut `deploy/start.sh` einen `GITHUB_TOKEN` mit Schreibrecht, obwohl Veröffentlichen abgeschaltet ist (410) | Token entfernen bzw. nur lesend (das Repo ist öffentlich, Klonen braucht keinen) | du |
 | O-06 | P3 | Dashboard: ein gemeinsames Passwort, Sitzungen im Speicher, keine Zwei-Faktor-Anmeldung | Optional Cloudflare Access oder Tailscale davor (`HOSTING.md`) | Agentur |
 | O-07 | P3 | Videos: nur MP4 mit GPS wird abgelehnt; Aufnahmedatum und Gerät in MP4/WebM bleiben | Vor dem Hochladen mit `ffmpeg -map_metadata -1` exportieren | Agentur |
-| O-08 | P3 | Telegram-Verknüpfungscode ohne Versuchsgrenze je Chat (32⁶ Möglichkeiten, 30 min gültig) | Grenze je Chat | – |
+| O-08 | P3 | ~~Telegram-Verknüpfungscode ohne Versuchsgrenze je Chat~~ **behoben:** höchstens 5 falsche Codes je Chat und Bot in 15 Minuten (`telegramBot.js`, Test 19) | – | – |
 | O-09 | P3 | `public/dashboard.html` verlinkt die Lead-Website ohne Schema-Prüfung (`javascript:` aus einem CSV-Import wäre klickbar) | Nur `http(s)` verlinken | – |
 | O-10 | P3 | `src/previewServer.js` (lokales Entwicklerwerkzeug) stürzt bei `/%` ab | wie S-05 | – |
 | O-11 | P3 | Push-Abo nimmt jede URL an (nur angemeldeter Wirt) | Nur `https:` zulassen | – |
 | O-12 | P2 | TLS, HSTS und Protokollaufbewahrung liegen beim Proxy/Host, nicht im Code | beim Einrichten festlegen (`LAUNCH-CHECKLISTE.md`) | Agentur/Host |
-| O-13 | P2 | Telegram und Web-Push an den Wirt enthalten Gastname und Telefonnummer (Drittland) | Rolle klären oder Inhalt kürzen (z. B. nur „Neue Reservierung, 2 Pers., 19:00“) | du + rechtliche Prüfung |
+| O-13 | P2 | **Telegram gekürzt** (nur Referenz, Termin/Abholzeit, Personenzahl, Status – `v2/integration/TELEGRAM-DATENSCHUTZ.md`). **Web-Push** enthält weiter Gastnamen. Drittland/Rolle von Telegram weiter offen | Web-Push ebenso kürzen; Rolle und Drittland fachlich prüfen | du + rechtliche Prüfung |
 
 ---
 
@@ -231,7 +231,7 @@ Prioritäten:
 | Shell-Injection | Nur `execFile` mit Argumentliste (`git`, `tar`), keine Shell | C |
 | Uploads | Typ aus den Bytes, SVG abgelehnt, Größen: Bild 8 MB, Video 40 MB, Lead-Bild wie bisher. Kundenmedien mit `nosniff`, nur über geschützte `/intern/`-Routen | C, L |
 | Abhängigkeiten | `npm audit`: 0 bekannte Schwachstellen (Stand 25.09.2026) | L |
-| Telegram-Knöpfe | Wirken nur auf den Betrieb des verknüpften Chats | C |
+| Telegram-Knöpfe | Wirken nur für Betrieb, Chat und Bot, die für diese Art konfiguriert sind, und nur für zulässige Statuswechsel (alter Knopf nach Dashboard-Entscheidung ändert nichts) | C, L (`test/telegramBenachrichtigung.test.js`) |
 | Kundenfassungen | Kein Stock- oder Konzeptmaterial, keine Unsplash-Adressen (bestehender Test) | L |
 | Öffentliche Ausgabe | `src/oeffentlichkeit.js` verhindert Lead-Demos in `docs/`; `npm run publish-site` läuft (docs danach zurückgesetzt, nichts veröffentlicht) | L |
 | Geheimnisse im Code | Keine Treffer in versionierten Dateien (außer S-01 in der Historie) | L (Test) |
