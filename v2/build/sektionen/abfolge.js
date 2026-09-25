@@ -155,6 +155,8 @@ export const ABFOLGE_SKRIPT = `
 export const ABFOLGE_CSS = `
 /* Einladung zweispaltig: links das Haus, rechts der Besuch (nur echte Angaben). */
 .einladung-innen { justify-items: start; text-align: left; }
+.einladung-innen > * { min-width: 0; max-width: 100%; }
+.einladung-name { overflow-wrap: anywhere; hyphens: auto; }
 .einladung .bewertung { justify-content: flex-start; }
 .einladung-aktionen { justify-content: flex-start; }
 .einladung-besuch { display: grid; gap: var(--s-2); width: 100%; padding-top: var(--s-3); border-top: 1px solid var(--linie); }
@@ -234,7 +236,8 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 /* Fußzeile (AP8) */
 .fuss-haus { padding-block: var(--sektion) var(--s-6); background: var(--tint); color: var(--auf-tint); }
 .fuss-haus-raster { display: grid; gap: var(--s-4); }
-.fuss-marke { font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform); font-size: var(--t-h1); line-height: 1.05; }
+.fuss-haus-raster > * { min-width: 0; }
+.fuss-marke { font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform); font-size: var(--t-h1); line-height: 1.05; overflow-wrap: anywhere; hyphens: auto; }
 .fuss-spalten { display: grid; gap: var(--s-3); color: var(--auf-tint-leise); }
 .fuss-spalten address { font-style: normal; }
 .fuss-haus a { color: var(--auf-tint); }
