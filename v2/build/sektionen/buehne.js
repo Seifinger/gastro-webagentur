@@ -101,7 +101,8 @@ function posterBild(medium, mobil, alt) {
  * Video über dem Poster – erst per Skript geladen (preload="none", data-src).
  * Wiedergabe "einmal" (Standard): keine Schleife, bleibt auf dem letzten Bild
  * stehen. Nur wiedergabe: "schleife" spielt als Loop.
- * Hochformat-Poster ohne Hochformat-Video: nur auf breiten Bildschirmen.
+ * Auf dem Handy (bis 767 px) spielt das Hochformat-Video (data-src-mobil);
+ * Hochformat-Poster ohne Hochformat-Video: Video nur auf breiten Bildschirmen.
  */
 function videoFuer(medien) {
   const video = medien.heroVideo;
@@ -112,11 +113,17 @@ function videoFuer(medien) {
   // letzten Bild stehen – ein nicht nahtloser Loop würde sichtbar springen.
   const einmal = video.wiedergabe !== "schleife";
   const nurBreit = !videoMobil?.src && Boolean(medien.heroMobil?.src);
-  return `<video class="buehne-video" muted${einmal ? "" : " loop"} playsinline preload="none" aria-hidden="true" data-src="${e(video.src)}"${video.webm?.src ? ` data-src-webm="${e(video.webm.src)}"` : ""}${videoMobil?.src ? ` data-src-mobil="${e(videoMobil.src)}"` : ""}${einmal ? " data-einmal" : ""}${nurBreit ? " data-nur-breit" : ""}></video>`;
+  return `<video class="buehne-video" muted${einmal ? "" : " loop"} playsinline preload="none" aria-hidden="true" data-src="${e(video.src)}"${video.webm?.src ? ` data-src-webm="${e(video.webm.src)}"` : ""}${videoMobil?.src ? ` data-src-mobil="${e(videoMobil.src)}"` : ""}${videoMobil?.webm?.src ? ` data-src-mobil-webm="${e(videoMobil.webm.src)}"` : ""}${einmal ? " data-einmal" : ""}${nurBreit ? " data-nur-breit" : ""}></video>`;
 }
 
 function fokusStil(medien, hero) {
-  return [hero?.fokus ? `--fokus: ${hero.fokus}` : "", medien.heroMobil?.fokus ? `--fokus-mobil: ${medien.heroMobil.fokus}` : "", medien.heroVideo?.fokus ? `--fokus-video: ${medien.heroVideo.fokus}` : ""].filter(Boolean).join("; ");
+  return [
+    hero?.fokus ? `--fokus: ${hero.fokus}` : "",
+    medien.heroMobil?.fokus ? `--fokus-mobil: ${medien.heroMobil.fokus}` : "",
+    medien.heroVideo?.fokus ? `--fokus-video: ${medien.heroVideo.fokus}` : "",
+    // Hochformat-Video: eigener Ausschnitt, sonst der des Hochformat-Standbilds (buehneStil.js).
+    medien.heroVideoMobil?.fokus ? `--fokus-video-mobil: ${medien.heroVideoMobil.fokus}` : "",
+  ].filter(Boolean).join("; ");
 }
 
 export function renderBuehne(ctx) {

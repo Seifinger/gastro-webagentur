@@ -110,9 +110,9 @@
     "heroMobil": {
       "datei": "v2/medien/eigene/beispiel-italienisch/heroMobil.jpg",
       "herkunft": "ki",
-      "quelle": "Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "quelle": "Erstes Bild des vom Inhaber gelieferten Hochformat-Videos (KI-generiert), damit Standbild und Video auf dem Handy nahtlos ineinander übergehen, 25.09.2026",
       "fokus": "50% 65%",
-      "eingetragen": "2026-09-24T18:18:17.142Z"
+      "eingetragen": "2026-09-25T17:00:22.451Z"
     },
     "heroVideo": {
       "datei": "v2/medien/eigene/beispiel-italienisch/heroVideo.mp4",
@@ -122,6 +122,15 @@
       "wiedergabe": "einmal",
       "webm": "v2/medien/eigene/beispiel-italienisch/heroVideo.webm",
       "eingetragen": "2026-09-24T18:18:17.155Z"
+    },
+    "heroVideoMobil": {
+      "datei": "v2/medien/eigene/beispiel-italienisch/heroVideoMobil.mp4",
+      "herkunft": "ki",
+      "quelle": "Hochformat-Video vom Inhaber im Chat geliefert (KI-generiert), 25.09.2026 – einmalige Wiedergabe, ohne Ton",
+      "fokus": "50% 65%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-italienisch/heroVideoMobil.webm",
+      "eingetragen": "2026-09-25T17:00:22.453Z"
     }
   },
   "beispiel-griechisch": {
@@ -135,9 +144,9 @@
     "heroMobil": {
       "datei": "v2/medien/eigene/beispiel-griechisch/heroMobil.jpg",
       "herkunft": "ki",
-      "quelle": "Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "quelle": "Erstes Bild des vom Inhaber gelieferten Hochformat-Videos (KI-generiert), damit Standbild und Video auf dem Handy nahtlos ineinander übergehen, 25.09.2026",
       "fokus": "55% 60%",
-      "eingetragen": "2026-09-24T18:23:43.835Z"
+      "eingetragen": "2026-09-25T17:00:22.434Z"
     },
     "heroVideo": {
       "datei": "v2/medien/eigene/beispiel-griechisch/heroVideo.mp4",
@@ -147,6 +156,15 @@
       "wiedergabe": "einmal",
       "webm": "v2/medien/eigene/beispiel-griechisch/heroVideo.webm",
       "eingetragen": "2026-09-24T18:23:43.836Z"
+    },
+    "heroVideoMobil": {
+      "datei": "v2/medien/eigene/beispiel-griechisch/heroVideoMobil.mp4",
+      "herkunft": "ki",
+      "quelle": "Hochformat-Video vom Inhaber im Chat geliefert (KI-generiert), 25.09.2026 – einmalige Wiedergabe, ohne Ton",
+      "fokus": "55% 60%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-griechisch/heroVideoMobil.webm",
+      "eingetragen": "2026-09-25T17:00:22.447Z"
     }
   },
   "beispiel-syrisch": {
@@ -210,9 +228,9 @@
     "heroMobil": {
       "datei": "v2/medien/eigene/beispiel-indisch/heroMobil.jpg",
       "herkunft": "ki",
-      "quelle": "Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
+      "quelle": "Erstes Bild des vom Inhaber gelieferten Hochformat-Videos (KI-generiert), damit Standbild und Video auf dem Handy nahtlos ineinander übergehen, 25.09.2026",
       "fokus": "50% 70%",
-      "eingetragen": "2026-09-24T18:55:46.925Z"
+      "eingetragen": "2026-09-25T17:00:22.454Z"
     },
     "heroVideo": {
       "datei": "v2/medien/eigene/beispiel-indisch/heroVideo.mp4",
@@ -222,6 +240,15 @@
       "wiedergabe": "einmal",
       "webm": "v2/medien/eigene/beispiel-indisch/heroVideo.webm",
       "eingetragen": "2026-09-24T18:55:46.926Z"
+    },
+    "heroVideoMobil": {
+      "datei": "v2/medien/eigene/beispiel-indisch/heroVideoMobil.mp4",
+      "herkunft": "ki",
+      "quelle": "Hochformat-Video vom Inhaber im Chat geliefert (KI-generiert), 25.09.2026 – einmalige Wiedergabe, ohne Ton",
+      "fokus": "50% 70%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-indisch/heroVideoMobil.webm",
+      "eingetragen": "2026-09-25T17:00:22.455Z"
     }
   },
   "beispiel-chinesisch": {

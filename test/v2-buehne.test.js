@@ -112,7 +112,34 @@ test("Video 'einmal': ohne Schleife, WebM-Alternative, auf dem Handy nur Poster,
   assert.match(video, /data-src="medien\/heroVideo.mp4" data-src-webm="medien\/heroVideo.webm"/);
   assert.match(video, /data-einmal data-nur-breit/);
   assert.ok(dateien.some((d) => d.src === "medien/heroVideo.webm"));
-  assert.match(html, /if \(einmal && video\.ended\) return;/);
+  assert.match(html, /if \(abgebrochen \|\| \(einmal && video\.ended\)\) return;/);
+});
+
+test("Hochformat-Video auf dem Handy: eigene Quelle (MP4 + WebM), Ausschnitt wie das Standbild, Standbild bei langsamem Netz", () => {
+  const medien = {
+    hero: { src: "medien/hero.jpg", herkunft: "ki", kennzeichnung: "KI-generiert", fokus: "45% 60%" },
+    heroMobil: { src: "medien/heroMobil.jpg", herkunft: "ki", fokus: "55% 60%" },
+    heroVideo: { src: "medien/heroVideo.mp4", datei: "/x/heroVideo.mp4", herkunft: "ki", typ: "video", wiedergabe: "einmal", fokus: "45% 60%", webm: { src: "medien/heroVideo.webm", datei: "/x/heroVideo.webm" } },
+    heroVideoMobil: { src: "medien/heroVideoMobil.mp4", datei: "/x/heroVideoMobil.mp4", herkunft: "ki", typ: "video", fokus: "55% 60%", webm: { src: "medien/heroVideoMobil.webm", datei: "/x/heroVideoMobil.webm" } },
+    haus: null,
+    team: null,
+    bestseller: null,
+    gericht: () => null,
+  };
+  const { html, dateien } = bau({ medien });
+  const video = html.match(/<video[^>]*>/)[0];
+  assert.match(video, /data-src-mobil="medien\/heroVideoMobil.mp4" data-src-mobil-webm="medien\/heroVideoMobil.webm"/);
+  assert.doesNotMatch(video, /data-nur-breit/, "mit Hochformat-Video spielt das Handy ein Video");
+  // Standbild fürs Handy bleibt ein echtes <img> (langsames Netz, ohne Skript, reduzierte Bewegung)
+  assert.match(html, /<source media="\(max-width: 767px\)" srcset="medien\/heroMobil.jpg">/);
+  assert.match(html, /--fokus-video-mobil: 55% 60%/);
+  assert.match(html, /\.buehne-video\[data-src-mobil\] \{ object-position: var\(--fokus-video-mobil, var\(--fokus-mobil/);
+  for (const d of ["medien/heroVideoMobil.mp4", "medien/heroVideoMobil.webm"]) assert.ok(dateien.some((x) => x.src === d), `${d} wird mitkopiert`);
+  // Langsames Netz, Datensparen und nicht rechtzeitig startendes Video → Standbild
+  assert.match(html, /prefers-reduced-data: reduce/);
+  assert.match(html, /\/\(\^\|-\)2g\$\|\^3g\$\/\.test\(netz\.effectiveType/);
+  assert.match(html, /var STARTFRIST_MS = 4000;/);
+  assert.match(html, /video\.removeAttribute\("src"\);/);
 });
 
 test("handwerk: Kopfzeile immer fest, Slogan unter dem Medium, kein Rückzug", () => {

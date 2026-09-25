@@ -23,6 +23,7 @@ tatsächlich veröffentlicht, nicht ein neues System daneben.
 | AP5 Atmosphäre | ✅ `v2/build/atmosphaere.js`: Lindenblatt (Haus) bzw. Küchenmarke, hinter dem Inhalt, nur Deckkraft, aus bei reduzierter Bewegung/ohne JS | (dieser Stand) |
 | AP6 Abfolge `gesellig` | ✅ `v2/build/sektionen/abfolge.js`: Einladung zweispaltig mit „Besuch“, Tisch-Collage, Haus-Band; keine Stimmen, keine Häkchen. Runde 2: `v2/art-direction/ausdruck/beispiel-bayerisch/runde-2/` | (dieser Stand) |
 | Video (Pilot) | ✅ einmalige Wiedergabe, MP4 + WebM, auf dem Handy nur Poster (kein Hochformat-Video) | (dieser Stand) |
+| Video mobil | ✅ Hochformat-Video (MP4 + WebM) für Griechisch, Italienisch, Indisch; Ausschnitt wie das Hochformat-Poster (`--fokus-video-mobil`); Startfrist 4 s, sonst bleibt das Poster | 25.09.2026 |
 | AP7 Karte/Bestellen mobil | ✅ mitlaufende Sprungleiste mit aktiver Kategorie, 48-px-Tippflächen, Aktionsleiste weicht der Tastatur | (dieser Stand) |
 | AP8 Reservierung/Anfahrt/Fuß | ✅ „Lieber anrufen?“ nur mit echter Nummer, Anfahrt als Hausschild + Öffnungstafel, Fuß mit Wortmarke. Runde 4: `v2/art-direction/ausdruck/beispiel-bayerisch/runde-4/` | (dieser Stand) |
 | AP4 Prüfwerkzeuge | ✅ `npm run v2:sequenz -- --seite … --runde n`: Scroll-Sequenz, reduzierte Bewegung, ohne JS, Menü, dazu Slow 4G + 4× CPU (LCP) und „ohne Video“; Auslieferung über lokalen HTTP-Server statt file://. Pilot: LCP 1,72 s, Poster ohne Video stabil | – |
@@ -236,7 +237,9 @@ unterscheiden sie.
    - Getrennte Ausschnitte für Desktop (16:9) und Mobil (4:5 oder 9:16) über `<picture>`
      bzw. zwei Videoquellen.
    - Das Video lädt erst nach `load`, und nur ohne `prefers-reduced-motion`, ohne
-     `Save-Data` und ohne langsames Netz (`effectiveType` 2g/3g).
+     `Save-Data`/`prefers-reduced-data` und ohne langsames Netz (`effectiveType` 2g/3g).
+   - Läuft es nicht binnen 4 Sekunden an (Browser ohne Netz-Auskunft wie Safari,
+     zähes Netz, Stromsparmodus), wird das Laden abgebrochen und das Poster bleibt.
    - Es pausiert außerhalb des Sichtfelds.
    - Bei einem Fehler bleibt das Poster stehen.
 4. **Slogan-Rückzug**

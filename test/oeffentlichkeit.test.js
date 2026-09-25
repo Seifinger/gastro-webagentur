@@ -13,7 +13,7 @@ import { schreibeSeiten } from "../src/buildSite.js";
 import { baueDemo } from "../v2/integration/demoBau.js";
 import { baueSite } from "../v2/build/siteBuilder.js";
 import { baueImZyklus } from "../v2/build/zyklus.js";
-import { loeseMedien, medienStatus } from "../v2/assets-pipeline/mediaGenerator.js";
+import { loeseMedien, medienStatus, ladeEigeneMedien } from "../v2/assets-pipeline/mediaGenerator.js";
 import { themeForLead } from "../src/landingPageGenerator.js";
 import { ausdruckZumBauen, stimmungFuerSlug } from "../v2/build/ausdruck.js";
 import { praesentationsHandler, startePraesentation, beendePraesentation, lanAdresse } from "../src/praesentation.js";
@@ -164,15 +164,20 @@ for (const [i, kueche] of [[0, "bayerisch"], [1, "italienisch"], [2, "thailaendi
     const lead = readFileSync(path.join(ordner, "index.html"), "utf-8");
     assert.deepEqual(merkmale(lead), merkmale(beispiel));
     assert.match(merkmale(lead).video, /data-einmal/, "Wiedergabemodus aus dem Medienprofil");
-    for (const datei of ["hero.jpg", "heroMobil.jpg", "heroVideo.mp4", "heroVideo.webm"]) assert.ok(existsSync(path.join(ordner, "medien", datei)), `${datei} mitkopiert`);
+    // Hochformat-Video nur, wo die Küche eines geliefert hat (v2/medien/eigene.json).
+    const mitVideoMobil = Boolean(ladeEigeneMedien()[slugBeispiel]?.heroVideoMobil);
+    const dateien = ["hero.jpg", "heroMobil.jpg", "heroVideo.mp4", "heroVideo.webm", ...(mitVideoMobil ? ["heroVideoMobil.mp4", "heroVideoMobil.webm"] : [])];
+    for (const datei of dateien) assert.ok(existsSync(path.join(ordner, "medien", datei)), `${datei} mitkopiert`);
+    assert.equal(/data-src-mobil="medien\/heroVideoMobil\.mp4"/.test(lead), mitVideoMobil, "Hochformat-Video genau dann, wenn geliefert");
     // Konzeptmaterial sichtbar gekennzeichnet, keine Google-Note, nichts wird verschickt.
     assert.match(lead, /class="buehne-herkunft">Konzeptmaterial</);
     assert.ok(!/auf Google|Bewertungen/.test(lead.replace(/<script[\s\S]*?<\/script>/g, "")));
     assert.match(lead, /"apiUrl":""/);
     assert.match(lead, /Konzept-Demo – unverbindlicher Entwurf, nicht die offizielle Website von /);
     const bericht = JSON.parse(readFileSync(path.join(ordner, "bericht.json"), "utf-8"));
-    assert.deepEqual(bericht.medienStatus.zeilen.map((z) => [z.rolle, z.vorhanden]), [["heroVideo", true], ["heroVideoMobil", false], ["hero", true], ["heroMobil", true]]);
-    assert.match(bericht.medienStatus.fehlend.join(" "), /Video Mobil fehlt – auf dem Handy steht das Hochformat-Poster/);
+    assert.deepEqual(bericht.medienStatus.zeilen.map((z) => [z.rolle, z.vorhanden]), [["heroVideo", true], ["heroVideoMobil", mitVideoMobil], ["hero", true], ["heroMobil", true]]);
+    if (mitVideoMobil) assert.deepEqual(bericht.medienStatus.fehlend, []);
+    else assert.match(bericht.medienStatus.fehlend.join(" "), /Video Mobil fehlt – auf dem Handy steht das Hochformat-Poster/);
   });
 }
 

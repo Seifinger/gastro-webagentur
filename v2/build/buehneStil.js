@@ -67,6 +67,9 @@ section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 .buehne-poster, .buehne-video { object-position: var(--fokus, 50% 50%); }
 @media (max-width: 767px) { .buehne-poster, .buehne-video { object-position: var(--fokus-mobil, var(--fokus, 50% 50%)); } }
 .buehne-video { opacity: 0; object-position: var(--fokus-video, var(--fokus, 50% 50%)); }
+/* Hochformat-Video auf dem Handy: derselbe Ausschnitt wie das Hochformat-Standbild,
+   damit der Wechsel vom Standbild zum ersten Videobild nicht springt. */
+@media (max-width: 767px) { .buehne-video[data-src-mobil] { object-position: var(--fokus-video-mobil, var(--fokus-mobil, var(--fokus, 50% 50%))); } }
 .buehne-video.laeuft { opacity: 1; }
 .buehne-schleier { position: absolute; inset: 0; background: var(--schleier); }
 .buehne-text { position: absolute; left: 0; right: 0; top: 28%; bottom: 38%; display: flex; align-items: center; justify-content: center;
@@ -227,26 +230,47 @@ export const BUEHNE_SKRIPT = `
     rechne();
   }
 
-  // 4. Video: erst nach dem Laden, nie bei reduzierter Bewegung, Save-Data
-  //    oder langsamem Netz. Das Poster bleibt stehen, bis der erste Frame läuft.
+  // 4. Video: erst nach dem Laden, nie bei reduzierter Bewegung, Save-Data,
+  //    reduzierten Daten oder langsamem Netz. Das Poster bleibt stehen, bis der
+  //    erste Frame läuft – und ganz, wenn das Video nicht in STARTFRIST_MS
+  //    anläuft (Browser ohne Netz-Auskunft wie Safari, Stromsparmodus).
   var video = document.querySelector(".buehne-video");
   var netz = navigator.connection || {};
-  var langsam = Boolean(netz.saveData) || /(^|-)2g$|^3g$/.test(netz.effectiveType || "");
+  var datenSparen = window.matchMedia && window.matchMedia("(prefers-reduced-data: reduce)").matches;
+  // Die Bandbreiten-Schätzung (downlink) ist ohne Messung ein Pauschalwert und
+  // taugt nicht als Schwelle; was wirklich ankommt, misst die Startfrist.
+  var langsam = Boolean(netz.saveData) || datenSparen || /(^|-)2g$|^3g$/.test(netz.effectiveType || "");
+  var STARTFRIST_MS = 4000;
   if (video && !reduziert && !langsam) {
     var starte = function () {
       var schmal = window.matchMedia("(max-width: 767px)").matches;
       // Hochformat-Poster ohne Hochformat-Video: auf dem Handy bleibt das Poster.
       if (schmal && video.hasAttribute("data-nur-breit")) return;
+      // Auf dem Handy das Hochformat-Video; ohne H.264 jeweils die WebM-Fassung.
       var mobil = schmal && video.getAttribute("data-src-mobil");
       var h264 = video.canPlayType('video/mp4; codecs="avc1.4d401f"');
-      var webm = video.getAttribute("data-src-webm");
-      var quelle = mobil ? video.getAttribute("data-src-mobil") : !h264 && webm && video.canPlayType('video/webm; codecs="vp9"') ? webm : video.getAttribute("data-src");
-      video.addEventListener("playing", function () { video.classList.add("laeuft"); });
+      var vp9 = video.canPlayType('video/webm; codecs="vp9"');
+      var mp4 = mobil ? video.getAttribute("data-src-mobil") : video.getAttribute("data-src");
+      var webm = video.getAttribute(mobil ? "data-src-mobil-webm" : "data-src-webm");
+      var quelle = !h264 && webm && vp9 ? webm : mp4;
+      var gestartet = false;
+      var abgebrochen = false;
+      video.addEventListener("playing", function () { if (abgebrochen) return; gestartet = true; video.classList.add("laeuft"); });
       video.addEventListener("error", function () { video.classList.remove("laeuft"); });
       video.src = quelle;
+      // Läuft das Video nicht rechtzeitig an, ist das Netz zu langsam: Laden
+      // abbrechen, das Standbild bleibt – kein spätes Umspringen, kein Datenverbrauch.
+      window.setTimeout(function () {
+        if (gestartet) return;
+        abgebrochen = true;
+        video.classList.remove("laeuft");
+        video.pause();
+        video.removeAttribute("src");
+        video.load();
+      }, STARTFRIST_MS);
       // "einmal": nach dem Ende bleibt das letzte Bild stehen, kein Neustart beim Zurückscrollen.
       var einmal = video.hasAttribute("data-einmal");
-      var spielen = function () { if (einmal && video.ended) return; var p = video.play(); if (p && p.catch) p.catch(function () {}); };
+      var spielen = function () { if (abgebrochen || (einmal && video.ended)) return; var p = video.play(); if (p && p.catch) p.catch(function () {}); };
       spielen();
       if ("IntersectionObserver" in window) {
         new IntersectionObserver(function (eintraege) {
