@@ -13,6 +13,7 @@
 
 import { escapeHtml, formatPrice, plus } from "../v1Funktionen.js";
 import { bild } from "./kopf.js";
+import { rechtsLinkHtml } from "./service.js";
 
 const e = escapeHtml;
 
@@ -120,7 +121,7 @@ export function renderFussAusdruck({ texte, lead, aktionen, seite = "start" }) {
       <nav aria-label="${e(texte.fuss.navigation)}">
         <a href="${e(karte)}">${e(aktionen?.karte ? texte.nav.speisekarte : texte.nav.karte)}</a>
         <a href="${e(start)}#reservierung">${e(texte.nav.reservierung)}</a>
-        <a href="${e(start)}#kontakt">${e(texte.nav.kontakt)}</a>
+        <a href="${e(start)}#kontakt">${e(texte.nav.kontakt)}</a>${rechtsLinkHtml(aktionen)}
       </nav>
     </div>
     <p class="fuss-hinweis">${e(texte.fuss.hinweis)}</p>

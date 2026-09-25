@@ -1,3 +1,5 @@
+import { gibNoShowRegelFrei } from "./hilfen/rechtstexte.js";
+import { noShowZustimmungstext } from "../src/rechtstexte.js";
 import { test, beforeEach, after } from "node:test";
 import assert from "node:assert/strict";
 import { rmSync } from "node:fs";
@@ -29,7 +31,6 @@ import {
   setzeWartezeitLernenAktiv,
   setzeNoShowSchutz,
   setzeBankverbindung,
-  noShowZustimmungstext,
   storniereBestellung,
   bestaetigeNoShow,
 } from "../src/betriebStore.js";
@@ -476,6 +477,8 @@ test("ein frischer Betrieb hat das Lernsystem aus, der Schalter wirkt", () => {
 /* ---------- No-Show-Schutz ---------- */
 
 function aktiviereNoShowSchutz(betrag = 10, fenster = 30, schwelle = 2) {
+  // Einschalten geht nur mit freigegebener Regel (rechtstexte.js).
+  gibNoShowRegelFrei(SLUG, { betrag, stornofensterMinuten: fenster });
   return setzeNoShowSchutz(SLUG, {
     aktiv: true,
     gebuehrBetrag: betrag,
@@ -535,13 +538,14 @@ test("mit Häkchen wird die Zustimmung korrekt gespeichert: Text, Zeitpunkt, Kon
     name: "Bauer",
     telefon: "0170 111",
     noShowZustimmung: true,
+    noShowVersion: "v1",
   });
 
-  assert.equal(
-    b.noShowZustimmung.text,
-    "Ich stimme zu: Bei Nichtabholung ohne Stornierung bis 45 Minuten vor der Abholzeit wird eine " +
-      "Ausfallpauschale von 12,50 € in Rechnung gestellt.",
-  );
+  // Beweistext ist der freigegebene Wortlaut der Regel – mit Version und Prüfsumme.
+  assert.equal(b.noShowZustimmung.text, noShowZustimmungstext("noshow-bestellung", { betrag: 12.5, stornofensterMinuten: 45 }));
+  assert.match(b.noShowZustimmung.text, /45 Minuten vor der Abholzeit.*12,50 €/);
+  assert.equal(b.noShowZustimmung.version, "v1");
+  assert.match(b.noShowZustimmung.inhaltHash, /^[0-9a-f]{64}$/);
   assert.ok(b.noShowZustimmung.zeitpunkt, "der Zeitpunkt der Zustimmung wird festgehalten");
   assert.equal(b.noShowGebuehrBetragVereinbart, 12.5);
   // Name/Kontakt stehen ohnehin schon auf der Bestellung - der Beweis ist vollständig.
@@ -556,6 +560,7 @@ test("eine Stornierung innerhalb des Fensters ist gebührenfrei", () => {
     abholzeit: "21:30",
     name: "X",
     noShowZustimmung: true,
+    noShowVersion: "v1",
   });
   const abholzeitpunkt = new Date(b.abholZeitpunkt);
   assert.equal(b.abholZeitpunkt, "2026-09-24T19:30:00.000Z", "21:30 Berliner Sommerzeit");
@@ -573,6 +578,7 @@ test("eine Stornierung nach Ablauf des Fensters wird nicht als gebührenfrei mar
     abholzeit: "21:30",
     name: "X",
     noShowZustimmung: true,
+    noShowVersion: "v1",
   });
   const abholzeitpunkt = new Date(b.abholZeitpunkt);
   assert.equal(b.abholZeitpunkt, "2026-09-24T19:30:00.000Z", "21:30 Berliner Sommerzeit");
@@ -599,6 +605,7 @@ test("bestaetigeNoShow lässt den Betrag nur nach unten korrigieren", () => {
     abholzeit: "18:30",
     name: "X",
     noShowZustimmung: true,
+    noShowVersion: "v1",
   });
 
   assert.throws(() => bestaetigeNoShow(SLUG, b.id, 25), /höchstens 20.00/);
@@ -615,6 +622,7 @@ test("bestaetigeNoShow lehnt eine vom Gast stornierte Bestellung ab", () => {
     abholzeit: "18:30",
     name: "X",
     noShowZustimmung: true,
+    noShowVersion: "v1",
   });
   storniereBestellung(SLUG, b.id);
   assert.throws(() => bestaetigeNoShow(SLUG, b.id, 10), /storniert/);
@@ -636,14 +644,16 @@ test("bestaetigeNoShow verhindert eine doppelte Bestätigung", () => {
     abholzeit: "18:30",
     name: "X",
     noShowZustimmung: true,
+    noShowVersion: "v1",
   });
   bestaetigeNoShow(SLUG, b.id, 10);
   assert.throws(() => bestaetigeNoShow(SLUG, b.id, 5), /bereits/);
 });
 
-test("noShowZustimmungstext rundet den Betrag deutsch", () => {
-  const text = noShowZustimmungstext({ noShowStornofensterMinuten: 30, noShowGebuehrBetrag: 9 });
+test("noShowZustimmungstext rundet den Betrag deutsch und nennt den Gegenbeweis", () => {
+  const text = noShowZustimmungstext("noshow-bestellung", { stornofensterMinuten: 30, betrag: 9 });
   assert.match(text, /9,00 €/);
+  assert.match(text, /wesentlich geringerer Schaden/);
 });
 
 test("setzeBankverbindung speichert freien Text", () => {

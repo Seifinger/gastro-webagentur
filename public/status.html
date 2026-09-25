@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Status Ihrer Anfrage</title>
+<style>
+  /* Bewusst schlicht und ohne fremde Ressourcen: Diese Seite trägt einen
+     persönlichen Zugriffsschlüssel im Fragment der Adresse – sie lädt
+     nichts von Dritten nach, damit er nirgends hin mitreist. */
+  :root {
+    --bg: #f6f3ee; --card: #ffffff; --text: #1f1c18; --muted: #6a6358; --line: #e4ded4;
+    --ok: #2f6b3a; --ok-bg: #e7f2e8; --warten: #7a5a12; --warten-bg: #fbf1d9;
+    --nein: #9b2c2c; --nein-bg: #f9e3e3; --neu: #1f4f8a; --neu-bg: #e3edf9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15130f; --card: #1f1c18; --text: #f2eee7; --muted: #b3aa9c; --line: #34302a;
+      --ok: #8fd19b; --ok-bg: #1e3322; --warten: #f0cf7d; --warten-bg: #3a2f14;
+      --nein: #f0a3a3; --nein-bg: #3d1d1d; --neu: #a5c6f0; --neu-bg: #1b2a3f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 560px; margin: 0 auto; padding: 32px 16px 48px; }
+  .karte { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  .haus { color: var(--muted); font-size: .9rem; margin: 0 0 6px; }
+  h1 { font-size: 1.45rem; line-height: 1.25; margin: 0 0 12px; }
+  .marke { display: inline-block; border-radius: 999px; padding: 4px 12px; font-size: .85rem; font-weight: 600; margin-bottom: 14px; }
+  .p-eingegangen { background: var(--warten-bg); color: var(--warten); }
+  .p-bestaetigt, .p-abgeholt { background: var(--ok-bg); color: var(--ok); }
+  .p-bereit { background: var(--neu-bg); color: var(--neu); }
+  .p-abgelehnt, .p-storniert { background: var(--nein-bg); color: var(--nein); }
+  dl { margin: 18px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; }
+  dt { color: var(--muted); font-size: .9rem; }
+  dd { margin: 0; font-weight: 500; overflow-wrap: anywhere; }
+  .geaendert { margin-top: 16px; padding: 12px 14px; border-radius: 10px; background: var(--neu-bg); color: var(--neu); font-weight: 600; }
+  .hinweis { color: var(--muted); font-size: .9rem; margin-top: 18px; }
+  .knoepfe { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  a.knopf, button.knopf { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; font-size: .95rem; text-decoration: none; cursor: pointer; }
+  .fehler { color: var(--nein); }
+</style>
+</head>
+<body>
+<main>
+  <div class="karte" id="karte" aria-live="polite">
+    <p class="haus" id="haus"></p>
+    <h1 id="titel">Status wird geladen …</h1>
+    <span class="marke" id="marke" hidden></span>
+    <p id="erklaerung"></p>
+    <dl id="angaben" hidden></dl>
+    <p class="geaendert" id="geaendert" hidden></p>
+    <div class="knoepfe" id="knoepfe" hidden>
+      <button class="knopf" type="button" id="neu-laden">Status aktualisieren</button>
+      <a class="knopf" id="anrufen" hidden href="#">Restaurant anrufen</a>
+    </div>
+    <p class="hinweis">Diese Seite zeigt Änderungen nur, wenn Sie sie öffnen oder aktualisieren. Speichern Sie sich den Link (z.&nbsp;B. als Lesezeichen), um später erneut nachzusehen. Der Link ist persönlich – bitte nicht weitergeben.</p>
+  </div>
+</main>
+<script>
+(function () {
+  var token = String(location.hash || "").replace(/^#/, "");
+  var el = function (id) { return document.getElementById(id); };
+
+  function zeile(dl, label, wert) {
+    if (!wert) return;
+    var dt = document.createElement("dt"); dt.textContent = label;
+    var dd = document.createElement("dd"); dd.textContent = wert;
+    dl.appendChild(dt); dl.appendChild(dd);
+  }
+
+  function zeitpunkt(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" }) + " Uhr";
+  }
+
+  function zeige(s) {
+    document.title = s.titel + " – " + s.referenz;
+    el("haus").textContent = s.betrieb.name + " · " + (s.art === "reservierung" ? "Tischreservierung" : "Abholbestellung");
+    el("titel").textContent = s.titel;
+    var marke = el("marke");
+    marke.hidden = false;
+    marke.className = "marke p-" + s.phase;
+    marke.textContent = s.zeitBestaetigt ? "Bestätigt" : s.phase === "eingegangen" ? "Wartet auf Bestätigung" : s.titel;
+    el("erklaerung").textContent = s.erklaerung;
+
+    var dl = el("angaben");
+    dl.innerHTML = "";
+    zeile(dl, "Referenz", s.referenz);
+    zeile(dl, "Status", s.titel);
+    zeile(dl, s.art === "reservierung" ? (s.zeitBestaetigt ? "Termin" : "Angefragt für") : (s.zeitBestaetigt ? "Abholzeit (bestätigt)" : "Abholzeit (gewünscht)"),
+      (s.datumText ? s.datumText + ", " : "") + s.uhrzeit + " Uhr");
+    if (s.personen) zeile(dl, "Personen", String(s.personen));
+    zeile(dl, "Letzte Änderung", s.letzteAenderungText || zeitpunkt(s.letzteAenderung));
+    zeile(dl, "Rückfragen", s.betrieb.telefon);
+    dl.hidden = false;
+
+    var geaendert = el("geaendert");
+    if (s.zeitGeaendert) {
+      geaendert.hidden = false;
+      geaendert.textContent = (s.art === "reservierung" ? "Neuer Termin: " : "Neue Abholzeit: ") +
+        (s.art === "reservierung" && s.datumText ? s.datumText + ", " : "") + s.uhrzeit + " Uhr" +
+        (s.wunsch ? " (ursprünglich " + (s.wunsch.datum ? s.wunsch.datum.split("-").reverse().join(".") + ", " : "") + s.wunsch.uhrzeit + " Uhr)" : "") +
+        (s.grund ? " – " + s.grund : "");
+    } else {
+      geaendert.hidden = true;
+    }
+
+    el("knoepfe").hidden = false;
+    var anrufen = el("anrufen");
+    if (s.betrieb.telefon) {
+      anrufen.hidden = false;
+      anrufen.href = "tel:" + s.betrieb.telefon.replace(/[^\d+]/g, "");
+    }
+  }
+
+  function fehler(text) {
+    el("titel").textContent = "Status nicht verfügbar";
+    el("erklaerung").textContent = text;
+    el("erklaerung").className = "fehler";
+    el("angaben").hidden = true;
+    el("marke").hidden = true;
+  }
+
+  function lade() {
+    if (!token) { fehler("In diesem Link fehlt der persönliche Zugriffsschlüssel."); return; }
+    fetch("/oeffentlich/status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+      body: JSON.stringify({ token: token })
+    }).then(function (r) { return r.json(); }).then(function (antwort) {
+      if (!antwort.ok) { fehler(antwort.fehler || "Dieser Status-Link ist ungültig oder abgelaufen."); return; }
+      el("erklaerung").className = "";
+      zeige(antwort.status);
+    }).catch(function () {
+      fehler("Der Status konnte gerade nicht geladen werden. Bitte später erneut versuchen oder das Restaurant anrufen.");
+    });
+  }
+
+  el("neu-laden").addEventListener("click", lade);
+  // Ein anderer Status-Link im selben Tab ändert nur das Fragment.
+  window.addEventListener("hashchange", function () {
+    token = String(location.hash || "").replace(/^#/, "");
+    lade();
+  });
+  // Solange die Seite offen ist, alle zwei Minuten nachsehen.
+  setInterval(function () { if (!document.hidden) lade(); }, 120000);
+  lade();
+})();
+</script>
+</body>
+</html>

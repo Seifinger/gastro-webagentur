@@ -18,13 +18,14 @@ import {
   kuechenMarke,
   KONTAKT_IKONEN,
   gedeck,
+  rechtlichesHtml,
 } from "../v1Funktionen.js";
 
 const e = escapeHtml;
 
 const PERSONEN = ["1 Person", "2 Personen", "3 Personen", "4 Personen", "5 Personen", "6 Personen", "7 Personen", "8 Personen", "Mehr als 8 Personen"];
 
-function feld({ id, name, label, typ = "text", pflicht = false, fehler = "", optional = "", breit = false, auto = "", platzhalter = "", optionen = null, extra = "" }) {
+function feld({ id, name, label, typ = "text", pflicht = false, fehler = "", optional = "", breit = false, auto = "", platzhalter = "", optionen = null, extra = "", zusatz = "" }) {
   const attr = `id="${id}" name="${name}"${pflicht ? " required" : ""}${auto ? ` autocomplete="${auto}"` : ""}${extra}`;
   let eingabe;
   if (optionen) eingabe = `<select ${attr}>${optionen}</select>`;
@@ -32,14 +33,20 @@ function feld({ id, name, label, typ = "text", pflicht = false, fehler = "", opt
   else eingabe = `<input type="${typ}" ${attr}>`;
   return `<div class="field${breit ? " field-wide" : ""}">
             <label for="${id}">${e(label)}${optional ? ` <span class="hint">${e(optional)}</span>` : ""}</label>
-            ${eingabe}
+            ${eingabe}${zusatz ? `
+            <span class="hint">${e(zusatz)}</span>` : ""}
             ${fehler ? `<span class="error">${e(fehler)}</span>` : ""}
           </div>`;
 }
 
-/** Vor dem Absenden: im Vorschau-Modus sagen, dass nichts verschickt wird. */
+/**
+ * Vor dem Absenden: im Vorschau-Modus sagen, dass nichts verschickt wird;
+ * live, was der Status-Link kann und was nicht.
+ */
 function vorschauHinweis(aktionen, texte) {
-  return aktionen?.modus === "live" ? "" : `<p class="hint vorschau-hinweis">${e(texte.bestellung.vorschauHinweis)}</p>`;
+  return aktionen?.modus === "live"
+    ? `<p class="hint status-hinweis">${e(texte.bestellung.statusHinweis)}</p>`
+    : `<p class="hint vorschau-hinweis">${e(texte.bestellung.vorschauHinweis)}</p>`;
 }
 
 export function renderReservierung({ ds, texte, betont, tief, aktionen, ausdruck }) {
@@ -61,9 +68,10 @@ export function renderReservierung({ ds, texte, betont, tief, aktionen, ausdruck
           ${feld({ id: "res-personen", name: "personen", label: f.personen, pflicht: true, fehler: t.fehler.personen, optionen: `<option value="">${e(f.bitteWaehlen)}</option>${optionList(PERSONEN)}` })}
           ${feld({ id: "res-name", name: "name", label: f.name, pflicht: true, fehler: t.fehler.name, auto: "name" })}
           ${feld({ id: "res-telefon", name: "telefon", label: f.telefon, typ: "tel", pflicht: true, fehler: t.fehler.telefon, auto: "tel" })}
-          ${feld({ id: "res-email", name: "email", label: f.email, typ: "email", optional: f.optional, auto: "email" })}
+          ${feld({ id: "res-email", name: "email", label: f.email, typ: "email", optional: f.optional, auto: "email", zusatz: f.emailZweck, extra: ' inputmode="email" maxlength="254"' })}
           ${feld({ id: "res-wunsch", name: "wunsch", label: f.wunsch, typ: "textarea", optional: f.optional, breit: true, platzhalter: f.wunschPlatzhalter })}
       </div>
+      ${rechtlichesHtml("reservierung", aktionen?.apiUrl)}
       <button class="btn btn-primary btn-block formular-absenden" type="submit">${e(t.absenden)}</button>
       ${vorschauHinweis(aktionen, texte)}
     </form>
@@ -139,15 +147,17 @@ ${leiste}
         ${feld({ id: "ord-abholzeit", name: "abholzeit", label: b.abholzeit, pflicht: true, fehler: b.fehlerAbholzeit, optionen: `<option value="">${e(texte.reservierung.felder.bitteWaehlen)}</option>`, extra: abholzeitAttribute({ oeffnungszeiten }, e) })}${abholHinweis ? `\n        <p class="hint abholzeit-beispiel">${e(abholHinweis)}</p>` : ""}
         ${feld({ id: "ord-name", name: "name", label: texte.reservierung.felder.name, pflicht: true, fehler: texte.reservierung.fehler.name, auto: "name" })}
         ${feld({ id: "ord-telefon", name: "telefon", label: texte.reservierung.felder.telefon, typ: "tel", pflicht: true, fehler: texte.reservierung.fehler.telefon, auto: "tel" })}
+        ${feld({ id: "ord-email", name: "email", label: texte.reservierung.felder.email, typ: "email", optional: texte.reservierung.felder.optional, auto: "email", zusatz: texte.reservierung.felder.emailZweck, extra: ' inputmode="email" maxlength="254"' })}
         ${feld({ id: "ord-hinweis", name: "hinweis", label: b.hinweis, typ: "textarea", optional: texte.reservierung.felder.optional, platzhalter: b.hinweisPlatzhalter })}
       </div>
+      ${rechtlichesHtml("bestellung", aktionen?.apiUrl)}
       <div class="field noshow" id="ord-noshow-feld" style="display:none">
         <label class="noshow-label"><input type="checkbox" id="ord-noshow" name="noShowZustimmung"><span id="ord-noshow-text"></span></label>
         <span class="error">${e(b.noShowFehler)}</span>
       </div>
       <div class="drawer-foot">
         <div class="totals"><span>${e(b.gesamt)}</span><span id="cart-total">0,00 €</span></div>
-        <button class="btn btn-primary btn-block" id="order-submit" type="submit">${e(b.absenden)}</button>
+        <button class="btn btn-primary btn-block" id="order-submit" type="submit">${e(aktionen?.modus === "live" ? b.absenden : b.absendenVorschau ?? b.absenden)}</button>
         <p class="hint drawer-hinweis">${e(b.bezahlung)}</p>
         ${vorschauHinweis(aktionen, texte)}
       </div>
@@ -167,7 +177,13 @@ ${leiste}
 </div>`;
 }
 
-export function renderFuss({ texte, lead, cuisine }) {
+/** Impressum/Datenschutz des Restaurants (nur mit Betriebsserver). */
+export function rechtsLinkHtml(aktionen) {
+  const r = aktionen?.rechtstexte;
+  return r ? `\n      <a href="${e(r.impressum)}" target="_blank" rel="noopener">Impressum</a>\n      <a href="${e(r.datenschutz)}" target="_blank" rel="noopener">Datenschutz</a>` : "";
+}
+
+export function renderFuss({ texte, lead, cuisine, aktionen }) {
   const telefon = lead.telefon || "";
   const telHref = telefon.replace(/[^\d+]/g, "");
   return `<footer class="fuss auf-tint">
@@ -179,7 +195,7 @@ export function renderFuss({ texte, lead, cuisine }) {
     <nav class="fuss-nav" aria-label="${e(texte.fuss.navigation)}">
       <a href="#karte">${e(texte.nav.karte)}</a>
       <a href="#reservierung">${e(texte.nav.reservierung)}</a>
-      <a href="#kontakt">${e(texte.nav.kontakt)}</a>
+      <a href="#kontakt">${e(texte.nav.kontakt)}</a>${rechtsLinkHtml(aktionen)}
     </nav>
     <div class="fuss-kontakt">${telefon ? `<a href="tel:${e(telHref)}">${e(telefon)}</a>` : ""}</div>
     <p class="fuss-hinweis">${e(texte.fuss.hinweis)}</p>

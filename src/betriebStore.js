@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { randomUUID } from "node:crypto";
+import { randomUUID, randomInt } from "node:crypto";
 import {
   berechneAbholzeiten,
   pruefeAbholwunsch,
@@ -11,6 +11,27 @@ import {
   STANDARD_OEFFNUNGSZEITEN,
   ZEITZONE_STANDARD,
 } from "./abholzeiten.js";
+import {
+  ereignisAusAenderung,
+  gastToken,
+  tokenHash,
+  istTokenFormat,
+  linkAbgelaufen,
+  neuesGeheimnis,
+  pruefeEmail,
+  referenzVon,
+} from "./gastStatus.js";
+import {
+  DOKUMENT_ARTEN,
+  entwurfAusVorlage,
+  freigabeHindernisse,
+  gueltigeFassung,
+  inhaltHash,
+  istArt,
+  pruefeBestaetigungen,
+  pruefeNoShowParameter,
+} from "./rechtstexte.js";
+import { QUELLEN as SEITENAUFRUF_QUELLEN } from "./seitenaufrufe.js";
 
 // Datenhaltung eines Betriebs: Tischplan, Reservierungen, Bestellungen.
 // Eine JSON-Datei je Betrieb – das reicht für ein Haus mit ein paar Dutzend
@@ -54,6 +75,22 @@ function leererBetrieb() {
     noShowStornofensterMinuten: NO_SHOW_STORNOFENSTER_MINUTEN_DEFAULT,
     noShowWarnSchwelle: NO_SHOW_WARN_SCHWELLE_DEFAULT,
     bankverbindung: "",
+    // Für Statusseite und Gast-E-Mails: wie das Haus heißt und unter welcher
+    // Nummer Gäste nachfragen können (siehe setzeGastKontakt).
+    anzeigeName: "",
+    telefon: "",
+    // Protokoll der Gast-Ereignisse samt Versandstand (siehe
+    // vermerkeGastMeldungen und kundenBenachrichtigung.js).
+    gastMeldungen: [],
+    // Demo-/Präsentationsbetrieb: keine Status-Links, keine Gast-E-Mails.
+    demoBetrieb: false,
+    // Rechtstexte des Restaurants, versioniert (siehe rechtstexte.js).
+    rechtsdokumente: [],
+    // No-Show für Reservierungen: vorbereitet, standardmäßig aus, nur mit
+    // freigegebener Regel einschaltbar (setzeReservierungsNoShow).
+    reservierungNoShowAktiv: false,
+    // Manuell bestätigte Punkte der Launch-Prüfliste (wer, wann, Vermerk).
+    launchVermerke: {},
   };
 }
 
@@ -67,6 +104,13 @@ export function ladeBetrieb(slug) {
 }
 
 export function speichereBetrieb(slug, daten) {
+  // Gast-Ereignisse entstehen aus dem Unterschied zwischen dem, was auf der
+  // Platte steht, und dem, was gleich darauf steht – also nur aus einer
+  // tatsächlich gespeicherten Änderung, egal über welchen Weg (v1-Dashboard,
+  // v2-Küchenstatus, Telegram-Knopf). Dieselbe Schreiboperation hält Änderung
+  // und Ereignis fest; es gibt keinen Zwischenstand, in dem das eine ohne
+  // das andere existiert.
+  vermerkeGastMeldungen(betriebExistiert(slug) ? ladeBetrieb(slug) : null, daten);
   mkdirSync(betriebeDir, { recursive: true });
   writeFileSync(datei(slug), `${JSON.stringify(daten, null, 2)}\n`, "utf-8");
   return daten;
@@ -300,42 +344,44 @@ export function setzeWartezeitLernenAktiv(slug, aktiv) {
 /* ---------- No-Show-Schutz ---------- */
 
 /**
- * Der exakte Zustimmungstext für eine gegebene Konfiguration – identisch
- * auf der Bestellseite (landingPageGenerator.js, dort clientseitig
- * nachgebaut) und hier serverseitig als Beweistext gespeichert.
- */
-export function noShowZustimmungstext({ noShowStornofensterMinuten, noShowGebuehrBetrag }) {
-  const betrag = Number(noShowGebuehrBetrag || 0).toFixed(2).replace(".", ",");
-  return (
-    `Ich stimme zu: Bei Nichtabholung ohne Stornierung bis ${noShowStornofensterMinuten} Minuten vor der ` +
-    `Abholzeit wird eine Ausfallpauschale von ${betrag} € in Rechnung gestellt.`
-  );
-}
-
-/**
- * Setzt die No-Show-Schutz-Einstellungen eines Betriebs. Default aus
- * (noShowSchutzAktiv: false), damit bestehende Betriebe sich nicht
- * plötzlich anders verhalten.
+ * Setzt die No-Show-Schutz-Einstellungen für Abholbestellungen. Default aus.
+ *
+ * Einschalten geht nur mit einer gültigen, freigegebenen No-Show-Regel
+ * (Dokumentart "noshow-bestellung"): Betrag und Stornofrist kommen aus
+ * dieser Fassung – abweichende Werte werden abgelehnt, damit Formular,
+ * Nachweis und Rechnung nie etwas anderes sagen als der freigegebene Text.
  */
 export function setzeNoShowSchutz(slug, { aktiv, gebuehrBetrag, stornofensterMinuten, warnSchwelle } = {}) {
-  const betrag = Number(gebuehrBetrag);
-  const fenster = Number(stornofensterMinuten);
-  const schwelle = Number(warnSchwelle);
+  const betrag = gebuehrBetrag === undefined ? undefined : Number(gebuehrBetrag);
+  const fenster = stornofensterMinuten === undefined ? undefined : Number(stornofensterMinuten);
+  const schwelle = Number(warnSchwelle ?? NO_SHOW_WARN_SCHWELLE_DEFAULT);
 
-  if (!Number.isFinite(betrag) || betrag < 0) {
+  if (betrag !== undefined && (!Number.isFinite(betrag) || betrag < 0)) {
     throw new Error("Die Ausfallpauschale muss ein Betrag ab 0 € sein.");
   }
-  if (!Number.isInteger(fenster) || fenster < 0 || fenster > 1440) {
-    throw new Error("Das Stornofenster muss zwischen 0 und 1440 Minuten liegen.");
+  if (fenster !== undefined && (!Number.isInteger(fenster) || fenster < 0 || fenster > 10_080)) {
+    throw new Error("Das Stornofenster muss zwischen 0 und 10080 Minuten liegen.");
   }
   if (!Number.isInteger(schwelle) || schwelle < 1) {
     throw new Error("Die Warn-Schwelle muss mindestens 1 sein.");
   }
 
   return aendere(slug, (daten) => {
+    if (aktiv) {
+      const regel = gueltigeFassung(daten.rechtsdokumente, "noshow-bestellung", uhrHook.jetzt());
+      if (!regel) {
+        throw new Error("Der No-Show-Schutz lässt sich erst einschalten, wenn eine No-Show-Regel für Abholbestellungen freigegeben ist (Reiter „Rechtstexte“).");
+      }
+      if (betrag !== undefined && betrag !== regel.parameter.betrag) {
+        throw new Error(`Der Betrag weicht von der freigegebenen No-Show-Regel ${regel.version} ab (${regel.parameter.betrag} €). Für einen anderen Betrag eine neue Fassung freigeben.`);
+      }
+      if (fenster !== undefined && fenster !== regel.parameter.stornofensterMinuten) {
+        throw new Error(`Die Stornofrist weicht von der freigegebenen No-Show-Regel ${regel.version} ab (${regel.parameter.stornofensterMinuten} Minuten).`);
+      }
+      daten.noShowGebuehrBetrag = regel.parameter.betrag;
+      daten.noShowStornofensterMinuten = regel.parameter.stornofensterMinuten;
+    }
     daten.noShowSchutzAktiv = Boolean(aktiv);
-    daten.noShowGebuehrBetrag = betrag;
-    daten.noShowStornofensterMinuten = fenster;
     daten.noShowWarnSchwelle = schwelle;
     return {
       noShowSchutzAktiv: daten.noShowSchutzAktiv,
@@ -343,6 +389,24 @@ export function setzeNoShowSchutz(slug, { aktiv, gebuehrBetrag, stornofensterMin
       noShowStornofensterMinuten: daten.noShowStornofensterMinuten,
       noShowWarnSchwelle: daten.noShowWarnSchwelle,
     };
+  });
+}
+
+/**
+ * No-Show-Regel für Reservierungen – technisch vorbereitet, standardmäßig
+ * aus. Einschalten nur mit gültiger freigegebener Regel "noshow-reservierung"
+ * (Betrag, Frist, Nachweisweg, Freigabevermerk). Es gibt KEINE Abrechnung:
+ * Das System hält nur die Bestätigung des Gastes fest.
+ */
+export function setzeReservierungsNoShow(slug, aktiv) {
+  return aendere(slug, (daten) => {
+    if (aktiv) {
+      const regel = gueltigeFassung(daten.rechtsdokumente, "noshow-reservierung", uhrHook.jetzt());
+      if (!regel) throw new Error("Die No-Show-Regel für Reservierungen lässt sich erst einschalten, wenn eine Fassung freigegeben ist.");
+      if (!String(regel.parameter?.nachweisweg ?? "").trim()) throw new Error("Für die freigegebene Regel fehlt der Nachweisweg.");
+    }
+    daten.reservierungNoShowAktiv = Boolean(aktiv);
+    return daten.reservierungNoShowAktiv;
   });
 }
 
@@ -413,29 +477,49 @@ function pruefeReservierung(daten, eingabe, { ignoriereId, quelle } = {}) {
 }
 
 export function legeReservierungAn(slug, eingabe, quelle = "online") {
+  // Die Quelle bestimmt ausschließlich der Server über den aufgerufenen Weg
+  // (wirtServer.js) – nie ein Wert aus dem Formular.
+  if (!["online", "manuell"].includes(quelle)) throw new Error(`Unbekannte Quelle "${quelle}".`);
+  const email = pruefeEmail(eingabe.email);
+
   return aendere(slug, (daten) => {
     const { personen, warnung } = pruefeReservierung(daten, eingabe, { quelle });
+    const jetzt = uhrHook.jetzt();
+    // Bedingungen und No-Show-Regel bestätigt nur der Gast online; was der
+    // Wirt nach einem Telefonat einträgt, braucht und bekommt keine
+    // Online-Bestätigung.
+    const rechtliches = quelle === "online" ? pruefeBestaetigungen(daten, "reservierung", eingabe, jetzt) : { nachweise: [], noShow: null };
 
     const reservierung = {
       id: randomUUID(),
+      nummer: `RES-${randomInt(1000, 10000)}`,
       datum: eingabe.datum,
       uhrzeit: eingabe.uhrzeit,
       personen,
       name: String(eingabe.name).trim(),
       telefon: String(eingabe.telefon ?? "").trim(),
-      email: String(eingabe.email ?? "").trim(),
+      email,
       wunsch: String(eingabe.wunsch ?? "").trim(),
       tischId: null,
       quelle,
       // Was der Wirt selbst einträgt, steht ohnehin schon fest.
       status: quelle === "manuell" ? "bestaetigt" : "neu",
-      eingegangen: new Date().toISOString(),
+      eingegangen: jetzt.toISOString(),
+      // Nachweise: welche Fassung wann bestätigt wurde (Version + Hash).
+      bestaetigungen: rechtliches.nachweise,
+      noShowZustimmung: rechtliches.noShow
+        ? { text: rechtliches.noShow.zustimmungstext, zeitpunkt: jetzt.toISOString(), version: rechtliches.noShow.version, dokumentId: rechtliches.noShow.id, inhaltHash: rechtliches.noShow.inhaltHash }
+        : null,
     };
+
+    // Was der Wirt selbst einträgt, weiß der Gast schon am Telefon – nur
+    // Online-Anfragen bekommen einen Status-Link.
+    const gastToken = quelle === "online" ? richteGastZugangEin(slug, daten, "reservierung", reservierung) : "";
 
     daten.reservierungen.push(reservierung);
     // Die Warnung hängt nicht an der Reservierung – sie gilt der Lage im
     // Raum, nicht dieser einen Gruppe, und löst sich mit jeder Absage auf.
-    return { ...reservierung, warnung };
+    return { ...reservierung, warnung, gastToken };
   });
 }
 
@@ -501,6 +585,7 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
   if (positionen.length === 0) throw new Error("Die Bestellung ist leer.");
   if (!String(eingabe.name ?? "").trim()) throw new Error("Bitte einen Namen angeben.");
   if (!String(eingabe.abholzeit ?? "").trim() && !eingabe.abholZeitpunkt) throw new Error("Bitte eine Abholzeit angeben.");
+  const email = pruefeEmail(eingabe.email);
 
   const sauber = positionen.map((p) => ({
     name: String(p.name ?? "").trim(),
@@ -518,26 +603,29 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
     });
     if (!abholung.ok) throw new Error(abholung.fehler);
 
-    // Ist die Funktion aktiv, ist die Zustimmung Pflicht – ohne Häkchen keine
-    // Bestellung. Der Text wird serverseitig aus der aktuellen Konfiguration
-    // gebaut, nicht vom Client übernommen: Beweistext und tatsächlich
-    // geltende Bedingungen dürfen nie auseinanderlaufen.
-    let noShowZustimmung = null;
-    let noShowGebuehrBetragVereinbart = null;
-    if (daten.noShowSchutzAktiv) {
-      if (eingabe.noShowZustimmung !== true) {
-        throw new Error("Bitte stimmen Sie der Ausfallpauschale zu, um fortzufahren.");
-      }
-      noShowZustimmung = {
-        text: noShowZustimmungstext(daten),
-        zeitpunkt: jetzt.toISOString(),
-      };
-      noShowGebuehrBetragVereinbart = daten.noShowGebuehrBetrag;
-    }
+    // Bedingungen und No-Show-Regel: Pflicht nur, wenn der Betrieb dafür
+    // eine freigegebene, gültige Fassung hat – und dann für GENAU diese
+    // Version (rechtstexte.js). Als Beweis dient die freigegebene Fassung,
+    // nicht ein vom Browser geschickter Text.
+    const rechtliches = pruefeBestaetigungen(daten, "bestellung", eingabe, jetzt);
+    const noShowZustimmung = rechtliches.noShow
+      ? {
+          text: rechtliches.noShow.zustimmungstext,
+          zeitpunkt: jetzt.toISOString(),
+          version: rechtliches.noShow.version,
+          dokumentId: rechtliches.noShow.id,
+          inhaltHash: rechtliches.noShow.inhaltHash,
+        }
+      : null;
+    const noShowGebuehrBetragVereinbart = rechtliches.noShow ? rechtliches.noShow.parameter.betrag : null;
 
     const bestellung = {
       id: randomUUID(),
-      nummer: `AB-${String(Math.floor(1000 + Math.random() * 9000))}`,
+      nummer: `AB-${randomInt(1000, 10000)}`,
+      // Einziger Weg zu einer Bestellung ist das Website-Formular
+      // (/oeffentlich/bestellung). Ältere Datensätze ohne dieses Feld
+      // gelten in der Statistik als "unbekannt".
+      quelle: "online",
       positionen: sauber,
       gesamt: sauber.reduce((summe, p) => summe + p.preis * p.menge, 0),
       // Wunsch des Gastes; was tatsächlich gilt, bestätigt der Wirt. Die
@@ -548,7 +636,7 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
       bestaetigteAbholzeit: "",
       name: String(eingabe.name).trim(),
       telefon: String(eingabe.telefon ?? "").trim(),
-      email: String(eingabe.email ?? "").trim(),
+      email,
       hinweis: String(eingabe.hinweis ?? "").trim(),
       status: "neu",
       eingegangen: jetzt.toISOString(),
@@ -556,13 +644,15 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
       // Name/Kontakt – die stehen ohnehin schon oben auf der Bestellung.
       noShowZustimmung,
       noShowGebuehrBetragVereinbart,
+      bestaetigungen: rechtliches.nachweise,
       storniertAm: "",
       noShowBestaetigtAm: "",
       noShowBetrag: null,
     };
 
+    const gastToken = richteGastZugangEin(slug, daten, "bestellung", bestellung);
     daten.bestellungen.push(bestellung);
-    return bestellung;
+    return { ...bestellung, gastToken };
   });
 }
 
@@ -646,13 +736,18 @@ export function bestaetigeNoShow(slug, id, betrag, jetzt = new Date()) {
  * Der Wirt bestätigt die Abholzeit – entweder die gewünschte oder eine
  * andere. Ohne diesen Schritt weiß der Gast nicht, ob seine Zeit machbar ist.
  */
-export function bestaetigeBestellung(slug, id, abholzeit) {
+export function bestaetigeBestellung(slug, id, abholzeit, { grund } = {}) {
   const zeit = String(abholzeit ?? "").trim();
   if (!zeit) throw new Error("Bitte eine Abholzeit bestätigen.");
 
   return aendere(slug, (daten) => {
     const b = daten.bestellungen.find((x) => x.id === id);
     if (!b) throw new Error("Bestellung nicht gefunden.");
+    if (b.status === "storniert") throw new Error("Diese Bestellung wurde vom Gast storniert.");
+    if (b.status === "abgeholt") throw new Error("Diese Bestellung wurde bereits abgeholt.");
+    // Der Grund gehört zur Zeitänderung, die gerade gespeichert wird – eine
+    // Bestätigung ohne neue Zeit lässt einen früheren Grund stehen.
+    if (grund !== undefined || zeit !== b.bestaetigteAbholzeit) b.aenderungsGrund = String(grund ?? "").trim().slice(0, 200);
     b.bestaetigteAbholzeit = zeit;
     b.status = "bestaetigt";
     return b;
@@ -732,5 +827,354 @@ export function setzeTelegramChatId(slug, chatId) {
   return aendere(slug, (daten) => {
     daten.telegramChatId = sauber;
     return sauber;
+  });
+}
+
+/* ---------- Gastbenachrichtigung: Status-Link und Ereignisse ---------- */
+
+const geheimnisDatei = path.join(betriebeDir, ".gast-status-geheimnis");
+let geheimnisCache = null;
+
+/**
+ * Das Geheimnis, aus dem die Status-Links hergeleitet werden. Vorrang hat
+ * GAST_STATUS_GEHEIMNIS aus der Umgebung (im Hosting als Secret); sonst
+ * wird einmalig eines erzeugt und neben den Betriebsdaten abgelegt
+ * (data/betrieb/ ist nicht im Git). Wer es austauscht, macht alle bisherigen
+ * Status-Links ungültig – so lassen sich im Notfall alle auf einmal sperren.
+ */
+export function gastGeheimnis() {
+  const ausUmgebung = String(process.env.GAST_STATUS_GEHEIMNIS ?? "").trim();
+  if (ausUmgebung) {
+    if (ausUmgebung.length < 32) throw new Error("GAST_STATUS_GEHEIMNIS muss mindestens 32 Zeichen lang sein.");
+    return ausUmgebung;
+  }
+  if (geheimnisCache) return geheimnisCache;
+  try {
+    geheimnisCache = readFileSync(geheimnisDatei, "utf-8").trim();
+  } catch {
+    geheimnisCache = "";
+  }
+  if (geheimnisCache.length < 32) {
+    geheimnisCache = neuesGeheimnis();
+    mkdirSync(betriebeDir, { recursive: true });
+    writeFileSync(geheimnisDatei, `${geheimnisCache}\n`, { encoding: "utf-8", mode: 0o600 });
+  }
+  return geheimnisCache;
+}
+
+/**
+ * Legt am Eintrag den Gastzugang an und gibt den Status-Token zurück. Der
+ * Token selbst wird nicht gespeichert – nur sein Hash zum Nachschlagen.
+ * Demo-Betriebe bekommen keinen (keine echten Status-Links im Demo-Modus).
+ */
+function richteGastZugangEin(slug, daten, art, eintrag) {
+  if (daten.demoBetrieb) return "";
+  const token = gastToken(gastGeheimnis(), { slug, art, id: eintrag.id, version: 1 });
+  eintrag.gastZugang = { version: 1, hash: tokenHash(token), erstellt: uhrHook.jetzt().toISOString(), widerrufenAm: "" };
+  return token;
+}
+
+/** Leitet den (unveränderten) Status-Token eines Eintrags erneut her – für E-Mails. */
+export function gastTokenFuer(slug, art, eintrag) {
+  if (!eintrag?.gastZugang || eintrag.gastZugang.widerrufenAm) return "";
+  return gastToken(gastGeheimnis(), { slug, art, id: eintrag.id, version: eintrag.gastZugang.version });
+}
+
+/**
+ * Sucht zum Token die passende Reservierung/Bestellung. Gibt null zurück bei
+ * unbekanntem, widerrufenem oder abgelaufenem Link – bewusst ohne zu sagen,
+ * welcher Fall vorliegt.
+ */
+export function findeUeberGastToken(slug, token, jetzt = uhrHook.jetzt()) {
+  if (!istTokenFormat(token)) return null;
+  const hash = tokenHash(token);
+  const daten = ladeBetrieb(slug);
+  for (const [art, liste] of [["reservierung", daten.reservierungen], ["bestellung", daten.bestellungen]]) {
+    const eintrag = liste.find((e) => e.gastZugang?.hash === hash);
+    if (!eintrag) continue;
+    if (eintrag.gastZugang.widerrufenAm) return null;
+    // Zweite Sicherung: der Token muss sich auch aus dem Geheimnis ergeben.
+    if (gastTokenFuer(slug, art, eintrag) !== token) return null;
+    if (linkAbgelaufen(art, eintrag, jetzt)) return null;
+    return { art, eintrag, daten };
+  }
+  return null;
+}
+
+function eintragFinden(daten, art, id) {
+  const liste = art === "reservierung" ? daten.reservierungen : art === "bestellung" ? daten.bestellungen : null;
+  if (!liste) throw new Error(`Unbekannte Art "${art}".`);
+  const eintrag = liste.find((e) => e.id === id);
+  if (!eintrag) throw new Error(art === "reservierung" ? "Reservierung nicht gefunden." : "Bestellung nicht gefunden.");
+  return eintrag;
+}
+
+/** Sperrt den Status-Link eines Eintrags dauerhaft (z. B. auf Wunsch des Gastes). */
+export function widerrufeGastZugang(slug, art, id) {
+  return aendere(slug, (daten) => {
+    const eintrag = eintragFinden(daten, art, id);
+    if (!eintrag.gastZugang) throw new Error("Für diesen Eintrag gibt es keinen Status-Link.");
+    eintrag.gastZugang.widerrufenAm ||= uhrHook.jetzt().toISOString();
+    eintrag.gastZugang.hash = "";
+    return eintrag;
+  });
+}
+
+/** Name und Rückfragenummer des Hauses für Statusseite und Gast-E-Mails. */
+export function setzeGastKontakt(slug, { anzeigeName, telefon } = {}) {
+  const name = String(anzeigeName ?? "").trim().slice(0, 120);
+  const nummer = String(telefon ?? "").trim().slice(0, 40);
+  if (nummer && !/^[+\d][\d\s/()-]{3,}$/.test(nummer)) throw new Error("Bitte eine gültige Telefonnummer angeben.");
+  return aendere(slug, (daten) => {
+    daten.anzeigeName = name;
+    daten.telefon = nummer;
+    return { anzeigeName: name, telefon: nummer };
+  });
+}
+
+export function betriebsKontakt(slug, daten = ladeBetrieb(slug)) {
+  return { name: daten.anzeigeName || slug, telefon: daten.telefon || "" };
+}
+
+/**
+ * Der Wirt verschiebt eine Reservierung auf einen anderen Termin – der
+ * einzige vorgesehene Weg, Datum/Uhrzeit nachträglich zu ändern. Der
+ * ursprünglich angefragte Termin bleibt nachvollziehbar gespeichert, die
+ * Reservierung gilt mit dem neuen Termin als bestätigt. Kapazität und
+ * Tischverteilung werden wie bei einer Eingabe des Wirts geprüft.
+ */
+export function verschiebeReservierung(slug, id, { datum, uhrzeit, grund } = {}) {
+  return aendere(slug, (daten) => {
+    const r = eintragFinden(daten, "reservierung", id);
+    if (r.status === "abgesagt") throw new Error("Eine abgesagte Reservierung kann nicht verschoben werden.");
+    if (r.datum === datum && r.uhrzeit === uhrzeit) throw new Error("Das ist bereits der aktuelle Termin.");
+    const { warnung } = pruefeReservierung(daten, { ...r, datum, uhrzeit }, { ignoriereId: id, quelle: "manuell" });
+    r.urspruenglich ??= { datum: r.datum, uhrzeit: r.uhrzeit };
+    r.datum = datum;
+    r.uhrzeit = uhrzeit;
+    r.status = "bestaetigt";
+    // Der zugewiesene Tisch galt für den alten Termin.
+    r.tischId = null;
+    r.aenderungsGrund = String(grund ?? "").trim().slice(0, 200);
+    r.geaendertAm = uhrHook.jetzt().toISOString();
+    return { ...r, warnung };
+  });
+}
+
+// Ältere Meldungen fallen irgendwann heraus – das Protokoll soll den
+// Versandstand zeigen, kein Archiv personenbezogener Vorgänge werden.
+const MELDUNGEN_MAX = 500;
+
+/**
+ * Vergleicht den gespeicherten mit dem neuen Stand und hängt für jede
+ * gast-relevante Änderung eine Meldung an (siehe ereignisAusAenderung).
+ * Die Meldung trägt nur, was für Versand und Statusanzeige nötig ist – die
+ * E-Mail-Adresse bleibt am Eintrag und wird nicht kopiert.
+ */
+function vermerkeGastMeldungen(vorherDaten, daten) {
+  if (!daten || typeof daten !== "object") return;
+  const zeitzone = daten.zeitzone || ZEITZONE_STANDARD;
+  const jetzt = uhrHook.jetzt().toISOString();
+  for (const [art, schluessel] of [["reservierung", "reservierungen"], ["bestellung", "bestellungen"]]) {
+    const vorher = new Map((vorherDaten?.[schluessel] ?? []).map((e) => [e.id, e]));
+    for (const eintrag of daten[schluessel] ?? []) {
+      const ereignis = ereignisAusAenderung(art, vorher.get(eintrag.id), eintrag, { zeitzone });
+      if (!ereignis) continue;
+      daten.gastMeldungen ??= [];
+      daten.gastMeldungen.push({
+        id: randomUUID(),
+        art,
+        bezugId: eintrag.id,
+        referenz: referenzVon(art, eintrag),
+        typ: ereignis.typ,
+        zeitGeaendert: Boolean(ereignis.zeitGeaendert),
+        vorherUhrzeit: ereignis.vorherUhrzeit ?? "",
+        sicht: ereignis.sicht,
+        erstellt: jetzt,
+        versand: {
+          kanal: "",
+          // Ob wirklich ein Kanal greift (E-Mail eingerichtet? SMS-Anbieter?),
+          // entscheidet erst die Zustellung – ohne jede Kontaktangabe nie.
+          zustand: daten.demoBetrieb ? "demo" : eintrag.email || eintrag.telefon ? "ausstehend" : "keine-adresse",
+          versuche: 0,
+          letzterVersuch: "",
+          fehler: "",
+          anbieterId: "",
+        },
+      });
+    }
+  }
+  if (daten.gastMeldungen?.length > MELDUNGEN_MAX) daten.gastMeldungen = daten.gastMeldungen.slice(-MELDUNGEN_MAX);
+}
+
+/** Ändert den Versandstand einer Meldung (für kundenBenachrichtigung.js). */
+export function aendereGastMeldung(slug, meldungId, fn) {
+  return aendere(slug, (daten) => {
+    const meldung = (daten.gastMeldungen ?? []).find((m) => m.id === meldungId);
+    if (!meldung) throw new Error("Meldung nicht gefunden.");
+    const bezug = (meldung.art === "reservierung" ? daten.reservierungen : daten.bestellungen).find((e) => e.id === meldung.bezugId);
+    return fn(meldung, bezug, daten);
+  });
+}
+
+/** Schaltet den Demo-Modus eines Betriebs (keine Status-Links, keine Gastmails). */
+export function setzeDemoBetrieb(slug, aktiv) {
+  return aendere(slug, (daten) => {
+    daten.demoBetrieb = Boolean(aktiv);
+    return daten.demoBetrieb;
+  });
+}
+
+/* ---------- Rechtstexte des Restaurants ---------- */
+
+function dokumentFinden(daten, id) {
+  const dok = (daten.rechtsdokumente ?? []).find((d) => d.id === id);
+  if (!dok) throw new Error("Dokument nicht gefunden.");
+  return dok;
+}
+
+/** Legt einen Entwurf aus der Vorlage an (mit Platzhaltern, als Entwurf markiert). */
+export function legeRechtsdokumentEntwurfAn(slug, art, { parameter } = {}) {
+  if (!istArt(art)) throw new Error(`Unbekannte Dokumentart "${art}".`);
+  return aendere(slug, (daten) => {
+    daten.rechtsdokumente ??= [];
+    const vorlage = entwurfAusVorlage(art, { name: daten.anzeigeName, parameter });
+    const dok = {
+      id: randomUUID(),
+      betrieb: slug,
+      ...vorlage,
+      version: "",
+      versionNr: null,
+      status: "entwurf",
+      erstellt: uhrHook.jetzt().toISOString(),
+      geaendert: uhrHook.jetzt().toISOString(),
+    };
+    daten.rechtsdokumente.push(dok);
+    return dok;
+  });
+}
+
+/** Ändert einen Entwurf. Freigegebene Fassungen sind unveränderlich. */
+export function bearbeiteRechtsdokument(slug, id, { inhalt, zustimmungstext, parameter } = {}) {
+  return aendere(slug, (daten) => {
+    const dok = dokumentFinden(daten, id);
+    if (dok.status !== "entwurf") throw new Error("Freigegebene Fassungen lassen sich nicht ändern – bitte eine neue Fassung anlegen.");
+    if (inhalt !== undefined) dok.inhalt = String(inhalt).slice(0, 60_000);
+    if (zustimmungstext !== undefined) dok.zustimmungstext = String(zustimmungstext).slice(0, 1_000);
+    if (parameter !== undefined && dok.art.startsWith("noshow-")) dok.parameter = pruefeNoShowParameter(dok.art, parameter);
+    dok.geaendert = uhrHook.jetzt().toISOString();
+    return dok;
+  });
+}
+
+/** Legt eine neue Entwurfsfassung als Kopie einer bestehenden an. */
+export function kopiereRechtsdokument(slug, id) {
+  return aendere(slug, (daten) => {
+    const quelle = dokumentFinden(daten, id);
+    const dok = {
+      id: randomUUID(),
+      betrieb: slug,
+      art: quelle.art,
+      titel: quelle.titel,
+      inhalt: quelle.inhalt,
+      zustimmungstext: quelle.zustimmungstext,
+      parameter: quelle.parameter ? { ...quelle.parameter } : null,
+      version: "",
+      versionNr: null,
+      status: "entwurf",
+      erstelltAus: quelle.version || quelle.id,
+      erstellt: uhrHook.jetzt().toISOString(),
+      geaendert: uhrHook.jetzt().toISOString(),
+    };
+    daten.rechtsdokumente.push(dok);
+    return dok;
+  });
+}
+
+/**
+ * Gibt einen Entwurf frei: vergibt die nächste Version, hält fest, wer
+ * freigibt, den Prüfvermerk, den Zeitpunkt und ab wann die Fassung gilt,
+ * und friert den Inhalt (SHA-256) ein. Das ist eine Freigabe durch den
+ * Betrieb – keine Aussage über die rechtliche Wirksamkeit.
+ */
+export function gibRechtsdokumentFrei(slug, id, { freigegebenVon, pruefvermerk, gueltigAb, geprueftBestaetigt } = {}) {
+  return aendere(slug, (daten) => {
+    const dok = dokumentFinden(daten, id);
+    const hindernisse = freigabeHindernisse(dok, { freigegebenVon, pruefvermerk, geprueftBestaetigt });
+    if (hindernisse.length) throw new Error(`Freigabe nicht möglich: ${hindernisse.join(" ")}`);
+    const jetzt = uhrHook.jetzt();
+    const ab = gueltigAb ? new Date(gueltigAb) : jetzt;
+    if (Number.isNaN(ab.getTime())) throw new Error("Ungültiges Datum für „gültig ab“.");
+    const nr = 1 + Math.max(0, ...daten.rechtsdokumente.filter((d) => d.art === dok.art && d.versionNr).map((d) => d.versionNr));
+    dok.versionNr = nr;
+    dok.version = `v${nr}`;
+    dok.status = "freigegeben";
+    dok.freigegebenVon = String(freigegebenVon).trim().slice(0, 120);
+    dok.pruefvermerk = String(pruefvermerk).trim().slice(0, 500);
+    dok.freigegebenAm = jetzt.toISOString();
+    dok.gueltigAb = (ab < jetzt ? jetzt : ab).toISOString();
+    dok.inhaltHash = inhaltHash(dok);
+    return dok;
+  });
+}
+
+/**
+ * Zieht eine Fassung zurück (gilt ab sofort nicht mehr). Sie bleibt
+ * gespeichert und abrufbar – bestehende Nachweise verweisen weiter auf sie.
+ */
+export function zieheRechtsdokumentZurueck(slug, id) {
+  return aendere(slug, (daten) => {
+    const dok = dokumentFinden(daten, id);
+    if (dok.status !== "freigegeben") throw new Error("Nur freigegebene Fassungen können zurückgezogen werden.");
+    dok.status = "zurueckgezogen";
+    dok.zurueckgezogenAm = uhrHook.jetzt().toISOString();
+    // Ohne gültige Regel wirkt der Schalter nicht mehr – sichtbar aus.
+    if (dok.art === "noshow-bestellung" && !gueltigeFassung(daten.rechtsdokumente, "noshow-bestellung", uhrHook.jetzt())) daten.noShowSchutzAktiv = false;
+    if (dok.art === "noshow-reservierung" && !gueltigeFassung(daten.rechtsdokumente, "noshow-reservierung", uhrHook.jetzt())) daten.reservierungNoShowAktiv = false;
+    return dok;
+  });
+}
+
+/** Löscht einen Entwurf. Freigegebene oder zurückgezogene Fassungen nie. */
+export function loescheRechtsdokumentEntwurf(slug, id) {
+  return aendere(slug, (daten) => {
+    const dok = dokumentFinden(daten, id);
+    if (dok.status !== "entwurf") throw new Error("Nur Entwürfe können gelöscht werden – Fassungen bleiben als Nachweis erhalten.");
+    daten.rechtsdokumente = daten.rechtsdokumente.filter((d) => d.id !== id);
+    return true;
+  });
+}
+
+/** Eine bestimmte freigegebene (oder zurückgezogene) Fassung – für Anzeige und Nachweis. */
+export function rechtsdokumentFassung(daten, art, version) {
+  return (daten.rechtsdokumente ?? []).find((d) => d.art === art && d.version === version && d.status !== "entwurf") ?? null;
+}
+
+export const RECHTSDOKUMENT_ARTEN = Object.keys(DOKUMENT_ARTEN);
+
+const LAUNCH_VERMERKE = ["allergene", "avv"];
+
+/** Vermerk für einen Punkt der Launch-Prüfliste, der sich nicht automatisch prüfen lässt. */
+export function setzeLaunchVermerk(slug, punkt, { vermerk, von } = {}) {
+  if (!LAUNCH_VERMERKE.includes(punkt)) throw new Error("Unbekannter Prüfpunkt.");
+  return aendere(slug, (daten) => {
+    daten.launchVermerke ??= {};
+    const text = String(vermerk ?? "").trim();
+    if (!text) delete daten.launchVermerke[punkt];
+    else daten.launchVermerke[punkt] = { vermerk: text.slice(0, 500), von: String(von ?? "").trim().slice(0, 120), am: uhrHook.jetzt().toISOString() };
+    return daten.launchVermerke;
+  });
+}
+
+/**
+ * Messquelle für Website-Aufrufe (seitenaufrufe.js). Bewusst kein Schalter
+ * im Dashboard: Einschalten ist erst sinnvoll, wenn der Host der Kundenseite
+ * tatsächlich zählt – sonst stünde dort eine falsche 0.
+ */
+export function setzeSeitenaufrufMessung(slug, quelle) {
+  if (!SEITENAUFRUF_QUELLEN.includes(quelle)) throw new Error(`Unbekannte Messquelle "${quelle}".`);
+  return aendere(slug, (daten) => {
+    daten.seitenaufrufMessung = quelle === "keine" ? null : { quelle, aktivSeit: daten.seitenaufrufMessung?.aktivSeit ?? uhrHook.jetzt().toISOString() };
+    return daten.seitenaufrufMessung;
   });
 }

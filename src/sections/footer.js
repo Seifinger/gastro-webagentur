@@ -15,7 +15,7 @@ import { kuechenMarke } from "../signaturIcons.js";
  * @param {string} [ctx.cuisine]
  * @param {string|null} [ctx.handschrift] - preset.layout.handschrift.
  */
-export function renderFooter({ name, adresse, telefon, cuisine, handschrift }) {
+export function renderFooter({ name, adresse, telefon, cuisine, handschrift, rechtsLinks = null }) {
   const marke = handschrift ? kuechenMarke(cuisine) : "";
   const telHref = String(telefon ?? "").replace(/[^\d+]/g, "");
   return `<footer>
@@ -27,7 +27,9 @@ export function renderFooter({ name, adresse, telefon, cuisine, handschrift }) {
     <nav class="footer-col footer-nav" aria-label="Seitennavigation">
       <a href="#karte">Speisekarte</a>
       <a href="#reservierung">Reservierung</a>
-      <a href="#kontakt">Kontakt</a>
+      <a href="#kontakt">Kontakt</a>${rechtsLinks ? `
+      <a href="${escapeHtml(rechtsLinks.impressum)}" target="_blank" rel="noopener">Impressum</a>
+      <a href="${escapeHtml(rechtsLinks.datenschutz)}" target="_blank" rel="noopener">Datenschutz</a>` : ""}
     </nav>
     <div class="footer-col footer-kontakt">
       ${telefon ? `<a href="tel:${escapeHtml(telHref)}">${escapeHtml(telefon)}</a>` : ""}

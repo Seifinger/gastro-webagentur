@@ -21,7 +21,8 @@ import { renderHighlights } from "./sections/highlights.js";
 import { renderMenu } from "./sections/menu.js";
 import { renderAmbiente, renderContact, renderKontaktZeilen, renderOeffnungszeiten, FOTO_SLOTS } from "./sections/contact.js";
 import { renderStimmen } from "./sections/testimonials.js";
-import { renderReservation } from "./sections/reservation.js";
+import { renderReservation, STATUS_LINK_HINWEIS, EMAIL_ZWECK } from "./sections/reservation.js";
+import { rechtlichesHtml, rechtsLinks, RECHTLICHES_CSS, ZAHLUNGSPFLICHTIG_BESTELLEN, PROBEBESTELLUNG_ABSENDEN } from "./sections/rechtliches.js";
 import { abholzeitSkript, abholzeitAttribute, STANDARD_OEFFNUNGSZEITEN } from "./abholzeiten.js";
 import { renderFooter } from "./sections/footer.js";
 
@@ -590,7 +591,6 @@ const PAGE_SCRIPT = `
 (function () {
   var data = window.PAGE_DATA;
   var cart = {};
-  var noShowEinstellungen = null;
   // Warenkorb \u00FCber mehrere Seiten (Startseite \u2194 Speisekarte): nur, wenn
   // die Seite ihre Karte mitliefert (PAGE_DATA.warenkorb). Name und Preis
   // kommen dann immer aus dieser Karte, nie aus einem alten Speicherstand.
@@ -759,7 +759,48 @@ const PAGE_SCRIPT = `
     if (!byId("confirm").classList.contains("open")) byId("overlay").classList.remove("open");
   }
 
-  function showConfirm(title, text, rows, mailto, fehler) {
+  /**
+   * Der pers\u00F6nliche Status-Link: nur, wenn der Betriebsserver einen
+   * Zugriffsschl\u00FCssel zur\u00FCckgegeben hat (nie in der Vorschau). Der
+   * Schl\u00FCssel steht im Fragment (#) und geht so an keinen Server-Log.
+   */
+  function statusUrl(teil) {
+    return data.apiUrl && teil && teil.statusToken ? data.apiUrl + "/status#" + teil.statusToken : "";
+  }
+
+  function zeigeStatusLink(url) {
+    var link = byId("confirm-status");
+    if (!link && url) {
+      link = document.createElement("a");
+      link.id = "confirm-status";
+      link.className = "btn btn-ghost btn-block";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Status sp\u00E4ter erneut ansehen";
+      link.style.marginTop = "10px";
+      byId("confirm-mail").parentNode.insertBefore(link, byId("confirm-mail"));
+    }
+    if (!link) return;
+    link.href = url || "#";
+    link.style.display = url ? "inline-flex" : "none";
+  }
+
+  /** Was nach dem Absenden \u00FCber E-Mail und Status-Link gesagt wird \u2013 ehrlich. */
+  function kanalSatz(email, teil) {
+    if (email && teil.emailVersand === "aktiv") {
+      return " Best\u00E4tigung und \u00C4nderungen schicken wir an " + email + ".";
+    }
+    if (email && teil.emailVersand === "fehlgeschlagen") {
+      return " Die E-Mail an " + email + " konnte gerade nicht verschickt werden \u2013 den aktuellen Stand sehen Sie \u00FCber Ihren Status-Link.";
+    }
+    if (email) {
+      return " Der E-Mail-Versand ist bei diesem Restaurant noch nicht eingerichtet \u2013 den aktuellen Stand sehen Sie \u00FCber Ihren Status-Link.";
+    }
+    return " Ohne E-Mail-Adresse sehen Sie \u00C4nderungen nur, wenn Sie Ihren Status-Link erneut \u00F6ffnen. Bei R\u00FCckfragen rufen wir Sie an.";
+  }
+
+  function showConfirm(title, text, rows, mailto, fehler, status) {
+    zeigeStatusLink(fehler ? "" : status);
     byId("confirm-title").textContent = title;
     byId("confirm-text").textContent = text;
     byId("confirm").className = fehler ? "confirm-box hat-fehler" : "confirm-box";
@@ -872,35 +913,69 @@ const PAGE_SCRIPT = `
   }
 
   /**
-   * Holt beim Laden der Seite die aktuellen No-Show-Einstellungen des
-   * Betriebs (falls das Lokal die Funktion eingeschaltet hat) und zeigt bei
-   * Bedarf die Zustimmungs-Checkbox mit dem exakten, serverseitig
-   * mitgeführten Text an. Ohne apiUrl (Vorschau) oder ohne aktivierten
-   * Schutz bleibt das Formular unverändert wie zuvor.
+   * Rechtstexte des Restaurants (nur mit Betriebsserver). Der Server nennt
+   * die aktuell g\\u00FCltigen, freigegebenen Fassungen: Bedingungen und
+   * No-Show-Regel bekommen je ein eigenes, nicht vorangekreuztes Feld mit
+   * Link zum Volltext. Ohne freigegebene Fassung bleibt das Feld weg \\u2013
+   * und der Server verlangt dann auch nichts. Mitgeschickt wird nur die
+   * Version, die der Gast gesehen hat; passt sie nicht mehr, lehnt der
+   * Server ab und die Felder werden neu geladen.
    */
-  function ladeNoShowEinstellungen() {
-    if (!data.apiUrl) return;
+  function zeigeBestaetigung(feldId, textId, dok, linkText) {
+    var feld = byId(feldId);
+    if (!feld) return;
+    var box = feld.querySelector("input[type=checkbox]");
+    if (!dok) {
+      feld.hidden = true;
+      feld.style.display = "none";
+      feld.removeAttribute("data-version");
+      if (box) box.checked = false;
+      return;
+    }
+    var text = byId(textId);
+    text.textContent = dok.zustimmungstext + " ";
+    var link = document.createElement("a");
+    link.href = data.apiUrl + dok.pfad;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = "(" + linkText + ", Fassung " + dok.version + ")";
+    text.appendChild(link);
+    // Eine neue Fassung muss neu best\\u00E4tigt werden.
+    if (box && feld.getAttribute("data-version") !== dok.version) box.checked = false;
+    feld.setAttribute("data-version", dok.version);
+    feld.hidden = false;
+    feld.style.display = "block";
+  }
 
-    fetch(data.apiUrl + "/oeffentlich/no-show-einstellungen", {
+  function ladeRechtslage() {
+    if (!data.apiUrl) return;
+    fetch(data.apiUrl + "/oeffentlich/rechtstexte", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: "{}"
     })
       .then(function (antwort) { return antwort.json(); })
-      .then(function (ergebnis) {
-        if (!ergebnis || !ergebnis.aktiv) return;
-        noShowEinstellungen = ergebnis;
-
-        var betrag = Number(ergebnis.gebuehrBetrag || 0).toFixed(2).replace(".", ",");
-        byId("ord-noshow-text").textContent =
-          "Ich stimme zu: Bei Nichtabholung ohne Stornierung bis " + ergebnis.stornofensterMinuten +
-          " Minuten vor der Abholzeit wird eine Ausfallpauschale von " + betrag + " \\u20AC in Rechnung gestellt.";
-        byId("ord-noshow-feld").style.display = "block";
+      .then(function (lage) {
+        if (!lage || !lage.ok) return;
+        zeigeBestaetigung("ord-bedingungen-feld", "ord-bedingungen-text", lage.bestellung.bedingungen, "Bestellbedingungen lesen");
+        zeigeBestaetigung("ord-noshow-feld", "ord-noshow-text", lage.bestellung.noShow, "No-Show-Regel lesen");
+        zeigeBestaetigung("res-bedingungen-feld", "res-bedingungen-text", lage.reservierung.bedingungen, "Reservierungsbedingungen lesen");
+        zeigeBestaetigung("res-noshow-feld", "res-noshow-text", lage.reservierung.noShow, "No-Show-Regel lesen");
       })
       .catch(function () {
-        // Ohne Antwort bleibt die Checkbox einfach aus - keine Bestellung
-        // darf an einem nicht erreichbaren Einstellungs-Abruf scheitern.
+        // Ohne Antwort bleiben die Felder aus. Verlangt der Server eine
+        // Best\\u00E4tigung, lehnt er ab \\u2013 dann wird hier neu geladen.
       });
+  }
+
+  /** Gibt die best\\u00E4tigte Version zur\\u00FCck ("" = nicht n\\u00F6tig) oder null, wenn ein Pflichtfeld fehlt. */
+  function bestaetigteVersion(feldId) {
+    var feld = byId(feldId);
+    if (!feld || !feld.getAttribute("data-version")) return "";
+    var box = feld.querySelector("input[type=checkbox]");
+    var ok = Boolean(box && box.checked);
+    feld.classList.toggle("invalid", !ok);
+    return ok ? feld.getAttribute("data-version") : null;
   }
 
   /*
@@ -1063,7 +1138,7 @@ const PAGE_SCRIPT = `
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    ladeNoShowEinstellungen();
+    ladeRechtslage();
     Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function (button) {
       button.addEventListener("click", function () {
         addToCart(button.getAttribute("data-add"), button.getAttribute("data-name"), Number(button.getAttribute("data-preis")));
@@ -1117,13 +1192,11 @@ const PAGE_SCRIPT = `
       aktualisiereAbholzeiten();
       if (!validate(form, ["name", "telefon", "abholzeit"])) return;
 
-      var noShowFeld = byId("ord-noshow-feld");
-      var noShowAktiv = noShowEinstellungen && noShowEinstellungen.aktiv;
-      if (noShowAktiv) {
-        var angehakt = byId("ord-noshow").checked;
-        noShowFeld.className = angehakt ? "field" : "field invalid";
-        if (!angehakt) return;
-      }
+      // Bedingungen und No-Show-Regel: getrennt, beide nur, wenn der Betrieb
+      // sie freigegeben hat.
+      var bedingungenVersion = bestaetigteVersion("ord-bedingungen-feld");
+      var noShowVersion = bestaetigteVersion("ord-noshow-feld");
+      if (bedingungenVersion === null || noShowVersion === null) return;
 
       var nummer = referenz("AB");
       var abholWahl = form.elements.abholzeit.options[form.elements.abholzeit.selectedIndex];
@@ -1148,6 +1221,8 @@ const PAGE_SCRIPT = `
       });
       var summe = euro(total());
       var stueck = String(anzahl());
+      // \u00C4ltere Seiten haben im Bestellformular kein E-Mail-Feld.
+      var bestellEmail = form.elements.email ? String(form.elements.email.value).trim() : "";
 
       sende("/oeffentlich/bestellung", {
         positionen: positionen,
@@ -1156,29 +1231,38 @@ const PAGE_SCRIPT = `
         abholZeitpunkt: abholArt ? form.elements.abholzeit.value : "",
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
+        email: bestellEmail,
         hinweis: form.elements.hinweis.value,
-        noShowZustimmung: noShowAktiv ? true : false
+        bestaetigungen: { bedingungen: bedingungenVersion, noShow: noShowVersion },
+        noShowZustimmung: noShowVersion ? true : false
       }, byId("order-submit")).then(function (ergebnis) {
         // Die Abholzeit ist zun\\u00E4chst nur ein Wunsch: ob sie machbar ist,
         // best\\u00E4tigt die K\\u00FCche.
         var echteNummer = ergebnis.demo ? nummer : ergebnis.bestellung.nummer;
         // Ohne Betriebsserver (Beispielseite, Entwurf) ist nichts passiert \\u2013
         // die Best\\u00E4tigung sagt das ehrlich, statt Erfolg vorzut\\u00E4uschen.
+        var teil = ergebnis.demo ? {} : ergebnis.bestellung;
         var text = ergebnis.demo
           ? "Das ist eine Vorschau: Ihre Bestellung wurde nicht verschickt und wird nicht zubereitet. Auf der fertigen Website landet sie direkt in der K\\u00FCche des Restaurants." + telefonSatz("Zum Bestellen")
-          : "Ihre Bestellung liegt in der K\\u00FCche. Die Abholzeit best\\u00E4tigen wir Ihnen gleich \\u2013 falls es knapp wird, melden wir uns telefonisch.";
+          : "Anfrage eingegangen \\u2013 wartet noch auf Best\\u00E4tigung durch das Restaurant. Die Abholzeit gilt erst, wenn das Restaurant sie best\\u00E4tigt." + kanalSatz(bestellEmail, teil);
         var zeilen = [
           [ergebnis.demo ? "Abholung" : "Abholung (gew\\u00FCnscht)", zeit],
           ["Positionen", stueck],
           ["Gesamt", summe],
         ];
-        if (!ergebnis.demo) zeilen.unshift(["Bestellnummer", echteNummer]);
+        if (!ergebnis.demo) {
+          zeilen.unshift(["Status", teil.statusText || "Eingegangen \\u2013 noch nicht best\\u00E4tigt"]);
+          zeilen.unshift(["Bestellnummer", echteNummer]);
+          if (teil.rueckfrageTelefon || data.telefon) zeilen.push(["R\\u00FCckfragen", teil.rueckfrageTelefon || data.telefon]);
+        }
 
         showConfirm(
           ergebnis.demo ? "Vorschau \\u2013 nichts bestellt" : "Bestellung eingegangen",
           text,
           zeilen,
-          mailtoLink("Abholbestellung " + echteNummer + " \\u2013 " + data.name, body)
+          mailtoLink("Abholbestellung " + echteNummer + " \\u2013 " + data.name, body),
+          false,
+          statusUrl(teil)
         );
 
         cart = {};
@@ -1190,6 +1274,7 @@ const PAGE_SCRIPT = `
         abhol.geladenUm = 0;
         ladeAbholKonfig();
         aktualisiereAbholzeiten();
+        ladeRechtslage();
         zeigeFehler(fehler.message);
       });
     });
@@ -1198,6 +1283,9 @@ const PAGE_SCRIPT = `
       event.preventDefault();
       var form = event.target;
       if (!validate(form, ["datum", "uhrzeit", "personen", "name", "telefon"])) return;
+      var resBedingungen = bestaetigteVersion("res-bedingungen-feld");
+      var resNoShow = bestaetigteVersion("res-noshow-feld");
+      if (resBedingungen === null || resNoShow === null) return;
 
       var nummer = referenz("RES");
       var datum = form.elements.datum.value.split("-").reverse().join(".");
@@ -1212,6 +1300,7 @@ const PAGE_SCRIPT = `
 
       var uhrzeit = form.elements.uhrzeit.value;
       var personenText = form.elements.personen.value;
+      var resEmail = String(form.elements.email.value).trim();
       // "4 Personen" -> 4, damit das Lokal eine Zahl bekommt.
       var personenZahl = parseInt(personenText, 10) || 1;
 
@@ -1221,27 +1310,38 @@ const PAGE_SCRIPT = `
         personen: personenZahl,
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
-        email: form.elements.email.value,
-        wunsch: form.elements.wunsch.value
+        email: resEmail,
+        wunsch: form.elements.wunsch.value,
+        bestaetigungen: { bedingungen: resBedingungen, noShow: resNoShow }
       }, form.querySelector("button[type=submit]")).then(function (ergebnis) {
+        var teil = ergebnis.demo ? {} : ergebnis.reservierung;
+        // Die Referenz vergibt der Server \\u2013 dieselbe steht in E-Mail und Statusseite.
+        var echteNummer = teil.nummer || nummer;
         var zeilen = [
           ["Datum", datum],
           ["Uhrzeit", uhrzeit],
           ["Personen", personenText],
         ];
-        if (!ergebnis.demo) zeilen.unshift(["Reservierungsnr.", nummer]);
+        if (!ergebnis.demo) {
+          zeilen.unshift(["Status", teil.statusText || "Anfrage eingegangen \\u2013 noch nicht best\\u00E4tigt"]);
+          zeilen.unshift(["Reservierungsnr.", echteNummer]);
+          if (teil.rueckfrageTelefon || data.telefon) zeilen.push(["R\\u00FCckfragen", teil.rueckfrageTelefon || data.telefon]);
+        }
         showConfirm(
           ergebnis.demo ? "Vorschau \\u2013 nichts gesendet" : "Anfrage eingegangen",
           ergebnis.demo
             ? "Das ist eine Vorschau: Ihre Anfrage wurde nicht verschickt, es ist kein Tisch reserviert. Auf der fertigen Website geht sie direkt an das Restaurant." + telefonSatz("Zum Reservieren")
-            : "Vielen Dank! Wir haben Ihren Tisch vorgemerkt und best\\u00E4tigen Ihnen die Reservierung in K\\u00FCrze.",
+            : "Anfrage eingegangen \\u2013 wartet noch auf Best\\u00E4tigung durch das Restaurant. Ihr Tisch ist erst reserviert, wenn das Restaurant best\\u00E4tigt." + kanalSatz(resEmail, teil),
           zeilen,
-          mailtoLink("Tischreservierung " + nummer + " \\u2013 " + data.name, body)
+          mailtoLink("Tischreservierung " + echteNummer + " \\u2013 " + data.name, body),
+          false,
+          statusUrl(teil)
         );
 
         form.reset();
         dateInput.value = iso;
       }).catch(function (fehler) {
+        ladeRechtslage();
         zeigeFehler(fehler.message);
       });
     });
@@ -1486,7 +1586,7 @@ ${fontCss}
 }${accentBoldBlock}
 ${PAGE_STYLES}
 ${signaturStil}
-${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}${handschriftStil}
+${MOTION_CSS}${typografieCss}${asymmetrisch ? EDITORIAL_CSS : ""}${brauchtExtraBewegung ? MOTION_EXTRA_CSS : ""}${handschriftStil}${apiUrl ? RECHTLICHES_CSS : ""}
 </style>
 </head>
 <body${bodyKlassen ? ` class="${bodyKlassen}"` : ""}>
@@ -1546,7 +1646,7 @@ ${(() => {
 
     stimmen: renderStimmen(gestaltung.cuisine, lead, fiktiv, preset.social.layout, handschrift),
 
-    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant, handschrift }),
+    reservierung: renderReservation({ widgetVariant: preset.reservation.widgetVariant, handschrift, statusHinweis: apiUrl ? STATUS_LINK_HINWEIS : "", rechtliches: rechtlichesHtml("reservierung", apiUrl) }),
 
     kontakt: renderContact({ kontaktZeilen, hoursRows, strasse: strasseAusAdresse(adresse), ort, handschrift }),
   };
@@ -1597,10 +1697,17 @@ ${
           <span class="error">Bitte geben Sie eine Telefonnummer an.</span>
         </div>
         <div class="field">
+          <label for="ord-email">E-Mail-Adresse für Bestätigung und Änderungen <span class="hint">(optional)</span></label>
+          <input type="email" id="ord-email" name="email" autocomplete="email" inputmode="email" maxlength="254">
+          <span class="hint">${EMAIL_ZWECK}</span>
+          <span class="error">Bitte prüfen Sie die E-Mail-Adresse.</span>
+        </div>
+        <div class="field">
           <label for="ord-hinweis">Hinweis <span class="hint">(optional)</span></label>
           <textarea id="ord-hinweis" name="hinweis" placeholder="Allergien, Sonderwünsche ..."></textarea>
         </div>
       </div>
+      ${rechtlichesHtml("bestellung", apiUrl)}
       <div class="field" id="ord-noshow-feld" style="display:none;margin-top:14px">
         <label style="display:flex;align-items:flex-start;gap:8px;font-weight:400;text-transform:none;letter-spacing:normal">
           <input type="checkbox" id="ord-noshow" name="noShowZustimmung" style="margin-top:3px">
@@ -1610,8 +1717,13 @@ ${
       </div>
       <div class="drawer-foot" style="margin:24px -22px -22px">
         <div class="totals"><span>Gesamt</span><span id="cart-total">0,00 €</span></div>
-        <button class="btn btn-primary btn-block" id="order-submit" type="submit">Abholung verbindlich bestellen</button>
-        <p class="hint" style="margin-top:10px;text-align:center">Bezahlung bei Abholung, bar oder mit Karte.</p>
+        <button class="btn btn-primary btn-block" id="order-submit" type="submit">${apiUrl ? ZAHLUNGSPFLICHTIG_BESTELLEN : PROBEBESTELLUNG_ABSENDEN}</button>
+        <p class="hint" style="margin-top:10px;text-align:center">Bezahlung bei Abholung, bar oder mit Karte.</p>${
+          apiUrl
+            ? `
+        <p class="hint" style="margin-top:6px;text-align:center">${escapeHtml(STATUS_LINK_HINWEIS)}</p>`
+            : ""
+        }
       </div>
     </form>
   </div>
@@ -1634,7 +1746,7 @@ ${
   }
 </div>
 
-${renderFooter({ name, adresse, telefon, cuisine: gestaltung.cuisine, handschrift })}
+${renderFooter({ name, adresse, telefon, cuisine: gestaltung.cuisine, handschrift, rechtsLinks: rechtsLinks(apiUrl) })}
 
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${abholzeitSkript()}</script>

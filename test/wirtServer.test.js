@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 const SLUG = "__test-wirt-server";
 process.env.BETRIEB = SLUG;
 const { handler } = await import("../src/wirtServer.js");
+const { gibNoShowRegelFrei } = await import("./hilfen/rechtstexte.js");
 const { ladeBetrieb, speichereBetrieb, legeTischAn, uhrHook } = await import("../src/betriebStore.js");
 
 // Feste Uhr (Donnerstag, 24.09.2026, 17:00 Berlin): "18:30" ist dann eine
@@ -434,15 +435,17 @@ test("POST /intern/bestellung/:id/verzoegerung setzt die neue Abholzeit und meld
   });
 });
 
-test("POST /intern/bestellung/:id/verzoegerung fällt ohne SMS-Hook auf E-Mail zurück", async () => {
+test("POST /intern/bestellung/:id/verzoegerung schickt genau eine E-Mail, wenn Adresse und Versand vorhanden sind", async () => {
   await mitServer(async (basis) => {
     const { id } = await bestellungAnlegen(basis);
 
     const emailAufrufe = [];
     const altSms = smsHook.aktuell;
     const altEmail = emailHook.aktuell;
+    const altUrl = process.env.WIRT_OEFFENTLICHE_URL;
     smsHook.aktuell = null;
     emailHook.aktuell = async (empfaenger, betreff, text) => emailAufrufe.push({ empfaenger, betreff, text });
+    process.env.WIRT_OEFFENTLICHE_URL = "https://wirt.beispiel.de";
 
     try {
       const antwort = await fetch(`${basis}/intern/bestellung/${id}/verzoegerung`, {
@@ -455,9 +458,15 @@ test("POST /intern/bestellung/:id/verzoegerung fällt ohne SMS-Hook auf E-Mail z
       assert.equal(ergebnis.kanal, "email");
       assert.equal(emailAufrufe.length, 1);
       assert.equal(emailAufrufe[0].empfaenger, "gast@beispiel.de");
+      assert.match(emailAufrufe[0].text, /19:15/);
+      assert.match(emailAufrufe[0].text, /https:\/\/wirt\.beispiel\.de\/status#/);
+      assert.equal(ergebnis.gast.letzteMeldung.zustand, "uebergeben");
+      assert.equal(ergebnis.gast.anrufNoetig, false);
     } finally {
       smsHook.aktuell = altSms;
       emailHook.aktuell = altEmail;
+      if (altUrl === undefined) delete process.env.WIRT_OEFFENTLICHE_URL;
+      else process.env.WIRT_OEFFENTLICHE_URL = altUrl;
     }
   });
 });
@@ -481,6 +490,10 @@ test("POST /intern/bestellung/:id/verzoegerung meldet 'keiner' ohne jeden konfig
 
       assert.equal(antwort.status, 200);
       assert.equal(ergebnis.kanal, "keiner");
+      // Die neue Zeit ist trotzdem gespeichert – und der Wirt muss anrufen.
+      assert.equal(ergebnis.bestellung.bestaetigteAbholzeit, "19:15");
+      assert.equal(ergebnis.gast.anrufNoetig, true);
+      assert.match(ergebnis.gast.anrufText, /bitte unter 0170 1234567 anrufen/);
     } finally {
       smsHook.aktuell = altSms;
       emailHook.aktuell = altEmail;
@@ -593,6 +606,8 @@ test("eine abgeholte Bestellung fließt ohne aktiviertes Lernsystem nicht in die
 /* ---------- No-Show-Schutz ---------- */
 
 async function aktiviereNoShow(basis, betrag = 10, fenster = 30, schwelle = 2) {
+  // Nur mit freigegebener No-Show-Regel einschaltbar (rechtstexte.js).
+  gibNoShowRegelFrei(SLUG, { betrag, stornofensterMinuten: fenster });
   await fetch(`${basis}/intern/no-show-schutz`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -647,6 +662,7 @@ test("eine Bestellung mit Häkchen wird angenommen, die Zustimmung wird gespeich
         name: "Testgast",
         telefon: "0170 999",
         noShowZustimmung: true,
+        noShowVersion: "v1",
       }),
     });
     const { bestellung } = await antwort.json();
@@ -670,6 +686,7 @@ test("Stornieren über /oeffentlich/bestellung/:id/stornieren meldet, ob es geb�
         abholzeit: "18:30",
         name: "Testgast",
         noShowZustimmung: true,
+        noShowVersion: "v1",
       }),
     });
     const { bestellung } = await bestellAntwort.json();
@@ -701,6 +718,7 @@ test("'Kunde nicht erschienen' erzeugt mit gemocktem E-Mail-Hook eine Rechnung u
         telefon: "0170 555",
         email: "gast@beispiel.de",
         noShowZustimmung: true,
+        noShowVersion: "v1",
       }),
     });
     const { bestellung } = await bestellAntwort.json();
@@ -744,6 +762,7 @@ test("'Kunde nicht erschienen' meldet rechnungVersendet:false ohne konfigurierte
         abholzeit: "18:30",
         name: "Testgast",
         noShowZustimmung: true,
+        noShowVersion: "v1",
       }),
     });
     const { bestellung } = await bestellAntwort.json();
@@ -774,6 +793,7 @@ test("der Warnhinweis im Dashboard erscheint erst ab der eingestellten Schwelle"
           name: "Testgast",
           telefon: "0170 777",
           noShowZustimmung: true,
+        noShowVersion: "v1",
         }),
       });
       return (await antwort.json()).bestellung;

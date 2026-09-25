@@ -22,3 +22,4 @@ data/v2-engine.json
 
 # Referenz-Frames fremder Websites (nur lokal, nicht veröffentlichen – Repo ist für GitHub Pages öffentlich)
 .referenzen/
+data/seitenaufrufe/

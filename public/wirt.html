@@ -22,6 +22,39 @@
     --transition-fast: .12s ease; --transition-base: .22s ease;
   }
   * { box-sizing: border-box; }
+  /* Statistik und Rechtstexte */
+  .kacheln { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); margin: 16px 0; }
+  .kachel { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; background: var(--surface-2); }
+  .kachel h3 { margin: 0 0 6px; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .kachel .gross { font-size: 1.9rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .kachel .gross.leise { font-size: 1.05rem; font-weight: 600; color: var(--muted); }
+  .kachel ul { list-style: none; margin: 8px 0 0; padding: 0; font-size: .88rem; }
+  .kachel li { display: flex; justify-content: space-between; gap: 10px; padding: 2px 0; }
+  .kachel li span:last-child { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .kachel p { margin: 8px 0 0; font-size: .8rem; color: var(--muted); }
+  .verlauf { display: flex; align-items: flex-end; gap: 6px; height: 160px; padding: 8px 0 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .verlauf .spalte { flex: 1 0 22px; display: flex; align-items: flex-end; gap: 2px; height: 100%; }
+  .verlauf .saeule { flex: 1; border-radius: 3px 3px 0 0; min-height: 0; }
+  .s-online { background: var(--accent); } .s-manuell { background: #7aa7ff; } .s-best { background: var(--green); }
+  .verlauf-achse { display: flex; gap: 6px; font-size: .7rem; color: var(--muted); overflow-x: auto; }
+  .verlauf-achse span { flex: 1 0 22px; text-align: center; white-space: nowrap; }
+  .legende { display: flex; gap: 14px; flex-wrap: wrap; font-size: .8rem; color: var(--muted); margin-top: 8px; }
+  .legende i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+  .doku { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; background: var(--surface-2); }
+  .doku h3 { margin: 0 0 4px; font-size: 1rem; }
+  .doku textarea { width: 100%; min-height: 220px; font-family: ui-monospace, Menlo, monospace; font-size: .85rem; }
+  .fassung { border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 10px; font-size: .88rem; }
+  .entwurf-marke { display: inline-block; background: color-mix(in srgb, var(--warn) 22%, transparent); color: var(--warn); border-radius: 4px; padding: 1px 8px; font-size: .75rem; font-weight: 700; }
+  .frei-marke { display: inline-block; background: color-mix(in srgb, var(--green) 20%, transparent); color: var(--green); border-radius: 4px; padding: 1px 8px; font-size: .75rem; font-weight: 700; }
+  .pruefliste { list-style: none; padding: 0; margin: 0; }
+  .pruefliste li { padding: 6px 0; border-bottom: 1px solid var(--line); font-size: .9rem; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .hinderung { color: var(--warn); font-size: .82rem; margin: 6px 0 0; padding-left: 18px; }
+  .nachweis { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+  /* Gastbenachrichtigung: was der Gast weiß – und wann der Wirt anrufen muss. */
+  .gastinfo { font-size: .82rem; color: var(--muted); margin-top: 6px; }
+  .gastinfo .zustand-fehler { color: var(--danger); }
+  .anruf { margin-top: 8px; padding: 8px 10px; border-radius: var(--radius-sm); font-weight: 700; font-size: .88rem;
+           color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); border: 1px solid var(--danger); }
   body { margin: 0; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.55;
          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 0 18px; }
@@ -86,6 +119,9 @@
      sonst leicht die Zeile verloren, in der man gerade tippt. */
   tbody tr:hover { background: rgba(255,255,255,.025); }
   tr.abgesagt td { opacity: .45; text-decoration: line-through; }
+  /* Status und Kontakt bleiben lesbar: Gerade nach einer Absage steht dort,
+     ob der Gast angerufen werden muss – und unter welcher Nummer. */
+  tr.abgesagt td.status-zelle, tr.abgesagt td.kontakt-zelle { opacity: 1; text-decoration: none; }
 
   /* Farbige Chips statt Pastell-auf-Weiß: dieselbe Bedeutung je Klasse,
      nur als getönte Fläche auf dunklem Grund statt als helle Kachel. */
@@ -163,6 +199,8 @@
     <button data-tab="reservierungen" class="aktiv">Reservierungen</button>
     <button data-tab="bestellungen">Bestellungen</button>
     <button data-tab="tischplan">Tischplan</button>
+    <button data-tab="statistik">Statistik</button>
+    <button data-tab="rechtstexte">Rechtstexte</button>
   </nav>
 
   <main class="tafel">
@@ -238,12 +276,14 @@
           </label>
         </div>
         <div style="color:var(--muted);font-size:.85rem;margin:6px 0 10px">
-          Aktiviert stimmen Gäste beim Bestellen einer Ausfallpauschale zu. Bei Nichtabholung können Sie unten je
-          Bestellung eine Rechnung auslösen – der Betrag ist dabei nur nach unten korrigierbar.
+          Nur mit einer freigegebenen No-Show-Regel (Reiter „Rechtstexte“) einschaltbar. Gäste bestätigen die Regel
+          dann gesondert vor dem Absenden. Bei Nichtabholung entscheiden Sie je Bestellung selbst, ob Sie eine Rechnung
+          auslösen – nichts wird automatisch abgebucht, der Betrag ist nur nach unten korrigierbar.
         </div>
+        <p id="noshow-regel-stand" style="font-size:.88rem;margin:0 0 10px"></p>
         <div class="felder" style="grid-template-columns:repeat(3,1fr);gap:10px">
-          <div><label for="noshow-betrag">Ausfallpauschale (€)</label><input type="number" id="noshow-betrag" min="0" step="0.5"></div>
-          <div><label for="noshow-fenster">Stornofenster (Min.)</label><input type="number" id="noshow-fenster" min="0" step="5"></div>
+          <div><label for="noshow-betrag">Ausfallpauschale (€)</label><input type="number" id="noshow-betrag" min="0" step="0.5" readonly title="Kommt aus der freigegebenen Regel"></div>
+          <div><label for="noshow-fenster">Stornofenster (Min.)</label><input type="number" id="noshow-fenster" min="0" step="5" readonly title="Kommt aus der freigegebenen Regel"></div>
           <div><label for="noshow-schwelle">Warnschwelle (No-Shows)</label><input type="number" id="noshow-schwelle" min="1" step="1"></div>
         </div>
         <button class="knopf klein" type="button" id="noshow-speichern" style="margin-top:10px">Einstellungen speichern</button>
@@ -255,6 +295,21 @@
             <button class="knopf klein stumm" type="button" id="bankverbindung-speichern">Speichern</button>
           </div>
         </div>
+      </div>
+
+      <div class="balken" id="gast-block">
+        <label style="margin-bottom:8px">Gastbenachrichtigung</label>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">
+          Jeder Gast bekommt nach dem Absenden einen persönlichen Status-Link. Wer eine E-Mail-Adresse angibt, erhält
+          Bestätigung, Ablehnung und geänderte Zeiten zusätzlich per E-Mail. Name und Telefonnummer unten erscheinen
+          auf der Statusseite und in den E-Mails.
+        </div>
+        <p id="gast-email-stand" style="font-size:.88rem;margin:0 0 10px"></p>
+        <div class="felder" style="grid-template-columns:repeat(2,1fr);gap:10px">
+          <div><label for="gast-name">Name des Hauses</label><input type="text" id="gast-name" placeholder="z. B. Trattoria da Luigi"></div>
+          <div><label for="gast-telefon">Telefon für Rückfragen</label><input type="tel" id="gast-telefon" placeholder="030 123456"></div>
+        </div>
+        <button class="knopf klein" type="button" id="gast-speichern" style="margin-top:10px">Speichern</button>
       </div>
 
       <div class="balken" id="telegram-block">
@@ -271,6 +326,39 @@
       </div>
 
       <div id="best-liste"></div>
+    </section>
+
+    <section id="tab-statistik" hidden>
+      <div class="leiste">
+        <div>
+          <label for="stat-zeitraum">Zeitraum</label>
+          <select id="stat-zeitraum">
+            <option value="heute">Heute</option>
+            <option value="woche">Diese Woche</option>
+            <option value="monat" selected>Dieser Monat</option>
+            <option value="quartal">Dieses Quartal</option>
+            <option value="jahr">Dieses Jahr</option>
+            <option value="frei">Eigener Zeitraum</option>
+          </select>
+        </div>
+        <div class="stat-frei" hidden><label for="stat-von">Von</label><input type="date" id="stat-von"></div>
+        <div class="stat-frei" hidden><label for="stat-bis">Bis</label><input type="date" id="stat-bis"></div>
+        <button class="knopf stumm" type="button" id="stat-laden">Anzeigen</button>
+      </div>
+      <div id="stat-inhalt"><p class="leer">Wird geladen …</p></div>
+    </section>
+
+    <section id="tab-rechtstexte" hidden>
+      <div class="balken" style="border-color:var(--warn)">
+        <strong>Entwürfe sind keine Rechtsberatung.</strong>
+        <div style="color:var(--muted);font-size:.88rem;margin-top:4px">
+          Die Vorlagen sind technische Entwürfe mit Platzhaltern. „Freigeben“ heißt: Sie als Betrieb geben diese Fassung
+          frei und vermerken, wer sie geprüft hat. Das macht einen Text nicht rechtssicher – und eine Checkbox macht
+          keine unwirksame Klausel wirksam. Freigegebene Fassungen sind unveränderlich; Änderungen ergeben eine neue Version.
+        </div>
+      </div>
+      <div id="launch-liste"></div>
+      <div id="rechtstexte-liste"><p class="leer">Wird geladen …</p></div>
     </section>
 
     <section id="tab-tischplan" hidden>
@@ -327,6 +415,14 @@ async function ruf(pfad, daten) {
   return ergebnis;
 }
 
+// Rückmeldung nach einer Wirt-Aktion: was mit der Gastnachricht passiert ist.
+function meldeGast(gast, grundtext) {
+  if (gast?.anrufNoetig) return melde(`${grundtext} ${gast.anrufText}`, false, true);
+  const m = gast?.letzteMeldung;
+  if (m && m.zustand === "uebergeben") return melde(`${grundtext} E-Mail an den Versanddienst übergeben.`);
+  melde(grundtext);
+}
+
 function datumDeutsch(iso) {
   if (!iso) return "";
   const [j, m, t] = iso.split("-");
@@ -335,6 +431,42 @@ function datumDeutsch(iso) {
 
 function euro(wert) {
   return Number(wert).toFixed(2).replace(".", ",") + " €";
+}
+
+/* ---------- Gastbenachrichtigung ---------- */
+
+// Nie „Gast informiert“: höchstens „an den Versanddienst übergeben“. Nach
+// Ablehnung oder geänderter Zeit ohne übergebene Nachricht steht der
+// Anruf-Hinweis unübersehbar da.
+function gastInfo(gast, art, id) {
+  if (!gast) return "";
+  const teile = [];
+  if (gast.statusLink === "aktiv") teile.push("Status-Link aktiv");
+  if (gast.statusLink === "widerrufen") teile.push("Status-Link gesperrt");
+  teile.push(gast.emailAngegeben ? "E-Mail angegeben" : "keine E-Mail");
+  const m = gast.letzteMeldung;
+  const zustand = m
+    ? `<div class="${m.zustand === "fehlgeschlagen" || m.zustand === "nicht-eingerichtet" ? "zustand-fehler" : ""}">Letzte Meldung (${esc(m.typText || m.typ)}): ${esc(m.zustandText)}${m.fehler ? ` – ${esc(m.fehler)}` : ""}</div>`
+    : "";
+  const knoepfe = [
+    m && m.erneutMoeglich ? `<button class="knopf klein stumm" data-gast-erneut="${esc(m.id)}">Nachricht erneut senden</button>` : "",
+    gast.statusLink === "aktiv" ? `<button class="knopf klein stumm" data-gast-sperren="${esc(id)}" data-art="${esc(art)}">Status-Link sperren</button>` : "",
+  ].filter(Boolean).join(" ");
+  return `<div class="gastinfo">${esc(teile.join(" · "))}${zustand}${knoepfe ? `<div class="aktionen" style="margin-top:6px">${knoepfe}</div>` : ""}</div>` +
+    (gast.anrufNoetig ? `<div class="anruf" role="alert">📞 ${esc(gast.anrufText)}</div>` : "");
+}
+
+function renderGastEinstellungen() {
+  const e = stand.gastEmail || {};
+  document.getElementById("gast-email-stand").innerHTML = stand.demoBetrieb
+    ? "<strong>Demo-Betrieb:</strong> Es werden keine Status-Links erzeugt und keine E-Mails verschickt."
+    : e.eingerichtet
+      ? "E-Mail-Versand: eingerichtet."
+      : `<strong style="color:var(--danger)">${esc(e.grund || "E-Mail nicht eingerichtet.")}</strong> Gäste sehen den Stand nur über ihren Status-Link.`;
+  const name = document.getElementById("gast-name");
+  const tel = document.getElementById("gast-telefon");
+  if (document.activeElement !== name) name.value = stand.gastKontakt?.anzeigeName ?? "";
+  if (document.activeElement !== tel) tel.value = stand.gastKontakt?.telefon ?? "";
 }
 
 /* ---------- Reservierungen ---------- */
@@ -390,10 +522,11 @@ function renderReservierungen() {
           <td>${r.personen}</td>
           <td>${tischOptionen(r)}</td>
           <td><span class="marke ${esc(r.quelle)}">${r.quelle === "online" ? "Online" : "Von Hand"}</span></td>
-          <td><span class="marke ${esc(r.status)}">${({ neu: "Neu", bestaetigt: "Bestätigt", abgesagt: "Abgesagt" })[r.status]}</span></td>
-          <td>${r.telefon ? `<a href="tel:${esc(r.telefon.replace(/[^\\d+]/g, ""))}">${esc(r.telefon)}</a>` : "–"}</td>
+          <td class="status-zelle"><span class="marke ${esc(r.status)}">${({ neu: "Neu", bestaetigt: "Bestätigt", abgesagt: "Abgesagt" })[r.status]}</span>${r.urspruenglich ? `<div class="gastinfo">verschoben (angefragt: ${esc(datumDeutsch(r.urspruenglich.datum))}, ${esc(r.urspruenglich.uhrzeit)})</div>` : ""}${r.quelle === "online" ? gastInfo(r.gast, "reservierung", r.id) : ""}${nachweisZeile(r)}</td>
+          <td class="kontakt-zelle">${r.telefon ? `<a href="tel:${esc(r.telefon.replace(/[^\\d+]/g, ""))}">${esc(r.telefon)}</a>` : "–"}</td>
           <td><div class="aktionen">
             ${r.status !== "bestaetigt" ? `<button class="knopf klein" data-res-status="bestaetigt" data-id="${esc(r.id)}">Bestätigen</button>` : ""}
+            ${r.status !== "abgesagt" ? `<button class="knopf klein stumm" data-res-verschieben="${esc(r.id)}" data-datum="${esc(r.datum)}" data-uhrzeit="${esc(r.uhrzeit)}">Termin ändern</button>` : ""}
             ${r.status !== "abgesagt" ? `<button class="knopf klein gefahr" data-res-status="abgesagt" data-id="${esc(r.id)}">Absagen</button>` : ""}
           </div></td>
         </tr>`).join("")}
@@ -434,6 +567,8 @@ function renderBestellungen() {
       <div class="summe"><span>Gesamt</span><span>${euro(b.gesamt)}</span></div>
       ${b.hinweis ? `<p class="hinweis-gast">Hinweis: ${esc(b.hinweis)}</p>` : ""}
       ${b.noShowBestaetigtAm ? `<p class="hinweis-gast">Ausfallpauschale bestätigt: ${euro(b.noShowBetrag)}</p>` : ""}
+      ${gastInfo(b.gast, "bestellung", b.id)}
+      ${nachweisZeile(b)}
 
       <div class="abholblock">
         <div class="wunsch">Gewünschte Abholzeit: <strong>${esc(b.abholzeit)}</strong>${
@@ -533,14 +668,20 @@ function renderNoShowEinstellungen() {
   document.getElementById("noshow-fenster").value = stand.noShowStornofensterMinuten ?? 30;
   document.getElementById("noshow-schwelle").value = stand.noShowWarnSchwelle ?? 2;
   document.getElementById("bankverbindung").value = stand.bankverbindung ?? "";
+  document.getElementById("noshow-regel-stand").innerHTML = stand.noShowRegel
+    ? `<span class="frei-marke">wirksam</span> Regel ${esc(stand.noShowRegel)} gilt für neue Bestellungen.`
+    : stand.noShowSchutzAktiv
+      ? `<strong style="color:var(--danger)">Eingeschaltet, aber ohne gültige freigegebene Regel – wirkt nicht.</strong>`
+      : stand.noShowFreigegebeneRegel
+        ? `Freigegebene Regel ${esc(stand.noShowFreigegebeneRegel)} vorhanden – aus.`
+        : "Keine freigegebene No-Show-Regel – der Schutz bleibt aus.";
 }
 
 document.getElementById("noshow-speichern").addEventListener("click", async () => {
   try {
+    // Betrag und Frist kommen aus der freigegebenen Regel, nicht aus diesem Formular.
     await ruf("/intern/no-show-schutz", {
       aktiv: document.getElementById("noshow-aktiv").checked,
-      gebuehrBetrag: Number(document.getElementById("noshow-betrag").value),
-      stornofensterMinuten: Number(document.getElementById("noshow-fenster").value),
       warnSchwelle: Number(document.getElementById("noshow-schwelle").value),
     });
     await lade();
@@ -652,14 +793,17 @@ async function lade() {
   renderLernenSchalter();
   renderNoShowEinstellungen();
   renderTelegram();
+  renderGastEinstellungen();
 }
 
 document.querySelectorAll("nav button").forEach((knopf) => {
   knopf.addEventListener("click", () => {
     document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("aktiv", b === knopf));
-    ["reservierungen", "bestellungen", "tischplan"].forEach((name) => {
+    ["reservierungen", "bestellungen", "tischplan", "statistik", "rechtstexte"].forEach((name) => {
       document.getElementById(`tab-${name}`).hidden = name !== knopf.dataset.tab;
     });
+    if (knopf.dataset.tab === "statistik") ladeStatistik();
+    if (knopf.dataset.tab === "rechtstexte") ladeRechtstexte();
   });
 });
 
@@ -675,22 +819,41 @@ document.addEventListener("click", async (e) => {
 
   try {
     if (ziel.dataset.resStatus) {
-      await ruf("/api/reservierung/status", { id: ziel.dataset.id, status: ziel.dataset.resStatus });
+      const ergebnis = await ruf("/api/reservierung/status", { id: ziel.dataset.id, status: ziel.dataset.resStatus });
       await lade();
-      melde(ziel.dataset.resStatus === "abgesagt" ? "Reservierung abgesagt." : "Reservierung bestätigt.");
+      meldeGast(ergebnis.gast, ziel.dataset.resStatus === "abgesagt" ? "Reservierung abgesagt." : "Reservierung bestätigt.");
+    } else if (ziel.dataset.resVerschieben) {
+      const datum = prompt("Neues Datum (JJJJ-MM-TT):", ziel.dataset.datum);
+      if (datum === null) return;
+      const uhrzeit = prompt("Neue Uhrzeit (HH:MM):", ziel.dataset.uhrzeit);
+      if (uhrzeit === null) return;
+      const grund = prompt("Grund für den Gast (optional):", "") ?? "";
+      const ergebnis = await ruf("/api/reservierung/verschieben", { id: ziel.dataset.resVerschieben, datum: datum.trim(), uhrzeit: uhrzeit.trim(), grund });
+      document.getElementById("tag").value = datum.trim();
+      await lade();
+      meldeGast(ergebnis.gast, "Termin geändert und bestätigt.");
+    } else if (ziel.dataset.gastErneut) {
+      const ergebnis = await ruf("/intern/gastmeldung/erneut", { id: ziel.dataset.gastErneut });
+      await lade();
+      melde(ergebnis.meldung.versand.zustand === "uebergeben" ? "Nachricht an den Versanddienst übergeben." : "Erneuter Versand gescheitert – bitte anrufen.", ergebnis.meldung.versand.zustand !== "uebergeben");
+    } else if (ziel.dataset.gastSperren) {
+      if (!confirm("Status-Link dieses Gastes dauerhaft sperren? Der Gast kann den Stand dann nicht mehr abrufen.")) return;
+      await ruf("/intern/gastlink/widerrufen", { id: ziel.dataset.gastSperren, art: ziel.dataset.art });
+      await lade();
+      melde("Status-Link gesperrt.");
     } else if (ziel.dataset.tischWeg) {
       await ruf("/api/tisch/loeschen", { id: ziel.dataset.tischWeg });
       await lade();
       melde("Tisch entfernt.");
     } else if (ziel.dataset.bestaetigen) {
       const feld = document.querySelector(`.abhol-zeit[data-id="${ziel.dataset.bestaetigen}"]`);
-      await ruf("/api/bestellung/bestaetigen", { id: ziel.dataset.bestaetigen, abholzeit: feld.value });
+      const ergebnis = await ruf("/api/bestellung/bestaetigen", { id: ziel.dataset.bestaetigen, abholzeit: feld.value });
       await lade();
-      melde("Abholzeit bestätigt. Geben Sie dem Gast Bescheid.");
+      meldeGast(ergebnis.gast, "Abholzeit bestätigt.");
     } else if (ziel.dataset.bestStatus) {
-      await ruf("/api/bestellung/status", { id: ziel.dataset.id, status: ziel.dataset.bestStatus });
+      const ergebnis = await ruf("/api/bestellung/status", { id: ziel.dataset.id, status: ziel.dataset.bestStatus });
       await lade();
-      melde("Bestellung aktualisiert.");
+      meldeGast(ergebnis.gast, "Bestellung aktualisiert.");
     } else if (ziel.dataset.kopiere) {
       await navigator.clipboard.writeText(ziel.dataset.kopiere);
       melde("Nachricht kopiert.");
@@ -700,12 +863,7 @@ document.addEventListener("click", async (e) => {
       const grund = document.querySelector(`.verzoegerung-grund[data-id="${id}"]`).value;
       const ergebnis = await ruf(`/intern/bestellung/${encodeURIComponent(id)}/verzoegerung`, { neueZeit, grund });
       await lade();
-      const meldungJeKanal = {
-        sms: "Gast per SMS informiert.",
-        email: "Gast per E-Mail informiert.",
-        keiner: "Kein automatischer Kanal verfügbar – bitte telefonisch informieren.",
-      };
-      melde(meldungJeKanal[ergebnis.kanal] ?? "Abholzeit aktualisiert.", false, ergebnis.kanal === "keiner");
+      meldeGast(ergebnis.gast, "Neue Abholzeit gespeichert, Statusseite aktualisiert.");
     } else if (ziel.dataset.noshow) {
       const id = ziel.dataset.noshow;
       const vereinbart = Number(ziel.dataset.betrag) || 0;
@@ -795,6 +953,19 @@ document.getElementById("wartezeit-speichern").addEventListener("click", async (
     await ruf("/intern/wartezeit", { minuten });
     await lade();
     melde(minuten === 0 ? "Zusatz-Wartezeit aufgehoben." : `Zusatz-Wartezeit: +${minuten} Minuten.`);
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+
+document.getElementById("gast-speichern").addEventListener("click", async () => {
+  try {
+    await ruf("/intern/gast-kontakt", {
+      anzeigeName: document.getElementById("gast-name").value.trim(),
+      telefon: document.getElementById("gast-telefon").value.trim(),
+    });
+    await lade();
+    melde("Angaben für die Gastbenachrichtigung gespeichert.");
   } catch (fehler) {
     melde(fehler.message, true);
   }
@@ -895,6 +1066,232 @@ ladeLernUebersicht();
 richtePushEin();
 // Im Betrieb liegt das Tablet offen herum - regelmäßig nachladen, damit neue
 // Bestellungen auftauchen, ohne dass jemand die Seite neu lädt.
+
+/* ---------- Nachweise am Vorgang ---------- */
+
+const ART_NAME = {
+  bestellbedingungen: "Bestellbedingungen", reservierungsbedingungen: "Reservierungsbedingungen",
+  "noshow-bestellung": "No-Show-Regel", "noshow-reservierung": "No-Show-Regel",
+};
+
+function nachweisZeile(v) {
+  const liste = v.bestaetigungen ?? [];
+  if (!liste.length) return "";
+  return `<div class="nachweis">Bestätigt: ${liste.map((n) => `${esc(ART_NAME[n.art] ?? n.art)} ${esc(n.version)}${n.betrag ? ` (${euro(n.betrag)})` : ""}`).join(", ")} · ${esc(new Date(liste[0].zeitpunkt).toLocaleString("de-DE"))}</div>`;
+}
+
+/* ---------- Statistik ---------- */
+
+function zahl(n) { return Number(n ?? 0).toLocaleString("de-DE"); }
+
+async function ladeStatistik() {
+  const ziel = document.getElementById("stat-inhalt");
+  const art = document.getElementById("stat-zeitraum").value;
+  const q = new URLSearchParams({ zeitraum: art });
+  if (art === "frei") {
+    q.set("von", document.getElementById("stat-von").value);
+    q.set("bis", document.getElementById("stat-bis").value);
+  }
+  try {
+    const antwort = await fetch(`/api/statistik?${q}`);
+    const d = await antwort.json();
+    if (!d.ok) throw new Error(d.fehler);
+    ziel.innerHTML = renderStatistik(d);
+  } catch (fehler) {
+    ziel.innerHTML = `<p class="leer">${esc(fehler.message)}</p>`;
+  }
+}
+
+function renderVerlauf(v) {
+  const max = Math.max(1, ...v.punkte.map((p) => Math.max(p.reservierungenOnline, p.reservierungenManuell, p.bestellungenOnline)));
+  const h = (n) => `${Math.round((n / max) * 100)}%`;
+  const beschriftung = (ab) => v.raster === "monat" ? ab.slice(5, 7) + "/" + ab.slice(2, 4) : ab.slice(8, 10) + "." + ab.slice(5, 7) + ".";
+  const titel = (p) => `${p.ab}: ${p.reservierungenOnline} online, ${p.reservierungenManuell} manuell, ${p.bestellungenOnline} Bestellungen`;
+  return `<div class="verlauf" role="img" aria-label="Verlauf nach ${v.raster === "tag" ? "Tagen" : v.raster === "woche" ? "Wochen" : "Monaten"}">${v.punkte.map((p) =>
+    `<div class="spalte" title="${esc(titel(p))}"><div class="saeule s-online" style="height:${h(p.reservierungenOnline)}"></div><div class="saeule s-manuell" style="height:${h(p.reservierungenManuell)}"></div><div class="saeule s-best" style="height:${h(p.bestellungenOnline)}"></div></div>`).join("")}</div>
+    <div class="verlauf-achse">${v.punkte.map((p, i) => `<span>${v.punkte.length <= 14 || i % 5 === 0 ? esc(beschriftung(p.ab)) : ""}</span>`).join("")}</div>
+    <div class="legende"><span><i class="s-online"></i>Online-Reservierungen</span><span><i class="s-manuell"></i>Manuelle Reservierungen</span><span><i class="s-best"></i>Online-Bestellungen</span><span>${v.raster === "woche" ? "je Woche ab Montag" : v.raster === "monat" ? "je Monat" : "je Tag"}</span></div>`;
+}
+
+function renderStatistik(d) {
+  const r = d.reservierungen;
+  const b = d.bestellungen;
+  const w = b.bestellwert;
+  const a = d.seitenaufrufe;
+  const leer = r.online.anzahl + r.manuell.anzahl + r.unbekannt.anzahl + b.gesamt === 0;
+  const heute = d.heute;
+  const aufrufe = a.status === "aktiv"
+    ? `<div class="gross">${zahl(a.summe)}</div><p>${esc(a.bezeichnung)}${a.vollstaendig ? "" : ` – gemessen erst ab ${esc(a.abTag)}`}. ${esc(a.hinweis)}</p>`
+    : `<div class="gross leise">${esc(a.text)}</div><p>${esc(a.grund)}</p>`;
+  return `
+  <p style="color:var(--muted);font-size:.88rem;margin:0">${esc(d.zeitraum.label)}: ${esc(d.zeitraum.vonTag)} bis ${esc(d.zeitraum.bisTag)} · gezählt nach <strong>Eingang</strong> der Anfrage bzw. Bestellung · Zeitzone ${esc(d.zeitraum.zeitzone)}</p>
+  ${leer ? `<p class="leer">Im gewählten Zeitraum ist nichts eingegangen.</p>` : ""}
+  <div class="kacheln">
+    <div class="kachel"><h3>Online-Reservierungen</h3><div class="gross">${zahl(r.online.anzahl)}</div>
+      <ul><li><span>davon bestätigt</span><span>${zahl(r.online.bestaetigt)}</span></li><li><span>davon abgelehnt</span><span>${zahl(r.online.abgelehnt)}</span></li><li><span>noch offen</span><span>${zahl(r.online.offen)}</span></li><li><span>Personen (laut Anfrage)</span><span>${zahl(r.online.personen)}</span></li></ul></div>
+    <div class="kachel"><h3>Manuell eingetragen</h3><div class="gross">${zahl(r.manuell.anzahl)}</div>
+      <ul><li><span>Personen</span><span>${zahl(r.manuell.personen)}</span></li></ul><p>Vom Team eingetragen, z. B. nach einem Anruf – keine Website-Anfragen.</p></div>
+    ${r.unbekannt.anzahl ? `<div class="kachel"><h3>Reservierungen, Herkunft unbekannt</h3><div class="gross">${zahl(r.unbekannt.anzahl)}</div><p>Ältere Datensätze ohne gesicherte Quelle – weder online noch manuell gezählt.</p></div>` : ""}
+    <div class="kachel"><h3>Online-Bestellungen</h3><div class="gross">${zahl(b.online)}</div>
+      <ul><li><span>neu</span><span>${zahl(b.status.neu)}</span></li><li><span>bestätigt / in Zubereitung</span><span>${zahl(b.status.bestaetigt)}</span></li><li><span>bereit</span><span>${zahl(b.status.bereit)}</span></li><li><span>abgeholt</span><span>${zahl(b.status.abgeholt)}</span></li><li><span>abgelehnt</span><span>${zahl(b.status.abgelehnt)}</span></li><li><span>storniert</span><span>${zahl(b.status.storniert)}</span></li></ul>
+      ${b.unbekannteQuelle ? `<p>Zusätzlich ${zahl(b.unbekannteQuelle)} ältere Bestellung(en) ohne gesicherte Quelle (in den Status enthalten).</p>` : ""}</div>
+    <div class="kachel"><h3>${esc(w.bezeichnung)} (kein bezahlter Umsatz)</h3><div class="gross">${euro(w.summe)}</div>
+      <ul><li><span>Durchschnitt je Bestellung</span><span>${w.durchschnitt === null ? "–" : euro(w.durchschnitt)}</span></li><li><span>davon abgeholt</span><span>${euro(w.davonAbgeholt)}</span></li></ul><p>${esc(w.erklaerung)}</p></div>
+    <div class="kachel"><h3>Website-Aufrufe</h3>${aufrufe}</div>
+    ${d.verhaeltnis ? `<div class="kachel"><h3>${esc(d.verhaeltnis.bezeichnung)}</h3><div class="gross">${String(d.verhaeltnis.wert).replace(".", ",")}</div><p>${esc(d.verhaeltnis.erklaerung)}</p></div>` : ""}
+  </div>
+  <h3 style="font-size:.95rem;margin:18px 0 4px">Verlauf</h3>
+  ${renderVerlauf(d.verlauf)}
+  <div class="balken" style="margin-top:22px">
+    <label style="margin-bottom:6px">Was steht heute an? (nach Besuchs- bzw. Abholtag, ${esc(heute.tag)})</label>
+    <div>${zahl(heute.reservierungen)} Reservierung(en) mit ${zahl(heute.personen)} Personen${heute.offeneAnfragen ? `, davon ${zahl(heute.offeneAnfragen)} noch unbestätigt` : ""} · ${zahl(heute.bestellungen)} offene Abholbestellung(en)${heute.unbestaetigteBestellungen ? `, davon ${zahl(heute.unbestaetigteBestellungen)} unbestätigt` : ""}</div>
+  </div>`;
+}
+
+document.getElementById("stat-zeitraum").addEventListener("change", (e) => {
+  const frei = e.target.value === "frei";
+  document.querySelectorAll(".stat-frei").forEach((el) => (el.hidden = !frei));
+  if (!frei) ladeStatistik();
+});
+document.getElementById("stat-laden").addEventListener("click", ladeStatistik);
+
+/* ---------- Rechtstexte ---------- */
+
+let rechtsStand = null;
+
+async function ladeRechtstexte() {
+  rechtsStand = await (await fetch("/api/rechtstexte")).json();
+  renderRechtstexte();
+}
+
+function datum(iso) { return iso ? new Date(iso).toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" }) : ""; }
+
+function renderLaunch() {
+  const l = rechtsStand.launch;
+  document.getElementById("launch-liste").innerHTML = `<div class="balken">
+    <label style="margin-bottom:6px">Startklar für eine echte Kundenseite? ${l.startklar ? '<span class="frei-marke">technisch ja</span>' : '<span class="entwurf-marke">noch nicht</span>'}</label>
+    <ul class="pruefliste">${l.punkte.map((p) => `<li><span>${p.ok ? "✓" : "✗"}</span><span style="flex:1">${esc(p.punkt)}${p.blocker && !p.ok ? ' <strong style="color:var(--danger)">Launch-Blocker</strong>' : ""}${p.stand ? `<div class="nachweis">Vermerk: ${esc(p.stand.vermerk)} – ${esc(p.stand.von)}, ${esc(datum(p.stand.am))}</div>` : ""}</span>${p.vermerk ? `<button class="knopf klein stumm" data-launch-vermerk="${esc(p.vermerk)}">${p.stand ? "Vermerk ändern" : "Als erledigt vermerken"}</button>` : ""}</li>`).join("")}</ul>
+    <div style="color:var(--muted);font-size:.8rem;margin-top:8px">Technische Prüfliste, keine rechtliche Bewertung.</div></div>`;
+}
+
+function parameterFelder(d) {
+  if (!d.art.startsWith("noshow-")) return "";
+  const p = d.parameter ?? {};
+  const res = d.art === "noshow-reservierung";
+  return `<div class="felder" style="grid-template-columns:repeat(${res ? 4 : 2},1fr);gap:10px;margin:8px 0">
+    <div><label>Betrag (€)</label><input type="number" step="0.5" min="0" data-param="betrag" value="${esc(p.betrag ?? "")}"></div>
+    <div><label>Stornofrist (Minuten)</label><input type="number" step="5" min="0" data-param="stornofensterMinuten" value="${esc(p.stornofensterMinuten ?? "")}"></div>
+    ${res ? `<div><label>Berechnung</label><select data-param="berechnung"><option value="pro-person"${p.berechnung !== "pauschal" ? " selected" : ""}>je Person</option><option value="pauschal"${p.berechnung === "pauschal" ? " selected" : ""}>pauschal</option></select></div>
+    <div><label>Nachweisweg</label><input type="text" data-param="nachweisweg" value="${esc(p.nachweisweg ?? "")}" placeholder="z. B. Tischplan + Anrufprotokoll"></div>` : ""}
+  </div>`;
+}
+
+function renderRechtstexte() {
+  renderLaunch();
+  const aktiv = document.activeElement;
+  if (aktiv && document.getElementById("rechtstexte-liste").contains(aktiv) && /TEXTAREA|INPUT|SELECT/.test(aktiv.tagName)) return;
+  const html = rechtsStand.arten.map((a) => {
+    const docs = rechtsStand.dokumente.filter((d) => d.art === a.art);
+    const entwuerfe = docs.filter((d) => d.status === "entwurf");
+    const fassungen = docs.filter((d) => d.status !== "entwurf").sort((x, y) => y.versionNr - x.versionNr);
+    const zusatz = a.art === "noshow-reservierung"
+      ? `<div style="margin:6px 0"><label style="display:inline-flex;gap:6px;align-items:center;text-transform:none;font-weight:400"><input type="checkbox" id="res-noshow-schalter"${rechtsStand.noShowReservierung.eingeschaltet ? " checked" : ""}> Für Reservierungen einschalten (nur mit freigegebener Regel inkl. Nachweisweg; keine Abrechnung im System)</label></div>`
+      : a.art === "noshow-bestellung"
+        ? `<div class="nachweis">Ein- und ausschalten im Reiter „Bestellungen“ → No-Show-Schutz. Derzeit ${rechtsStand.noShowBestellung.wirksam ? `wirksam mit ${esc(rechtsStand.noShowBestellung.wirksam)}` : "nicht wirksam"}.</div>`
+        : "";
+    return `<div class="doku">
+      <h3>${esc(a.titel)} ${a.gueltig ? `<span class="frei-marke">gültig: ${esc(a.gueltig)}</span> <a href="/rechtstexte/${esc(a.pfad)}" target="_blank" rel="noopener" style="font-size:.8rem">öffentlich ansehen</a>` : '<span class="entwurf-marke">keine freigegebene Fassung</span>'}</h3>
+      ${zusatz}
+      ${entwuerfe.map((d) => `<div class="fassung" data-doku="${esc(d.id)}">
+        <span class="entwurf-marke">ENTWURF</span> angelegt ${esc(datum(d.erstellt))}${d.erstelltAus ? ` aus ${esc(d.erstelltAus)}` : ""}
+        ${parameterFelder(d)}
+        <label style="margin-top:8px">Text</label><textarea data-feld="inhalt">${esc(d.inhalt)}</textarea>
+        ${DOKU_MIT_BESTAETIGUNG.includes(d.art) ? `<label style="margin-top:8px">Bestätigungstext im Formular (Gast kreuzt selbst an)</label><textarea data-feld="zustimmungstext" style="min-height:70px">${esc(d.zustimmungstext)}</textarea>` : ""}
+        ${d.hindernisse.length ? `<ul class="hinderung">${d.hindernisse.map((h) => `<li>${esc(h)}</li>`).join("")}</ul>` : ""}
+        <div class="aktionen" style="margin-top:8px"><button class="knopf klein" data-doku-speichern="${esc(d.id)}">Entwurf speichern</button><button class="knopf klein stumm" data-doku-freigeben="${esc(d.id)}">Freigeben …</button><button class="knopf klein gefahr" data-doku-loeschen="${esc(d.id)}">Entwurf löschen</button></div>
+      </div>`).join("")}
+      ${fassungen.map((d) => `<div class="fassung">
+        <strong>${esc(d.version)}</strong> ${d.status === "freigegeben" ? '<span class="frei-marke">freigegeben</span>' : '<span class="entwurf-marke">zurückgezogen</span>'}
+        gültig ab ${esc(datum(d.gueltigAb))} · freigegeben von ${esc(d.freigegebenVon)} am ${esc(datum(d.freigegebenAm))}${d.zurueckgezogenAm ? ` · zurückgezogen ${esc(datum(d.zurueckgezogenAm))}` : ""}
+        <div class="nachweis">Prüfvermerk: ${esc(d.pruefvermerk)} · SHA-256 ${esc(String(d.inhaltHash).slice(0, 16))}…${d.parameter?.betrag ? ` · ${euro(d.parameter.betrag)}, Frist ${esc(d.parameter.stornofensterMinuten)} Min.` : ""}</div>
+        <div class="aktionen" style="margin-top:6px"><a class="knopf klein stumm" href="/rechtstexte/${esc(a.pfad)}/${esc(d.version)}" target="_blank" rel="noopener">Ansehen</a><button class="knopf klein stumm" data-doku-kopieren="${esc(d.id)}">Neue Fassung daraus</button>${d.status === "freigegeben" ? `<button class="knopf klein gefahr" data-doku-zurueck="${esc(d.id)}">Zurückziehen</button>` : ""}</div>
+      </div>`).join("")}
+      <div class="aktionen" style="margin-top:10px"><button class="knopf klein stumm" data-doku-neu="${esc(a.art)}">Neuer Entwurf aus Vorlage</button></div>
+    </div>`;
+  }).join("");
+  document.getElementById("rechtstexte-liste").innerHTML = html;
+}
+
+const DOKU_MIT_BESTAETIGUNG = ["bestellbedingungen", "reservierungsbedingungen", "noshow-bestellung", "noshow-reservierung"];
+
+function entwurfsDaten(id) {
+  const block = document.querySelector(`[data-doku="${CSS.escape(id)}"]`);
+  const daten = { id, inhalt: block.querySelector('[data-feld="inhalt"]').value };
+  const z = block.querySelector('[data-feld="zustimmungstext"]');
+  if (z) daten.zustimmungstext = z.value;
+  const params = block.querySelectorAll("[data-param]");
+  if (params.length) daten.parameter = Object.fromEntries([...params].map((f) => [f.dataset.param, f.value]));
+  return daten;
+}
+
+document.addEventListener("click", async (e) => {
+  const k = e.target.closest("button");
+  if (!k || !document.getElementById("tab-rechtstexte").contains(k)) return;
+  try {
+    if (k.dataset.dokuNeu) {
+      await ruf("/intern/rechtstexte/entwurf", { art: k.dataset.dokuNeu });
+      melde("Entwurf aus der Vorlage angelegt – Platzhalter ausfüllen.");
+    } else if (k.dataset.dokuSpeichern) {
+      await ruf("/intern/rechtstexte/bearbeiten", entwurfsDaten(k.dataset.dokuSpeichern));
+      document.activeElement?.blur();
+      melde("Entwurf gespeichert.");
+    } else if (k.dataset.dokuFreigeben) {
+      await ruf("/intern/rechtstexte/bearbeiten", entwurfsDaten(k.dataset.dokuFreigeben));
+      const von = prompt("Wer gibt diese Fassung für den Betrieb frei? (Name)");
+      if (!von) return;
+      const vermerk = prompt("Prüfvermerk: Wer hat den Text fachlich/rechtlich geprüft? (oder: bewusst ohne Prüfung)");
+      if (!vermerk) return;
+      const ab = prompt("Gültig ab (JJJJ-MM-TT, leer = sofort):", "") ?? "";
+      if (!confirm("Diese Fassung wird unveränderlich freigegeben und ab dem Datum im Formular bzw. öffentlich verwendet. Die Freigabe macht den Text nicht rechtssicher. Fortfahren?")) return;
+      await ruf("/intern/rechtstexte/freigeben", { id: k.dataset.dokuFreigeben, freigegebenVon: von, pruefvermerk: vermerk, gueltigAb: ab.trim() || undefined, geprueftBestaetigt: true });
+      document.activeElement?.blur();
+      melde("Fassung freigegeben.");
+    } else if (k.dataset.dokuLoeschen) {
+      if (!confirm("Entwurf löschen?")) return;
+      await ruf("/intern/rechtstexte/loeschen", { id: k.dataset.dokuLoeschen });
+    } else if (k.dataset.dokuKopieren) {
+      await ruf("/intern/rechtstexte/kopieren", { id: k.dataset.dokuKopieren });
+      melde("Neue Entwurfsfassung angelegt.");
+    } else if (k.dataset.dokuZurueck) {
+      if (!confirm("Fassung zurückziehen? Sie gilt dann nicht mehr für neue Vorgänge, bleibt aber als Nachweis erhalten.")) return;
+      await ruf("/intern/rechtstexte/zurueckziehen", { id: k.dataset.dokuZurueck });
+    } else if (k.dataset.launchVermerk) {
+      const vermerk = prompt("Vermerk (z. B. wo und wie es erledigt ist; leer = Vermerk entfernen):", "");
+      if (vermerk === null) return;
+      const von = vermerk ? prompt("Ihr Name:") ?? "" : "";
+      await ruf("/intern/launch-vermerk", { punkt: k.dataset.launchVermerk, vermerk, von });
+    } else {
+      return;
+    }
+    await ladeRechtstexte();
+    await lade();
+  } catch (fehler) {
+    melde(fehler.message, true);
+    await ladeRechtstexte();
+  }
+});
+
+document.addEventListener("change", async (e) => {
+  if (e.target.id !== "res-noshow-schalter") return;
+  try {
+    await ruf("/intern/reservierung-no-show", { aktiv: e.target.checked });
+    melde(e.target.checked ? "No-Show-Regel für Reservierungen eingeschaltet." : "No-Show-Regel für Reservierungen aus.");
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+  await ladeRechtstexte();
+});
+
 setInterval(lade, 20000);
 </script>
 
