@@ -200,6 +200,12 @@ function highlightAnzahl(art, verfuegbar) {
   return Math.min(wunsch, verfuegbar);
 }
 
+// Logo in der Kopfzeile (Kundenfassung): ersetzt die Wortmarke im selben
+// Element, Höhe im Raster, Breite begrenzt. Nur auf Seiten mit Logo.
+const LOGO_CSS = `
+.kopf-logo { display: block; height: 40px; width: auto; max-width: 176px; object-fit: contain; }
+`;
+
 function favicon(ds) {
   const r = ds.farben.rollen;
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='${ds.radius.knopf * 2}' fill='${r.akzent.hex}'/><circle cx='32' cy='32' r='12' fill='${r.aufAkzent.hex}'/></svg>`;
@@ -280,7 +286,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   // Welche Medien diese Seite wirklich benutzt – für den Bericht (Dashboard-
   // Badges) und damit schreibeSite() lokale Dateien mitkopieren kann.
   const genutzt = [
-    ...["hero", "heroVideo", "heroMobil", "heroVideoMobil", "haus", "team", "bestseller"].map((rolle) => [rolle, medien[rolle]]),
+    ...["hero", "heroVideo", "heroMobil", "heroVideoMobil", "haus", "team", "bestseller", "logo", "favicon"].map((rolle) => [rolle, medien[rolle]]),
     ...highlights.map((g) => [`gericht:${g.id}`, medien.gericht(g)]),
   ].filter(([, m]) => m);
 
@@ -300,7 +306,11 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   // Konzept: Der Weg zum Haus führt über das Google-Maps-Profil (Place ID) –
   // statt Note und Rezensionen auf der Seite.
   if (konzept && optionen.googleMapsUrl) aktionen.route = { art: "extern", href: optionen.googleMapsUrl };
-  const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv, aktionen, ausdruck, konzept };
+  // Kundenfassung (src/kundenProjekt.js): Inhalte stammen vom Kunden – die
+  // „Platzhalter“-Marken der Konzeptfassung entfallen wie auf den fiktiven
+  // Beispielseiten. Telefon und Aktionen bleiben echt (aktionen oben).
+  const kundenfassung = Boolean(optionen.kundenfassung);
+  const ctx = { ds, texte, lead, medien, highlights, cuisine: gestaltung.cuisine, fiktiv: fiktiv || kundenfassung, aktionen, ausdruck, konzept, ...(medien.logo ? { logo: medien.logo } : {}) };
 
   const sektionen = {
     highlights: (tief) => renderHighlights({ ...ctx, betont: betont === "highlights", tief }),
@@ -326,7 +336,8 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
     raum: () => renderHausBand(ctx),
     herkunft: () => renderHausBand(ctx),
     reservierung: () => sektionen.reservierung(true),
-    kontakt: () => renderAnfahrt({ ...ctx, oeffnungszeiten: konzept ? [] : optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS }),
+    // Ausnahmen (Feiertage, Urlaub) nur in der Anzeige – die Abholzeiten rechnen mit dem Wochenplan.
+    kontakt: () => renderAnfahrt({ ...ctx, oeffnungszeiten: konzept ? [] : [...(optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS), ...(optionen.oeffnungsAusnahmen ?? [])] }),
   };
   const hauptteil = ausdruck
     ? ausdruck.abfolge.filter((id) => ausdruckSektionen[id]).map((id) => ausdruckSektionen[id]()).filter(Boolean).join("\n\n")
@@ -379,13 +390,13 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
 <meta name="v2-designsystem" content="${escapeHtml(ds.id)}">
 <meta name="v2-hero" content="${heroVariante}">
 ${ausdruck ? `<meta name="v2-ausdruck" content="${ausdruck.id}">\n` : ""}${konzept ? '<meta name="demo-art" content="konzept">\n' : ""}${optionen.buildId ? `<meta name="demo-build" content="${escapeHtml(optionen.buildId)}">\n` : ""}<meta name="theme-color" content="${ds.farben.rollen.grund.hex}">
-${optionen.veroeffentlicht || konzept ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<link rel="icon" href="${favicon(ds)}">
+${optionen.veroeffentlicht || konzept ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<link rel="icon" href="${medien.favicon?.src ? escapeHtml(medien.favicon.src) : favicon(ds)}">
 <style>
 ${fontCss}
 ${cssVariablen(ds)}
 ${STIL}
 ${BEWEGUNG_CSS}
-${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}\n${ABFOLGE_CSS}\n${ATMOSPHAERE_CSS}\n${KARTE_CSS}` : ""}${apiUrl ? RECHTLICHES_CSS : ""}
+${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}\n${ABFOLGE_CSS}\n${ATMOSPHAERE_CSS}\n${KARTE_CSS}` : ""}${apiUrl ? RECHTLICHES_CSS : ""}${medien.logo ? LOGO_CSS : ""}
 </style>
 </head>
 <body class="${bodyKlassen}">
@@ -419,7 +430,7 @@ ${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</
   const seiten = {};
   if (karte) {
     const aktionenKarte = { ...aktionen, ...(aktionen.reservieren ? { reservieren: { ...aktionen.reservieren, href: `${START_PFAD}#reservierung` } } : {}) };
-    const ctxKarte = { ...ctx, aktionen: aktionenKarte, seite: "karte" };
+    const ctxKarte = { ...ctx, aktionen: aktionenKarte, seite: "karte", ...(medien.logo ? { logo: { ...medien.logo, src: `../${medien.logo.src}` } } : {}) };
     const unterPfad = (p) => (/^(?:[a-z]+:|\/)/i.test(p) ? p : `../${p}`);
     const fontCssKarte = optionen.fontCss ?? schriftCss(familien, optionen.fontsDir ?? FONTS_DIR, unterPfad(optionen.fontsPfad ?? "../../assets/fonts"));
     const titelKarte = `${texte.speisekarte.titel} – ${texte.name}${konzept ? " – Konzept-Demo" : ""}`;
@@ -437,7 +448,7 @@ ${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</
 <meta name="v2-ausdruck" content="${ausdruck.id}">
 <meta name="v2-seite" content="speisekarte">
 ${konzept ? '<meta name="demo-art" content="konzept">\n' : ""}${optionen.buildId ? `<meta name="demo-build" content="${escapeHtml(optionen.buildId)}">\n` : ""}<meta name="theme-color" content="${ds.farben.rollen.grund.hex}">
-${optionen.veroeffentlicht || konzept ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<link rel="icon" href="${favicon(ds)}">
+${optionen.veroeffentlicht || konzept ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<link rel="icon" href="${medien.favicon?.src ? escapeHtml(`../${medien.favicon.src}`) : favicon(ds)}">
 <style>
 ${fontCssKarte}
 ${cssVariablen(ds)}
@@ -447,7 +458,7 @@ ${darstellungsCss}
 ${ausdruckVariablen(ausdruck, ds)}
 ${BUEHNE_CSS}
 ${ABFOLGE_CSS}
-${KARTE_CSS}${apiUrl ? RECHTLICHES_CSS : ""}
+${KARTE_CSS}${medien.logo ? LOGO_CSS : ""}${apiUrl ? RECHTLICHES_CSS : ""}
 </style>
 </head>
 <body class="${bodyKlassen} seite-karte">

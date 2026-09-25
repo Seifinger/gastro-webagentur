@@ -124,7 +124,7 @@ export function renderFussAusdruck({ texte, lead, aktionen, seite = "start" }) {
         <a href="${e(start)}#kontakt">${e(texte.nav.kontakt)}</a>${rechtsLinkHtml(aktionen)}
       </nav>
     </div>
-    <p class="fuss-hinweis">${e(texte.fuss.hinweis)}</p>
+    ${texte.fuss.hinweis ? `<p class="fuss-hinweis">${e(texte.fuss.hinweis)}</p>` : ""}
   </div>
 </footer>`;
 }

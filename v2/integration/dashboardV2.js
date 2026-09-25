@@ -31,6 +31,7 @@ import { creativeHandler } from "./creativeDashboard.js";
 import { AUSDRUECKE, AUSDRUCK_AUS } from "../build/ausdruck.js";
 import { demoEinstellungen, speichereDemoEinstellungen } from "../../src/demoEinstellungen.js";
 import { baueDemo, bauParameter } from "./demoBau.js";
+import { kundenHandler } from "./kundenDashboard.js";
 import { demoHandler } from "./demoDashboard.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -378,7 +379,7 @@ const BEARBEITEN_SKRIPT = `
 `;
 
 export function v2HtmlInjektion(html, seite) {
-  const skripte = seite === "bearbeiten" ? ["/v2/bearbeiten.js", "/v2/demo-panel.js"] : ["/v2/dashboard.js"];
+  const skripte = seite === "bearbeiten" ? ["/v2/bearbeiten.js", "/v2/demo-panel.js", "/v2/kunden-panel.js"] : ["/v2/dashboard.js"];
   return html
     .replace("</head>", '<link rel="stylesheet" href="/v2/dashboard.css">\n</head>')
     .replace("</body>", `${skripte.map((s) => `<script src="${s}"></script>`).join("\n")}\n</body>`);
@@ -430,6 +431,8 @@ export async function v2Handler(req, res, pathname) {
   if (await creativeHandler(req, res, pathname)) return true;
   // Demo-Steuerung je Lead (Vorlage, Farbschema, Slogan, Veröffentlichen)
   if (await demoHandler(req, res, pathname)) return true;
+  // Kundenmodus derselben Bearbeiten-Ansicht (Kundenfassungen gewonnener Betriebe)
+  if (await kundenHandler(req, res, pathname)) return true;
   if (pathname === "/v2/dashboard.css") return sende(res, 200, dashboardCss(), "text/css; charset=utf-8"), true;
   if (pathname === "/v2/dashboard.js") return sende(res, 200, DASHBOARD_SKRIPT, "text/javascript; charset=utf-8"), true;
   if (pathname === "/v2/bearbeiten.js") return sende(res, 200, BEARBEITEN_SKRIPT, "text/javascript; charset=utf-8"), true;

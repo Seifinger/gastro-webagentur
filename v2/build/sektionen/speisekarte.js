@@ -108,7 +108,7 @@ function gerichtZeile(g, { texte, bestellbar }) {
   return `<li class="karte-gericht${g.ausverkauft ? " karte-gericht--aus" : ""}" id="${e(g.anker)}">
           <div class="karte-gericht-kopf"><h3>${e(g.name)}</h3>${mitVarianten ? "" : `<span class="menue-punkte" aria-hidden="true"></span><span class="preis">${formatPrice(g.preis)}</span>`}</div>
           ${g.beschreibung ? `<p class="gericht-desc">${e(g.beschreibung)}</p>` : ""}
-          ${marken ? `<p class="karte-marken">${marken}</p>` : ""}${extras}${varianten}${aktion ? `\n          <div class="karte-gericht-aktion">${aktion}</div>` : ""}
+          ${marken ? `<p class="karte-marken">${marken}</p>` : ""}${g.allergene ? `<p class="karte-extras"><span>Allergene/Zusatzstoffe:</span> ${e(g.allergene)}</p>` : ""}${extras}${varianten}${aktion ? `\n          <div class="karte-gericht-aktion">${aktion}</div>` : ""}
         </li>`;
 }
 

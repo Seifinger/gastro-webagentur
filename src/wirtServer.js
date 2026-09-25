@@ -102,13 +102,23 @@ const BREMSE_FENSTER_MS = 60_000;
 const BREMSE_MAX = 20;
 const zugriffe = new Map();
 
-function zuSchnell(adresse) {
+// Lesende Abrufe (Abholzeiten, Rechtstexte, Verfügbarkeit …) macht jede
+// Seite beim Laden – mehrere Gäste im selben WLAN teilen sich eine Adresse.
+// Sie bekommen deshalb eine großzügige eigene Grenze; streng bleibt die
+// Bremse für alles, was etwas anlegt oder ändert.
+const BREMSE_MAX_LESEN = 240;
+const lesezugriffe = new Map();
+
+function zuSchnell(adresse, { lesend = false } = {}) {
   const jetzt = Date.now();
-  const liste = (zugriffe.get(adresse) ?? []).filter((t) => jetzt - t < BREMSE_FENSTER_MS);
+  const karte = lesend ? lesezugriffe : zugriffe;
+  const liste = (karte.get(adresse) ?? []).filter((t) => jetzt - t < BREMSE_FENSTER_MS);
   liste.push(jetzt);
-  zugriffe.set(adresse, liste);
-  return liste.length > BREMSE_MAX;
+  karte.set(adresse, liste);
+  return liste.length > (lesend ? BREMSE_MAX_LESEN : BREMSE_MAX);
 }
+
+const LESENDE_PFADE = new Set(["/oeffentlich/abholzeiten", "/oeffentlich/rechtstexte", "/oeffentlich/no-show-einstellungen", "/oeffentlich/verfuegbarkeit"]);
 
 // Falsche Status-Links: eigene, strengere Bremse gegen Durchprobieren.
 const FEHLVERSUCHE_FENSTER_MS = 10 * 60_000;
@@ -126,6 +136,7 @@ function zuVieleFehlversuche(adresse, neu = false) {
 /** Für Tests: beide Bremsen leeren (sie gelten je Adresse, im Test immer 127.0.0.1). */
 export function setzeBremsenZurueck() {
   zugriffe.clear();
+  lesezugriffe.clear();
   fehlversuche.clear();
 }
 
@@ -361,7 +372,7 @@ export const handler = async (req, res) => {
 
   if (pathname.startsWith("/oeffentlich/") && req.method === "POST") {
     const adresse = req.socket.remoteAddress ?? "unbekannt";
-    if (zuSchnell(adresse)) {
+    if (zuSchnell(adresse, { lesend: LESENDE_PFADE.has(pathname) })) {
       json(res, 429, { ok: false, fehler: "Zu viele Anfragen. Bitte kurz warten." }, CORS);
       return;
     }
@@ -417,7 +428,7 @@ export const handler = async (req, res) => {
           await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
         }
         await stelleGastMeldungenZu(slug);
-        json(res, 200, { ok: true, bestellung: { id: b.id, ...gastAntwort("bestellung", b) } }, { ...CORS, ...PRIVAT });
+        json(res, 200, { ok: true, bestellung: { id: b.id, gesamt: b.gesamt, ...gastAntwort("bestellung", b) } }, { ...CORS, ...PRIVAT });
         return;
       }
 

@@ -16,7 +16,8 @@ export function bild(medium, { klasse = "", alt = "", lazy = true, zeigeBadge = 
     // ersten Frame und bei abgeschalteter Bewegung nie ein leerer Kasten steht.
     return `<video${klasse ? ` class="${klasse}"` : ""} src="${e(medium.src)}"${medium.poster ? ` poster="${e(medium.poster)}"` : ""} autoplay muted loop playsinline preload="metadata" aria-label="${e(alt)}" data-herkunft="${e(medium.herkunft ?? "")}"></video>${badge}`;
   }
-  return `<img${klasse ? ` class="${klasse}"` : ""} src="${e(medium.src)}" alt="${e(alt || medium.alt || "")}"${lazy ? ' loading="lazy"' : ""} data-herkunft="${e(medium.herkunft ?? "")}">${badge}`;
+  // Ein im Dashboard gepflegter Alt-Text des Mediums (Kundenfassung) geht vor.
+  return `<img${klasse ? ` class="${klasse}"` : ""} src="${e(medium.src)}" alt="${e(medium.altEigen || alt || medium.alt || "")}"${lazy ? ' loading="lazy"' : ""} data-herkunft="${e(medium.herkunft ?? "")}">${badge}`;
 }
 
 export function renderKopfzeile({ texte, ds }) {

@@ -594,6 +594,11 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
   }));
 
   return aendere(slug, (daten) => {
+    // Mit hinterlegter Bestellkarte (Kundenfassung, setzeBestellkarte) gilt
+    // nur, was der Server kennt: Name und Preis kommen aus der Karte, nie aus
+    // dem Browser. Ein abweichender Preis wird abgelehnt statt still anders
+    // berechnet – so zahlt niemand etwas anderes, als er gesehen hat.
+    const positionenGeprueft = pruefePositionenGegenKarte(daten.bestellkarte, positionen, sauber);
     const abholung = pruefeAbholwunsch({
       jetzt,
       ...abholEinstellungen(daten),
@@ -626,8 +631,9 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
       // (/oeffentlich/bestellung). Ältere Datensätze ohne dieses Feld
       // gelten in der Statistik als "unbekannt".
       quelle: "online",
-      positionen: sauber,
-      gesamt: sauber.reduce((summe, p) => summe + p.preis * p.menge, 0),
+      positionen: positionenGeprueft,
+      gesamt: Math.round(positionenGeprueft.reduce((summe, p) => summe + p.preis * p.menge, 0) * 100) / 100,
+      ...(daten.bestellkarte ? { bestellkarteVersion: daten.bestellkarte.version } : {}),
       // Wunsch des Gastes; was tatsächlich gilt, bestätigt der Wirt. Die
       // Uhrzeit kommt aus dem geprüften Zeitpunkt, nicht aus dem Text des Browsers.
       abholzeit: abholung.uhrzeit,
@@ -653,6 +659,45 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
     const gastToken = richteGastZugangEin(slug, daten, "bestellung", bestellung);
     daten.bestellungen.push(bestellung);
     return { ...bestellung, gastToken };
+  });
+}
+
+/**
+ * Prüft Warenkorb-Positionen gegen die Bestellkarte des Betriebs. Ohne Karte
+ * (Betriebe ohne Kundenfassung) bleibt es beim bisherigen Verhalten.
+ */
+function pruefePositionenGegenKarte(karte, roh, sauber) {
+  if (!karte?.katalog) return sauber;
+  return roh.map((p, i) => {
+    const id = String(p?.id ?? "");
+    const eintrag = karte.katalog[id];
+    if (!eintrag) throw new Error(`„${sauber[i].name || "Ein Gericht"}“ ist nicht mehr bestellbar. Bitte den Warenkorb prüfen und die Seite neu laden.`);
+    const [name, preis] = eintrag;
+    if (Math.round(Number(p.preis) * 100) !== Math.round(preis * 100)) {
+      throw new Error(`Der Preis für „${name}“ hat sich geändert (jetzt ${preis.toFixed(2).replace(".", ",")} €). Bitte die Seite neu laden.`);
+    }
+    return { id, name, menge: sauber[i].menge, preis };
+  });
+}
+
+/**
+ * Hinterlegt die Bestellkarte eines Betriebs: Katalog { id: [name, preis] }
+ * – derselbe, den die gebaute Seite im Warenkorb nutzt (v2/build/speisekarte.js).
+ * null entfernt sie.
+ */
+export function setzeBestellkarte(slug, karte) {
+  return aendere(slug, (daten) => {
+    if (!karte) {
+      delete daten.bestellkarte;
+      return null;
+    }
+    const katalog = {};
+    for (const [id, eintrag] of Object.entries(karte.katalog ?? {})) {
+      if (!Array.isArray(eintrag) || !String(eintrag[0] ?? "").trim() || !(Number(eintrag[1]) >= 0)) throw new Error(`Ungültiger Karteneintrag "${id}".`);
+      katalog[id] = [String(eintrag[0]), Math.round(Number(eintrag[1]) * 100) / 100];
+    }
+    daten.bestellkarte = { katalog, version: String(karte.version ?? ""), quelle: String(karte.quelle ?? ""), gesetzt: uhrHook.jetzt().toISOString() };
+    return daten.bestellkarte;
   });
 }
 

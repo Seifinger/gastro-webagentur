@@ -92,7 +92,7 @@ export async function baueImZyklus({ lead, kueche, stimmung, judge = true, optio
       const m = await erzeugeMedien({ slug: siteId, ds, seed: gestaltung.seed, provider: waehleProvider() });
       stufen.push({ stufe: "medien-erzeugt", ...m });
     }
-    const medien = optionen.medien ?? loeseMedien({ slug: siteId, gestaltung, fiktiv: Boolean(optionen.fiktiv ?? lead.fiktiv), ds, offline, konzeptVon: optionen.konzept ? `beispiel-${gestaltung.cuisine}` : null });
+    const medien = optionen.medien ?? loeseMedien({ slug: siteId, gestaltung, fiktiv: Boolean(optionen.fiktiv ?? lead.fiktiv), ds, offline, konzeptVon: optionen.konzept ? `beispiel-${gestaltung.cuisine}` : null, kunde: optionen.kundenMedien ?? null });
 
     // 4. Copy: optional ein Sprachmodell-Durchgang für auffällige Texte (mit
     //    Cache), danach immer die Regeln – im Build selbst.

@@ -23,6 +23,24 @@ const SLOGAN = {
 };
 export const sloganFuer = (kueche, ort) => (SLOGAN[kueche] ?? ((o) => (o ? `Zu Gast in ${o}` : "Zu Gast bei uns")))(ort);
 
+/**
+ * Kundenfassung: einzelne Texte gezielt ersetzen ("tisch.titel",
+ * "ambiente.text", …). Nur Pfade, die es in der Vorlage schon als Text gibt
+ * – so entsteht kein neuer Platz und keine neue Struktur. Ein leerer Wert
+ * blendet einen optionalen Satz aus (z. B. "fuss.hinweis").
+ */
+export function mitEigenenTexten(texte, pfade) {
+  if (!pfade || typeof pfade !== "object") return texte;
+  for (const [pfad, wert] of Object.entries(pfade)) {
+    const teile = String(pfad).split(".");
+    let ziel = texte;
+    for (const t of teile.slice(0, -1)) ziel = ziel && typeof ziel[t] === "object" ? ziel[t] : null;
+    const letzter = teile.at(-1);
+    if (ziel && typeof ziel[letzter] === "string" && typeof wert === "string") ziel[letzter] = wert;
+  }
+  return texte;
+}
+
 export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
   const ort = lead.ort || "";
   const lage = ortsbezug(lead.adresse, ort);
@@ -33,7 +51,7 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
   const kurz = archetyp === "abend";
   const direkt = archetyp === "hell";
 
-  return {
+  const texte = {
     name: lead.name || "Ihr Restaurant",
     kicker: `${konzept}${ort ? ` · ${ort}` : ""}`,
     headline: eigeneTexte.headline ?? (lead.name || "Ihr Restaurant"),
@@ -201,6 +219,7 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
     entwurfsleiste: `Unverbindlicher Gestaltungsentwurf – nicht die offizielle Website von ${lead.name || "diesem Lokal"}.`,
     entwurfsleisteFiktiv: "Beispielseite – dieses Lokal ist frei erfunden.",
   };
+  return mitEigenenTexten(texte, eigeneTexte.pfade);
 }
 
 /**
