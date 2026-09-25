@@ -182,6 +182,16 @@ export function standardMedien(gestaltung, { bildUrl = remoteImageUrl, fiktiv = 
 /* Build                                                               */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Flache Sicht einer Karte für Verbraucher, die nur kategorien[].gerichte
+ * kennen (Highlights, Karte ohne Ausdruck): Gruppen-Gerichte hängen hinten an –
+ * in derselben Reihenfolge, in der speisekarte.js ihre index-Kennung vergibt.
+ */
+function menuFlach(menu) {
+  if (!menu.kategorien.some((k) => k.gruppen)) return menu;
+  return { ...menu, kategorien: menu.kategorien.map((k) => ({ ...k, gerichte: [...(k.gerichte ?? []), ...(k.gruppen ?? []).flatMap((g) => g.gerichte ?? [])] })) };
+}
+
 function highlightAnzahl(art, verfuegbar) {
   const wunsch = { treppe: 3, leseliste: 4, reihe: 4 }[art] ?? 4;
   return Math.min(wunsch, verfuegbar);
@@ -248,7 +258,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   const karte = ausdruck ? karteAusDaten(menu, { beschreibungen: eigeneBeschreibungen }) : null;
   const bestellung = optionen.bestellung !== false;
 
-  const kandidaten = highlightCandidates(menu)
+  const kandidaten = highlightCandidates(menuFlach(menu))
     .map((g) => ({ ...g, beschreibung: verfeinern({ beschreibung: eigeneBeschreibungen[g.id] ?? g.beschreibung }, ds).texte.beschreibung }))
     // Mit Speisekarten-Seite: nur, was dort freigegeben und nicht ausverkauft
     // ist – mit Link zum Gericht statt Hinzufügen-Knopf.
@@ -291,7 +301,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
 
   const sektionen = {
     highlights: (tief) => renderHighlights({ ...ctx, betont: betont === "highlights", tief }),
-    karte: (tief, extra = {}) => renderKarte({ ...ctx, ...extra, menu: { ...menu, kategorien: menu.kategorien.map((k, ki) => ({ ...k, gerichte: k.gerichte.map((g, gi) => ({ ...g, beschreibung: eigeneBeschreibungen[`${ki}-${gi}`] ?? g.beschreibung })) })) }, tief }),
+    karte: (tief, extra = {}) => renderKarte({ ...ctx, ...extra, menu: { ...menu, kategorien: menuFlach(menu).kategorien.map((k, ki) => ({ ...k, gerichte: k.gerichte.map((g, gi) => ({ ...g, beschreibung: eigeneBeschreibungen[`${ki}-${gi}`] ?? g.beschreibung })) })) }, tief }),
     ambiente: (tief) => renderAmbiente({ ...ctx, tief }),
     stimmen: (tief) => renderStimmen({ ...ctx, tief }),
     reservierung: (tief) => renderReservierung({ ...ctx, betont: betont === "reservierung", tief }),
