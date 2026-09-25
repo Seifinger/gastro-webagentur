@@ -17,15 +17,17 @@ test("gesellig: Abfolge aus dem Profil, keine Gästestimmen, keine Häkchen", ()
   assert.ok(!html.includes('id="stimmen"'));
   assert.ok(!html.includes('class="pluspunkte"'));
   assert.ok(!html.includes('class="leiste"'));
-  assert.deepEqual(pruefeFunktionsVertrag(html), []);
+  // Die Startseite legt nichts selbst in den Warenkorb – das geschieht auf der Speisekarte.
+  assert.deepEqual(pruefeFunktionsVertrag(html, { hinzufuegen: false }), []);
   assert.equal(lint(html).ok, true);
 });
 
-test("Tisch: drei Gerichte als Collage, jedes vorbestellbar", () => {
+test("Tisch: drei Gerichte als Collage, jedes führt zum Gericht auf der Speisekarte", () => {
   const { html } = bau();
   const tisch = html.slice(html.indexOf('id="highlights"'), html.indexOf('id="karte"'));
   for (const n of [1, 2, 3]) assert.ok(tisch.includes(`teller teller--${n}`), `teller--${n}`);
-  assert.equal((tisch.match(/data-add="/g) || []).length, 3);
+  assert.equal((tisch.match(/data-add="/g) || []).length, 0, "kein heimliches Hinzufügen");
+  assert.equal((tisch.match(/href="speisekarte\/index\.html#gericht-[a-z0-9-]+"/g) || []).length, 3);
 });
 
 test("Einladung: rechts nur echte Angaben (Adresse, Route, Google-Note)", () => {
@@ -59,14 +61,14 @@ test("alle vier Ausdrucksweisen bauen quer durch die Archetypen durch alle Gates
     for (const [kueche, stimmung] of [["bayerisch", "kellerstube"], ["italienisch", "costiera"], ["japanisch", "washitsu"], ["cafe", "third-wave"]]) {
       const lead = testLeadFuer(kueche, stimmung);
       const { html } = baueSite({ lead, kueche, stimmung, optionen: { fiktiv: true, fontCss: "", ausdruck } });
-      assert.deepEqual(pruefeFunktionsVertrag(html), [], `${ausdruck} ${kueche}`);
+      assert.deepEqual(pruefeFunktionsVertrag(html, { hinzufuegen: false }), [], `${ausdruck} ${kueche}`);
     }
   }
 });
 
-test("AP7 Karte: Sprungleiste nur mit Ausdruck, Plus-Knöpfe mit vergrößerter Tippfläche", () => {
-  const { html } = bau();
-  assert.match(html, /<nav class="karten-sprung karten-sprung--fest" aria-label="Kategorien"><a href="#karte-0">/);
+test("AP7 Karte: Sprungleiste nur mit Ausdruck (jetzt auf der Speisekarten-Seite), Plus-Knöpfe mit vergrößerter Tippfläche", () => {
+  const { html, seiten } = bau();
+  assert.match(seiten["speisekarte/index.html"], /<nav class="karten-sprung karten-sprung--fest karten-sprung--seite" aria-label="Kategorien der Speisekarte"><a href="#kat-zum-anfangen">/);
   assert.match(html, /section\[id\^="karte-"\] \{ scroll-margin-top: calc\(var\(--kopf-ist/);
   assert.match(html, /\.mini-add::after \{ content: ""; position: absolute; inset: -4px; \}/);
   assert.match(html, /\.tippt \.mobilebar \{ opacity: 0;/);

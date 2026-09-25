@@ -104,18 +104,27 @@ export function renderKontakt({ texte, lead, oeffnungszeiten, tief }) {
  * welchen Öffnungszeiten gerechnet wird. Fest eingebaute Zeiten wären beim
  * ersten Aufruf schon veraltet.
  */
-export function renderBestellweg({ ds, texte, aktionen, oeffnungszeiten, abholHinweis = "" }) {
+export function renderBestellweg({ ds, texte, aktionen, oeffnungszeiten, abholHinweis = "", seite = "start" }) {
   const b = texte.bestellung;
-  const bestellen = (k) => `<button class="btn ${k}" id="bar-order" type="button">${e(b.bestellen)}</button>`;
-  const reservieren = (k) => `<a class="btn ${k}" href="#reservierung">${e(b.reservieren)}</a>`;
+  // Mit Speisekarten-Seite (aktionen.karte): Bei leerem Warenkorb führt der
+  // Knopf auf der Startseite zur Karte (PAGE_DATA.karteUrl, data-leer); ohne
+  // Bestellweg (bestellung: false) ist er ein schlichter Link zur Karte.
+  const mitKarte = Boolean(aktionen?.karte);
+  const leer = mitKarte ? ` data-leer="${e(seite === "karte" ? b.warenkorb : texte.nav.speisekarte)}"` : "";
+  const bestellen = (k) =>
+    mitKarte && !aktionen.bestellen
+      ? seite === "karte" ? "" : `<a class="btn ${k}" href="${e(aktionen.karte.href)}">${e(texte.nav.speisekarte)}</a>`
+      : `<button class="btn ${k}" id="bar-order" type="button"${leer}>${e(mitKarte ? (seite === "karte" ? b.warenkorb : texte.nav.speisekarte) : b.bestellen)}</button>`;
+  const reservieren = (k) => `<a class="btn ${k}" href="${seite === "karte" ? e(aktionen.start.href) : ""}#reservierung">${e(b.reservieren)}</a>`;
   const leiste = ds.layout.mobileAktionsleiste
     ? `<div class="mobilebar" id="mobilebar">${ds.layout.primaerAktion === "reservation" ? reservieren("btn-primary") + bestellen("btn-ghost") : bestellen("btn-primary") + reservieren("btn-ghost")}</div>`
     : "";
+  const status = seite === "karte" ? `\n<p class="cart-status" id="cart-status" role="status" aria-live="polite"></p>` : "";
   return `<button class="cart-fab" id="cart-fab" type="button">
   <span>${e(b.warenkorb)}</span>
   <span class="cart-count" id="fab-count">0</span>
   <span id="fab-total">0,00 €</span>
-</button>
+</button>${status}
 ${leiste}
 <div class="overlay" id="overlay"></div>
 <aside class="drawer" id="drawer" aria-label="${e(b.titel)}">

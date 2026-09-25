@@ -519,7 +519,10 @@ section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 .kopf .entwurf-hinweis { position: relative; }
 .kopf-innen { position: relative; display: flex; align-items: center; gap: var(--s-2); min-height: var(--kopf-hoehe-mobil); padding-inline: var(--rand); }
 .kopf-marke { margin-right: auto; font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform);
-  letter-spacing: var(--f-display-sperrung); font-size: var(--t-basis); line-height: 1.15; text-decoration: none; color: inherit; }
+  letter-spacing: var(--f-display-sperrung); font-size: var(--t-basis); line-height: 1.15; text-decoration: none; color: inherit;
+  min-width: 0; overflow-wrap: anywhere; }
+.kopf-aktionen { min-width: 0; }
+.kopf-aktionen .btn { white-space: nowrap; }
 .kopf-nav { display: none; gap: var(--s-3); }
 .kopf-nav a { color: inherit; text-decoration: none; font-size: var(--t-basis); }
 .kopf-nav a:hover { text-decoration: underline; }
@@ -643,6 +646,8 @@ section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 
 /* Einladung zweispaltig: links das Haus, rechts der Besuch (nur echte Angaben). */
 .einladung-innen { justify-items: start; text-align: left; }
+.einladung-innen > * { min-width: 0; max-width: 100%; }
+.einladung-name { overflow-wrap: anywhere; hyphens: auto; }
 .einladung .bewertung { justify-content: flex-start; }
 .einladung-aktionen { justify-content: flex-start; }
 .einladung-besuch { display: grid; gap: var(--s-2); width: 100%; padding-top: var(--s-3); border-top: 1px solid var(--linie); }
@@ -708,7 +713,8 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 
 /* Anfahrt (AP8) */
 .anfahrt-raster { display: grid; gap: var(--s-8); }
-.anfahrt-adresse { font-size: var(--t-h1); }
+.anfahrt-raster > * { min-width: 0; }
+.anfahrt-adresse { font-size: var(--t-h1); overflow-wrap: anywhere; hyphens: auto; }
 .anfahrt-adresse span { display: block; margin-top: var(--s-1); color: var(--text-leise); font-size: var(--t-h3); }
 .anfahrt-wege { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-4); }
 .anfahrt-hinweis { margin-top: var(--s-3); color: var(--text-leise); }
@@ -721,7 +727,8 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 /* Fußzeile (AP8) */
 .fuss-haus { padding-block: var(--sektion) var(--s-6); background: var(--tint); color: var(--auf-tint); }
 .fuss-haus-raster { display: grid; gap: var(--s-4); }
-.fuss-marke { font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform); font-size: var(--t-h1); line-height: 1.05; }
+.fuss-haus-raster > * { min-width: 0; }
+.fuss-marke { font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform); font-size: var(--t-h1); line-height: 1.05; overflow-wrap: anywhere; hyphens: auto; }
 .fuss-spalten { display: grid; gap: var(--s-3); color: var(--auf-tint-leise); }
 .fuss-spalten address { font-style: normal; }
 .fuss-haus a { color: var(--auf-tint); }
@@ -741,6 +748,93 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   .atmosphaere { display: none; }
 }
 
+
+/* Startseite: kleine Auswahl + Weg zur ganzen Karte */
+.auswahl-raster { display: grid; gap: var(--s-6); }
+.auswahl-liste .karten-zeile .gericht-desc { max-width: 52ch; }
+.auswahl-karte { display: grid; align-content: start; gap: var(--s-2); padding: var(--s-4); background: var(--grund); border: 1px solid var(--linie); border-radius: var(--r-karte); }
+.auswahl-kategorien { list-style: none; margin: 0 0 var(--s-2); padding: 0; }
+.auswahl-kategorien li { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-2); border-bottom: 1px solid var(--linie); }
+.auswahl-kategorien a { display: block; padding-block: var(--s-1); color: var(--text); text-decoration: none; font-weight: var(--f-text-stark); }
+.auswahl-kategorien a:hover { color: var(--akzent-text); text-decoration: underline; }
+.auswahl-karte .anzahl, .karten-sprung--seite .anzahl { color: var(--text-leise); font-size: var(--t-klein); font-variant-numeric: tabular-nums; }
+.auswahl-ganz { width: 100%; }
+@media (min-width: 1024px) { .auswahl-raster { grid-template-columns: 8fr 4fr; column-gap: calc(var(--rinne) * 2); align-items: start; } }
+
+.kopf-nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: .3em; }
+/* Speisekarten-Seite: ruhiger als die Startseite, Kopfzeile im Fluss */
+.seite-karte .kopf { position: sticky; }
+.karte-seite { padding-bottom: var(--sektion); }
+.karte-seite-kopf { padding-block: var(--s-6) var(--s-4); }
+.karte-seite-kopf .rubrik a { color: inherit; }
+.karte-seite-kopf .rubrik span { color: var(--text-leise); }
+.karte-seite-kopf h1 { font-size: var(--t-h1); }
+.karte-seite-kopf .intro { max-width: var(--text-breite); }
+.karte-probe { max-width: var(--text-breite); margin-top: var(--s-3); padding: var(--s-2) var(--s-3); border-left: 4px solid var(--signal-text); background: var(--flaeche); color: var(--text); }
+.karte-wege { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); margin-top: var(--s-3); }
+.karte-wege a { display: inline-flex; align-items: center; min-height: var(--s-6); color: var(--akzent-text); font-weight: var(--f-text-stark); }
+
+.karten-sprung--seite a { gap: var(--s-1); min-height: var(--s-6); }
+.karten-sprung--seite a[aria-current="true"] .anzahl { color: inherit; }
+[id^="kat-"], [id^="gericht-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe)) + var(--s-8)); }
+
+.karte-kategorie { padding-block: var(--s-6); border-top: 1px solid var(--linie-stark); }
+.karte-kategorie:first-child { border-top: 0; padding-top: 0; }
+.karte-kategorie-kopf { display: grid; gap: var(--s-1); margin-bottom: var(--s-2); }
+.karte-kategorie-kopf h2 { font-size: var(--t-h2); }
+.karte-kategorie-text { max-width: var(--text-breite); color: var(--text-leise); }
+.karte-kategorie-bild { margin-top: var(--s-2); max-width: 28rem; }
+.karte-kategorie-bild img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: var(--r-bild); background: var(--flaeche-tief); }
+.karte-kategorie-bild figcaption { margin-top: var(--s-1); color: var(--text-leise); font-size: var(--t-klein); }
+.karte-gruppe { margin-top: var(--s-4); }
+.karte-gruppe-name { font-size: var(--t-h3); margin-bottom: var(--s-1); }
+
+.karte-gerichte { list-style: none; margin: 0; padding: 0; display: grid; }
+.karte-gericht { display: grid; gap: var(--s-1); padding-block: var(--s-3); border-bottom: 1px solid var(--linie); min-width: 0; }
+.karte-gericht-kopf { display: flex; align-items: baseline; gap: var(--s-1); }
+.karte-gericht-kopf h3 { min-width: 0; font-family: var(--f-text); font-size: var(--t-gross); font-weight: var(--f-text-stark); text-transform: none; letter-spacing: 0; overflow-wrap: anywhere; }
+.karte-gericht-kopf .preis { font-size: var(--t-gross); }
+.karte-gericht .gericht-desc { max-width: 60ch; color: var(--text-leise); overflow-wrap: anywhere; }
+.karte-marken { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.karte-extras { color: var(--text-leise); font-size: var(--t-klein); }
+.karte-extras span { font-weight: var(--f-text-stark); color: var(--text); }
+.karte-varianten { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-halb); }
+.karte-varianten li { display: flex; align-items: center; gap: var(--s-1); min-height: var(--s-6); }
+.karte-varianten li.aus { color: var(--text-leise); text-decoration: line-through; }
+.karte-gericht-aktion { display: flex; }
+.karte-add { min-height: var(--s-6); }
+.karte-gericht--aus h3, .karte-gericht--aus .preis { color: var(--text-leise); }
+/* Sprung von der Startseite (Plus): das Gericht ist markiert – auch ohne Skript (:target). */
+.karte-gericht:target { margin-inline: calc(var(--s-2) * -1); padding-inline: var(--s-2); background: var(--flaeche); box-shadow: inset 4px 0 0 var(--akzent); border-radius: var(--r-klein); }
+.karte-fuss { margin-top: var(--s-6); color: var(--text-leise); font-size: var(--t-klein); max-width: var(--text-breite); }
+
+/* Status nach dem Hinzufügen: kurz sichtbar, für Vorleser als Live-Region */
+.cart-status { position: fixed; left: var(--rand); right: var(--rand); bottom: calc(var(--s-10) + var(--s-6)); z-index: 60; margin: 0 auto; max-width: 28rem;
+  padding: var(--s-1) var(--s-2); background: var(--tint); color: var(--auf-tint); border-radius: var(--r-karte); text-align: center;
+  opacity: 0; transform: translateY(var(--s-1)); pointer-events: none; transition: opacity var(--m-kurz) ease, transform var(--m-kurz) ease; }
+.cart-status.sichtbar { opacity: 1; transform: none; }
+.cart-hinweis { margin: 0 0 var(--s-2); padding: var(--s-1) var(--s-2); background: var(--flaeche); border-left: 4px solid var(--signal-text); font-size: var(--t-klein); }
+.cart-fab.gerade { animation: fab-gerade var(--m-mittel) var(--m-kurve); }
+@keyframes fab-gerade { 50% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) {
+  .cart-status { transition: none; transform: none; }
+  .cart-fab.gerade { animation: none; }
+}
+
+@media (min-width: 1024px) {
+  .karte-seite-kopf { padding-block: var(--s-10) var(--s-6); }
+  .karte-seite-raster { display: grid; grid-template-columns: 3fr 9fr; column-gap: calc(var(--rinne) * 2); align-items: start; }
+  .karten-sprung--seite { position: sticky; top: calc(var(--kopf-ist, var(--kopf-hoehe)) + var(--s-3)); flex-direction: column; flex-wrap: nowrap; gap: 0;
+    margin: 0; padding: 0; overflow: visible; }
+  .karten-sprung--seite a { justify-content: space-between; padding: var(--s-1) var(--s-2); border: 0; border-left: 2px solid var(--linie-stark); border-radius: 0; font-size: var(--t-basis); }
+  .karten-sprung--seite a[aria-current="true"] { background: transparent; color: var(--akzent-text); border-left-color: var(--akzent); }
+  .karte-kategorie--bild .karte-kategorie-kopf { grid-template-columns: minmax(0, 1fr) minmax(0, 20rem); column-gap: var(--rinne); align-items: end; }
+  .karte-kategorie--bild .karte-kategorie-bild { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; }
+}
+@media (min-width: 1280px) {
+  .karte-gerichte { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: calc(var(--rinne) * 2); }
+}
+
 </style>
 </head>
 <body class="a-hell schema-hell rubrik-mono moment-highlights ausdruck-editorial">
@@ -749,14 +843,14 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   
   <div class="kopf-innen">
     <a class="kopf-marke" href="#">Café Morgenrot</a>
-    <nav class="kopf-nav" aria-label="Hauptnavigation"><a href="#karte">Karte</a><a href="#highlights">Empfehlungen</a><a href="#reservierung">Reservieren</a><a href="#kontakt">Anfahrt</a></nav>
-    <div class="kopf-aktionen"><a class="btn btn-ghost kopf-zweit" href="#karte" data-aktion="bestellen">Bestellen</a><a class="btn btn-primary kopf-erst" href="#reservierung" data-aktion="reservieren">Reservieren</a></div>
+    <nav class="kopf-nav" aria-label="Hauptnavigation"><a href="speisekarte/index.html">Speisekarte</a><a href="#karte">Empfehlungen</a><a href="#reservierung">Reservieren</a><a href="#kontakt">Anfahrt</a></nav>
+    <div class="kopf-aktionen"><a class="btn btn-ghost kopf-zweit" href="speisekarte/index.html" data-aktion="bestellen">Probebestellung</a><a class="btn btn-primary kopf-erst" href="#reservierung" data-aktion="reservieren">Reservieren</a></div>
     <a class="kopf-menue-knopf" href="#kopf-menue" aria-controls="kopf-menue" aria-expanded="false"><span class="kopf-menue-linien" aria-hidden="true"></span><span class="nur-vorleser">Menü</span></a>
   </div>
   <nav class="kopf-menue" id="kopf-menue" aria-label="Menü">
     <a class="kopf-menue-zu" href="#" aria-label="Menü schließen">×</a>
-    <a href="#karte">Karte</a><a href="#highlights">Empfehlungen</a><a href="#reservierung">Reservieren</a><a href="#kontakt">Anfahrt</a>
-    <a class="btn btn-primary" href="#reservierung" data-aktion="reservieren">Reservieren</a><a class="btn btn-ghost" href="#karte" data-aktion="bestellen">Bestellen</a>
+    <a href="speisekarte/index.html">Speisekarte</a><a href="#karte">Empfehlungen</a><a href="#reservierung">Reservieren</a><a href="#kontakt">Anfahrt</a>
+    <a class="btn btn-primary" href="#reservierung" data-aktion="reservieren">Reservieren</a><a class="btn btn-ghost" href="speisekarte/index.html" data-aktion="bestellen">Probebestellung</a>
   </nav>
 </header>
 <div class="atmosphaere" aria-hidden="true" style="--atmo-deckkraft: 0.06"><svg class="atmosphaere-marke" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><ellipse cx="14" cy="13.6" rx="6" ry="8.4" transform="rotate(28 14 13.6)"/><path d="M10.8 20c1.7-4.4 2.9-8.6 3.6-12.8"/></svg></div>
@@ -782,7 +876,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       <h2>Besuch</h2>
       <address class="einladung-adresse">Musterplatz 11, 84503 Altötting<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Musterplatz%2011%2C%2084503%20Alt%C3%B6tting" target="_blank" rel="noopener">Route planen</a></address>
       <p class="bewertung"><span class="sterne" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span><span><strong>4,9</strong> von 5 auf Google · 341 Bewertungen</span></p>
-      <div class="einladung-aktionen"><a class="btn btn-primary" href="#reservierung">Tisch reservieren</a><a class="btn btn-ghost" href="#karte">Jetzt vorbestellen</a></div>
+      <div class="einladung-aktionen"><a class="btn btn-primary" href="#reservierung">Tisch reservieren</a><a class="btn btn-ghost" href="speisekarte/index.html">Probebestellung</a></div>
     </aside>
   </div>
 </section>
@@ -798,44 +892,38 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   </div>
 </section>
 
-<section class="sektion sektion--tief" id="karte">
+<section class="sektion sektion--tief auswahl" id="karte">
   <div class="rahmen">
     <header class="sektion-kopf">
-      <p class="rubrik">Speisekarte</p>
+      <p class="rubrik">Aus der Karte</p>
       <div>
-        <h2>Die Karte</h2>
-        <p class="intro">Jedes Gericht lässt sich mit einem Tipp vorbestellen.</p>
+        <h2>Eine kleine Auswahl</h2>
+        <p class="intro">Ein paar Gerichte aus der Karte. Die ganze Karte steht auf einer eigenen Seite.</p>
       </div>
     </header>
-    <nav class="karten-sprung" aria-label="Kategorien"><a href="#karte-0">Frühstück</a><a href="#karte-1">Kuchen &amp; Torten</a><a href="#karte-2">Kaffee &amp; Getränke</a></nav>
-    <div class="karte-liste"><section class="karten-kategorie" id="karte-0"><h3>Frühstück <span class="anzahl">3 Gerichte</span></h3><ul class="karten-liste"><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Frühstück Klassik</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">11,50 €</span><button class="mini-add" type="button" data-add="0-0" data-name="Frühstück Klassik" data-preis="11.5" aria-label="Frühstück Klassik vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
+    <div class="auswahl-raster">
+      <ul class="karten-liste auswahl-liste"><li class="karten-zeile">
+          <div class="zeile-kopf"><span class="karten-name">Frühstück Klassik</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">11,50 €</span><a class="mini-add" href="speisekarte/index.html#gericht-fruehstueck-klassik" aria-label="Frühstück Klassik auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Semmeln, Butter, Marmelade, Ei, Aufschnitt</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Pancakes mit Ahornsirup</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">9,90 €</span><button class="mini-add" type="button" data-add="0-1" data-name="Pancakes mit Ahornsirup" data-preis="9.9" aria-label="Pancakes mit Ahornsirup vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Mit frischer Banane und Puderzucker</p>
-        </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Lachs-Bowl</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">13,90 €</span><button class="mini-add" type="button" data-add="0-2" data-name="Lachs-Bowl" data-preis="13.9" aria-label="Lachs-Bowl vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Mit Ei, Avocado, Gurke und frischem Gemüse</p>
-        </li></ul></section><section class="karten-kategorie" id="karte-1"><h3>Kuchen &amp; Torten <span class="anzahl">3 Gerichte</span></h3><ul class="karten-liste"><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Apfelkuchen mit Sahne</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">5,50 €</span><button class="mini-add" type="button" data-add="1-0" data-name="Apfelkuchen mit Sahne" data-preis="5.5" aria-label="Apfelkuchen mit Sahne vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
+          <div class="zeile-kopf"><span class="karten-name">Apfelkuchen mit Sahne</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">5,50 €</span><a class="mini-add" href="speisekarte/index.html#gericht-apfelkuchen-mit-sahne" aria-label="Apfelkuchen mit Sahne auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Nach Omas Rezept gebacken</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Käsesahnetorte</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">5,90 €</span><button class="mini-add" type="button" data-add="1-1" data-name="Käsesahnetorte" data-preis="5.9" aria-label="Käsesahnetorte vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Luftig-frisch</p>
-        </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Schokoladenkuchen</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">5,50 €</span><button class="mini-add" type="button" data-add="1-2" data-name="Schokoladenkuchen" data-preis="5.5" aria-label="Schokoladenkuchen vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Saftig, mit Zartbitterschokolade</p>
-        </li></ul></section><section class="karten-kategorie" id="karte-2"><h3>Kaffee &amp; Getränke <span class="anzahl">3 Gerichte</span></h3><ul class="karten-liste"><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Cappuccino</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">3,90 €</span><button class="mini-add" type="button" data-add="2-0" data-name="Cappuccino" data-preis="3.9" aria-label="Cappuccino vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
+          <div class="zeile-kopf"><span class="karten-name">Cappuccino</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">3,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-cappuccino" aria-label="Cappuccino auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Aus regional gerösteten Bohnen</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Heiße Schokolade</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">4,50 €</span><button class="mini-add" type="button" data-add="2-1" data-name="Heiße Schokolade" data-preis="4.5" aria-label="Heiße Schokolade vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Mit Sahnehaube</p>
+          <div class="zeile-kopf"><span class="karten-name">Pancakes mit Ahornsirup</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">9,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-pancakes-mit-ahornsirup" aria-label="Pancakes mit Ahornsirup auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
+          <p class="gericht-desc">Mit frischer Banane und Puderzucker</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Frisch gepresster Orangensaft</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">4,90 €</span><button class="mini-add" type="button" data-add="2-2" data-name="Frisch gepresster Orangensaft" data-preis="4.9" aria-label="Frisch gepresster Orangensaft vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">0,3 l</p>
-        </li></ul></section></div>
+          <div class="zeile-kopf"><span class="karten-name">Käsesahnetorte</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">5,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-kaesesahnetorte" aria-label="Käsesahnetorte auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
+          <p class="gericht-desc">Luftig-frisch</p>
+        </li></ul>
+      <nav class="auswahl-karte" aria-label="Kategorien der Speisekarte">
+        <p class="rubrik">Auf der Karte</p>
+        <ul class="auswahl-kategorien"><li><a href="speisekarte/index.html#kat-fruehstueck">Frühstück</a><span class="anzahl">3</span></li><li><a href="speisekarte/index.html#kat-kuchen-torten">Kuchen &amp; Torten</a><span class="anzahl">3</span></li><li><a href="speisekarte/index.html#kat-kaffee-getraenke">Kaffee &amp; Getränke</a><span class="anzahl">3</span></li></ul>
+        <a class="btn btn-primary auswahl-ganz" href="speisekarte/index.html">Gesamte Speisekarte ansehen</a>
+      </nav>
+    </div>
   </div>
 </section>
 
@@ -911,7 +999,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   <span class="cart-count" id="fab-count">0</span>
   <span id="fab-total">0,00 €</span>
 </button>
-<div class="mobilebar" id="mobilebar"><a class="btn btn-primary" href="#reservierung">Reservieren</a><button class="btn btn-ghost" id="bar-order" type="button">Bestellen</button></div>
+<div class="mobilebar" id="mobilebar"><a class="btn btn-primary" href="#reservierung">Reservieren</a><button class="btn btn-ghost" id="bar-order" type="button" data-leer="Speisekarte">Speisekarte</button></div>
 <div class="overlay" id="overlay"></div>
 <aside class="drawer" id="drawer" aria-label="Ihre Abholbestellung">
   <div class="drawer-head">
@@ -974,7 +1062,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       <address>Musterplatz 11, 84503 Altötting<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Musterplatz%2011%2C%2084503%20Alt%C3%B6tting" target="_blank" rel="noopener">Route planen</a></address>
       <div></div>
       <nav aria-label="Seitennavigation">
-        <a href="#karte">Karte</a>
+        <a href="speisekarte/index.html">Speisekarte</a>
         <a href="#reservierung">Reservieren</a>
         <a href="#kontakt">Anfahrt</a>
       </nav>
@@ -982,7 +1070,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     <p class="fuss-hinweis">Unverbindlicher Gestaltungsentwurf. Was als Platzhalter gekennzeichnet ist – Gerichte, Preise, Öffnungszeiten, Angaben zu Herkunft und Geschichte des Hauses –, ist ein Vorschlag und noch nicht vom Haus bestätigt. Fotos stammen aus einer Bilddatenbank oder sind KI-generiert und entsprechend markiert.</p>
   </div>
 </footer>
-<script>window.PAGE_DATA = {"name":"Café Morgenrot","kontaktEmail":"","apiUrl":""};</script>
+<script>window.PAGE_DATA = {"name":"Café Morgenrot","kontaktEmail":"","apiUrl":"","seite":"start","karteUrl":"speisekarte/index.html","warenkorb":{"schluessel":"dd303902c3ba","karte":{"fruehstueck-klassik":["Frühstück Klassik",11.5],"pancakes-mit-ahornsirup":["Pancakes mit Ahornsirup",9.9],"lachs-bowl":["Lachs-Bowl",13.9],"apfelkuchen-mit-sahne":["Apfelkuchen mit Sahne",5.5],"kaesesahnetorte":["Käsesahnetorte",5.9],"schokoladenkuchen":["Schokoladenkuchen",5.5],"cappuccino":["Cappuccino",3.9],"heisse-schokolade":["Heiße Schokolade",4.5],"frisch-gepresster-orangensaft":["Frisch gepresster Orangensaft",4.9]}}};</script>
 <script>window.Abholzeiten = (function abholzeitKern() {
   var MINUTE = 60000;
   var ASAP_VORLAUF_MINUTEN = 20;
@@ -1329,6 +1417,11 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   var data = window.PAGE_DATA;
   var cart = {};
   var noShowEinstellungen = null;
+  // Warenkorb über mehrere Seiten (Startseite ↔ Speisekarte): nur, wenn
+  // die Seite ihre Karte mitliefert (PAGE_DATA.warenkorb). Name und Preis
+  // kommen dann immer aus dieser Karte, nie aus einem alten Speicherstand.
+  var speicher = data.warenkorb && data.warenkorb.karte ? data.warenkorb : null;
+  var warenkorbHinweis = "";
 
   function euro(value) { return value.toFixed(2).replace(".", ",") + " \u20AC"; }
   function byId(id) { return document.getElementById(id); }
@@ -1347,6 +1440,14 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     var list = byId("cart-lines");
     var current = lines();
     list.innerHTML = "";
+
+    if (warenkorbHinweis && current.length > 0) {
+      var notiz = document.createElement("p");
+      notiz.className = "cart-hinweis";
+      notiz.setAttribute("role", "status");
+      notiz.textContent = warenkorbHinweis;
+      list.appendChild(notiz);
+    }
 
     if (current.length === 0) {
       var empty = document.createElement("p");
@@ -1398,7 +1499,57 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     byId("fab-count").textContent = String(anzahl());
     byId("order-submit").disabled = current.length === 0;
     byId("cart-fab").className = current.length === 0 ? "cart-fab" : "cart-fab visible";
-    byId("bar-order").textContent = current.length === 0 ? "Bestellen" : "Bestellen \u00B7 " + euro(total());
+    var barOrder = byId("bar-order");
+    if (barOrder) barOrder.textContent = current.length === 0 ? (barOrder.getAttribute("data-leer") || "Bestellen") : "Bestellen \u00B7 " + euro(total());
+    if (current.length === 0) warenkorbHinweis = "";
+    speichere();
+  }
+
+  function speicherSchluessel() { return "warenkorb:" + speicher.schluessel; }
+
+  function speichere() {
+    if (!speicher) return;
+    try {
+      window.sessionStorage.setItem(speicherSchluessel(), JSON.stringify(lines().map(function (line) {
+        return { id: line.id, name: line.name, preis: line.preis, menge: line.menge };
+      })));
+    } catch (e) { /* ohne Speicher bleibt der Warenkorb auf dieser Seite */ }
+  }
+
+  /**
+   * Holt einen auf der anderen Seite begonnenen Warenkorb zur\u00FCck. Was nicht
+   * mehr auf der Karte steht (oder ausverkauft ist), f\u00E4llt heraus; ein
+   * ge\u00E4nderter Preis wird \u00FCbernommen und im Warenkorb genannt.
+   */
+  function stelleWarenkorbWiederHer() {
+    if (!speicher) return;
+    var gespeichert = [];
+    try { gespeichert = JSON.parse(window.sessionStorage.getItem(speicherSchluessel()) || "[]"); } catch (e) { gespeichert = []; }
+    if (!Array.isArray(gespeichert)) return;
+    var hinweise = [];
+    gespeichert.forEach(function (eintrag) {
+      if (!eintrag || typeof eintrag.id !== "string") return;
+      var menge = Math.min(99, Math.floor(Number(eintrag.menge)));
+      if (!(menge > 0)) return;
+      var aktuell = speicher.karte[eintrag.id];
+      if (!aktuell) {
+        hinweise.push(String(eintrag.name || "Ein Gericht") + " ist nicht mehr bestellbar und wurde entfernt.");
+        return;
+      }
+      cart[eintrag.id] = { id: eintrag.id, name: aktuell[0], preis: aktuell[1], menge: menge };
+      if (Number(eintrag.preis) !== aktuell[1]) hinweise.push("Neuer Preis f\u00FCr " + aktuell[0] + ": " + euro(aktuell[1]) + ".");
+    });
+    warenkorbHinweis = hinweise.join(" ");
+  }
+
+  /** Auf der Speisekarte: kurz best\u00E4tigen statt den Warenkorb \u00FCber die Karte zu legen. */
+  function meldeHinzugefuegt(name) {
+    var status = byId("cart-status");
+    if (status) status.textContent = name + " liegt im Warenkorb (" + anzahl() + " insgesamt).";
+    var fab = byId("cart-fab");
+    fab.classList.remove("gerade");
+    void fab.offsetWidth;
+    fab.classList.add("gerade");
   }
 
   function changeQty(id, delta) {
@@ -1410,10 +1561,17 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   }
 
   function addToCart(id, name, preis) {
+    if (speicher) {
+      // Nur, was die Karte als bestellbar f\u00FChrt \u2013 zum Preis der Karte.
+      if (!speicher.karte[id]) return;
+      name = speicher.karte[id][0];
+      preis = speicher.karte[id][1];
+    }
     if (!cart[id]) cart[id] = { id: id, name: name, preis: preis, menge: 0 };
     cart[id].menge += 1;
     renderCart();
-    openDrawer();
+    if (data.seite === "karte") meldeHinzugefuegt(name);
+    else openDrawer();
   }
 
   function openDrawer() {
@@ -1753,8 +1911,9 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     var barOrder = byId("bar-order");
     if (barOrder) {
       barOrder.addEventListener("click", function () {
-        if (lines().length === 0) byId("karte").scrollIntoView({ behavior: "smooth" });
-        else openDrawer();
+        if (lines().length > 0) openDrawer();
+        else if (data.karteUrl) window.location.href = data.karteUrl;
+        else byId("karte").scrollIntoView({ behavior: "smooth" });
       });
     }
     byId("drawer-close").addEventListener("click", closeDrawer);
@@ -1764,13 +1923,16 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       if (event.key === "Escape") { closeDrawer(); closeConfirm(); }
     });
 
+    // Die Reservierung steht auf der Startseite; die Speisekarten-Seite hat sie nicht.
     var dateInput = byId("res-datum");
     var today = new Date();
     var iso = today.getFullYear() + "-" +
       String(today.getMonth() + 1).padStart(2, "0") + "-" +
       String(today.getDate()).padStart(2, "0");
-    dateInput.min = iso;
-    dateInput.value = iso;
+    if (dateInput) {
+      dateInput.min = iso;
+      dateInput.value = iso;
+    }
 
     byId("order-form").addEventListener("submit", function (event) {
       event.preventDefault();
@@ -1858,7 +2020,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       });
     });
 
-    byId("reservation-form").addEventListener("submit", function (event) {
+    if (byId("reservation-form")) byId("reservation-form").addEventListener("submit", function (event) {
       event.preventDefault();
       var form = event.target;
       if (!validate(form, ["datum", "uhrzeit", "personen", "name", "telefon"])) return;
@@ -1912,6 +2074,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 
     beobachteAbholzeiten();
     ladeAbholKonfig();
+    stelleWarenkorbWiederHer();
     renderCart();
   });
 })();

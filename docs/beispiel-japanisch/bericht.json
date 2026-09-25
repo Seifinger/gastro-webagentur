@@ -18,6 +18,37 @@
     "0-1",
     "1-0"
   ],
+  "speisekarte": {
+    "pfad": "speisekarte/index.html",
+    "quelle": "musterkarte",
+    "kategorien": [
+      {
+        "name": "Vorspeisen",
+        "anker": "kat-vorspeisen",
+        "gerichte": 3
+      },
+      {
+        "name": "Sushi",
+        "anker": "kat-sushi",
+        "gerichte": 4
+      },
+      {
+        "name": "Ramen & Warmes",
+        "anker": "kat-ramen-warmes",
+        "gerichte": 4
+      }
+    ],
+    "gerichte": 11,
+    "bestellbar": 11,
+    "bestellung": "vorschau",
+    "startseite": [
+      "edamame",
+      "sushi-box-12-stueck",
+      "shoyu-ramen",
+      "gyoza-5-stueck",
+      "nigiri-lachs-2-stueck"
+    ]
+  },
   "kontrast": {
     "geprueft": 23,
     "fehler": 0

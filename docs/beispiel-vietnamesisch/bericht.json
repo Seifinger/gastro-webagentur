@@ -19,6 +19,37 @@
     "1-2",
     "2-0"
   ],
+  "speisekarte": {
+    "pfad": "speisekarte/index.html",
+    "quelle": "musterkarte",
+    "kategorien": [
+      {
+        "name": "Vorspeisen",
+        "anker": "kat-vorspeisen",
+        "gerichte": 3
+      },
+      {
+        "name": "Phở & Suppen",
+        "anker": "kat-pho-suppen",
+        "gerichte": 3
+      },
+      {
+        "name": "Bánh Mì & Bowls",
+        "anker": "kat-banh-mi-bowls",
+        "gerichte": 4
+      }
+    ],
+    "gerichte": 10,
+    "bestellbar": 10,
+    "bestellung": "vorschau",
+    "startseite": [
+      "sommerrollen-3-stueck",
+      "pho-bo",
+      "banh-mi-mit-schweinebauch",
+      "sommerrollen-vegetarisch-3-stueck",
+      "pho-ga"
+    ]
+  },
   "kontrast": {
     "geprueft": 23,
     "fehler": 0

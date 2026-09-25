@@ -95,10 +95,23 @@ export const PFLICHT_FELDER = {
   "reservation-form": ["datum", "uhrzeit", "personen", "name", "telefon", "email", "wunsch"],
 };
 
-/** Prüft, ob das Markup alle Anker des v1-Skripts enthält. */
-export function pruefeFunktionsVertrag(html) {
-  const fehlend = PFLICHT_IDS.filter((id) => !new RegExp(`id="${id}"`).test(html));
+/** Was die Speisekarten-Seite nicht hat: Die Reservierung bleibt auf der Startseite. */
+const NUR_STARTSEITE = { ids: ["reservation-form", "res-datum"], formulare: ["reservation-form"] };
+
+/**
+ * Prüft, ob das Markup alle Anker des v1-Skripts enthält.
+ *
+ * @param {string} html
+ * @param {object} [o]
+ * @param {"start"|"karte"} [o.seite] - "karte": ohne Reservierungsformular
+ * @param {boolean} [o.hinzufuegen=true] - false: Seite ohne eigene Hinzufügen-Knöpfe
+ *   (Startseite mit Speisekarten-Seite: Das Plus öffnet das Gericht dort.)
+ */
+export function pruefeFunktionsVertrag(html, { seite = "start", hinzufuegen = true } = {}) {
+  const ausgenommen = seite === "karte" ? NUR_STARTSEITE : { ids: [], formulare: [] };
+  const fehlend = PFLICHT_IDS.filter((id) => !ausgenommen.ids.includes(id) && !new RegExp(`id="${id}"`).test(html));
   for (const [form, felder] of Object.entries(PFLICHT_FELDER)) {
+    if (ausgenommen.formulare.includes(form)) continue;
     const formStart = html.indexOf(`id="${form}"`);
     const formEnde = html.indexOf("</form>", formStart);
     const block = formStart === -1 ? "" : html.slice(formStart, formEnde);
@@ -106,6 +119,6 @@ export function pruefeFunktionsVertrag(html) {
       if (!new RegExp(`name="${feld}"`).test(block)) fehlend.push(`${form}[name=${feld}]`);
     }
   }
-  if (!/data-add="[^"]+"[^>]*data-name="[^"]*"[^>]*data-preis="[\d.]+"/.test(html)) fehlend.push("[data-add][data-name][data-preis]");
+  if (hinzufuegen && !/data-add="[^"]+"[^>]*data-name="[^"]*"[^>]*data-preis="[\d.]+"/.test(html)) fehlend.push("[data-add][data-name][data-preis]");
   return fehlend;
 }

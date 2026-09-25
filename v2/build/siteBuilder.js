@@ -16,6 +16,7 @@
 // wirtServer.js) ist das v1-Skript, unverändert (v1Funktionen.js).
 
 import { mkdirSync, writeFileSync, copyFileSync, existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { ladeDesignsystem, HERO_VARIANTEN, SPACING_SKALA } from "./designsystemGenerator.js";
@@ -49,6 +50,8 @@ import { renderTisch, renderHausBand, renderAnfahrt, renderFussAusdruck, ABFOLGE
 import { renderAtmosphaere, ATMOSPHAERE_CSS, ATMOSPHAERE_SKRIPT } from "./atmosphaere.js";
 import { renderReservierung, renderKontakt, renderBestellweg, renderFuss, renderEntwurfsleiste } from "./sektionen/service.js";
 import { konzeptLead, konzeptTexte } from "./konzept.js";
+import { karteAusDaten, gerichtZuIndex, gerichtLink, auswahlFuerStartseite, KARTE_PFAD, START_PFAD } from "./speisekarte.js";
+import { renderAuswahl, renderKarteSeite, kategorieBilder, KARTE_CSS, KARTE_SEITE_SKRIPT } from "./sektionen/speisekarte.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const OUTPUT_DIR = path.join(__dirname, "..", "output");
@@ -179,6 +182,16 @@ export function standardMedien(gestaltung, { bildUrl = remoteImageUrl, fiktiv = 
 /* Build                                                               */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Flache Sicht einer Karte für Verbraucher, die nur kategorien[].gerichte
+ * kennen (Highlights, Karte ohne Ausdruck): Gruppen-Gerichte hängen hinten an –
+ * in derselben Reihenfolge, in der speisekarte.js ihre index-Kennung vergibt.
+ */
+function menuFlach(menu) {
+  if (!menu.kategorien.some((k) => k.gruppen)) return menu;
+  return { ...menu, kategorien: menu.kategorien.map((k) => ({ ...k, gerichte: [...(k.gerichte ?? []), ...(k.gruppen ?? []).flatMap((g) => g.gerichte ?? [])] })) };
+}
+
 function highlightAnzahl(art, verfuegbar) {
   const wunsch = { treppe: 3, leseliste: 4, reihe: 4 }[art] ?? 4;
   return Math.min(wunsch, verfuegbar);
@@ -240,7 +253,20 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
     throw new BuildAbbruch("copy", copyBericht.verbleibend.map((v) => `${v.pfad}: ${v.regeln.join(", ")} („${v.text.slice(0, 60)}“)`));
   }
 
-  const kandidaten = highlightCandidates(menu).map((g) => ({ ...g, beschreibung: verfeinern({ beschreibung: eigeneBeschreibungen[g.id] ?? g.beschreibung }, ds).texte.beschreibung }));
+  // Seiten mit Ausdruck bekommen eine eigene Speisekarten-Seite (speisekarte.js):
+  // Startseite, Speisekarte und Warenkorb lesen dieselbe aufbereitete Karte.
+  const karte = ausdruck ? karteAusDaten(menu, { beschreibungen: eigeneBeschreibungen }) : null;
+  const bestellung = optionen.bestellung !== false;
+
+  const kandidaten = highlightCandidates(menuFlach(menu))
+    .map((g) => ({ ...g, beschreibung: verfeinern({ beschreibung: eigeneBeschreibungen[g.id] ?? g.beschreibung }, ds).texte.beschreibung }))
+    // Mit Speisekarten-Seite: nur, was dort freigegeben und nicht ausverkauft
+    // ist – mit Link zum Gericht statt Hinzufügen-Knopf.
+    .flatMap((g) => {
+      if (!karte) return [g];
+      const k = gerichtZuIndex(karte, g.id);
+      return k && !k.ausverkauft ? [{ ...g, preis: k.preis, schluessel: k.schluessel, link: gerichtLink(k) }] : [];
+    });
   const start = gestaltung.seed % Math.max(1, kandidaten.length);
   const anzahl = highlightAnzahl(ds.layout.highlights, kandidaten.length);
   const highlights = Array.from({ length: anzahl }, (_, i) => kandidaten[(start + i) % kandidaten.length]);
@@ -255,9 +281,19 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
     ...highlights.map((g) => [`gericht:${g.id}`, medien.gericht(g)]),
   ].filter(([, m]) => m);
 
+  // Speisekarte: je Kategorie höchstens ein zulässiges Bild (sektionen/speisekarte.js).
+  const karteBilder = karte ? kategorieBilder(karte, medien, { fiktiv }) : {};
+  for (const { gericht: g, medium } of Object.values(karteBilder)) {
+    if (!genutzt.some(([rolle]) => rolle === `gericht:${g.index}`)) genutzt.push([`gericht:${g.index}`, medium]);
+  }
+
   const betont = ds.layout.betonterMoment;
-  const apiUrl = String(optionen.apiUrl ?? "").replace(/\/+$/, "");
-  const aktionen = aktionsziele({ lead, apiUrl, fiktiv });
+  // Eine Konzept-Demo ist an keinen Betrieb angeschlossen: Sie schickt nie eine
+  // echte Bestellung oder Reservierung ab, auch wenn ein Betriebsserver bekannt ist.
+  const apiUrl = konzept ? "" : String(optionen.apiUrl ?? "").replace(/\/+$/, "");
+  const aktionen = karte
+    ? { ...aktionsziele({ lead, apiUrl, fiktiv, bestellung, karteHref: KARTE_PFAD }), start: { href: START_PFAD } }
+    : aktionsziele({ lead, apiUrl, fiktiv });
   // Konzept: Der Weg zum Haus führt über das Google-Maps-Profil (Place ID) –
   // statt Note und Rezensionen auf der Seite.
   if (konzept && optionen.googleMapsUrl) aktionen.route = { art: "extern", href: optionen.googleMapsUrl };
@@ -265,7 +301,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
 
   const sektionen = {
     highlights: (tief) => renderHighlights({ ...ctx, betont: betont === "highlights", tief }),
-    karte: (tief, extra = {}) => renderKarte({ ...ctx, ...extra, menu: { ...menu, kategorien: menu.kategorien.map((k, ki) => ({ ...k, gerichte: k.gerichte.map((g, gi) => ({ ...g, beschreibung: eigeneBeschreibungen[`${ki}-${gi}`] ?? g.beschreibung })) })) }, tief }),
+    karte: (tief, extra = {}) => renderKarte({ ...ctx, ...extra, menu: { ...menu, kategorien: menuFlach(menu).kategorien.map((k, ki) => ({ ...k, gerichte: k.gerichte.map((g, gi) => ({ ...g, beschreibung: eigeneBeschreibungen[`${ki}-${gi}`] ?? g.beschreibung })) })) }, tief }),
     ambiente: (tief) => renderAmbiente({ ...ctx, tief }),
     stimmen: (tief) => renderStimmen({ ...ctx, tief }),
     reservierung: (tief) => renderReservierung({ ...ctx, betont: betont === "reservierung", tief }),
@@ -276,9 +312,13 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   // Mit Ausdruck: Abfolge und Flächen aus dem Profil (ausdruck.js), die Einladung
   // steht schon unter der Bühne. "raum" (kino) und "herkunft" (editorial) nutzen
   // bis zu ihren eigenen Formen das Raum-Band.
+  const mitTisch = Boolean(ausdruck?.abfolge.includes("tisch")) && highlights.length > 0;
+  const auswahl = karte
+    ? auswahlFuerStartseite(karte, { ohne: mitTisch ? highlights.slice(0, 3).map((g) => g.schluessel) : [], anzahl: mitTisch ? 4 : 5 })
+    : [];
   const ausdruckSektionen = {
-    tisch: () => renderTisch(ctx),
-    karte: () => sektionen.karte(true, { sprung: true }),
+    tisch: () => (mitTisch ? renderTisch(ctx) : ""),
+    karte: () => renderAuswahl({ ...ctx, karte, auswahl }),
     haus: () => renderHausBand(ctx),
     raum: () => renderHausBand(ctx),
     herkunft: () => renderHausBand(ctx),
@@ -286,11 +326,17 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
     kontakt: () => renderAnfahrt({ ...ctx, oeffnungszeiten: konzept ? [] : optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS }),
   };
   const hauptteil = ausdruck
-    ? ausdruck.abfolge.filter((id) => ausdruckSektionen[id]).map((id) => ausdruckSektionen[id]()).join("\n\n")
+    ? ausdruck.abfolge.filter((id) => ausdruckSektionen[id]).map((id) => ausdruckSektionen[id]()).filter(Boolean).join("\n\n")
     : reihenfolge.map((id, i) => sektionen[id](i % 2 === 1)).join("\n\n");
 
   // telefon nur mit echter Nummer: Die Vorschau-Bestätigung nennt sie als echten Weg zum Lokal.
-  const pageData = jsonForScript({ name: texte.name, kontaktEmail: optionen.kontaktEmail ?? "", apiUrl, ...(aktionen.anrufen ? { telefon: aktionen.anrufen.text } : {}) });
+  const pageDataBasis = { name: texte.name, kontaktEmail: optionen.kontaktEmail ?? "", apiUrl, ...(aktionen.anrufen ? { telefon: aktionen.anrufen.text } : {}) };
+  // Mit Speisekarten-Seite: derselbe Warenkorb auf beiden Seiten (sessionStorage,
+  // Schlüssel je Website), Name und Preis nur aus dem Katalog der Karte.
+  const warenkorb = karte && bestellung
+    ? { schluessel: createHash("sha256").update(`${lead.placeId ?? ""}|${texte.name}|${gestaltung.cuisine}`).digest("hex").slice(0, 12), karte: karte.katalog }
+    : null;
+  const pageData = jsonForScript(karte ? { ...pageDataBasis, seite: "start", ...(bestellung ? { karteUrl: KARTE_PFAD } : {}), ...(warenkorb ? { warenkorb } : {}) } : pageDataBasis);
 
   const familien = [ds.typografie.display.familie, ds.typografie.text.familie, ds.typografie.label?.familie].filter(Boolean);
   const fontCss = optionen.fontCss ?? schriftCss(familien, optionen.fontsDir ?? FONTS_DIR, optionen.fontsPfad ?? "../../assets/fonts");
@@ -336,7 +382,7 @@ ${fontCss}
 ${cssVariablen(ds)}
 ${STIL}
 ${BEWEGUNG_CSS}
-${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}\n${ABFOLGE_CSS}\n${ATMOSPHAERE_CSS}` : ""}
+${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}\n${ABFOLGE_CSS}\n${ATMOSPHAERE_CSS}\n${KARTE_CSS}` : ""}
 </style>
 </head>
 <body class="${bodyKlassen}">
@@ -357,16 +403,77 @@ ${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</
 </html>
 `;
 
-  // Gate 3: Funktionsvertrag des v1-Skripts
-  const fehlend = pruefeFunktionsVertrag(html);
+  // Gate 3: Funktionsvertrag des v1-Skripts. Mit Speisekarten-Seite legt die
+  // Startseite nichts selbst in den Warenkorb (das Plus öffnet das Gericht).
+  const fehlend = pruefeFunktionsVertrag(html, { hinzufuegen: !karte });
   if (fehlend.length) throw new BuildAbbruch("funktionsvertrag", fehlend.map((f) => `fehlt: ${f}`));
 
   // Gate 4: Anti-Slop-Lint
   const lintErgebnis = lint(html);
   if (!lintErgebnis.ok) throw new BuildAbbruch("anti-slop-lint", lintErgebnis.fehler);
 
+  // Zweite Seite: die ganze Speisekarte, mit denselben Gates.
+  const seiten = {};
+  if (karte) {
+    const aktionenKarte = { ...aktionen, ...(aktionen.reservieren ? { reservieren: { ...aktionen.reservieren, href: `${START_PFAD}#reservierung` } } : {}) };
+    const ctxKarte = { ...ctx, aktionen: aktionenKarte, seite: "karte" };
+    const unterPfad = (p) => (/^(?:[a-z]+:|\/)/i.test(p) ? p : `../${p}`);
+    const fontCssKarte = optionen.fontCss ?? schriftCss(familien, optionen.fontsDir ?? FONTS_DIR, unterPfad(optionen.fontsPfad ?? "../../assets/fonts"));
+    const titelKarte = `${texte.speisekarte.titel} – ${texte.name}${konzept ? " – Konzept-Demo" : ""}`;
+    const beschreibungKarte = `${texte.name}: ${texte.speisekarte.titel}. ${bestellung ? texte.speisekarte.intro : texte.speisekarte.introOhneBestellung}`;
+    const pageDataKarte = jsonForScript({ ...pageDataBasis, seite: "karte", ...(warenkorb ? { warenkorb } : {}) });
+    const karteHtml = `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(titelKarte)}</title>
+<meta name="description" content="${escapeHtml(beschreibungKarte)}">
+<meta name="engine" content="${ENGINE_KENNUNG}">
+<meta name="v2-designsystem" content="${escapeHtml(ds.id)}">
+<meta name="v2-ausdruck" content="${ausdruck.id}">
+<meta name="v2-seite" content="speisekarte">
+${konzept ? '<meta name="demo-art" content="konzept">\n' : ""}${optionen.buildId ? `<meta name="demo-build" content="${escapeHtml(optionen.buildId)}">\n` : ""}<meta name="theme-color" content="${ds.farben.rollen.grund.hex}">
+${optionen.veroeffentlicht || konzept ? '<meta name="robots" content="noindex, nofollow">\n' : ""}<link rel="icon" href="${favicon(ds)}">
+<style>
+${fontCssKarte}
+${cssVariablen(ds)}
+${STIL}
+${BEWEGUNG_CSS}
+${darstellungsCss}
+${ausdruckVariablen(ausdruck, ds)}
+${BUEHNE_CSS}
+${ABFOLGE_CSS}
+${KARTE_CSS}
+</style>
+</head>
+<body class="${bodyKlassen} seite-karte">
+${renderKopfAusdruck({ ...ctxKarte, hinweis: optionen.veroeffentlicht || konzept ? renderEntwurfsleiste({ texte, fiktiv }) : "" })}
+<main id="inhalt">
+${renderKarteSeite({ ...ctxKarte, karte, bilder: karteBilder, bestellbar: bestellung, probe: aktionen.modus !== "live" })}
+</main>
+${renderBestellweg({ ...ctxKarte, ds: { ...ds, layout: { ...ds.layout, primaerAktion: bestellung ? "order" : "reservation" } }, oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS, ...(konzept ? { abholHinweis: texte.kontakt.abholzeitBeispiel } : {}) })}
+${renderFussAusdruck(ctxKarte)}
+<script>window.PAGE_DATA = ${pageDataKarte};</script>
+<script>${abholzeitSkript()}</script>
+<script>${seitenSkript()}</script>
+<script>${BEWEGUNG_SKRIPT}</script>
+<script>${BUEHNE_SKRIPT}</script>
+<script>${ABFOLGE_SKRIPT}</script>
+<script>${KARTE_SEITE_SKRIPT}</script>
+</body>
+</html>
+`;
+    const fehlendKarte = pruefeFunktionsVertrag(karteHtml, { seite: "karte", hinzufuegen: bestellung && Object.keys(karte.katalog).length > 0 });
+    if (fehlendKarte.length) throw new BuildAbbruch("funktionsvertrag", fehlendKarte.map((f) => `Speisekarte fehlt: ${f}`));
+    const lintKarte = lint(karteHtml);
+    if (!lintKarte.ok) throw new BuildAbbruch("anti-slop-lint", lintKarte.fehler.map((f) => ({ ...f, meldung: `Speisekarte: ${f.meldung}` })));
+    seiten[KARTE_PFAD] = karteHtml;
+  }
+
   return {
     html,
+    seiten,
     dateien: genutzt.filter(([, m]) => m.datei).flatMap(([, m]) => [{ datei: m.datei, src: m.src }, ...(m.webm?.datei ? [{ datei: m.webm.datei, src: m.webm.src }] : [])]),
     bericht: {
       engine: ENGINE_KENNUNG,
@@ -379,6 +486,19 @@ ${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</
       heroVarianten: ds.layout.heroVarianten,
       ...(ausdruck ? { ausdruck: ausdruck.id } : {}),
       highlights: highlights.map((h) => h.id),
+      ...(karte
+        ? {
+            speisekarte: {
+              pfad: KARTE_PFAD,
+              quelle: menu.quelle === "betrieb" ? "betrieb" : "musterkarte",
+              kategorien: karte.kategorien.map((k) => ({ name: k.name, anker: k.anker, gerichte: k.anzahl })),
+              gerichte: karte.gerichte.length,
+              bestellbar: Object.keys(karte.katalog).length,
+              bestellung: bestellung ? aktionen.modus : "aus",
+              startseite: auswahl.map((g) => g.schluessel),
+            },
+          }
+        : {}),
       kontrast: { geprueft: ds.kontrastPaare.length, fehler: 0 },
       lint: { fehler: 0, warnungen: lintErgebnis.warnungen },
       korrekturen: korrekturProtokoll,
@@ -404,6 +524,11 @@ export function schreibeSite(parameter, { zielDir = SITES_DIR, slug } = {}) {
     copyFileSync(datei, path.join(ordner, src));
   }
   writeFileSync(path.join(ordner, "index.html"), ergebnis.html, "utf-8");
+  // Weitere Seiten derselben Website (Speisekarte) – relativ zur Startseite.
+  for (const [pfad, html] of Object.entries(ergebnis.seiten ?? {})) {
+    mkdirSync(path.dirname(path.join(ordner, pfad)), { recursive: true });
+    writeFileSync(path.join(ordner, pfad), html, "utf-8");
+  }
   writeFileSync(path.join(ordner, "bericht.json"), `${JSON.stringify(ergebnis.bericht, null, 2)}\n`, "utf-8");
   return { ...ergebnis, ordner };
 }

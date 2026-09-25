@@ -517,7 +517,10 @@ section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 .kopf .entwurf-hinweis { position: relative; }
 .kopf-innen { position: relative; display: flex; align-items: center; gap: var(--s-2); min-height: var(--kopf-hoehe-mobil); padding-inline: var(--rand); }
 .kopf-marke { margin-right: auto; font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform);
-  letter-spacing: var(--f-display-sperrung); font-size: var(--t-basis); line-height: 1.15; text-decoration: none; color: inherit; }
+  letter-spacing: var(--f-display-sperrung); font-size: var(--t-basis); line-height: 1.15; text-decoration: none; color: inherit;
+  min-width: 0; overflow-wrap: anywhere; }
+.kopf-aktionen { min-width: 0; }
+.kopf-aktionen .btn { white-space: nowrap; }
 .kopf-nav { display: none; gap: var(--s-3); }
 .kopf-nav a { color: inherit; text-decoration: none; font-size: var(--t-basis); }
 .kopf-nav a:hover { text-decoration: underline; }
@@ -641,6 +644,8 @@ section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 
 /* Einladung zweispaltig: links das Haus, rechts der Besuch (nur echte Angaben). */
 .einladung-innen { justify-items: start; text-align: left; }
+.einladung-innen > * { min-width: 0; max-width: 100%; }
+.einladung-name { overflow-wrap: anywhere; hyphens: auto; }
 .einladung .bewertung { justify-content: flex-start; }
 .einladung-aktionen { justify-content: flex-start; }
 .einladung-besuch { display: grid; gap: var(--s-2); width: 100%; padding-top: var(--s-3); border-top: 1px solid var(--linie); }
@@ -706,7 +711,8 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 
 /* Anfahrt (AP8) */
 .anfahrt-raster { display: grid; gap: var(--s-8); }
-.anfahrt-adresse { font-size: var(--t-h1); }
+.anfahrt-raster > * { min-width: 0; }
+.anfahrt-adresse { font-size: var(--t-h1); overflow-wrap: anywhere; hyphens: auto; }
 .anfahrt-adresse span { display: block; margin-top: var(--s-1); color: var(--text-leise); font-size: var(--t-h3); }
 .anfahrt-wege { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-4); }
 .anfahrt-hinweis { margin-top: var(--s-3); color: var(--text-leise); }
@@ -719,7 +725,8 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 /* Fußzeile (AP8) */
 .fuss-haus { padding-block: var(--sektion) var(--s-6); background: var(--tint); color: var(--auf-tint); }
 .fuss-haus-raster { display: grid; gap: var(--s-4); }
-.fuss-marke { font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform); font-size: var(--t-h1); line-height: 1.05; }
+.fuss-haus-raster > * { min-width: 0; }
+.fuss-marke { font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform); font-size: var(--t-h1); line-height: 1.05; overflow-wrap: anywhere; hyphens: auto; }
 .fuss-spalten { display: grid; gap: var(--s-3); color: var(--auf-tint-leise); }
 .fuss-spalten address { font-style: normal; }
 .fuss-haus a { color: var(--auf-tint); }
@@ -739,6 +746,93 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   .atmosphaere { display: none; }
 }
 
+
+/* Startseite: kleine Auswahl + Weg zur ganzen Karte */
+.auswahl-raster { display: grid; gap: var(--s-6); }
+.auswahl-liste .karten-zeile .gericht-desc { max-width: 52ch; }
+.auswahl-karte { display: grid; align-content: start; gap: var(--s-2); padding: var(--s-4); background: var(--grund); border: 1px solid var(--linie); border-radius: var(--r-karte); }
+.auswahl-kategorien { list-style: none; margin: 0 0 var(--s-2); padding: 0; }
+.auswahl-kategorien li { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-2); border-bottom: 1px solid var(--linie); }
+.auswahl-kategorien a { display: block; padding-block: var(--s-1); color: var(--text); text-decoration: none; font-weight: var(--f-text-stark); }
+.auswahl-kategorien a:hover { color: var(--akzent-text); text-decoration: underline; }
+.auswahl-karte .anzahl, .karten-sprung--seite .anzahl { color: var(--text-leise); font-size: var(--t-klein); font-variant-numeric: tabular-nums; }
+.auswahl-ganz { width: 100%; }
+@media (min-width: 1024px) { .auswahl-raster { grid-template-columns: 8fr 4fr; column-gap: calc(var(--rinne) * 2); align-items: start; } }
+
+.kopf-nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: .3em; }
+/* Speisekarten-Seite: ruhiger als die Startseite, Kopfzeile im Fluss */
+.seite-karte .kopf { position: sticky; }
+.karte-seite { padding-bottom: var(--sektion); }
+.karte-seite-kopf { padding-block: var(--s-6) var(--s-4); }
+.karte-seite-kopf .rubrik a { color: inherit; }
+.karte-seite-kopf .rubrik span { color: var(--text-leise); }
+.karte-seite-kopf h1 { font-size: var(--t-h1); }
+.karte-seite-kopf .intro { max-width: var(--text-breite); }
+.karte-probe { max-width: var(--text-breite); margin-top: var(--s-3); padding: var(--s-2) var(--s-3); border-left: 4px solid var(--signal-text); background: var(--flaeche); color: var(--text); }
+.karte-wege { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); margin-top: var(--s-3); }
+.karte-wege a { display: inline-flex; align-items: center; min-height: var(--s-6); color: var(--akzent-text); font-weight: var(--f-text-stark); }
+
+.karten-sprung--seite a { gap: var(--s-1); min-height: var(--s-6); }
+.karten-sprung--seite a[aria-current="true"] .anzahl { color: inherit; }
+[id^="kat-"], [id^="gericht-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe)) + var(--s-8)); }
+
+.karte-kategorie { padding-block: var(--s-6); border-top: 1px solid var(--linie-stark); }
+.karte-kategorie:first-child { border-top: 0; padding-top: 0; }
+.karte-kategorie-kopf { display: grid; gap: var(--s-1); margin-bottom: var(--s-2); }
+.karte-kategorie-kopf h2 { font-size: var(--t-h2); }
+.karte-kategorie-text { max-width: var(--text-breite); color: var(--text-leise); }
+.karte-kategorie-bild { margin-top: var(--s-2); max-width: 28rem; }
+.karte-kategorie-bild img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: var(--r-bild); background: var(--flaeche-tief); }
+.karte-kategorie-bild figcaption { margin-top: var(--s-1); color: var(--text-leise); font-size: var(--t-klein); }
+.karte-gruppe { margin-top: var(--s-4); }
+.karte-gruppe-name { font-size: var(--t-h3); margin-bottom: var(--s-1); }
+
+.karte-gerichte { list-style: none; margin: 0; padding: 0; display: grid; }
+.karte-gericht { display: grid; gap: var(--s-1); padding-block: var(--s-3); border-bottom: 1px solid var(--linie); min-width: 0; }
+.karte-gericht-kopf { display: flex; align-items: baseline; gap: var(--s-1); }
+.karte-gericht-kopf h3 { min-width: 0; font-family: var(--f-text); font-size: var(--t-gross); font-weight: var(--f-text-stark); text-transform: none; letter-spacing: 0; overflow-wrap: anywhere; }
+.karte-gericht-kopf .preis { font-size: var(--t-gross); }
+.karte-gericht .gericht-desc { max-width: 60ch; color: var(--text-leise); overflow-wrap: anywhere; }
+.karte-marken { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+.karte-extras { color: var(--text-leise); font-size: var(--t-klein); }
+.karte-extras span { font-weight: var(--f-text-stark); color: var(--text); }
+.karte-varianten { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-halb); }
+.karte-varianten li { display: flex; align-items: center; gap: var(--s-1); min-height: var(--s-6); }
+.karte-varianten li.aus { color: var(--text-leise); text-decoration: line-through; }
+.karte-gericht-aktion { display: flex; }
+.karte-add { min-height: var(--s-6); }
+.karte-gericht--aus h3, .karte-gericht--aus .preis { color: var(--text-leise); }
+/* Sprung von der Startseite (Plus): das Gericht ist markiert – auch ohne Skript (:target). */
+.karte-gericht:target { margin-inline: calc(var(--s-2) * -1); padding-inline: var(--s-2); background: var(--flaeche); box-shadow: inset 4px 0 0 var(--akzent); border-radius: var(--r-klein); }
+.karte-fuss { margin-top: var(--s-6); color: var(--text-leise); font-size: var(--t-klein); max-width: var(--text-breite); }
+
+/* Status nach dem Hinzufügen: kurz sichtbar, für Vorleser als Live-Region */
+.cart-status { position: fixed; left: var(--rand); right: var(--rand); bottom: calc(var(--s-10) + var(--s-6)); z-index: 60; margin: 0 auto; max-width: 28rem;
+  padding: var(--s-1) var(--s-2); background: var(--tint); color: var(--auf-tint); border-radius: var(--r-karte); text-align: center;
+  opacity: 0; transform: translateY(var(--s-1)); pointer-events: none; transition: opacity var(--m-kurz) ease, transform var(--m-kurz) ease; }
+.cart-status.sichtbar { opacity: 1; transform: none; }
+.cart-hinweis { margin: 0 0 var(--s-2); padding: var(--s-1) var(--s-2); background: var(--flaeche); border-left: 4px solid var(--signal-text); font-size: var(--t-klein); }
+.cart-fab.gerade { animation: fab-gerade var(--m-mittel) var(--m-kurve); }
+@keyframes fab-gerade { 50% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) {
+  .cart-status { transition: none; transform: none; }
+  .cart-fab.gerade { animation: none; }
+}
+
+@media (min-width: 1024px) {
+  .karte-seite-kopf { padding-block: var(--s-10) var(--s-6); }
+  .karte-seite-raster { display: grid; grid-template-columns: 3fr 9fr; column-gap: calc(var(--rinne) * 2); align-items: start; }
+  .karten-sprung--seite { position: sticky; top: calc(var(--kopf-ist, var(--kopf-hoehe)) + var(--s-3)); flex-direction: column; flex-wrap: nowrap; gap: 0;
+    margin: 0; padding: 0; overflow: visible; }
+  .karten-sprung--seite a { justify-content: space-between; padding: var(--s-1) var(--s-2); border: 0; border-left: 2px solid var(--linie-stark); border-radius: 0; font-size: var(--t-basis); }
+  .karten-sprung--seite a[aria-current="true"] { background: transparent; color: var(--akzent-text); border-left-color: var(--akzent); }
+  .karte-kategorie--bild .karte-kategorie-kopf { grid-template-columns: minmax(0, 1fr) minmax(0, 20rem); column-gap: var(--rinne); align-items: end; }
+  .karte-kategorie--bild .karte-kategorie-bild { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; }
+}
+@media (min-width: 1280px) {
+  .karte-gerichte { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: calc(var(--rinne) * 2); }
+}
+
 </style>
 </head>
 <body class="a-traditionell schema-hell rubrik-versal moment-hero ausdruck-gesellig">
@@ -747,14 +841,14 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   
   <div class="kopf-innen">
     <a class="kopf-marke" href="#">Wirtshaus zur Alten Linde</a>
-    <nav class="kopf-nav" aria-label="Hauptnavigation"><a href="#karte">Karte</a><a href="#highlights">Empfehlungen</a><a href="#reservierung">Reservieren</a><a href="#kontakt">Anfahrt</a></nav>
-    <div class="kopf-aktionen"><a class="btn btn-ghost kopf-zweit" href="#karte" data-aktion="bestellen">Bestellen</a><a class="btn btn-primary kopf-erst" href="#reservierung" data-aktion="reservieren">Reservieren</a></div>
+    <nav class="kopf-nav" aria-label="Hauptnavigation"><a href="speisekarte/index.html">Speisekarte</a><a href="#highlights">Empfehlungen</a><a href="#reservierung">Reservieren</a><a href="#kontakt">Anfahrt</a></nav>
+    <div class="kopf-aktionen"><a class="btn btn-ghost kopf-zweit" href="speisekarte/index.html" data-aktion="bestellen">Probebestellung</a><a class="btn btn-primary kopf-erst" href="#reservierung" data-aktion="reservieren">Reservieren</a></div>
     <a class="kopf-menue-knopf" href="#kopf-menue" aria-controls="kopf-menue" aria-expanded="false"><span class="kopf-menue-linien" aria-hidden="true"></span><span class="nur-vorleser">Menü</span></a>
   </div>
   <nav class="kopf-menue" id="kopf-menue" aria-label="Menü">
     <a class="kopf-menue-zu" href="#" aria-label="Menü schließen">×</a>
-    <a href="#karte">Karte</a><a href="#highlights">Empfehlungen</a><a href="#reservierung">Reservieren</a><a href="#kontakt">Anfahrt</a>
-    <a class="btn btn-primary" href="#reservierung" data-aktion="reservieren">Reservieren</a><a class="btn btn-ghost" href="#karte" data-aktion="bestellen">Bestellen</a>
+    <a href="speisekarte/index.html">Speisekarte</a><a href="#highlights">Empfehlungen</a><a href="#reservierung">Reservieren</a><a href="#kontakt">Anfahrt</a>
+    <a class="btn btn-primary" href="#reservierung" data-aktion="reservieren">Reservieren</a><a class="btn btn-ghost" href="speisekarte/index.html" data-aktion="bestellen">Probebestellung</a>
   </nav>
 </header>
 <div class="atmosphaere" aria-hidden="true" style="--atmo-deckkraft: 0.08"><svg viewBox="0 0 240 260" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
@@ -783,7 +877,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       <h2>Besuch</h2>
       <address class="einladung-adresse">Musterstraße 1, 84453 Mühldorf am Inn<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Musterstra%C3%9Fe%201%2C%2084453%20M%C3%BChldorf%20am%20Inn" target="_blank" rel="noopener">Route planen</a></address>
       <p class="bewertung"><span class="sterne" aria-hidden="true"><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg><svg class="ikon ikon-stern" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3.2 14.9 9l6.5.9-4.7 4.5 1.2 6.4-5.9-3.1-5.8 3.2 1-6.4-4.7-4.4 6.4-1Z"/></svg></span><span><strong>4,7</strong> von 5 auf Google · 428 Bewertungen</span></p>
-      <div class="einladung-aktionen"><a class="btn btn-primary" href="#reservierung">Tisch reservieren</a><a class="btn btn-ghost" href="#karte">Zur Abholung bestellen</a></div>
+      <div class="einladung-aktionen"><a class="btn btn-primary" href="#reservierung">Tisch reservieren</a><a class="btn btn-ghost" href="speisekarte/index.html">Probebestellung</a></div>
     </aside>
   </div>
 </section>
@@ -800,70 +894,55 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       <div class="teller-text">
         <h3>Forelle Müllerin</h3>
         <p class="teller-desc">Aus heimischer Zucht, Butter, Mandeln, Salzkartoffeln</p>
-        <div class="teller-fuss"><span class="preis">19,50 €</span><button class="btn btn-ghost btn-klein" type="button" data-add="1-5" data-name="Forelle Müllerin" data-preis="19.5"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</button></div>
+        <div class="teller-fuss"><span class="preis">19,50 €</span><a class="btn btn-ghost btn-klein" href="speisekarte/index.html#gericht-forelle-muellerin" aria-label="Forelle Müllerin auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</a></div>
       </div>
     </article><article class="teller teller--2 auftritt">
       <figure class="teller-bild"><img src="https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Schweinsbraten mit Knödel" loading="lazy" data-herkunft="platzhalter"></figure>
       <div class="teller-text">
         <h3>Schweinsbraten mit Knödel</h3>
         <p class="teller-desc">Dunkle Biersoße, Semmelknödel, Krautsalat</p>
-        <div class="teller-fuss"><span class="preis">16,90 €</span><button class="btn btn-ghost btn-klein" type="button" data-add="1-0" data-name="Schweinsbraten mit Knödel" data-preis="16.9"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</button></div>
+        <div class="teller-fuss"><span class="preis">16,90 €</span><a class="btn btn-ghost btn-klein" href="speisekarte/index.html#gericht-schweinsbraten-mit-knoedel" aria-label="Schweinsbraten mit Knödel auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</a></div>
       </div>
     </article><article class="teller teller--3 auftritt">
       <figure class="teller-bild"><img src="https://images.unsplash.com/photo-1599921841143-819065a55cc6?w=800&amp;h=600&amp;fit=crop&amp;crop=entropy&amp;q=72&amp;fm=jpg" alt="Wiener Schnitzel vom Kalb" loading="lazy" data-herkunft="platzhalter"></figure>
       <div class="teller-text">
         <h3>Wiener Schnitzel vom Kalb</h3>
         <p class="teller-desc">Mit Preiselbeeren, Petersilienkartoffeln</p>
-        <div class="teller-fuss"><span class="preis">22,50 €</span><button class="btn btn-ghost btn-klein" type="button" data-add="1-1" data-name="Wiener Schnitzel vom Kalb" data-preis="22.5"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</button></div>
+        <div class="teller-fuss"><span class="preis">22,50 €</span><a class="btn btn-ghost btn-klein" href="speisekarte/index.html#gericht-wiener-schnitzel-vom-kalb" aria-label="Wiener Schnitzel vom Kalb auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg> Vorbestellen</a></div>
       </div>
     </article></div>
   </div>
 </section>
 
-<section class="sektion sektion--tief" id="karte">
+<section class="sektion sektion--tief auswahl" id="karte">
   <div class="rahmen">
     <header class="sektion-kopf">
-      <p class="rubrik">Speisekarte</p>
+      <p class="rubrik">Aus der Karte</p>
       <div>
-        <h2>Unsere ganze Karte</h2>
-        <p class="intro">Jedes Gericht können Sie direkt zur Abholung vorbestellen.</p>
+        <h2>Eine kleine Auswahl</h2>
+        <p class="intro">Ein paar Gerichte aus der Karte. Die ganze Karte steht auf einer eigenen Seite.</p>
       </div>
     </header>
-    <nav class="karten-sprung karten-sprung--fest" aria-label="Kategorien"><a href="#karte-0">Zum Anfangen</a><a href="#karte-1">Hauptgerichte</a><a href="#karte-2">Nachspeisen</a></nav>
-    <div class="karte-tafel"><section class="tafel-kategorie" id="karte-0"><h3 class="tafel-name">Zum Anfangen</h3><ul class="karten-liste"><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Obatzda mit Brezn</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">8,50 €</span><button class="mini-add" type="button" data-add="0-0" data-name="Obatzda mit Brezn" data-preis="8.5" aria-label="Obatzda mit Brezn vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
+    <div class="auswahl-raster">
+      <ul class="karten-liste auswahl-liste"><li class="karten-zeile">
+          <div class="zeile-kopf"><span class="karten-name">Obatzda mit Brezn</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">8,50 €</span><a class="mini-add" href="speisekarte/index.html#gericht-obatzda-mit-brezn" aria-label="Obatzda mit Brezn auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Hausgemacht, mit roten Zwiebeln und frischer Laugenbrezn</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Leberknödelsuppe</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">6,90 €</span><button class="mini-add" type="button" data-add="0-1" data-name="Leberknödelsuppe" data-preis="6.9" aria-label="Leberknödelsuppe vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Kräftige Rinderbrühe, Schnittlauch</p>
-        </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Bayerischer Wurstsalat</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">9,50 €</span><button class="mini-add" type="button" data-add="0-2" data-name="Bayerischer Wurstsalat" data-preis="9.5" aria-label="Bayerischer Wurstsalat vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Mit Essiggurken, Zwiebeln und Bauernbrot</p>
-        </li></ul></section><section class="tafel-kategorie" id="karte-1"><h3 class="tafel-name">Hauptgerichte</h3><ul class="karten-liste"><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Schweinsbraten mit Knödel</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">16,90 €</span><button class="mini-add" type="button" data-add="1-0" data-name="Schweinsbraten mit Knödel" data-preis="16.9" aria-label="Schweinsbraten mit Knödel vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Dunkle Biersoße, Semmelknödel, Krautsalat</p>
-        </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Wiener Schnitzel vom Kalb</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">22,50 €</span><button class="mini-add" type="button" data-add="1-1" data-name="Wiener Schnitzel vom Kalb" data-preis="22.5" aria-label="Wiener Schnitzel vom Kalb vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Mit Preiselbeeren, Petersilienkartoffeln</p>
-        </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Krustenbraten vom Schwein</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">18,90 €</span><button class="mini-add" type="button" data-add="1-2" data-name="Krustenbraten vom Schwein" data-preis="18.9" aria-label="Krustenbraten vom Schwein vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
+          <div class="zeile-kopf"><span class="karten-name">Krustenbraten vom Schwein</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">18,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-krustenbraten-vom-schwein" aria-label="Krustenbraten vom Schwein auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Knusprige Kruste, dunkle Biersoße, Kartoffelknödel</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Käsespätzle</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">13,50 €</span><button class="mini-add" type="button" data-add="1-3" data-name="Käsespätzle" data-preis="13.5" aria-label="Käsespätzle vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Mit Bergkäse und Röstzwiebeln</p>
-        </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Grillrippchen</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">16,50 €</span><button class="mini-add" type="button" data-add="1-4" data-name="Grillrippchen" data-preis="16.5" aria-label="Grillrippchen vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Mit Barbecuesoße, Kartoffelwedges und Krautsalat</p>
-        </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Forelle Müllerin</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">19,50 €</span><button class="mini-add" type="button" data-add="1-5" data-name="Forelle Müllerin" data-preis="19.5" aria-label="Forelle Müllerin vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Aus heimischer Zucht, Butter, Mandeln, Salzkartoffeln</p>
-        </li></ul></section><section class="tafel-kategorie" id="karte-2"><h3 class="tafel-name">Nachspeisen</h3><ul class="karten-liste"><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Kaiserschmarrn</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">9,50 €</span><button class="mini-add" type="button" data-add="2-0" data-name="Kaiserschmarrn" data-preis="9.5" aria-label="Kaiserschmarrn vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
+          <div class="zeile-kopf"><span class="karten-name">Kaiserschmarrn</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">9,50 €</span><a class="mini-add" href="speisekarte/index.html#gericht-kaiserschmarrn" aria-label="Kaiserschmarrn auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Mit Apfelmus und Puderzucker</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Apfelstrudel</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">7,50 €</span><button class="mini-add" type="button" data-add="2-1" data-name="Apfelstrudel" data-preis="7.5" aria-label="Apfelstrudel vorbestellen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></button></div>
-          <p class="gericht-desc">Warm, mit Vanillesoße</p>
-        </li></ul></section></div>
+          <div class="zeile-kopf"><span class="karten-name">Leberknödelsuppe</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">6,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-leberknoedelsuppe" aria-label="Leberknödelsuppe auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
+          <p class="gericht-desc">Kräftige Rinderbrühe, Schnittlauch</p>
+        </li></ul>
+      <nav class="auswahl-karte" aria-label="Kategorien der Speisekarte">
+        <p class="rubrik">Auf der Karte</p>
+        <ul class="auswahl-kategorien"><li><a href="speisekarte/index.html#kat-zum-anfangen">Zum Anfangen</a><span class="anzahl">3</span></li><li><a href="speisekarte/index.html#kat-hauptgerichte">Hauptgerichte</a><span class="anzahl">6</span></li><li><a href="speisekarte/index.html#kat-nachspeisen">Nachspeisen</a><span class="anzahl">2</span></li></ul>
+        <a class="btn btn-primary auswahl-ganz" href="speisekarte/index.html">Gesamte Speisekarte ansehen</a>
+      </nav>
+    </div>
   </div>
 </section>
 
@@ -950,7 +1029,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   <span class="cart-count" id="fab-count">0</span>
   <span id="fab-total">0,00 €</span>
 </button>
-<div class="mobilebar" id="mobilebar"><a class="btn btn-primary" href="#reservierung">Reservieren</a><button class="btn btn-ghost" id="bar-order" type="button">Bestellen</button></div>
+<div class="mobilebar" id="mobilebar"><a class="btn btn-primary" href="#reservierung">Reservieren</a><button class="btn btn-ghost" id="bar-order" type="button" data-leer="Speisekarte">Speisekarte</button></div>
 <div class="overlay" id="overlay"></div>
 <aside class="drawer" id="drawer" aria-label="Ihre Abholbestellung">
   <div class="drawer-head">
@@ -1013,7 +1092,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       <address>Musterstraße 1, 84453 Mühldorf am Inn<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Musterstra%C3%9Fe%201%2C%2084453%20M%C3%BChldorf%20am%20Inn" target="_blank" rel="noopener">Route planen</a></address>
       <div></div>
       <nav aria-label="Seitennavigation">
-        <a href="#karte">Karte</a>
+        <a href="speisekarte/index.html">Speisekarte</a>
         <a href="#reservierung">Reservieren</a>
         <a href="#kontakt">Anfahrt</a>
       </nav>
@@ -1021,7 +1100,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     <p class="fuss-hinweis">Unverbindlicher Gestaltungsentwurf. Was als Platzhalter gekennzeichnet ist – Gerichte, Preise, Öffnungszeiten, Angaben zu Herkunft und Geschichte des Hauses –, ist ein Vorschlag und noch nicht vom Haus bestätigt. Fotos stammen aus einer Bilddatenbank oder sind KI-generiert und entsprechend markiert.</p>
   </div>
 </footer>
-<script>window.PAGE_DATA = {"name":"Wirtshaus zur Alten Linde","kontaktEmail":"","apiUrl":""};</script>
+<script>window.PAGE_DATA = {"name":"Wirtshaus zur Alten Linde","kontaktEmail":"","apiUrl":"","seite":"start","karteUrl":"speisekarte/index.html","warenkorb":{"schluessel":"8e211a8562d8","karte":{"obatzda-mit-brezn":["Obatzda mit Brezn",8.5],"leberknoedelsuppe":["Leberknödelsuppe",6.9],"bayerischer-wurstsalat":["Bayerischer Wurstsalat",9.5],"schweinsbraten-mit-knoedel":["Schweinsbraten mit Knödel",16.9],"wiener-schnitzel-vom-kalb":["Wiener Schnitzel vom Kalb",22.5],"krustenbraten-vom-schwein":["Krustenbraten vom Schwein",18.9],"kaesespaetzle":["Käsespätzle",13.5],"grillrippchen":["Grillrippchen",16.5],"forelle-muellerin":["Forelle Müllerin",19.5],"kaiserschmarrn":["Kaiserschmarrn",9.5],"apfelstrudel":["Apfelstrudel",7.5]}}};</script>
 <script>window.Abholzeiten = (function abholzeitKern() {
   var MINUTE = 60000;
   var ASAP_VORLAUF_MINUTEN = 20;
@@ -1368,6 +1447,11 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   var data = window.PAGE_DATA;
   var cart = {};
   var noShowEinstellungen = null;
+  // Warenkorb über mehrere Seiten (Startseite ↔ Speisekarte): nur, wenn
+  // die Seite ihre Karte mitliefert (PAGE_DATA.warenkorb). Name und Preis
+  // kommen dann immer aus dieser Karte, nie aus einem alten Speicherstand.
+  var speicher = data.warenkorb && data.warenkorb.karte ? data.warenkorb : null;
+  var warenkorbHinweis = "";
 
   function euro(value) { return value.toFixed(2).replace(".", ",") + " \u20AC"; }
   function byId(id) { return document.getElementById(id); }
@@ -1386,6 +1470,14 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     var list = byId("cart-lines");
     var current = lines();
     list.innerHTML = "";
+
+    if (warenkorbHinweis && current.length > 0) {
+      var notiz = document.createElement("p");
+      notiz.className = "cart-hinweis";
+      notiz.setAttribute("role", "status");
+      notiz.textContent = warenkorbHinweis;
+      list.appendChild(notiz);
+    }
 
     if (current.length === 0) {
       var empty = document.createElement("p");
@@ -1437,7 +1529,57 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     byId("fab-count").textContent = String(anzahl());
     byId("order-submit").disabled = current.length === 0;
     byId("cart-fab").className = current.length === 0 ? "cart-fab" : "cart-fab visible";
-    byId("bar-order").textContent = current.length === 0 ? "Bestellen" : "Bestellen \u00B7 " + euro(total());
+    var barOrder = byId("bar-order");
+    if (barOrder) barOrder.textContent = current.length === 0 ? (barOrder.getAttribute("data-leer") || "Bestellen") : "Bestellen \u00B7 " + euro(total());
+    if (current.length === 0) warenkorbHinweis = "";
+    speichere();
+  }
+
+  function speicherSchluessel() { return "warenkorb:" + speicher.schluessel; }
+
+  function speichere() {
+    if (!speicher) return;
+    try {
+      window.sessionStorage.setItem(speicherSchluessel(), JSON.stringify(lines().map(function (line) {
+        return { id: line.id, name: line.name, preis: line.preis, menge: line.menge };
+      })));
+    } catch (e) { /* ohne Speicher bleibt der Warenkorb auf dieser Seite */ }
+  }
+
+  /**
+   * Holt einen auf der anderen Seite begonnenen Warenkorb zur\u00FCck. Was nicht
+   * mehr auf der Karte steht (oder ausverkauft ist), f\u00E4llt heraus; ein
+   * ge\u00E4nderter Preis wird \u00FCbernommen und im Warenkorb genannt.
+   */
+  function stelleWarenkorbWiederHer() {
+    if (!speicher) return;
+    var gespeichert = [];
+    try { gespeichert = JSON.parse(window.sessionStorage.getItem(speicherSchluessel()) || "[]"); } catch (e) { gespeichert = []; }
+    if (!Array.isArray(gespeichert)) return;
+    var hinweise = [];
+    gespeichert.forEach(function (eintrag) {
+      if (!eintrag || typeof eintrag.id !== "string") return;
+      var menge = Math.min(99, Math.floor(Number(eintrag.menge)));
+      if (!(menge > 0)) return;
+      var aktuell = speicher.karte[eintrag.id];
+      if (!aktuell) {
+        hinweise.push(String(eintrag.name || "Ein Gericht") + " ist nicht mehr bestellbar und wurde entfernt.");
+        return;
+      }
+      cart[eintrag.id] = { id: eintrag.id, name: aktuell[0], preis: aktuell[1], menge: menge };
+      if (Number(eintrag.preis) !== aktuell[1]) hinweise.push("Neuer Preis f\u00FCr " + aktuell[0] + ": " + euro(aktuell[1]) + ".");
+    });
+    warenkorbHinweis = hinweise.join(" ");
+  }
+
+  /** Auf der Speisekarte: kurz best\u00E4tigen statt den Warenkorb \u00FCber die Karte zu legen. */
+  function meldeHinzugefuegt(name) {
+    var status = byId("cart-status");
+    if (status) status.textContent = name + " liegt im Warenkorb (" + anzahl() + " insgesamt).";
+    var fab = byId("cart-fab");
+    fab.classList.remove("gerade");
+    void fab.offsetWidth;
+    fab.classList.add("gerade");
   }
 
   function changeQty(id, delta) {
@@ -1449,10 +1591,17 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   }
 
   function addToCart(id, name, preis) {
+    if (speicher) {
+      // Nur, was die Karte als bestellbar f\u00FChrt \u2013 zum Preis der Karte.
+      if (!speicher.karte[id]) return;
+      name = speicher.karte[id][0];
+      preis = speicher.karte[id][1];
+    }
     if (!cart[id]) cart[id] = { id: id, name: name, preis: preis, menge: 0 };
     cart[id].menge += 1;
     renderCart();
-    openDrawer();
+    if (data.seite === "karte") meldeHinzugefuegt(name);
+    else openDrawer();
   }
 
   function openDrawer() {
@@ -1792,8 +1941,9 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     var barOrder = byId("bar-order");
     if (barOrder) {
       barOrder.addEventListener("click", function () {
-        if (lines().length === 0) byId("karte").scrollIntoView({ behavior: "smooth" });
-        else openDrawer();
+        if (lines().length > 0) openDrawer();
+        else if (data.karteUrl) window.location.href = data.karteUrl;
+        else byId("karte").scrollIntoView({ behavior: "smooth" });
       });
     }
     byId("drawer-close").addEventListener("click", closeDrawer);
@@ -1803,13 +1953,16 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       if (event.key === "Escape") { closeDrawer(); closeConfirm(); }
     });
 
+    // Die Reservierung steht auf der Startseite; die Speisekarten-Seite hat sie nicht.
     var dateInput = byId("res-datum");
     var today = new Date();
     var iso = today.getFullYear() + "-" +
       String(today.getMonth() + 1).padStart(2, "0") + "-" +
       String(today.getDate()).padStart(2, "0");
-    dateInput.min = iso;
-    dateInput.value = iso;
+    if (dateInput) {
+      dateInput.min = iso;
+      dateInput.value = iso;
+    }
 
     byId("order-form").addEventListener("submit", function (event) {
       event.preventDefault();
@@ -1897,7 +2050,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       });
     });
 
-    byId("reservation-form").addEventListener("submit", function (event) {
+    if (byId("reservation-form")) byId("reservation-form").addEventListener("submit", function (event) {
       event.preventDefault();
       var form = event.target;
       if (!validate(form, ["datum", "uhrzeit", "personen", "name", "telefon"])) return;
@@ -1951,6 +2104,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 
     beobachteAbholzeiten();
     ladeAbholKonfig();
+    stelleWarenkorbWiederHer();
     renderCart();
   });
 })();

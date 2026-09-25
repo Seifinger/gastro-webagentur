@@ -19,6 +19,36 @@
     "1-0",
     "1-1"
   ],
+  "speisekarte": {
+    "pfad": "speisekarte/index.html",
+    "quelle": "musterkarte",
+    "kategorien": [
+      {
+        "name": "Vorspeisen",
+        "anker": "kat-vorspeisen",
+        "gerichte": 3
+      },
+      {
+        "name": "Vom Grill",
+        "anker": "kat-vom-grill",
+        "gerichte": 4
+      },
+      {
+        "name": "Nachspeisen",
+        "anker": "kat-nachspeisen",
+        "gerichte": 2
+      }
+    ],
+    "gerichte": 9,
+    "bestellbar": 9,
+    "bestellung": "vorschau",
+    "startseite": [
+      "tzatziki-mit-pitabrot",
+      "souvlaki-spiesse",
+      "baklava",
+      "dolmades"
+    ]
+  },
   "kontrast": {
     "geprueft": 23,
     "fehler": 0

@@ -19,6 +19,36 @@
     "1-1",
     "0-0"
   ],
+  "speisekarte": {
+    "pfad": "speisekarte/index.html",
+    "quelle": "musterkarte",
+    "kategorien": [
+      {
+        "name": "Mezze",
+        "anker": "kat-mezze",
+        "gerichte": 5
+      },
+      {
+        "name": "Vom Spieß & Grill",
+        "anker": "kat-vom-spiess-grill",
+        "gerichte": 4
+      },
+      {
+        "name": "Süßes",
+        "anker": "kat-suesses",
+        "gerichte": 3
+      }
+    ],
+    "gerichte": 12,
+    "bestellbar": 12,
+    "bestellung": "vorschau",
+    "startseite": [
+      "hummus",
+      "kafta-vom-grill",
+      "baklava-3-stueck",
+      "mutabbal"
+    ]
+  },
   "kontrast": {
     "geprueft": 23,
     "fehler": 0

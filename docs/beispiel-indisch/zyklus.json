@@ -83,7 +83,19 @@
       "kennzeichnung": "Platzhalter",
       "quelle": "stock:photo-1588166524941-3bf61a9c41db",
       "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1603894584373-5ac82b2ae398",
+      "typ": "bild"
+    },
+    "gericht:2-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1565557623262-b51c2513a641",
+      "typ": "bild"
     }
   },
-  "zeitpunkt": "2026-09-24T19:18:17.308Z"
+  "zeitpunkt": "2026-09-25T05:58:23.307Z"
 }

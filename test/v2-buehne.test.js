@@ -36,18 +36,19 @@ test("erster Bildschirm: Kopfzeile mit Zustand, Bühne mit Poster, Slogan, Einla
   assert.ok(!html.includes('class="leiste"'), "keine Häkchen-Leiste mit Ausdruck");
   assert.ok(!html.includes('class="kopfzeile'), "alte Kopfzeile ersetzt");
   assert.equal(bericht.heroVariante, "buehne");
-  assert.deepEqual(pruefeFunktionsVertrag(html), []);
+  assert.deepEqual(pruefeFunktionsVertrag(html, { hinzufuegen: false }), []);
   assert.equal(lint(html).ok, true);
 });
 
 test("Aktionen folgen dem Ausdruck: gesellig → Reservieren zuerst (Kopf, Einladung, Aktionsleiste)", () => {
   const { html } = bau();
   const kopf = html.slice(html.indexOf('class="kopf-aktionen"'), html.indexOf('class="kopf-menue-knopf"'));
-  assert.match(kopf, /btn-ghost kopf-zweit" href="#karte"[^>]*>Bestellen<\/a><a class="btn btn-primary kopf-erst" href="#reservierung"/);
+  // Ohne Betriebsserver heißt der Weg ehrlich "Probebestellung" und führt zur Speisekarte.
+  assert.match(kopf, /btn-ghost kopf-zweit" href="speisekarte\/index\.html"[^>]*>Probebestellung<\/a><a class="btn btn-primary kopf-erst" href="#reservierung"/);
   const leiste = html.slice(html.indexOf('id="mobilebar"'));
   assert.ok(leiste.indexOf("#reservierung") < leiste.indexOf('id="bar-order"'));
   const handwerk = bau({ ausdruck: "handwerk" }).html;
-  assert.match(handwerk, /class="btn btn-primary kopf-erst" href="#karte"/);
+  assert.match(handwerk, /class="btn btn-primary kopf-erst" href="speisekarte\/index\.html"/);
 });
 
 test("Video nur mit Poster und erst per Skript (preload=none, data-src)", () => {
@@ -126,5 +127,5 @@ test("editorial: Titelblatt mit Medium im Rahmen (quer, auf dem Handy hoch), kei
   assert.match(html, /<figure class="titelblatt-bild" style="--fokus-mobil: 50% 40%"><picture><source media="\(max-width: 767px\)" srcset="medien\/heroMobil.jpg"><img class="buehne-poster" src="medien\/hero.jpg"/);
   assert.ok(!html.includes('<section class="buehne"'));
   assert.equal(lint(html).ok, true);
-  assert.deepEqual(pruefeFunktionsVertrag(html), []);
+  assert.deepEqual(pruefeFunktionsVertrag(html, { hinzufuegen: false }), []);
 });

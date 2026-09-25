@@ -390,6 +390,21 @@ Die Karte wird **anhand des Restaurantnamens** gewählt (Pizzeria → italienisc
 
 Gerichte, Preise, Öffnungszeiten und Fotos sind Platzhalter und auf der Seite auch als solche gekennzeichnet – sie werden vor einer Veröffentlichung durch die echten Angaben und Aufnahmen des Wirts ersetzt.
 
+#### Eigene Seite „Speisekarte & Bestellen“ (v2, Seiten mit Ausdruck)
+
+Jede v2-Seite mit Ausdruck (alle Beispielseiten und Lead-Demos) besteht aus zwei Seiten:
+
+| Seite | Pfad | Inhalt |
+|---|---|---|
+| Startseite | `<slug>/index.html` (wie bisher, QR-Ziel) | Bühne, Einladung, Tisch-Collage, **kleine Auswahl** (4–5 Gerichte, Anker `#karte`) mit Kategorien und „Gesamte Speisekarte ansehen“ |
+| Speisekarte | `<slug>/speisekarte/index.html` | alle freigegebenen Gerichte je Kategorie, Kategorien-Navigation (Handy: waagrecht unter der Kopfzeile, Desktop: Seitenleiste), Hinzufügen, Warenkorb und Abholzeit |
+
+- **Eine Datenquelle:** `v2/build/speisekarte.js` bereitet die Karte auf (Musterkarte aus `src/menuCatalog.js` oder die Karte des Betriebs aus `data/lead-edits/<slug>.json` → `speisekarte.kategorien`). Kategorien und Gruppen erscheinen nur mit Gerichten; `aktiv: false`/`freigegeben: false` blendet aus, `ausverkauft: true` zeigt ohne Hinzufügen; `varianten: [{ name, preis }]`, `extras`, `signatur: true` (für die Auswahl der Startseite).
+- **Plus auf der Startseite** öffnet `speisekarte/index.html#gericht-<schlüssel>` und markiert das Gericht (`:target`, auch ohne JavaScript). Es legt nichts in den Warenkorb. Die Schlüssel kommen aus dem Gerichtnamen und bleiben beim Umsortieren gleich.
+- **Warenkorb:** das bestehende `PAGE_SCRIPT` (`src/landingPageGenerator.js`), über `sessionStorage` für beide Seiten. Name und Preis kommen immer aus der aktuellen Karte (`PAGE_DATA.warenkorb.karte`); geänderte Preise und entfallene Gerichte nennt der Warenkorb ausdrücklich.
+- **Bestellen im Header:** mit Betriebsserver „Bestellen“, ohne „Probebestellung“, bei `lead-edits.bestellung.aktiv = false` gar nicht (die Karte bleibt verlinkt). Konzept-Demos schicken nie etwas an einen Server.
+- Alle Links sind relativ (`speisekarte/index.html`, `../index.html`) und funktionieren lokal (auch `file://`), unter `https://<user>.github.io/<repo>/<slug>/` und auf einer eigenen Domain.
+
 ## Entwürfe öffentlich zeigen (GitHub Pages, kostenlos)
 
 Damit du einem Wirt vorab einen Link schicken kannst, einen QR-Code aufs Handy bringst oder er den Entwurf abends jemandem zeigen kann, lässt sich eine öffentliche Fassung erzeugen:

@@ -18,6 +18,37 @@
     "2-0",
     "0-1"
   ],
+  "speisekarte": {
+    "pfad": "speisekarte/index.html",
+    "quelle": "musterkarte",
+    "kategorien": [
+      {
+        "name": "Vorspeisen",
+        "anker": "kat-vorspeisen",
+        "gerichte": 3
+      },
+      {
+        "name": "Aus dem Wok",
+        "anker": "kat-aus-dem-wok",
+        "gerichte": 4
+      },
+      {
+        "name": "Sushi & Dessert",
+        "anker": "kat-sushi-dessert",
+        "gerichte": 2
+      }
+    ],
+    "gerichte": 9,
+    "bestellbar": 9,
+    "bestellung": "vorschau",
+    "startseite": [
+      "fruehlingsrollen-4-stueck",
+      "pad-thai-mit-haehnchen",
+      "sushi-box-12-stueck",
+      "ramen-suppe",
+      "rindfleisch-szechuan"
+    ]
+  },
   "kontrast": {
     "geprueft": 23,
     "fehler": 0
@@ -80,6 +111,12 @@
       "herkunft": "platzhalter",
       "kennzeichnung": "Platzhalter",
       "quelle": "stock:photo-1569718212165-3a8278d5f624",
+      "typ": "bild"
+    },
+    "gericht:1-0": {
+      "herkunft": "platzhalter",
+      "kennzeichnung": "Platzhalter",
+      "quelle": "stock:photo-1559314809-0d155014e29e",
       "typ": "bild"
     }
   },

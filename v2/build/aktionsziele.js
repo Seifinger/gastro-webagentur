@@ -9,8 +9,13 @@
 // Anrufen und Route gibt es nur mit echter Nummer bzw. Adresse. Auf
 // erfundenen Beispielseiten (fiktiv) ist die Nummer eine Filmnummer – dorthin
 // wird niemand zum Anrufen geschickt.
+//
+// Mit eigener Speisekarten-Seite (karteHref) führen Speisekarte und Bestellen
+// dorthin. bestellung: false heißt: Dieser Betrieb nimmt keine Bestellungen
+// über die Website an – dann gibt es keinen Bestellen-Knopf, die Karte bleibt
+// erreichbar.
 
-export function aktionsziele({ lead = {}, apiUrl = "", fiktiv = false } = {}) {
+export function aktionsziele({ lead = {}, apiUrl = "", fiktiv = false, bestellung = true, karteHref = "" } = {}) {
   const modus = String(apiUrl ?? "").trim() ? "live" : "vorschau";
   const telefon = fiktiv ? "" : String(lead.telefon ?? "").trim();
   const tel = telefon.replace(/[^\d+]/g, "");
@@ -18,7 +23,8 @@ export function aktionsziele({ lead = {}, apiUrl = "", fiktiv = false } = {}) {
   return {
     modus,
     reservieren: { art: modus, href: "#reservierung" },
-    bestellen: { art: modus, href: "#karte" },
+    bestellen: bestellung ? { art: modus, href: karteHref || "#karte" } : null,
+    ...(karteHref ? { karte: { href: karteHref } } : {}),
     anrufen: tel ? { art: "telefon", href: `tel:${tel}`, text: telefon } : null,
     route: adresse ? { art: "extern", href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(adresse)}` } : null,
   };
