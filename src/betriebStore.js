@@ -1,7 +1,7 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, openSync, writeSync, fsyncSync, closeSync, renameSync, rmSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { randomUUID, randomInt } from "node:crypto";
+import { randomUUID, randomInt, randomBytes } from "node:crypto";
 import {
   berechneAbholzeiten,
   pruefeAbholwunsch,
@@ -94,12 +94,58 @@ function leererBetrieb() {
   };
 }
 
+/**
+ * Nur eine FEHLENDE Datei ist ein leerer Betrieb. Eine unlesbare oder
+ * beschädigte Datei wird nie still als leer behandelt – sonst überschriebe
+ * die nächste Reservierung alle Reservierungen, Bestellungen und Nachweise.
+ * Sie bleibt unverändert liegen, bis sie aus der Sicherung ersetzt ist.
+ */
+export class BetriebsdatenBeschaedigt extends Error {
+  constructor(slug, ursache) {
+    super("Online-Reservierung und -Bestellung sind gerade nicht möglich. Bitte telefonisch melden.");
+    this.code = "BETRIEBSDATEN_BESCHAEDIGT";
+    this.slug = slug;
+    this.ursache = ursache;
+  }
+}
+
 export function ladeBetrieb(slug) {
+  let roh;
   try {
-    const daten = JSON.parse(readFileSync(datei(slug), "utf-8"));
-    return { ...leererBetrieb(), ...daten };
+    roh = readFileSync(datei(slug), "utf-8");
+  } catch (fehler) {
+    if (fehler.code === "ENOENT") return leererBetrieb();
+    console.error(`⛔ Betriebsdatei ${datei(slug)} nicht lesbar (${fehler.code}) – es wird nichts überschrieben.`);
+    throw new BetriebsdatenBeschaedigt(slug, fehler.code);
+  }
+  try {
+    return { ...leererBetrieb(), ...JSON.parse(roh) };
   } catch {
-    return leererBetrieb();
+    console.error(`⛔ Betriebsdatei ${datei(slug)} ist beschädigt – es wird nichts überschrieben. Letzte Sicherung einspielen.`);
+    throw new BetriebsdatenBeschaedigt(slug, "json");
+  }
+}
+
+/**
+ * Schreibt erst eine Nachbardatei und benennt sie dann um: Ein Absturz oder
+ * eine volle Platte mitten im Schreiben hinterlässt die alte, vollständige
+ * Datei statt einer halben.
+ */
+function schreibeAtomar(ziel, inhalt) {
+  const tmp = `${ziel}.${process.pid}-${randomBytes(4).toString("hex")}.tmp`;
+  try {
+    const fd = openSync(tmp, "w", 0o600);
+    try {
+      const bytes = Buffer.from(inhalt, "utf-8");
+      for (let geschrieben = 0; geschrieben < bytes.length; ) geschrieben += writeSync(fd, bytes, geschrieben);
+      fsyncSync(fd);
+    } finally {
+      closeSync(fd);
+    }
+    renameSync(tmp, ziel);
+  } catch (fehler) {
+    rmSync(tmp, { force: true });
+    throw fehler;
   }
 }
 
@@ -112,7 +158,7 @@ export function speichereBetrieb(slug, daten) {
   // das andere existiert.
   vermerkeGastMeldungen(betriebExistiert(slug) ? ladeBetrieb(slug) : null, daten);
   mkdirSync(betriebeDir, { recursive: true });
-  writeFileSync(datei(slug), `${JSON.stringify(daten, null, 2)}\n`, "utf-8");
+  schreibeAtomar(datei(slug), `${JSON.stringify(daten, null, 2)}\n`);
   return daten;
 }
 
@@ -476,10 +522,29 @@ function pruefeReservierung(daten, eingabe, { ignoriereId, quelle } = {}) {
   return { personen, warnung: verteilung ? verteilung.wirtText : "" };
 }
 
+/**
+ * Obergrenzen für freie Gasteingaben. Großzügig für echte Angaben, aber
+ * niemand soll über das öffentliche Formular Kilobytes je Feld in die
+ * Betriebsdatei schreiben (sie wird bei jeder Anfrage ganz gelesen).
+ */
+export const GAST_FELD_MAX = { name: 120, telefon: 40, wunsch: 1000, hinweis: 1000, positionen: 100, gericht: 200 };
+
+function pruefeLaenge(wert, max, bezeichnung) {
+  if (String(wert ?? "").trim().length > max) throw new Error(`${bezeichnung} ist zu lang (höchstens ${max} Zeichen).`);
+}
+
+function pruefeGastFelder(eingabe) {
+  pruefeLaenge(eingabe.name, GAST_FELD_MAX.name, "Der Name");
+  pruefeLaenge(eingabe.telefon, GAST_FELD_MAX.telefon, "Die Telefonnummer");
+  pruefeLaenge(eingabe.wunsch, GAST_FELD_MAX.wunsch, "Der Wunsch");
+  pruefeLaenge(eingabe.hinweis, GAST_FELD_MAX.hinweis, "Der Hinweis");
+}
+
 export function legeReservierungAn(slug, eingabe, quelle = "online") {
   // Die Quelle bestimmt ausschließlich der Server über den aufgerufenen Weg
   // (wirtServer.js) – nie ein Wert aus dem Formular.
   if (!["online", "manuell"].includes(quelle)) throw new Error(`Unbekannte Quelle "${quelle}".`);
+  pruefeGastFelder(eingabe);
   const email = pruefeEmail(eingabe.email);
 
   return aendere(slug, (daten) => {
@@ -585,6 +650,9 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
   if (positionen.length === 0) throw new Error("Die Bestellung ist leer.");
   if (!String(eingabe.name ?? "").trim()) throw new Error("Bitte einen Namen angeben.");
   if (!String(eingabe.abholzeit ?? "").trim() && !eingabe.abholZeitpunkt) throw new Error("Bitte eine Abholzeit angeben.");
+  pruefeGastFelder(eingabe);
+  if (positionen.length > GAST_FELD_MAX.positionen) throw new Error(`Höchstens ${GAST_FELD_MAX.positionen} verschiedene Positionen je Bestellung.`);
+  for (const p of positionen) pruefeLaenge(p?.name, GAST_FELD_MAX.gericht, "Ein Gerichtname");
   const email = pruefeEmail(eingabe.email);
 
   const sauber = positionen.map((p) => ({

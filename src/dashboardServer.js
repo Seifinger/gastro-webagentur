@@ -49,6 +49,7 @@ import { ladeManifest, slugFuerPlaceId, placeIdFuerSlug } from "./entwurfsManife
 import { v2Handler, ergaenzeLeadsV2, v2HtmlInjektion, textVorschauV2 } from "../v2/integration/dashboardV2.js";
 import { farbschemataFuer, farbschemaStandard } from "./demoEinstellungen.js";
 import { anmeldungPruefen, anmeldungAktiv } from "./dashboardAnmeldung.js";
+import { fremdeHerkunft, istLokalerHost } from "./anfrageSchutz.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "..", "public");
@@ -92,6 +93,7 @@ function parsePort(argv) {
 }
 
 const port = parsePort(process.argv.slice(2));
+const LOKAL_GEBUNDEN = ["127.0.0.1", "localhost", "::1"].includes(dashboardHost);
 
 /**
  * Liest die Zuordnung Lead -> Entwurfsordner bei jedem Aufruf neu, damit ein
@@ -380,6 +382,22 @@ const routen = async (req, res) => {
   // Online-Betrieb: Anmeldung vor allem anderen (dashboardAnmeldung.js). Dann
   // ersetzt die Sitzung den Token; lokal ohne Passwort bleibt alles wie bisher.
   if (await anmeldungPruefen(req, res, pathname)) return;
+
+  if (!anmeldungAktiv()) {
+    // Lokal lauscht der Server nur auf 127.0.0.1. Eine fremde Domain, die auf
+    // 127.0.0.1 zeigt (DNS-Rebinding), käme sonst an Leads und Vorschauen.
+    if (LOKAL_GEBUNDEN && !istLokalerHost(req.headers.host)) {
+      res.writeHead(421, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end("Unerwarteter Host. Das Dashboard ist ohne Anmeldung nur über http://localhost erreichbar.");
+      return;
+    }
+    // Schreibaktionen, die eine fremde Seite im Browser auslöst (CSRF), sind
+    // nie gewollt – mit oder ohne DASHBOARD_TOKEN.
+    if (!["GET", "HEAD"].includes(req.method) && fremdeHerkunft(req)) {
+      sendeJson(res, 403, { ok: false, fehler: "Anfrage von fremder Seite abgelehnt." });
+      return;
+    }
+  }
 
   if (!anmeldungAktiv() && brauchtToken(pathname, req.method) && !tokenGueltig(tokenAusAnfrage(req))) {
     sendeJson(res, 401, {

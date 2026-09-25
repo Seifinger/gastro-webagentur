@@ -76,7 +76,7 @@ Zustellung (`stelleGastMeldungenZu` in src/kundenBenachrichtigung.js):
 - Statusseite zeigt nur Betrieb, Referenz, Status, Datum/Uhrzeit, Personenzahl (Reservierung), letzte Änderung, Rückrufnummer des **Restaurants**. Keine Gastdaten.
 - Widerruf: Knopf „Status-Link sperren“ im Dashboard (`POST /intern/gastlink/widerrufen`). Alle Links auf einmal: `GAST_STATUS_GEHEIMNIS` austauschen.
 - Demo: Seiten ohne `--api` (Entwürfe, Konzept-Demos, GitHub Pages) schicken nichts ab. Ein Wirt-Server mit `--demo` erzeugt weder Status-Links noch Mails (gespeichert am Betrieb, zurück mit `--kein-demo`).
-- **Neu und wichtig:** `WIRT_PASSWORT` schützt Dashboard, `/api/*` und `/intern/*` per HTTP-Basic. Sobald der Wirt-Server öffentlich erreichbar ist (für Status-Links nötig), muss es gesetzt sein – vorher waren diese Routen ungeschützt.
+- **Neu und wichtig:** `WIRT_PASSWORT` schützt Dashboard, `/api/*` und `/intern/*` per HTTP-Basic. Sobald der Wirt-Server öffentlich erreichbar ist (für Status-Links nötig), muss es gesetzt sein. Seit dem Audit vom 25.09.2026 sind diese Routen ohne Passwort gesperrt, sobald die Anfrage über einen Proxy kommt oder `WIRT_OEFFENTLICHE_URL` gesetzt ist (`SECURITY-AUDIT.md`).
 
 ## Umgebungsvariablen (nur Server)
 

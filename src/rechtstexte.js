@@ -414,7 +414,7 @@ export function pruefeBestaetigungen(daten, vorgang, eingabe, jetzt = new Date()
  */
 export function launchPruefung(daten, { wirtPasswortGesetzt, oeffentlicheUrl, emailEingerichtet, jetzt = new Date() } = {}) {
   const punkte = [
-    { punkt: "Wirt-Dashboard mit Passwort geschützt (WIRT_PASSWORT)", ok: Boolean(wirtPasswortGesetzt), blocker: true },
+    { punkt: "Wirt-Dashboard mit Passwort geschützt (WIRT_PASSWORT, mindestens 12 Zeichen)", ok: Boolean(wirtPasswortGesetzt), blocker: true },
     { punkt: "Öffentliche HTTPS-Adresse des Wirt-Servers (WIRT_OEFFENTLICHE_URL)", ok: /^https:\/\//.test(oeffentlicheUrl ?? ""), blocker: true },
     { punkt: "Impressum des Restaurants freigegeben", ok: Boolean(gueltigeFassung(daten.rechtsdokumente, "impressum", jetzt)), blocker: true },
     { punkt: "Datenschutzerklärung des Restaurants freigegeben", ok: Boolean(gueltigeFassung(daten.rechtsdokumente, "datenschutz", jetzt)), blocker: true },

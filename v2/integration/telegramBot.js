@@ -298,7 +298,13 @@ export function starteDienst({ log = console.log } = {}) {
   if (!telegramKonfiguriert()) throw new Error("TELEGRAM_BOT_TOKEN fehlt – siehe v2/integration/TELEGRAM-SETUP.md");
   let offset = 0;
   let laeuft = true;
-  const takt = setInterval(() => sendeFaelligeUebersichten().then((l) => l.length && log(`Tagesübersicht an ${l.join(", ")}`)), 60_000);
+  // Ohne .catch beendete ein einzelner Fehler (Netz, unlesbare Datei) den Prozess.
+  const takt = setInterval(
+    () => sendeFaelligeUebersichten()
+      .then((l) => l.length && log(`Tagesübersicht an ${l.join(", ")}`))
+      .catch((e) => log(`Tagesübersicht fehlgeschlagen (${e.message}) – neuer Versuch in 1 min`)),
+    60_000,
+  );
   (async () => {
     while (laeuft) {
       try {

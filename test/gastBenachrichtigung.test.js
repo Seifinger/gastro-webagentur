@@ -35,6 +35,9 @@ store.uhrHook.jetzt = () => new Date(JETZT);
 const ENV = ["RESEND_API_KEY", "GAST_EMAIL_ABSENDER", "WIRT_OEFFENTLICHE_URL", "WIRT_PASSWORT"];
 const altEnv = Object.fromEntries(ENV.map((k) => [k, process.env[k]]));
 
+const WIRT_PW = "passwort-fuer-den-test";
+const WIRT_ANMELDUNG = { Authorization: `Basic ${Buffer.from(`wirt:${WIRT_PW}`).toString("base64")}` };
+
 let mails = [];
 function mailMock() {
   emailHook.aktuell = async (an, betreff, text, anhaenge, optionen) => {
@@ -46,6 +49,8 @@ function mailMock() {
 beforeEach(() => {
   for (const k of ENV) delete process.env[k];
   process.env.WIRT_OEFFENTLICHE_URL = "https://wirt.beispiel.de";
+  // Mit öffentlicher Adresse gibt es das Dashboard nur mit Passwort.
+  process.env.WIRT_PASSWORT = WIRT_PW;
   mails = [];
   mailMock();
   smsHook.aktuell = null;
@@ -87,7 +92,7 @@ async function mitServer(h, fn) {
 }
 
 async function post(basis, pfad, daten = {}) {
-  const antwort = await fetch(`${basis}${pfad}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(daten) });
+  const antwort = await fetch(`${basis}${pfad}`, { method: "POST", headers: { "Content-Type": "application/json", ...WIRT_ANMELDUNG }, body: JSON.stringify(daten) });
   return { status: antwort.status, kopf: antwort.headers, ...(await antwort.json()) };
 }
 
@@ -98,7 +103,7 @@ const bestellen = (basis, zusatz = {}) =>
   post(basis, "/oeffentlich/bestellung", { positionen: [{ name: "Pizza", menge: 1, preis: 9.9 }], abholzeit: "18:30", name: "Max Gast", telefon: "0170 2222222", email: "max@beispiel.de", ...zusatz });
 
 const statusVon = (basis, token) => post(basis, "/oeffentlich/status", { token });
-const betrieb = async (basis) => (await fetch(`${basis}/api/betrieb`)).json();
+const betrieb = async (basis) => (await fetch(`${basis}/api/betrieb`, { headers: WIRT_ANMELDUNG })).json();
 const knopf = (data) => verarbeiteUpdate({ callback_query: { id: "k", data, message: { chat: { id: 4711 }, message_id: 1 } } }, { betriebe: [SLUG] });
 const meldungenVon = (id) => store.ladeBetrieb(SLUG).gastMeldungen.filter((m) => m.bezugId === id);
 

@@ -20,6 +20,7 @@
 // NICHT enthalten – nur Inhalte, die in vorhandene Plätze der Vorlage fließen.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, renameSync, rmSync } from "node:fs";
+import { entferneBildMetadaten, mp4HatStandort } from "./bildMetadaten.js";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createHash, randomBytes } from "node:crypto";
@@ -530,6 +531,7 @@ export function pruefeMedium(def, puffer) {
   if (def.art === "video") {
     const v = videoArt(puffer);
     if (!v) throw new Error("Kein MP4- oder WebM-Video erkannt.");
+    if (mp4HatStandort(puffer)) throw new Error("Das Video enthält den Aufnahmeort (GPS). Bitte ohne Standort exportieren (z. B. am iPhone: Teilen → Optionen → „Ort“ aus) und erneut hochladen.");
     if (puffer.length > LIMITS.videoBytes) throw new Error(`Das Video ist größer als ${LIMITS.videoBytes / 1024 / 1024} MB.`);
     return { ...v, bytes: puffer.length };
   }
@@ -548,9 +550,12 @@ export function pruefeMedium(def, puffer) {
  * Legt ein Medium als VORSCHLAG ab. Das bisherige bleibt aktiv, bis der
  * Vorschlag übernommen wird. Dateiname und Ort bestimmt allein der Server.
  */
-export function legeMediumVor(projekt, rolle, puffer, { von, jetzt, basis = KUNDEN_DIR }) {
+export function legeMediumVor(projekt, rolle, roh, { von, jetzt, basis = KUNDEN_DIR }) {
   const def = rolleDef(projekt, rolle);
-  const info = pruefeMedium(def, puffer);
+  const geprueft = pruefeMedium(def, roh);
+  // Aufnahmeort, Kamera, Namen: nichts davon soll später öffentlich werden.
+  const puffer = def.art === "video" ? roh : entferneBildMetadaten(roh, geprueft.typ);
+  const info = { ...geprueft, bytes: puffer.length };
   const name = `${rolle.replace(":", "-").toLowerCase()}-${zufall(8)}.${info.endung}`;
   const ordner = medienOrdner(projekt.id, basis);
   mkdirSync(ordner, { recursive: true });

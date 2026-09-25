@@ -25,3 +25,16 @@ data/v2-engine.json
 data/seitenaufrufe/
 data/kunden/
 v2/output/kunden/
+
+# Personenbezogene bzw. Lead-Daten, die zur Laufzeit entstehen (Audit 25.09.2026):
+# Telefonnummern nicht erschienener Gäste, gelernte Wartezeiten,
+# Farbschema-Wahl je Lead (Place-IDs), KI-Texte je Lead, Briefings echter Betriebe
+data/zuverlaessigkeit/
+data/wartezeitLernen/
+data/stimmungen.json
+v2/output/copy/
+v2/briefings/*
+!v2/briefings/pilot-*.json
+# Lokale Umgebungsdateien jeder Art
+.env.*
+!.env.example

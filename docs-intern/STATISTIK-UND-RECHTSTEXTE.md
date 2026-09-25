@@ -120,15 +120,15 @@ Keine dieser Daten liegen in `docs/`, GitHub Pages oder Git (`data/betrieb/` und
 ## 10. Zugriff und Launch-Blocker
 
 - Ein Wirt-Server-Prozess bedient genau einen Betrieb. Die APIs haben keinen Betriebsparameter, fremde Daten sind nicht adressierbar. Mehrere Betriebe auf einem Host teilen sich aber `data/` und brauchen je ein eigenes Passwort (Prozess).
-- `/api/*` (Statistik, Rechtstexte, Nachweise) und `/intern/*` sind nie öffentlich, **sofern `WIRT_PASSWORT` gesetzt ist**. Öffentlich sind nur `/oeffentlich/*`, `/status` und `/rechtstexte/*`.
+- `/api/*` (Statistik, Rechtstexte, Nachweise) und `/intern/*` sind nie öffentlich. Mit `WIRT_PASSWORT` nur nach Anmeldung. Ohne Passwort nur direkt auf dem Rechner (localhost, ohne Proxy), bei `WIRT_OEFFENTLICHE_URL` oder `NODE_ENV=production` gar nicht (seit Audit 25.09.2026, `SECURITY-AUDIT.md`). Öffentlich sind nur `/oeffentlich/*`, `/status` und `/rechtstexte/*`.
 - **Launch-Blocker** (Prüfliste im Reiter „Rechtstexte“, Warnung beim Start ohne Passwort auf 0.0.0.0):
-  1. `WIRT_PASSWORT` fehlt
+  1. `WIRT_PASSWORT` fehlt oder ist kürzer als 12 Zeichen
   2. keine öffentliche HTTPS-Adresse
   3. Impressum nicht freigegeben
   4. Datenschutzerklärung nicht freigegeben
   5. Allergeninformation fehlt
   6. AVV ungeklärt
-- HTTP-Basic ist ein Minimalschutz. Für den Produktivbetrieb zusätzlich prüfen: TLS-Terminierung, Rate-Limit für Anmeldeversuche (fehlt), eigene Zugänge je Person statt eines geteilten Passworts.
+- HTTP-Basic ist ein Minimalschutz. Vorhanden: höchstens 10 Fehlversuche je Adresse in 15 Minuten, Herkunftsprüfung gegen CSRF. Für den Produktivbetrieb zusätzlich prüfen: TLS-Terminierung, `VERTRAUTER_PROXY` hinter einem Proxy, eigene Zugänge je Person statt eines geteilten Passworts.
 
 ## Rollen und AVV (zu prüfen)
 

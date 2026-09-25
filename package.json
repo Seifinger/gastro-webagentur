@@ -15,6 +15,7 @@
     "wirt": "node src/wirtServer.js",
     "gast:mailtest": "node scripts/gastMailTest.mjs",
     "kunde": "node scripts/kunde.mjs",
+    "sicherung": "node scripts/sicherung.mjs",
     "resonanz": "node src/resonanzServer.js",
     "test": "node --test --test-concurrency=1 test/*.test.js",
     "preview": "node src/previewServer.js",

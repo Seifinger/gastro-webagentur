@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { docsDir, resonanzHost, resonanzPort } from "./config.js";
 import { vermerkeAufruf } from "./resonanzStore.js";
+import { Bremse, clientAdresse } from "./anfrageSchutz.js";
 
 // Nimmt die Signale der veröffentlichten Entwürfe entgegen. Aufbau wie
 // wirtServer.js, weil das Problem dasselbe ist: ein öffentlicher Endpunkt,
@@ -19,20 +20,16 @@ import { vermerkeAufruf } from "./resonanzStore.js";
 // aus Rate-Bremse, Größendeckel und der Prüfung, dass der gemeldete Entwurf
 // überhaupt existiert.
 
-const BREMSE_FENSTER_MS = 60_000;
 const BREMSE_MAX = 20;
-const zugriffe = new Map();
+const zugriffe = new Bremse({ fensterMs: 60_000 });
 
 /**
  * Die Adresse dient nur der Bremse und bleibt im Arbeitsspeicher – auf der
- * Platte landet sie nie.
+ * Platte landet sie nie. Hinter einem Proxy zählt sie nur mit
+ * VERTRAUTER_PROXY (anfrageSchutz.js).
  */
 function zuSchnell(adresse) {
-  const jetzt = Date.now();
-  const liste = (zugriffe.get(adresse) ?? []).filter((t) => jetzt - t < BREMSE_FENSTER_MS);
-  liste.push(jetzt);
-  zugriffe.set(adresse, liste);
-  return liste.length > BREMSE_MAX;
+  return zugriffe.zaehle(adresse) > BREMSE_MAX;
 }
 
 const CORS = {
@@ -72,8 +69,19 @@ function entwurfExistiert(slug) {
   return existsSync(path.join(docsDir, slug, "index.html"));
 }
 
+/** Wie im Wirt-Server: Ein Fehler in einer Anfrage beendet nie den Prozess. */
 export async function handler(req, res) {
-  const { pathname } = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
+  try {
+    await routen(req, res);
+  } catch (fehler) {
+    console.error(`Fehler bei ${req.method} ${String(req.url).slice(0, 200)}: ${fehler.message}`);
+    if (!res.headersSent) json(res, 400, { ok: false, fehler: "Ungültige Anfrage." });
+    else res.end();
+  }
+}
+
+async function routen(req, res) {
+  const { pathname } = new URL(req.url, "http://localhost");
 
   if (req.method === "OPTIONS") {
     res.writeHead(204, CORS);
@@ -82,7 +90,7 @@ export async function handler(req, res) {
   }
 
   if (pathname === "/resonanz" && req.method === "POST") {
-    if (zuSchnell(req.socket.remoteAddress ?? "unbekannt")) {
+    if (zuSchnell(clientAdresse(req))) {
       json(res, 429, { ok: false, fehler: "Zu viele Anfragen." });
       return;
     }

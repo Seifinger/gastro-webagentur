@@ -518,7 +518,9 @@ Das Wirt-Dashboard hat zwei weitere Reiter:
 
 Details, Bestandsaufnahme, Checkliste der zu liefernden Angaben und Launch-Blocker: [docs-intern/STATISTIK-UND-RECHTSTEXTE.md](docs-intern/STATISTIK-UND-RECHTSTEXTE.md).
 
-Sobald der Wirt-Server öffentlich erreichbar ist, **`WIRT_PASSWORT` setzen** (schützt Dashboard und Wirt-Aktionen). Einrichtung, Umgebungsvariablen, Sicherheit, Datenschutz-Baustein und der sichere Versandtest an die eigene Adresse (`npm run gast:mailtest -- --an …`): [docs-intern/GASTBENACHRICHTIGUNG.md](docs-intern/GASTBENACHRICHTIGUNG.md).
+Sobald der Wirt-Server öffentlich erreichbar ist, **`WIRT_PASSWORT` setzen** (mindestens 12 Zeichen; schützt Dashboard und Wirt-Aktionen). Ohne Passwort ist das Wirt-Dashboard nur direkt über `http://localhost` erreichbar. Hinter einem Proxy zusätzlich `VERTRAUTER_PROXY` setzen (`.env.example`).
+
+**Vor dem ersten Launch:** [SECURITY-AUDIT.md](SECURITY-AUDIT.md) (Befunde und Migrationswirkung), [DATENFLUSS.md](DATENFLUSS.md) (welche Daten wo liegen und wohin sie gehen), [LAUNCH-CHECKLISTE.md](LAUNCH-CHECKLISTE.md). Sicherung der Laufzeitdaten: `npm run sicherung -- erstellen [--ziel <ordner>]`, Wiederherstellungsprobe: `npm run sicherung -- pruefen <datei.tar.gz>`. Einrichtung, Umgebungsvariablen, Sicherheit, Datenschutz-Baustein und der sichere Versandtest an die eigene Adresse (`npm run gast:mailtest -- --an …`): [docs-intern/GASTBENACHRICHTIGUNG.md](docs-intern/GASTBENACHRICHTIGUNG.md).
 
 ## v2-Pipeline (parallel zu v1)
 
