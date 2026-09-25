@@ -58,6 +58,7 @@ import { zeitraum, auswertung, heuteAnstehend, anfragenJe100Aufrufe, ZEITZONE_ST
 import { seitenaufrufe } from "./seitenaufrufe.js";
 import { benachrichtigeBetrieb, oeffentlicherVapidSchluessel } from "./pushNotify.js";
 import { benachrichtigeUeberTelegram } from "./telegramNotify.js";
+import { darfJetztMelden, rueckkanalText, telegramStand, telegramHinweis, setzeTelegramEinstellungen } from "./telegramRegeln.js";
 import {
   versendeRechnung,
   stelleGastMeldungenZu,
@@ -186,6 +187,18 @@ function gastHinweisFuer(art, id) {
   return eintrag ? wirtGastHinweis(art, eintrag, daten.gastMeldungen ?? []) : null;
 }
 
+/**
+ * Telegram-Rückkanal (v1, reiner Text): nur in den Telegram-Zeiten des
+ * Betriebs, nur an den konfigurierten gemeinsamen Chat und ohne Gastdaten
+ * (src/telegramRegeln.js). Nachmelden und Erinnerungen macht der v2-Bot.
+ */
+async function telegramRueckkanal(art, eintrag) {
+  const daten = ladeBetrieb(slug);
+  const erlaubt = darfJetztMelden(daten, art, uhrHook.jetzt());
+  if (!erlaubt.ok || erlaubt.ziel.bot !== "standard") return;
+  await benachrichtigeUeberTelegram(erlaubt.ziel.chatId, rueckkanalText(art, eintrag, daten, slug));
+}
+
 function uebersicht() {
   const daten = ladeBetrieb(slug);
   const heute = new Date().toISOString().slice(0, 10);
@@ -216,6 +229,8 @@ function uebersicht() {
     tischKonflikte: tischKonflikte(daten),
     zusaetzlicheWartezeitMinuten: daten.zusaetzlicheWartezeitMinuten ?? 0,
     telegramChatId: daten.telegramChatId ?? "",
+    // Ein Satz, wenn Telegram eingerichtet ist, aber gerade nicht melden kann.
+    telegramHinweis: telegramHinweis(daten, uhrHook.jetzt()),
     wartezeitLernenAktiv: Boolean(daten.wartezeitLernenAktiv),
     noShowSchutzAktiv: Boolean(daten.noShowSchutzAktiv),
     noShowGebuehrBetrag: daten.noShowGebuehrBetrag ?? 0,
@@ -230,6 +245,7 @@ function uebersicht() {
     gastEmail: gastEmailEinrichtung(),
     demoBetrieb: Boolean(daten.demoBetrieb),
     heute,
+    zeitzone: daten.zeitzone || ZEITZONE_STANDARD,
     jetztIso: new Date().toISOString(),
   };
 }
@@ -490,9 +506,7 @@ const routen = async (req, res) => {
         // Telegram ist der Fallback-Kanal: er greift nur, wenn kein Gerät für
         // Web Push registriert ist (siehe pushNotify.js – "versucht": 0 heißt
         // entweder kein VAPID-Schlüssel hinterlegt oder keine Subscription).
-        if (!push.versucht) {
-          await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
-        }
+        if (!push.versucht) await telegramRueckkanal("reservierung", r);
         await stelleGastMeldungenZu(slug);
         json(res, 200, { ok: true, reservierung: { id: r.id, datum: r.datum, uhrzeit: r.uhrzeit, ...gastAntwort("reservierung", r) } }, { ...CORS, ...PRIVAT });
         return;
@@ -502,9 +516,7 @@ const routen = async (req, res) => {
         const b = legeBestellungAn(slug, daten);
         const text = `Neue Bestellung ${b.nummer} · Abholung gewünscht um ${b.abholzeit}, ${b.name}`;
         const push = await benachrichtigeBetrieb(slug, { titel: "Neue Bestellung", text });
-        if (!push.versucht) {
-          await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
-        }
+        if (!push.versucht) await telegramRueckkanal("bestellung", b);
         await stelleGastMeldungenZu(slug);
         json(res, 200, { ok: true, bestellung: { id: b.id, gesamt: b.gesamt, ...gastAntwort("bestellung", b) } }, { ...CORS, ...PRIVAT });
         return;
@@ -645,6 +657,12 @@ const routen = async (req, res) => {
         jetzt,
       }),
     }, PRIVAT);
+    return;
+  }
+
+  // Reiter „Telegram“: Einstellungen, berechnete Zeiten, Warnungen, Probleme.
+  if (pathname === "/api/telegram/benachrichtigung") {
+    json(res, 200, { ok: true, ...telegramStand(ladeBetrieb(slug), { jetzt: uhrHook.jetzt() }) }, PRIVAT);
     return;
   }
 
@@ -834,6 +852,12 @@ const routen = async (req, res) => {
       if (pathname === "/intern/wartezeit-lernen/aktiv") {
         const aktiv = setzeWartezeitLernenAktiv(slug, eingabe.aktiv);
         json(res, 200, { ok: true, wartezeitLernenAktiv: aktiv });
+        return;
+      }
+
+      if (pathname === "/intern/telegram/benachrichtigung") {
+        setzeTelegramEinstellungen(slug, eingabe, uhrHook.jetzt());
+        json(res, 200, { ok: true, ...telegramStand(ladeBetrieb(slug), { jetzt: uhrHook.jetzt() }) });
         return;
       }
 

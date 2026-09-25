@@ -7,8 +7,11 @@
 //   1. das Wirt-Dashboard im Designsystem des Betriebs (Farben, Schriften,
 //      Radien, Abstände aus v2/designsysteme/<kueche>--<stimmung>.json),
 //      eingespielt über public/wirt.html, ohne die Datei zu ändern
-//   2. Telegram-Push nach jeder erfolgreichen öffentlichen Anfrage
-//      (Reservierung, Bestellung, Stornierung) und die Verknüpfung per Code
+//   2. Telegram-Meldung nach jeder erfolgreichen öffentlichen Anfrage
+//      (Reservierung, Bestellung, Stornierung – nur in den Telegram-Zeiten,
+//      sonst zum Nachmelden vorgemerkt, telegramPlaner.js) sowie Chat-Modus,
+//      Verknüpfung per Code je Kanal, Testnachricht und Trennen für den
+//      Reiter „Telegram“ in public/wirt.html
 //   3. den Küchenstatus (Neu → In Zubereitung → Bereit) als API
 //
 //   npm run v2:wirt -- --betrieb <slug> [--kueche k --stimmung s] [--telegram] [--port 3200]
@@ -26,10 +29,15 @@ import {
   erzeugeVerknuepfungscode,
   telegramStatus,
   setzeTagesuebersicht,
-  trenneTelegram,
+  trenneKanal,
+  uebernimmBisherigenChat,
   setzeKuechenStatus,
+  KANAL_NAME,
 } from "./wirtAdapter.js";
 import { benachrichtige, telegramKonfiguriert, starteDienst } from "./telegramBot.js";
+import { api, testNachricht } from "./telegramNachrichten.js";
+import { ladeBetrieb } from "../../src/betriebStore.js";
+import { zielFuer, telegramEinstellungen, botName, botToken, GRUND_TEXT } from "../../src/telegramRegeln.js";
 import { stelleGastMeldungenZu } from "../../src/kundenBenachrichtigung.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -73,47 +81,14 @@ label { color: var(--muted); }
 .v2-code { font-family: ${t.display.stapel}; font-size: 1.6rem; letter-spacing: .2em; color: var(--text); }`;
 }
 
-const PANEL_SKRIPT = `
-(function () {
-  var block = document.getElementById("telegram-block");
-  if (!block) return;
-  var zeile = document.createElement("div");
-  zeile.style.marginTop = "16px";
-  zeile.innerHTML = '<label>Telegram-Bot verbinden (v2)</label>' +
-    '<p class="v2-hinweis" id="v2-tg-status">…</p>' +
-    '<button class="knopf klein" type="button" id="v2-tg-code">Verbindungs-Code erzeugen</button> ' +
-    '<button class="knopf klein stumm" type="button" id="v2-tg-trennen">Trennen</button>' +
-    '<p class="v2-code" id="v2-tg-anzeige"></p>';
-  block.appendChild(zeile);
-  function lade() {
-    fetch("/v2/api/telegram").then(function (r) { return r.json(); }).then(function (s) {
-      document.getElementById("v2-tg-status").textContent = s.verknuepft
-        ? "Verbunden" + (s.verknuepftAm ? " seit " + new Date(s.verknuepftAm).toLocaleDateString("de-DE") : "") + ". Tagesübersicht " + (s.tagesuebersicht ? "um " + s.uhrzeit : "aus") + "."
-        : "Nicht verbunden – das Dashboard funktioniert trotzdem wie gewohnt.";
-    });
-  }
-  document.getElementById("v2-tg-code").addEventListener("click", function () {
-    fetch("/v2/intern/telegram/code", { method: "POST" }).then(function (r) { return r.json(); }).then(function (c) {
-      document.getElementById("v2-tg-anzeige").textContent = c.code;
-      var status = document.getElementById("v2-tg-status");
-      status.textContent = "Im Bot senden: /start " + c.code + " (gültig 30 Minuten)";
-      if (c.botLink) {
-        var a = document.createElement("a");
-        a.href = c.botLink; a.target = "_blank"; a.rel = "noopener"; a.textContent = " oder direkt öffnen";
-        status.appendChild(a);
-      }
-    });
-  });
-  document.getElementById("v2-tg-trennen").addEventListener("click", function () {
-    fetch("/v2/intern/telegram/trennen", { method: "POST" }).then(lade);
-  });
-  lade();
-})();
-`;
+// Das Wirt-Dashboard (public/wirt.html) hat einen Reiter „Telegram“. Die
+// Chat-Verknüpfung per Code, der Modus und die Testnachricht brauchen den Bot
+// und gibt es deshalb nur hier; die Hülle meldet das der Seite.
+const V2_MARKER = '<script>window.wirtV2 = { telegram: true };</script>';
 
 export function themeWirtHtml(html, ds) {
   const style = ds ? `<style id="v2-betriebs-theme">\n${wirtThemeCss(ds)}\n</style>\n` : "";
-  return html.replace("</head>", `${style}</head>`).replace("</body>", `<script>${PANEL_SKRIPT}</script>\n</body>`);
+  return html.replace("</head>", `${style}${V2_MARKER}\n</head>`);
 }
 
 /* ------------------------------------------------------------------ */
@@ -167,6 +142,12 @@ function mitschneiden(res) {
 }
 
 const STORNO = /^\/oeffentlich\/bestellung\/([^/]+)\/stornieren$/;
+
+function kanalAus(eingabe) {
+  const kanal = eingabe?.kanal ?? "alle";
+  if (!["alle", "reservierung", "bestellung"].includes(kanal)) throw new Error("Unbekannter Kanal.");
+  return kanal;
+}
 
 /**
  * Baut den Handler. `slug` muss dem Betrieb entsprechen, den der v1-Handler
@@ -223,13 +204,35 @@ export async function erzeugeHandlerV2({ slug, v1TelegramErsetzen = true } = {})
       try {
         const e = await koerper(req);
         if (pathname === "/v2/intern/telegram/code") {
-          const code = erzeugeVerknuepfungscode(betrieb);
-          const bot = process.env.TELEGRAM_BOT_NAME;
-          return json(res, 200, { ok: true, ...code, botLink: bot ? `https://t.me/${bot}?start=${code.code}` : "" });
+          const code = erzeugeVerknuepfungscode(betrieb, new Date(), { kanal: kanalAus(e) });
+          const name = botName(code.bot);
+          return json(res, 200, { ok: true, ...code, botName: name, botLink: name ? `https://t.me/${name}?start=${code.code}` : "", botEingerichtet: Boolean(botToken(code.bot)) });
         }
         if (pathname === "/v2/intern/telegram/trennen") {
-          trenneTelegram(betrieb);
-          return json(res, 200, { ok: true });
+          trenneKanal(betrieb, kanalAus(e));
+          return json(res, 200, { ok: true, ...telegramStatus(betrieb) });
+        }
+        if (pathname === "/v2/intern/telegram/uebernehmen") {
+          uebernimmBisherigenChat(betrieb, kanalAus(e));
+          return json(res, 200, { ok: true, ...telegramStatus(betrieb) });
+        }
+        if (pathname === "/v2/intern/telegram/test") {
+          // Vom Wirt ausgelöst: gilt als Antwort, nicht als Benachrichtigung –
+          // deshalb auch außerhalb der Telegram-Zeiten, nie im Demo-Betrieb.
+          const kanal = kanalAus(e);
+          const daten = ladeBetrieb(betrieb);
+          if (daten.demoBetrieb) return json(res, 400, { ok: false, fehler: GRUND_TEXT.demo });
+          const einstellungen = telegramEinstellungen(daten);
+          const art = kanal === "alle" ? "reservierung" : kanal;
+          const ziel = zielFuer(daten, art, einstellungen);
+          if (!ziel || (kanal === "alle" && einstellungen.modus !== "ein-chat")) return json(res, 400, { ok: false, fehler: "Für diesen Kanal ist im gewählten Modus kein Chat verbunden." });
+          if (!botToken(ziel.bot)) return json(res, 400, { ok: false, fehler: GRUND_TEXT["kein-token"] });
+          try {
+            await api("sendMessage", { chat_id: ziel.chatId, ...testNachricht(daten, betrieb, KANAL_NAME[ziel.kanal]) }, ziel.bot);
+          } catch (fehler) {
+            return json(res, 502, { ok: false, fehler: `Telegram hat die Testnachricht nicht angenommen: ${String(fehler.message).slice(0, 160)}` });
+          }
+          return json(res, 200, { ok: true, gesendetAn: KANAL_NAME[ziel.kanal] });
         }
         if (pathname === "/v2/intern/telegram/tagesuebersicht") return json(res, 200, { ok: true, ...setzeTagesuebersicht(betrieb, e) });
         if (pathname === "/v2/intern/design") return json(res, 200, { ok: true, design: setzeBetriebsDesign(betrieb, e) });

@@ -33,9 +33,14 @@ const DATEI = path.join(__dirname, "..", "data", "betrieb", `${SLUG}.json`);
 const BETRIEBE = [SLUG];
 const morgen = () => new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
 
+// Eigene Öffnungszeiten: Telegram meldet nur in den Telegram-Zeiten
+// (Öffnung ± 30 Minuten). Um 17:00 (feste Uhr) ist das Fenster offen.
+const OEFFNUNGSZEITEN = [{ tage: "Montag – Sonntag", zeiten: "11:00 – 23:00" }];
+
 beforeEach(() => {
-  speichereBetrieb(SLUG, { tische: [], reservierungen: [], bestellungen: [], pushSubscriptions: [] });
+  speichereBetrieb(SLUG, { tische: [], reservierungen: [], bestellungen: [], pushSubscriptions: [], oeffnungszeiten: OEFFNUNGSZEITEN });
   legeTischAn(SLUG, { name: "Tisch 1", plaetze: 6 });
+  bot.setzeCodeBremseZurueck();
 });
 
 after(() => {
@@ -131,7 +136,8 @@ test(
     assert.equal(push.methode, "sendMessage");
     assert.equal(push.daten.chat_id, "4711");
     assert.match(push.daten.text, /4 Personen/);
-    assert.match(push.daten.text, /Frau Huber/);
+    assert.ok(push.daten.text.includes(r.nummer), "Referenznummer statt Name");
+    assert.doesNotMatch(push.daten.text, /Frau Huber|Fensterplatz/, "keine Gastdaten in Telegram");
     assert.equal(push.daten.reply_markup.inline_keyboard[0][0].callback_data, `r:ok:${r.id}`);
 
     const antwort = await bot.verarbeiteUpdate(
@@ -152,7 +158,8 @@ test(
     const b = legeBestellungAn(SLUG, { positionen: [{ name: "Schnitzel", menge: 1, preis: 16.5 }], name: "Herr Maier", abholzeit: "18:00" });
     await bot.benachrichtige(SLUG, { art: "bestellung", id: b.id });
     const knopf = (daten) => bot.verarbeiteUpdate({ callback_query: { id: "x", data: daten, message: { chat: { id: 4711 }, message_id: 1 } } }, { betriebe: BETRIEBE });
-    assert.match(aufrufe.at(-1).daten.text, /16,50 €/);
+    assert.ok(aufrufe.at(-1).daten.text.includes(b.nummer));
+    assert.doesNotMatch(aufrufe.at(-1).daten.text, /16,50 €|Schnitzel|Herr Maier/, "keine Summe, Positionen oder Namen");
     assert.equal(aufrufe.at(-1).daten.reply_markup.inline_keyboard[0][0].callback_data, `b:zub:${b.id}`);
     await knopf(`b:zub:${b.id}`);
     await knopf(`b:bereit:${b.id}`);
@@ -173,7 +180,7 @@ test(
     assert.deepEqual(antwort, { aktion: "verknuepft", slug: SLUG });
     assert.equal(ladeBetrieb(SLUG).telegramChatId, "-100123");
     await bot.verarbeiteUpdate({ message: { chat: { id: -100123 }, text: "/heute@MeinLokalBot" } }, { betriebe: BETRIEBE });
-    assert.match(aufrufe.at(-1).daten.text, /Guten Morgen/);
+    assert.match(aufrufe.at(-1).daten.text, /Heute/);
   }),
 );
 
@@ -190,22 +197,27 @@ test(
 );
 
 test(
-  "Telegram: Tagesübersicht einmal pro Tag zur eingestellten Uhrzeit, abschaltbar",
+  "Telegram: Tagesübersicht einmal pro Tag zur eingestellten Uhrzeit (Zeitzone des Betriebs), nur im Zeitfenster, abschaltbar",
   mitTelegram(async (aufrufe) => {
     await verknuepfe(4711);
-    const heute = new Date(2031, 4, 12, 9, 5);
-    legeReservierungAn(SLUG, { datum: "2031-05-12", uhrzeit: "19:30", personen: 3, name: "Abend" });
-    legeReservierungAn(SLUG, { datum: "2031-05-12", uhrzeit: "12:00", personen: 2, name: "Mittag" });
-    assert.deepEqual(await bot.sendeFaelligeUebersichten(new Date(2031, 4, 12, 8, 59), BETRIEBE), [], "vor 09:00 nicht");
-    assert.deepEqual(await bot.sendeFaelligeUebersichten(heute, BETRIEBE), [SLUG]);
+    // Dienstag, 12.05.2031 – geöffnet 11:00–23:00, Fenster ab 10:30
+    const um = (hhmm) => new Date(`2031-05-12T${hhmm}:00+02:00`);
+    const r1 = legeReservierungAn(SLUG, { datum: "2031-05-12", uhrzeit: "19:30", personen: 3, name: "Abend" });
+    const r2 = legeReservierungAn(SLUG, { datum: "2031-05-12", uhrzeit: "12:00", personen: 2, name: "Mittag" });
+    adapter.setzeTagesuebersicht(SLUG, { uhrzeit: "09:00" });
+    assert.deepEqual(await bot.sendeFaelligeUebersichten(um("08:59"), BETRIEBE), [], "vor 09:00 nicht");
+    assert.deepEqual(await bot.sendeFaelligeUebersichten(um("09:05"), BETRIEBE), [], "09:05 liegt vor dem Zeitfenster (ab 10:30)");
+    assert.deepEqual(await bot.sendeFaelligeUebersichten(um("10:30"), BETRIEBE), [SLUG], "kommt mit Beginn des Fensters");
     const text = aufrufe.at(-1).daten.text;
     assert.match(text, /12\.05\.2031/);
-    assert.match(text, /2 Reservierungen, 5 Gäste/);
-    assert.ok(text.indexOf("Mittag") < text.indexOf("Abend"), "chronologisch");
-    assert.deepEqual(await bot.sendeFaelligeUebersichten(heute, BETRIEBE), [], "nur einmal am Tag");
+    assert.match(text, /Reservierungen: 2 \(5 Gäste\)/);
+    assert.ok(text.indexOf(r2.nummer) < text.indexOf(r1.nummer), "chronologisch");
+    assert.doesNotMatch(text, /Mittag|Abend/, "keine Namen");
+    assert.deepEqual(await bot.sendeFaelligeUebersichten(um("11:00"), BETRIEBE), [], "nur einmal am Tag");
     adapter.setzeTagesuebersicht(SLUG, { aktiv: false });
-    assert.deepEqual(await bot.sendeFaelligeUebersichten(new Date(2031, 4, 13, 10, 0), BETRIEBE), []);
+    assert.deepEqual(await bot.sendeFaelligeUebersichten(new Date("2031-05-13T12:00:00+02:00"), BETRIEBE), []);
     assert.throws(() => adapter.setzeTagesuebersicht(SLUG, { uhrzeit: "9 Uhr" }));
+    assert.throws(() => adapter.setzeTagesuebersicht(SLUG, { uhrzeit: "25:00" }));
   }),
 );
 
@@ -237,9 +249,11 @@ test("Wirt-Theme: Rollen des Designsystems landen in den wirt.html-Variablen und
   assert.ok(contrastRatio(r.aufAkzent.hex, r.akzent.hex) >= 4.5);
   const html = themeWirtHtml("<html><head></head><body><div id=\"telegram-block\"></div></body></html>", ds);
   assert.match(html, /<style id="v2-betriebs-theme">/);
-  assert.match(html, /Telegram-Bot verbinden \(v2\)/);
-  // Ohne Design bleibt wirt.html optisch v1 – nur das Telegram-Panel kommt dazu.
-  assert.doesNotMatch(themeWirtHtml("<head></head><body></body>", null), /v2-betriebs-theme/);
+  assert.match(html, /window\.wirtV2 = \{ telegram: true \}/, "Die Seite weiß, dass der Bot (Codes, Chat-Modi) verfügbar ist");
+  // Ohne Design bleibt wirt.html optisch v1 – nur der Hinweis auf den Bot kommt dazu.
+  const ohneDesign = themeWirtHtml("<head></head><body></body>", null);
+  assert.doesNotMatch(ohneDesign, /v2-betriebs-theme/);
+  assert.match(ohneDesign, /window\.wirtV2/);
 });
 
 async function mitWirtServer(fn) {
@@ -285,7 +299,9 @@ test(
         body: JSON.stringify({ datum: morgen(), uhrzeit: "19:00", personen: 2, name: "Gast Hülle", telefon: "030 1" }),
       });
       assert.equal(antwort.status, 200);
-      assert.ok(await warteAuf(() => aufrufe.some((a) => a.methode === "sendMessage" && /Gast Hülle/.test(a.daten.text))));
+      const { nummer } = (await antwort.json()).reservierung;
+      assert.ok(await warteAuf(() => aufrufe.some((a) => a.methode === "sendMessage" && a.daten.text.includes(nummer))));
+      assert.ok(!aufrufe.some((a) => /Gast Hülle|030 1/.test(a.daten.text ?? "")), "keine Gastdaten in Telegram");
       const uebersicht = await (await fetch(`${basis}/api/betrieb`)).json();
       assert.equal(uebersicht.reservierungen[0].name, "Gast Hülle");
 
