@@ -18,6 +18,37 @@
     "1-2",
     "1-0"
   ],
+  "speisekarte": {
+    "pfad": "speisekarte/index.html",
+    "quelle": "musterkarte",
+    "kategorien": [
+      {
+        "name": "Vorspeisen",
+        "anker": "kat-vorspeisen",
+        "gerichte": 3
+      },
+      {
+        "name": "Vom Drehspieß & Grill",
+        "anker": "kat-vom-drehspiess-grill",
+        "gerichte": 4
+      },
+      {
+        "name": "Nachspeisen",
+        "anker": "kat-nachspeisen",
+        "gerichte": 2
+      }
+    ],
+    "gerichte": 9,
+    "bestellbar": 9,
+    "bestellung": "vorschau",
+    "startseite": [
+      "linsensuppe",
+      "doener-kebab",
+      "kuenefe",
+      "sucuk-vom-grill",
+      "dueruem-teller"
+    ]
+  },
   "kontrast": {
     "geprueft": 23,
     "fehler": 0

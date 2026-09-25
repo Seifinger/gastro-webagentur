@@ -19,6 +19,37 @@
     "0-0",
     "1-0"
   ],
+  "speisekarte": {
+    "pfad": "speisekarte/index.html",
+    "quelle": "musterkarte",
+    "kategorien": [
+      {
+        "name": "Suppen & Salate",
+        "anker": "kat-suppen-salate",
+        "gerichte": 3
+      },
+      {
+        "name": "Curry",
+        "anker": "kat-curry",
+        "gerichte": 4
+      },
+      {
+        "name": "Wok & Dessert",
+        "anker": "kat-wok-dessert",
+        "gerichte": 3
+      }
+    ],
+    "gerichte": 10,
+    "bestellbar": 10,
+    "bestellung": "vorschau",
+    "startseite": [
+      "tom-yum-goong",
+      "gruenes-curry-mit-haehnchen",
+      "pad-thai-mit-haehnchen",
+      "tom-kha-gai",
+      "rotes-curry-mit-ente"
+    ]
+  },
   "kontrast": {
     "geprueft": 23,
     "fehler": 0

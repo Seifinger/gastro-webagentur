@@ -18,6 +18,36 @@
     "1-0",
     "1-1"
   ],
+  "speisekarte": {
+    "pfad": "speisekarte/index.html",
+    "quelle": "musterkarte",
+    "kategorien": [
+      {
+        "name": "Zum Anfangen",
+        "anker": "kat-zum-anfangen",
+        "gerichte": 3
+      },
+      {
+        "name": "Hauptgerichte",
+        "anker": "kat-hauptgerichte",
+        "gerichte": 6
+      },
+      {
+        "name": "Nachspeisen",
+        "anker": "kat-nachspeisen",
+        "gerichte": 2
+      }
+    ],
+    "gerichte": 11,
+    "bestellbar": 11,
+    "bestellung": "vorschau",
+    "startseite": [
+      "obatzda-mit-brezn",
+      "krustenbraten-vom-schwein",
+      "kaiserschmarrn",
+      "leberknoedelsuppe"
+    ]
+  },
   "kontrast": {
     "geprueft": 23,
     "fehler": 0

@@ -19,6 +19,37 @@
     "2-0",
     "0-0"
   ],
+  "speisekarte": {
+    "pfad": "speisekarte/index.html",
+    "quelle": "musterkarte",
+    "kategorien": [
+      {
+        "name": "Frühstück",
+        "anker": "kat-fruehstueck",
+        "gerichte": 3
+      },
+      {
+        "name": "Kuchen & Torten",
+        "anker": "kat-kuchen-torten",
+        "gerichte": 3
+      },
+      {
+        "name": "Kaffee & Getränke",
+        "anker": "kat-kaffee-getraenke",
+        "gerichte": 3
+      }
+    ],
+    "gerichte": 9,
+    "bestellbar": 9,
+    "bestellung": "vorschau",
+    "startseite": [
+      "fruehstueck-klassik",
+      "apfelkuchen-mit-sahne",
+      "cappuccino",
+      "pancakes-mit-ahornsirup",
+      "kaesesahnetorte"
+    ]
+  },
   "kontrast": {
     "geprueft": 23,
     "fehler": 0
