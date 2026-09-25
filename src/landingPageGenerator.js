@@ -1217,7 +1217,8 @@ const PAGE_SCRIPT = `
         (form.elements.hinweis.value ? "\\nHinweis: " + form.elements.hinweis.value : "");
 
       var positionen = lines().map(function (line) {
-        return { name: line.name, menge: line.menge, preis: line.preis };
+        // Die ID lässt den Server Name und Preis aus seiner Karte prüfen.
+        return { id: line.id, name: line.name, menge: line.menge, preis: line.preis };
       });
       var summe = euro(total());
       var stueck = String(anzahl());

@@ -174,7 +174,7 @@ const STORNO = /^\/oeffentlich\/bestellung\/([^/]+)\/stornieren$/;
  */
 export async function erzeugeHandlerV2({ slug, v1TelegramErsetzen = true } = {}) {
   process.env.BETRIEB ??= slug;
-  const { handler: v1, wirtZugangErlaubt, istOeffentlicheRoute, verweigereZugang } = await import("../../src/wirtServer.js");
+  const { handler: v1, istOeffentlicheRoute, pruefeWirtZugang } = await import("../../src/wirtServer.js");
   if (v1TelegramErsetzen && telegramKonfiguriert()) {
     // Der v1-Rückkanal schickt nur „Neue Bestellung …“ als Text. Der v2-Bot
     // schickt dasselbe mit Knöpfen – beide zusammen wären doppelt.
@@ -183,15 +183,13 @@ export async function erzeugeHandlerV2({ slug, v1TelegramErsetzen = true } = {})
   }
   const betrieb = process.env.BETRIEB;
 
-  return async (req, res) => {
-    const { pathname } = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
+  const handler = async (req, res) => {
+    const { pathname } = new URL(req.url, "http://localhost");
 
-    // Dieselbe Anmeldung wie in v1 (WIRT_PASSWORT) – auch für die Routen,
-    // die diese Hülle selbst beantwortet. Schriften sind unkritisch.
-    if (!istOeffentlicheRoute(pathname, req.method) && !pathname.startsWith("/v2/assets/fonts/") && !wirtZugangErlaubt(req)) {
-      verweigereZugang(res);
-      return;
-    }
+    // Dieselbe Prüfung wie in v1 (WIRT_PASSWORT, Fehlversuche, Herkunft) –
+    // auch für die Routen, die diese Hülle selbst beantwortet. Schriften sind
+    // unkritisch.
+    if (!istOeffentlicheRoute(pathname, req.method) && !pathname.startsWith("/v2/assets/fonts/") && !pruefeWirtZugang(req, res)) return;
 
     if (pathname === "/" || pathname === "/index.html") {
       const { v2Design } = ladeBetriebV2(betrieb);
@@ -261,6 +259,16 @@ export async function erzeugeHandlerV2({ slug, v1TelegramErsetzen = true } = {})
     else {
       const storno = STORNO.exec(pathname);
       if (storno) await benachrichtige(betrieb, { art: "storno", id: decodeURIComponent(storno[1]) });
+    }
+  };
+  // Ein Fehler in einer Anfrage beendet nie den Prozess (wie in v1).
+  return async (req, res) => {
+    try {
+      await handler(req, res);
+    } catch (fehler) {
+      console.error(`Fehler bei ${req.method} ${String(req.url).slice(0, 200)}: ${fehler.message}`);
+      if (!res.headersSent) json(res, 400, { ok: false, fehler: "Ungültige Anfrage." });
+      else res.end();
     }
   };
 }

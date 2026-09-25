@@ -26,6 +26,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BETRIEB_DATEI = path.join(__dirname, "..", "data", "betrieb", `${SLUG}.json`);
 const ZIEL = mkdtempSync(path.join(tmpdir(), "gaststatus-browser-"));
 const altUrl = process.env.WIRT_OEFFENTLICHE_URL;
+const altPasswort = process.env.WIRT_PASSWORT;
+// Mit öffentlicher Adresse gibt es Wirt-Aktionen nur mit Passwort.
+const WIRT_ANMELDUNG = `Basic ${Buffer.from("wirt:passwort-fuer-den-test").toString("base64")}`;
+process.env.WIRT_PASSWORT = "passwort-fuer-den-test";
 
 after(() => {
   rmSync(BETRIEB_DATEI, { force: true });
@@ -33,6 +37,8 @@ after(() => {
   emailHook.aktuell = null;
   if (altUrl === undefined) delete process.env.WIRT_OEFFENTLICHE_URL;
   else process.env.WIRT_OEFFENTLICHE_URL = altUrl;
+  if (altPasswort === undefined) delete process.env.WIRT_PASSWORT;
+  else process.env.WIRT_PASSWORT = altPasswort;
 });
 
 function starte(h) {
@@ -55,7 +61,7 @@ function statisch(wurzel) {
 }
 
 async function wirt(basis, pfad, daten) {
-  const antwort = await fetch(`${basis}${pfad}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(daten) });
+  const antwort = await fetch(`${basis}${pfad}`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: WIRT_ANMELDUNG }, body: JSON.stringify(daten) });
   return antwort.json();
 }
 
@@ -159,11 +165,14 @@ test("Gast bestellt und reserviert → Wirt verschiebt/lehnt ab → Statusseite 
     assert.equal(mails.length, 2, "ohne Adresse keine Mail zur Reservierung");
 
     // Wirt-Dashboard zeigt den Anruf-Hinweis sichtbar an.
-    const dashboard = await kontext.newPage();
+    // Der Wirt meldet sich mit WIRT_PASSWORT an (eigener Browser-Kontext).
+    const wirtKontext = await browser.newContext({ httpCredentials: { username: "wirt", password: "passwort-fuer-den-test" }, locale: "de-DE", timezoneId: "Europe/Berlin" });
+    const dashboard = await wirtKontext.newPage();
     await dashboard.goto(server.url);
     await dashboard.locator("#tag").fill("2026-09-26");
     await dashboard.locator("#tag").dispatchEvent("change");
     await dashboard.getByText("Gast nicht automatisch informiert – bitte unter 0170 9999999 anrufen.").first().waitFor({ timeout: 4000 });
+    await wirtKontext.close();
     await kontext.close();
   } finally {
     server.server.close();

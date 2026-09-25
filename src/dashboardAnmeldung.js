@@ -11,18 +11,19 @@
 //              SameSite=Strict, Secure (hinter HTTPS), 12 Stunden
 //   CSRF       SameSite=Strict + Origin-/Referer-Prüfung für jede
 //              schreibende Anfrage
-//   Anmelden   höchstens 10 Fehlversuche je Adresse in 15 Minuten
+//   Anmelden   höchstens 10 Fehlversuche je Adresse in 15 Minuten (Adresse
+//              hinter einem Proxy nur mit VERTRAUTER_PROXY, anfrageSchutz.js)
 
 import { scryptSync, randomBytes, timingSafeEqual } from "node:crypto";
+import { Bremse, clientAdresse } from "./anfrageSchutz.js";
 
 export const SITZUNG_COOKIE = "dash_sitzung";
 export const SITZUNG_DAUER_MS = 12 * 60 * 60 * 1000;
 const VERSUCHE_MAX = 10;
-const VERSUCHE_FENSTER_MS = 15 * 60 * 1000;
 const SCRYPT = { N: 16384, r: 8, p: 1 };
 
 const sitzungen = new Map();
-const fehlversuche = new Map();
+const fehlversuche = new Bremse({ fensterMs: 15 * 60 * 1000 });
 
 export function anmeldungAktiv() {
   return Boolean(process.env.DASHBOARD_PASSWORT_HASH);
@@ -70,15 +71,15 @@ export function gueltigeSitzung(req, jetzt = Date.now()) {
   return true;
 }
 
+// Hinter Fly steht die echte Adresse in Fly-Client-IP – aber nur mit
+// VERTRAUTER_PROXY=fly (fly.toml). Eine selbst geschriebene
+// X-Forwarded-For-Zeile darf die Sperre nicht zurücksetzen.
 function adresse(req) {
-  // Hinter einem Proxy (Fly, Render) steht die echte Adresse im ersten Eintrag.
-  return String(req.headers["fly-client-ip"] ?? req.headers["x-forwarded-for"] ?? req.socket?.remoteAddress ?? "?").split(",")[0].trim();
+  return clientAdresse(req);
 }
 
-function zuVieleVersuche(req, jetzt = Date.now()) {
-  const liste = (fehlversuche.get(adresse(req)) ?? []).filter((t) => jetzt - t < VERSUCHE_FENSTER_MS);
-  fehlversuche.set(adresse(req), liste);
-  return liste.length >= VERSUCHE_MAX;
+function zuVieleVersuche(req) {
+  return fehlversuche.anzahl(adresse(req)) >= VERSUCHE_MAX;
 }
 
 /** Schreibende Anfragen nur von der eigenen Seite (gegen CSRF zusätzlich zu SameSite=Strict). */
@@ -153,7 +154,7 @@ export async function anmeldungPruefen(req, res, pathname) {
       }
       const form = await leseForm(req).catch(() => new URLSearchParams());
       if (!pruefePasswort(form.get("passwort"))) {
-        fehlversuche.get(adresse(req)).push(Date.now());
+        fehlversuche.zaehle(adresse(req));
         res.writeHead(401, { "Content-Type": "text/html; charset=utf-8" });
         res.end(anmeldeSeite("Passwort falsch."));
         return true;
@@ -200,5 +201,5 @@ export async function anmeldungPruefen(req, res, pathname) {
 
 export function _zuruecksetzenFuerTests() {
   sitzungen.clear();
-  fehlversuche.clear();
+  fehlversuche.leeren();
 }

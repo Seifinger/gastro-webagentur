@@ -90,7 +90,12 @@ function liefere(res, wurzel, rel, { head = false, range = "" } = {}) {
 export function praesentationsHandler({ leadsDir = LEADS_DIR, assetsDir = ASSETS_DIR } = {}) {
   return (req, res) => {
     if (!aktiv || Date.now() > aktiv.bis || !["GET", "HEAD"].includes(req.method)) return nichtDa(res);
-    const pfad = decodeURIComponent(new URL(req.url, "http://x").pathname);
+    let pfad;
+    try {
+      pfad = decodeURIComponent(new URL(req.url, "http://x").pathname);
+    } catch {
+      return nichtDa(res); // kaputte Adresse ("/%", "//[") – nie den Prozess beenden
+    }
     const optionen = { head: req.method === "HEAD", range: req.headers.range ?? "" };
     // Schriften der Demo (../../assets/fonts relativ zu /<token>/index.html).
     if (pfad.startsWith("/assets/fonts/")) return liefere(res, path.join(assetsDir, "fonts"), pfad.slice("/assets/fonts/".length), optionen);

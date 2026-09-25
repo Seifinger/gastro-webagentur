@@ -505,6 +505,10 @@ Der Hinweis „Entwurfsansicht" verschwindet dann, weil die Anfrage wirklich bei
 
 Nach dem Absenden bekommt jeder Gast Referenznummer, den ehrlichen Stand „eingegangen – noch nicht bestätigt“ und einen persönlichen **Status-Link** (`/status#…` auf dem Wirt-Server). Wer freiwillig eine E-Mail-Adresse angibt, erhält Eingang, Bestätigung, Ablehnung, geänderte Zeiten und „bereit zur Abholung“ zusätzlich als transaktionale E-Mail (Resend). Ohne E-Mail oder ohne eingerichteten Versand zeigt das Dashboard nach Ablehnung oder Zeitänderung: „Gast nicht automatisch informiert – bitte unter … anrufen.“ Die Meldungen entstehen beim Speichern der Statusänderung – v1-Dashboard, v2-Küchenstatus und Telegram-Knöpfe lösen deshalb nie doppelte Mails aus.
 
+### Kundenwebsites (gewonnene Betriebe)
+
+Die vorhandene Bearbeiten-Ansicht hat zwei Modi. Unter „Konzept-Demo“ bleibt die Lead-Demo, wie sie ist. „Kundenwebsite“ legt aus der Demo eine eigene Kundenfassung an. Darin lassen sich Logo, Hero-Medien (Desktop/Mobile), Texte, das Haus-Bild, die Speisekarte mit Preisen, Allergenen und Gerichtbildern sowie die Betriebsangaben pflegen. Danach wird nur diese Seite lokal gebaut, in der Vorschau auf Desktop und Mobil geprüft und freigegeben. Layout und Designsystem bleiben gesperrt, veröffentlicht wird noch nichts. Dashboard und Claude-Code-Chat (`npm run kunde -- …`) arbeiten auf demselben Speicher unter `data/kunden/`. Details: [docs-intern/KUNDENWEBSITES.md](docs-intern/KUNDENWEBSITES.md).
+
 ### Statistik und Rechtstexte
 
 Das Wirt-Dashboard hat zwei weitere Reiter:
@@ -514,7 +518,9 @@ Das Wirt-Dashboard hat zwei weitere Reiter:
 
 Details, Bestandsaufnahme, Checkliste der zu liefernden Angaben und Launch-Blocker: [docs-intern/STATISTIK-UND-RECHTSTEXTE.md](docs-intern/STATISTIK-UND-RECHTSTEXTE.md).
 
-Sobald der Wirt-Server öffentlich erreichbar ist, **`WIRT_PASSWORT` setzen** (schützt Dashboard und Wirt-Aktionen). Einrichtung, Umgebungsvariablen, Sicherheit, Datenschutz-Baustein und der sichere Versandtest an die eigene Adresse (`npm run gast:mailtest -- --an …`): [docs-intern/GASTBENACHRICHTIGUNG.md](docs-intern/GASTBENACHRICHTIGUNG.md).
+Sobald der Wirt-Server öffentlich erreichbar ist, **`WIRT_PASSWORT` setzen** (mindestens 12 Zeichen; schützt Dashboard und Wirt-Aktionen). Ohne Passwort ist das Wirt-Dashboard nur direkt über `http://localhost` erreichbar. Hinter einem Proxy zusätzlich `VERTRAUTER_PROXY` setzen (`.env.example`).
+
+**Vor dem ersten Launch:** [SECURITY-AUDIT.md](SECURITY-AUDIT.md) (Befunde und Migrationswirkung), [DATENFLUSS.md](DATENFLUSS.md) (welche Daten wo liegen und wohin sie gehen), [LAUNCH-CHECKLISTE.md](LAUNCH-CHECKLISTE.md). Sicherung der Laufzeitdaten: `npm run sicherung -- erstellen [--ziel <ordner>]`, Wiederherstellungsprobe: `npm run sicherung -- pruefen <datei.tar.gz>`. Einrichtung, Umgebungsvariablen, Sicherheit, Datenschutz-Baustein und der sichere Versandtest an die eigene Adresse (`npm run gast:mailtest -- --an …`): [docs-intern/GASTBENACHRICHTIGUNG.md](docs-intern/GASTBENACHRICHTIGUNG.md).
 
 ## v2-Pipeline (parallel zu v1)
 

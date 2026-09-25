@@ -445,12 +445,15 @@ test("POST /intern/bestellung/:id/verzoegerung schickt genau eine E-Mail, wenn A
     const altUrl = process.env.WIRT_OEFFENTLICHE_URL;
     smsHook.aktuell = null;
     emailHook.aktuell = async (empfaenger, betreff, text) => emailAufrufe.push({ empfaenger, betreff, text });
+    const altPasswort = process.env.WIRT_PASSWORT;
     process.env.WIRT_OEFFENTLICHE_URL = "https://wirt.beispiel.de";
+    // Mit öffentlicher Adresse gibt es Wirt-Aktionen nur mit Passwort.
+    process.env.WIRT_PASSWORT = "passwort-fuer-den-test";
 
     try {
       const antwort = await fetch(`${basis}/intern/bestellung/${id}/verzoegerung`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Basic ${Buffer.from("wirt:passwort-fuer-den-test").toString("base64")}` },
         body: JSON.stringify({ neueZeit: "19:15", grund: "" }),
       });
       const ergebnis = await antwort.json();
@@ -467,6 +470,8 @@ test("POST /intern/bestellung/:id/verzoegerung schickt genau eine E-Mail, wenn A
       emailHook.aktuell = altEmail;
       if (altUrl === undefined) delete process.env.WIRT_OEFFENTLICHE_URL;
       else process.env.WIRT_OEFFENTLICHE_URL = altUrl;
+      if (altPasswort === undefined) delete process.env.WIRT_PASSWORT;
+      else process.env.WIRT_PASSWORT = altPasswort;
     }
   });
 });

@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadLeadEdits, saveLeadEdits } from "./leadEdits.js";
+import { entferneBildMetadaten } from "./bildMetadaten.js";
 
 // Eigene Fotos des Betreibers für einen Entwurf. Sie landen unter
 // public/uploads/<slug>/<rolle>.jpg und werden über leadEdits.js in
@@ -250,7 +251,8 @@ export function speichereLeadBild(slug, rolle, datei) {
 
   const ordner = path.join(uploadsDir, slug);
   mkdirSync(ordner, { recursive: true });
-  writeFileSync(path.join(ordner, `${rolle}.jpg`), datei.inhalt);
+  // Metadaten (Aufnahmeort, Kamera …) fallen vor dem Speichern weg.
+  writeFileSync(path.join(ordner, `${rolle}.jpg`), entferneBildMetadaten(datei.inhalt, masse.typ));
 
   // Absoluter Pfad: die Bearbeitungsansicht und der Entwurf unter
   // /entwuerfe/<slug>/ liegen auf demselben Server, beide erreichen ihn.

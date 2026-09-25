@@ -68,6 +68,7 @@ import { statusFuerGast, wirtGastHinweis, gastPhase, titelFuer } from "./gastSta
 import { beobachteAbholung, lernUebersicht } from "./wartezeitLernStore.js";
 import { vermerkeNoShow, warnhinweisNoetig } from "./zuverlaessigkeitStore.js";
 import { erzeugeNoShowRechnung } from "./rechnungGenerator.js";
+import { Bremse, clientAdresse, direktLokal, fremdeHerkunft } from "./anfrageSchutz.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const seite = path.join(__dirname, "..", "public", "wirt.html");
@@ -96,37 +97,44 @@ if (argv.includes("--kein-demo")) setzeDemoBetrieb(slug, false);
 /**
  * Die öffentlichen Endpunkte nimmt jeder Gast an, der die Seite offen hat.
  * Eine einfache Bremse je Adresse verhindert, dass jemand die Datei mit
- * tausenden Reservierungen vollschreibt.
+ * tausenden Reservierungen vollschreibt. Die Adresse kommt aus
+ * clientAdresse() – hinter einem Proxy nur mit VERTRAUTER_PROXY, sonst
+ * teilen sich alle Gäste die Adresse des Proxys (anfrageSchutz.js).
  */
-const BREMSE_FENSTER_MS = 60_000;
 const BREMSE_MAX = 20;
-const zugriffe = new Map();
+const zugriffe = new Bremse({ fensterMs: 60_000 });
 
-function zuSchnell(adresse) {
-  const jetzt = Date.now();
-  const liste = (zugriffe.get(adresse) ?? []).filter((t) => jetzt - t < BREMSE_FENSTER_MS);
-  liste.push(jetzt);
-  zugriffe.set(adresse, liste);
-  return liste.length > BREMSE_MAX;
+// Lesende Abrufe (Abholzeiten, Rechtstexte, Verfügbarkeit …) macht jede
+// Seite beim Laden – mehrere Gäste im selben WLAN teilen sich eine Adresse.
+// Sie bekommen deshalb eine großzügige eigene Grenze; streng bleibt die
+// Bremse für alles, was etwas anlegt oder ändert.
+const BREMSE_MAX_LESEN = 240;
+const lesezugriffe = new Bremse({ fensterMs: 60_000 });
+
+function zuSchnell(adresse, { lesend = false } = {}) {
+  return lesend ? lesezugriffe.zaehle(adresse) > BREMSE_MAX_LESEN : zugriffe.zaehle(adresse) > BREMSE_MAX;
 }
+
+const LESENDE_PFADE = new Set(["/oeffentlich/abholzeiten", "/oeffentlich/rechtstexte", "/oeffentlich/no-show-einstellungen", "/oeffentlich/verfuegbarkeit"]);
 
 // Falsche Status-Links: eigene, strengere Bremse gegen Durchprobieren.
-const FEHLVERSUCHE_FENSTER_MS = 10 * 60_000;
 const FEHLVERSUCHE_MAX = 10;
-const fehlversuche = new Map();
+const fehlversuche = new Bremse({ fensterMs: 10 * 60_000 });
 
 function zuVieleFehlversuche(adresse, neu = false) {
-  const jetzt = Date.now();
-  const liste = (fehlversuche.get(adresse) ?? []).filter((t) => jetzt - t < FEHLVERSUCHE_FENSTER_MS);
-  if (neu) liste.push(jetzt);
-  fehlversuche.set(adresse, liste);
-  return liste.length >= FEHLVERSUCHE_MAX;
+  return (neu ? fehlversuche.zaehle(adresse) : fehlversuche.anzahl(adresse)) >= FEHLVERSUCHE_MAX;
 }
 
-/** Für Tests: beide Bremsen leeren (sie gelten je Adresse, im Test immer 127.0.0.1). */
+// Falsches WIRT_PASSWORT: höchstens 10 Versuche je Adresse in 15 Minuten.
+const ANMELDEVERSUCHE_MAX = 10;
+const anmeldeFehler = new Bremse({ fensterMs: 15 * 60_000 });
+
+/** Für Tests: alle Bremsen leeren (sie gelten je Adresse, im Test immer 127.0.0.1). */
 export function setzeBremsenZurueck() {
-  zugriffe.clear();
-  fehlversuche.clear();
+  zugriffe.leeren();
+  lesezugriffe.leeren();
+  fehlversuche.leeren();
+  anmeldeFehler.leeren();
 }
 
 // Statusseite und -antwort: nie zwischenspeichern, nie als Referrer
@@ -227,15 +235,15 @@ function uebersicht() {
 }
 
 /**
- * Optionaler Schutz für Dashboard und Wirt-Aktionen: Ist WIRT_PASSWORT
- * gesetzt, verlangt alles außer den öffentlichen Gast-Routen (/oeffentlich/,
- * /status) eine Anmeldung per HTTP-Basic (Benutzername beliebig). Sobald
- * der Server öffentlich erreichbar ist – und das muss er für Status-Links –,
- * gehört das Passwort gesetzt; sonst sind Gastdaten unter /api/betrieb offen.
+ * Schutz für Dashboard und Wirt-Aktionen: Ist WIRT_PASSWORT gesetzt,
+ * verlangt alles außer den öffentlichen Gast-Routen (/oeffentlich/, /status,
+ * /rechtstexte/) eine Anmeldung per HTTP-Basic (Benutzername beliebig).
  */
+export const WIRT_PASSWORT_MIN = 12;
+
 export function wirtZugangErlaubt(req) {
   const passwort = String(process.env.WIRT_PASSWORT ?? "");
-  if (!passwort) return true;
+  if (!passwort) return direktLokal(req) && !oeffentlicherBetrieb();
   const kopf = String(req.headers.authorization ?? "");
   if (!kopf.startsWith("Basic ")) return false;
   const roh = Buffer.from(kopf.slice(6), "base64").toString("utf-8");
@@ -245,6 +253,16 @@ export function wirtZugangErlaubt(req) {
   return timingSafeEqual(a, b);
 }
 
+/**
+ * Öffentlicher Betrieb: eine öffentliche Adresse ist eingetragen oder der
+ * Prozess läuft als Produktion. Dann gibt es ohne Passwort gar keinen
+ * internen Zugang – auch nicht von 127.0.0.1, denn davor kann ein Proxy
+ * sitzen, der keine Weiterleitungs-Köpfe setzt.
+ */
+function oeffentlicherBetrieb() {
+  return Boolean(process.env.WIRT_OEFFENTLICHE_URL) || process.env.NODE_ENV === "production";
+}
+
 export function istOeffentlicheRoute(pathname, method) {
   return method === "OPTIONS" || pathname.startsWith("/oeffentlich/") || pathname === "/status" || pathname === "/sw.js" || pathname.startsWith("/rechtstexte/");
 }
@@ -252,6 +270,64 @@ export function istOeffentlicheRoute(pathname, method) {
 export function verweigereZugang(res) {
   res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Wirt-Dashboard", charset="UTF-8"', "Content-Type": "text/plain; charset=utf-8" });
   res.end("Anmeldung erforderlich");
+}
+
+// Dashboard und seine Daten: nie in fremde Seiten einbetten (Klick-Fallen),
+// nie zwischenspeichern (Gastdaten auf geteilten Geräten).
+const INTERN_KOEPFE = {
+  "X-Frame-Options": "DENY",
+  "Content-Security-Policy": "frame-ancestors 'none'",
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "same-origin",
+  "Cache-Control": "no-store",
+};
+
+function erlaubteHosts() {
+  try {
+    return [new URL(process.env.WIRT_OEFFENTLICHE_URL ?? "").host];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Prüft jede nicht öffentliche Anfrage (v1 und die v2-Hülle): Zugang,
+ * Fehlversuche, Herkunft. Beantwortet eine Ablehnung selbst und liefert dann
+ * false.
+ */
+export function pruefeWirtZugang(req, res) {
+  for (const [k, v] of Object.entries(INTERN_KOEPFE)) res.setHeader(k, v);
+
+  if (!process.env.WIRT_PASSWORT) {
+    if (!wirtZugangErlaubt(req)) {
+      res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
+      res.end(`Das Wirt-Dashboard ist ohne WIRT_PASSWORT nur direkt auf diesem Rechner (http://localhost) erreichbar. Für den Betrieb im Netz WIRT_PASSWORT setzen (mindestens ${WIRT_PASSWORT_MIN} Zeichen).`);
+      return false;
+    }
+  } else {
+    const adresse = clientAdresse(req);
+    if (anmeldeFehler.anzahl(adresse) >= ANMELDEVERSUCHE_MAX) {
+      res.writeHead(429, { "Content-Type": "text/plain; charset=utf-8", "Retry-After": "900" });
+      res.end("Zu viele falsche Anmeldungen. Bitte 15 Minuten warten.");
+      return false;
+    }
+    if (!wirtZugangErlaubt(req)) {
+      // Ohne Kopf fragt der Browser erst nach dem Passwort – das ist kein Fehlversuch.
+      if (req.headers.authorization) anmeldeFehler.zaehle(adresse);
+      verweigereZugang(res);
+      return false;
+    }
+  }
+
+  // Der Browser schickt die Basic-Anmeldung auch mit, wenn eine fremde Seite
+  // ein Formular hierher abschickt. Schreibende Wirt-Aktionen deshalb nur
+  // von der eigenen Seite.
+  if (!["GET", "HEAD"].includes(req.method) && fremdeHerkunft(req, erlaubteHosts())) {
+    res.writeHead(403, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(JSON.stringify({ ok: false, fehler: "Anfrage von fremder Seite abgelehnt." }));
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -277,14 +353,27 @@ function gastAntwort(art, eintrag) {
 
 // Als eigene Funktion exportiert, damit Tests einen Server auf einem
 // zufälligen Port starten können, statt den festen Port aus argv/env zu
-// belegen – siehe dashboardServer.js für dasselbe Muster.
+// belegen – siehe dashboardServer.js für dasselbe Muster. Ein Fehler in einer
+// einzelnen Anfrage darf den Server nie beenden – sonst reicht eine kaputte
+// Adresse (z. B. "//["), und keine Reservierung kommt mehr an, bis jemand
+// neu startet.
 export const handler = async (req, res) => {
-  const { pathname, searchParams } = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
-
-  if (!istOeffentlicheRoute(pathname, req.method) && !wirtZugangErlaubt(req)) {
-    verweigereZugang(res);
-    return;
+  try {
+    await routen(req, res);
+  } catch (fehler) {
+    console.error(`Fehler bei ${req.method} ${String(req.url).slice(0, 200)}: ${fehler.message}`);
+    // Beschädigte Betriebsdatei: ehrlich „gerade nicht möglich“, nie still leer.
+    const beschaedigt = fehler.code === "BETRIEBSDATEN_BESCHAEDIGT";
+    if (!res.headersSent) json(res, beschaedigt ? 503 : 400, { ok: false, fehler: beschaedigt ? fehler.message : "Ungültige Anfrage." }, beschaedigt ? CORS : {});
+    else res.end();
   }
+};
+
+const routen = async (req, res) => {
+  // Fester Basiswert: Pfad und Parameter hängen nicht vom Host-Kopf ab.
+  const { pathname, searchParams } = new URL(req.url, "http://localhost");
+
+  if (!istOeffentlicheRoute(pathname, req.method) && !pruefeWirtZugang(req, res)) return;
 
   if (req.method === "OPTIONS") {
     res.writeHead(204, CORS);
@@ -360,8 +449,8 @@ export const handler = async (req, res) => {
   /* ----- Öffentlich: was von der Landingpage hereinkommt ----- */
 
   if (pathname.startsWith("/oeffentlich/") && req.method === "POST") {
-    const adresse = req.socket.remoteAddress ?? "unbekannt";
-    if (zuSchnell(adresse)) {
+    const adresse = clientAdresse(req);
+    if (zuSchnell(adresse, { lesend: LESENDE_PFADE.has(pathname) })) {
       json(res, 429, { ok: false, fehler: "Zu viele Anfragen. Bitte kurz warten." }, CORS);
       return;
     }
@@ -417,7 +506,7 @@ export const handler = async (req, res) => {
           await benachrichtigeUeberTelegram(ladeBetrieb(slug).telegramChatId, text);
         }
         await stelleGastMeldungenZu(slug);
-        json(res, 200, { ok: true, bestellung: { id: b.id, ...gastAntwort("bestellung", b) } }, { ...CORS, ...PRIVAT });
+        json(res, 200, { ok: true, bestellung: { id: b.id, gesamt: b.gesamt, ...gastAntwort("bestellung", b) } }, { ...CORS, ...PRIVAT });
         return;
       }
 
@@ -550,7 +639,7 @@ export const handler = async (req, res) => {
       noShowBestellung: { eingeschaltet: Boolean(daten.noShowSchutzAktiv), wirksam: noShowBestellungAktiv(daten, jetzt)?.version ?? "" },
       noShowReservierung: { eingeschaltet: Boolean(daten.reservierungNoShowAktiv), wirksam: noShowReservierungAktiv(daten, jetzt)?.version ?? "" },
       launch: launchPruefung(daten, {
-        wirtPasswortGesetzt: Boolean(process.env.WIRT_PASSWORT),
+        wirtPasswortGesetzt: String(process.env.WIRT_PASSWORT ?? "").length >= WIRT_PASSWORT_MIN,
         oeffentlicheUrl: process.env.WIRT_OEFFENTLICHE_URL ?? "",
         emailEingerichtet: gastEmailEinrichtung().eingerichtet,
         jetzt,
@@ -800,11 +889,16 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   });
 
   server.listen(port, dashboardHost, () => {
-    // Launch-Blocker: Ist der Server von außen erreichbar, muss das
-    // Dashboard geschützt sein – sonst liegen Gastdaten und Nachweise offen.
-    if (!process.env.WIRT_PASSWORT && !["127.0.0.1", "localhost", "::1"].includes(dashboardHost)) {
-      console.log("\n⛔ WIRT_PASSWORT ist nicht gesetzt, der Server lauscht aber auf " + dashboardHost + ".");
-      console.log("   Dashboard, Statistik und Nachweise sind damit für jeden im Netz lesbar. Vor dem Livegang setzen!");
+    // Ohne Passwort bleibt das Dashboard gesperrt, sobald es nicht direkt
+    // auf diesem Rechner aufgerufen wird (pruefeWirtZugang).
+    const passwort = String(process.env.WIRT_PASSWORT ?? "");
+    if (!passwort) {
+      console.log("\nℹ️  WIRT_PASSWORT ist nicht gesetzt: Dashboard und Wirt-Aktionen nur direkt über http://localhost.");
+      if (oeffentlicherBetrieb() || !["127.0.0.1", "localhost", "::1"].includes(dashboardHost)) {
+        console.log("⛔ Öffentlicher Betrieb ohne WIRT_PASSWORT: Das Dashboard ist gesperrt, bis es gesetzt ist. Gastseiten funktionieren weiter.");
+      }
+    } else if (passwort.length < WIRT_PASSWORT_MIN) {
+      console.log(`\n⚠️  WIRT_PASSWORT ist kürzer als ${WIRT_PASSWORT_MIN} Zeichen – bitte ein längeres wählen (Launch-Prüfung zeigt es als offen).`);
     }
     console.log(`\n🍽️  Wirt-Dashboard für "${slug}": http://${dashboardHost}:${port}`);
     console.log(`    Reservierungen der Seite gehen an: http://${dashboardHost}:${port}/oeffentlich/\n`);

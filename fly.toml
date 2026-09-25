@@ -11,6 +11,9 @@ primary_region = "fra"
   DASHBOARD_PORT = "8080"
   SITE_BASE_URL = "https://seifinger.github.io/gastro-webagentur"
   GITHUB_REPO = "Seifinger/gastro-webagentur"
+  # Anmelde-Sperre je Besucher: die echte Adresse steht in Fly-Client-IP
+  # (setzt der Fly-Proxy). Ohne diese Zeile teilen sich alle die Proxy-Adresse.
+  VERTRAUTER_PROXY = "fly"
 
 [[mounts]]
   source = "dashboard_daten"

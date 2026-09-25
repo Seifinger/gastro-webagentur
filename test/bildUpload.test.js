@@ -7,6 +7,9 @@ import { fileURLToPath } from "node:url";
 import { handler } from "../src/dashboardServer.js";
 import { uploadsDir, bildMasse, parseMultipart } from "../src/bildUpload.js";
 import { loadLeadEdits } from "../src/leadEdits.js";
+// Echtes PNG (vollständig bis IEND): Beim Speichern werden Metadaten
+// entfernt, dafür muss die Datei von Anfang bis Ende lesbar sein.
+import { png } from "./hilfen/bilder.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const leadEditsDir = path.join(__dirname, "..", "data", "lead-edits");
@@ -26,15 +29,6 @@ function jpeg(breite, hoehe) {
   ]);
 }
 
-function png(breite, hoehe) {
-  const kopf = Buffer.alloc(24);
-  kopf.writeUInt32BE(0x89504e47, 0);
-  kopf.writeUInt32BE(0x0d0a1a0a, 4);
-  kopf.write("IHDR", 12, "latin1");
-  kopf.writeUInt32BE(breite, 16);
-  kopf.writeUInt32BE(hoehe, 20);
-  return kopf;
-}
 
 /**
  * Startet den Dashboard-Handler auf einem freien Port. Der Test schickt damit

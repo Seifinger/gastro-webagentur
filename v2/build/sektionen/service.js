@@ -198,7 +198,7 @@ export function renderFuss({ texte, lead, cuisine, aktionen }) {
       <a href="#kontakt">${e(texte.nav.kontakt)}</a>${rechtsLinkHtml(aktionen)}
     </nav>
     <div class="fuss-kontakt">${telefon ? `<a href="tel:${e(telHref)}">${e(telefon)}</a>` : ""}</div>
-    <p class="fuss-hinweis">${e(texte.fuss.hinweis)}</p>
+    ${texte.fuss.hinweis ? `<p class="fuss-hinweis">${e(texte.fuss.hinweis)}</p>` : ""}
   </div>
 </footer>`;
 }

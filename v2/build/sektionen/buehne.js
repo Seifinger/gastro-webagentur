@@ -66,7 +66,7 @@ export function renderKopfAusdruck(ctx) {
   return `<header class="kopf" id="topbar" data-zustand="fest" data-ueber="${e(ctx.ausdruck?.kopfzeile?.ueberHero ?? "transparent")}">
   ${ctx.hinweis ?? ""}
   <div class="kopf-innen">
-    <a class="kopf-marke" href="${e(marke)}">${e(texte.name)}</a>
+    <a class="kopf-marke" href="${e(marke)}">${ctx.logo?.src ? `<img class="kopf-logo" src="${e(ctx.logo.src)}" alt="${e(texte.name)}" height="40">` : e(texte.name)}</a>
     <nav class="kopf-nav" aria-label="Hauptnavigation">${nav}</nav>
     <div class="kopf-aktionen">${aktion(zweite, "btn-ghost kopf-zweit")}${aktion(erste, "btn-primary kopf-erst")}</div>
     <a class="kopf-menue-knopf" href="#kopf-menue" aria-controls="kopf-menue" aria-expanded="false"><span class="kopf-menue-linien" aria-hidden="true"></span><span class="nur-vorleser">Menü</span></a>

@@ -275,7 +275,8 @@ function medium({ herkunft, src, datei = null, quelle, typ = "bild", zeigeBadge,
  * Badges auf der Seite: KI-Material immer (Transparenz), Platzhalter nur an
  * den drei Haus-Fotos (Foto-Aufgabenliste wie in v1), eigene Fotos nie.
  */
-export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remoteImageUrl, eigene = ladeEigeneMedien(), leadEdits = loadLeadEdits(slug), kiDir = KI_DIR, offline = false, ds = null, konzeptVon = null }) {
+export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remoteImageUrl, eigene = ladeEigeneMedien(), leadEdits = loadLeadEdits(slug), kiDir = KI_DIR, offline = false, ds = null, konzeptVon = null, kunde = null }) {
+  if (kunde) return loeseKundenMedien(kunde, ds);
   const eigeneSeite = eigene[slug] ?? {};
   const uploads = leadEdits?.bilder ?? {};
   const ki = ladeKiMedien(slug, kiDir);
@@ -330,6 +331,36 @@ export function loeseMedien({ slug, gestaltung, fiktiv = false, bildUrl = remote
     gericht: (g) => (g ? loese(`gericht:${g.id}`, { stock: g.bild ? [g.bild, "gericht"] : null }) : null),
   };
   return medien;
+}
+
+/**
+ * Kundenfassung (src/kundenProjekt.js): NUR die Medien des Kundenprojekts.
+ * Kein Konzeptmaterial, kein Stockfoto, kein KI-Cache – was fehlt, bleibt
+ * leer bzw. zeigt auf der Bühne die neutrale „Foto folgt“-Fläche. So kann
+ * kein fremdes Bild als Foto des Restaurants durchrutschen.
+ *
+ * @param {{ medien: Record<string, { datei: string, typ: "bild"|"video", alt?: string, fokus?: string }> }} kunde
+ */
+export function loeseKundenMedien(kunde, ds) {
+  const eintrag = (rolle) => {
+    const k = kunde.medien?.[rolle];
+    if (!k?.datei) return null;
+    const m = medium({ herkunft: "eigen", src: `medien/${rolle.replace(":", "-")}${path.extname(k.datei)}`, datei: k.datei, quelle: "kundenprojekt", typ: k.typ === "video" ? "video" : "bild", zeigeBadge: false, fokus: k.fokus });
+    return k.alt ? { ...m, altEigen: k.alt } : m;
+  };
+  const svg = () => (ds ? medium({ herkunft: "platzhalter", src: `data:image/svg+xml,${encodeURIComponent(platzhalterSvgSync(ds, "hero"))}`, quelle: "platzhalter:svg", zeigeBadge: false }) : null);
+  return {
+    hero: eintrag("hero") ?? svg(),
+    heroMobil: eintrag("heroMobil"),
+    heroVideo: eintrag("heroVideo"),
+    heroVideoMobil: eintrag("heroVideoMobil"),
+    haus: eintrag("haus"),
+    team: null,
+    bestseller: null,
+    logo: eintrag("logo"),
+    favicon: eintrag("favicon"),
+    gericht: (g) => (g ? eintrag(`gericht:${g.kundenId ?? g.id}`) : null),
+  };
 }
 
 function platzhalterSvgSync(ds, rolle) {

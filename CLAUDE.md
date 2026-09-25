@@ -34,6 +34,16 @@ Stand 24.09.2026 – Details und Belege: v2/GESTALTUNGS-UMBAU-PLAN.md (Abschnitt
 - src/landingPageGenerator.js bleibt Pflicht: v2 liest PAGE_SCRIPT (Bestellung/Reservierung) zur Build-Zeit daraus.
 </active_pipeline>
 
+<kundenfassungen>
+Kundenwebsites gewonnener Betriebe (Stand 25.09.2026, Details: docs-intern/KUNDENWEBSITES.md):
+- EINE Quelle für Dashboard und Chat: data/kunden/<kunden-id>/projekt.json (+ medien/), gitignoriert.
+- Inhaltswünsche aus dem Chat (Texte, Preise, Gerichte, Medien, Öffnungszeiten) IMMER über
+  `npm run kunde -- …` (scripts/kunde.mjs) umsetzen – nie projekt.json von Hand, nie einen zweiten Speicher.
+  `npm run kunde -- liste` / `anzeigen --kunde k-…` zeigt den aktuellen Stand inkl. Dashboard-Änderungen.
+- Bauen: `npm run kunde -- bauen --kunde k-…` (nur lokal, v2/output/kunden/). Nichts davon nach docs/.
+- Layout-Sonderwünsche sind KEINE Inhalte: die gehen in Code/Vorlage und brauchen den Snapshot-Test.
+</kundenfassungen>
+
 <constraints>
 - Keine komplette Neuimplementierung: bestehender Generator, Scoring-Logik, Dashboard- und Wirt-Server bleiben erhalten.
 - Der Archetypen-/Stimmungs-Ansatz in designPresets.js, stimmungen.js und heroSignature.js bleibt die Basis der Gestaltung.
