@@ -16,12 +16,20 @@ import { bild } from "./kopf.js";
 
 const e = escapeHtml;
 
-function vorbestellen(g, texte) {
+/**
+ * Mit Speisekarten-Seite legt der Knopf nichts in den Warenkorb: Er öffnet das
+ * Gericht auf der Speisekarte (gerichtLink), erst dort wird hinzugefügt.
+ */
+function vorbestellen(g, texte, aktionen) {
+  if (aktionen?.karte && g.link) {
+    const text = aktionen.bestellen ? texte.highlights.vorbestellen : texte.speisekarte.aufDerKarte;
+    return `<a class="btn btn-ghost btn-klein" href="${e(g.link)}" aria-label="${e(g.name)} ${e(texte.speisekarte.zumGericht)}">${plus()} ${e(text)}</a>`;
+  }
   return `<button class="btn btn-ghost btn-klein" type="button" data-add="${e(g.id)}" data-name="${e(g.name)}" data-preis="${g.preis}">${plus()} ${e(texte.highlights.vorbestellen)}</button>`;
 }
 
 /** Heute auf dem Tisch: ein großes und zwei versetzte kleinere Gerichte. */
-export function renderTisch({ texte, highlights, medien, fiktiv }) {
+export function renderTisch({ texte, highlights, medien, fiktiv, aktionen }) {
   const t = texte.tisch;
   const gerichte = highlights.slice(0, 3);
   const teller = (g, i) => `<article class="teller teller--${i + 1} auftritt">
@@ -29,7 +37,7 @@ export function renderTisch({ texte, highlights, medien, fiktiv }) {
       <div class="teller-text">
         <h3>${e(g.name)}</h3>
         <p class="teller-desc">${e(g.beschreibung)}</p>
-        <div class="teller-fuss"><span class="preis">${formatPrice(g.preis)}</span>${vorbestellen(g, texte)}</div>
+        <div class="teller-fuss"><span class="preis">${formatPrice(g.preis)}</span>${vorbestellen(g, texte, aktionen)}</div>
       </div>
     </article>`;
   return `<section class="sektion tisch" id="highlights" data-atmosphaere="an">
@@ -99,7 +107,10 @@ export function renderAnfahrt({ texte, lead, aktionen, oeffnungszeiten, fiktiv }
 }
 
 /** Fußzeile (AP8): Wortmarke statt Linkfriedhof, nur echte Kontaktwege. */
-export function renderFussAusdruck({ texte, lead, aktionen }) {
+export function renderFussAusdruck({ texte, lead, aktionen, seite = "start" }) {
+  // Mit Speisekarten-Seite: "Karte" führt dorthin; von der Karte aus zurück zu den Ankern der Startseite.
+  const start = seite === "karte" ? aktionen.start.href : "";
+  const karte = aktionen?.karte ? (seite === "karte" ? "./index.html" : aktionen.karte.href) : "#karte";
   return `<footer class="fuss-haus auf-tint">
   <div class="rahmen fuss-haus-raster">
     <p class="fuss-marke">${e(texte.name)}</p>
@@ -107,9 +118,9 @@ export function renderFussAusdruck({ texte, lead, aktionen }) {
       <address>${lead.adresse ? e(lead.adresse) : ""}${aktionen?.route ? `<br><a href="${e(aktionen.route.href)}" target="_blank" rel="noopener">${e(texte.kontakt.route)}</a>` : ""}</address>
       <div>${aktionen?.anrufen ? `<a href="${e(aktionen.anrufen.href)}">${e(aktionen.anrufen.text)}</a>` : ""}</div>
       <nav aria-label="${e(texte.fuss.navigation)}">
-        <a href="#karte">${e(texte.nav.karte)}</a>
-        <a href="#reservierung">${e(texte.nav.reservierung)}</a>
-        <a href="#kontakt">${e(texte.nav.kontakt)}</a>
+        <a href="${e(karte)}">${e(aktionen?.karte ? texte.nav.speisekarte : texte.nav.karte)}</a>
+        <a href="${e(start)}#reservierung">${e(texte.nav.reservierung)}</a>
+        <a href="${e(start)}#kontakt">${e(texte.nav.kontakt)}</a>
       </nav>
     </div>
     <p class="fuss-hinweis">${e(texte.fuss.hinweis)}</p>
@@ -209,7 +220,8 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 
 /* Anfahrt (AP8) */
 .anfahrt-raster { display: grid; gap: var(--s-8); }
-.anfahrt-adresse { font-size: var(--t-h1); }
+.anfahrt-raster > * { min-width: 0; }
+.anfahrt-adresse { font-size: var(--t-h1); overflow-wrap: anywhere; hyphens: auto; }
 .anfahrt-adresse span { display: block; margin-top: var(--s-1); color: var(--text-leise); font-size: var(--t-h3); }
 .anfahrt-wege { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-top: var(--s-4); }
 .anfahrt-hinweis { margin-top: var(--s-3); color: var(--text-leise); }

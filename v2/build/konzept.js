@@ -23,6 +23,8 @@ export function konzeptTexte(texte, { lead, menu, eigeneTexte = {} }) {
   const name = lead.name || "Ihr Restaurant";
   const ort = lead.ort || "";
   const richtung = menu.label;
+  // Karte des Betriebs (lead-edits.speisekarte) statt Musterkarte.
+  const echteKarte = menu.quelle === "betrieb";
   return {
     ...texte,
     kicker: `${richtung}${ort ? ` · ${ort}` : ""}`,
@@ -32,19 +34,35 @@ export function konzeptTexte(texte, { lead, menu, eigeneTexte = {} }) {
     einladungText: eigeneTexte.schlagzeile ?? `Ein Entwurf, wie sich ${name} im Netz zeigen könnte – mit eigener Karte, eigenen Zeiten und eigenen Fotos.`,
     entwurfsleiste: `Konzept-Demo – unverbindlicher Entwurf, nicht die offizielle Website von ${name}.`,
     platzhalter: "Beispiel",
-    tisch: {
+    tisch: echteKarte ? texte.tisch : {
       ...texte.tisch,
       rubrik: "Aus der Musterkarte",
       titel: "So könnten Empfehlungen aussehen",
       intro: `Beispielgerichte der Küchenrichtung – nicht die Karte von ${name}.`,
     },
-    highlights: { ...texte.highlights, titel: "So könnten Empfehlungen aussehen", intro: `Beispielgerichte – nicht die Karte von ${name}.` },
-    karte: {
+    highlights: echteKarte ? texte.highlights : { ...texte.highlights, titel: "So könnten Empfehlungen aussehen", intro: `Beispielgerichte – nicht die Karte von ${name}.` },
+    karte: echteKarte ? texte.karte : {
       ...texte.karte,
       rubrik: "Musterkarte",
       titel: "So könnte die Karte aussehen",
       intro: `Beispielgerichte und Beispielpreise der Küchenrichtung – nicht die Karte von ${name}. Jedes Gericht lässt sich zur Probe in den Warenkorb legen.`,
+      fussnote: `Musterkarte: Gerichte und Preise sind Beispiele der Küchenrichtung, nicht das Angebot von ${name}.`,
     },
+    // Speisekarten-Seite: ohne Karte des Betriebs eine klar gekennzeichnete
+    // Musterkarte; mit Karte des Betriebs dessen Gerichte (Bestellung bleibt Probe).
+    speisekarte: echteKarte
+      ? { ...texte.speisekarte, intro: `Die Karte nach Angaben von ${name}.` }
+      : {
+          ...texte.speisekarte,
+          rubrik: "Musterkarte",
+          titel: "So könnte die Speisekarte aussehen",
+          intro: `Beispielgerichte und Beispielpreise der Küchenrichtung – nicht die Karte von ${name}.`,
+          introOhneBestellung: `Beispielgerichte und Beispielpreise der Küchenrichtung – nicht die Karte von ${name}.`,
+          auswahlRubrik: "Aus der Musterkarte",
+          auswahlTitel: "Ein Blick in die Musterkarte",
+          auswahlIntro: `Beispielgerichte – nicht die Karte von ${name}. Die ganze Musterkarte steht auf einer eigenen Seite.`,
+          ganzeKarte: "Ganze Musterkarte ansehen",
+        },
     ambiente: {
       ...texte.ambiente,
       rubrik: "Ihr Haus",

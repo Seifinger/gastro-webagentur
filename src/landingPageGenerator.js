@@ -591,6 +591,11 @@ const PAGE_SCRIPT = `
   var data = window.PAGE_DATA;
   var cart = {};
   var noShowEinstellungen = null;
+  // Warenkorb \u00FCber mehrere Seiten (Startseite \u2194 Speisekarte): nur, wenn
+  // die Seite ihre Karte mitliefert (PAGE_DATA.warenkorb). Name und Preis
+  // kommen dann immer aus dieser Karte, nie aus einem alten Speicherstand.
+  var speicher = data.warenkorb && data.warenkorb.karte ? data.warenkorb : null;
+  var warenkorbHinweis = "";
 
   function euro(value) { return value.toFixed(2).replace(".", ",") + " \\u20AC"; }
   function byId(id) { return document.getElementById(id); }
@@ -609,6 +614,14 @@ const PAGE_SCRIPT = `
     var list = byId("cart-lines");
     var current = lines();
     list.innerHTML = "";
+
+    if (warenkorbHinweis && current.length > 0) {
+      var notiz = document.createElement("p");
+      notiz.className = "cart-hinweis";
+      notiz.setAttribute("role", "status");
+      notiz.textContent = warenkorbHinweis;
+      list.appendChild(notiz);
+    }
 
     if (current.length === 0) {
       var empty = document.createElement("p");
@@ -660,7 +673,57 @@ const PAGE_SCRIPT = `
     byId("fab-count").textContent = String(anzahl());
     byId("order-submit").disabled = current.length === 0;
     byId("cart-fab").className = current.length === 0 ? "cart-fab" : "cart-fab visible";
-    byId("bar-order").textContent = current.length === 0 ? "Bestellen" : "Bestellen \\u00B7 " + euro(total());
+    var barOrder = byId("bar-order");
+    if (barOrder) barOrder.textContent = current.length === 0 ? (barOrder.getAttribute("data-leer") || "Bestellen") : "Bestellen \\u00B7 " + euro(total());
+    if (current.length === 0) warenkorbHinweis = "";
+    speichere();
+  }
+
+  function speicherSchluessel() { return "warenkorb:" + speicher.schluessel; }
+
+  function speichere() {
+    if (!speicher) return;
+    try {
+      window.sessionStorage.setItem(speicherSchluessel(), JSON.stringify(lines().map(function (line) {
+        return { id: line.id, name: line.name, preis: line.preis, menge: line.menge };
+      })));
+    } catch (e) { /* ohne Speicher bleibt der Warenkorb auf dieser Seite */ }
+  }
+
+  /**
+   * Holt einen auf der anderen Seite begonnenen Warenkorb zur\\u00FCck. Was nicht
+   * mehr auf der Karte steht (oder ausverkauft ist), f\\u00E4llt heraus; ein
+   * ge\\u00E4nderter Preis wird \\u00FCbernommen und im Warenkorb genannt.
+   */
+  function stelleWarenkorbWiederHer() {
+    if (!speicher) return;
+    var gespeichert = [];
+    try { gespeichert = JSON.parse(window.sessionStorage.getItem(speicherSchluessel()) || "[]"); } catch (e) { gespeichert = []; }
+    if (!Array.isArray(gespeichert)) return;
+    var hinweise = [];
+    gespeichert.forEach(function (eintrag) {
+      if (!eintrag || typeof eintrag.id !== "string") return;
+      var menge = Math.min(99, Math.floor(Number(eintrag.menge)));
+      if (!(menge > 0)) return;
+      var aktuell = speicher.karte[eintrag.id];
+      if (!aktuell) {
+        hinweise.push(String(eintrag.name || "Ein Gericht") + " ist nicht mehr bestellbar und wurde entfernt.");
+        return;
+      }
+      cart[eintrag.id] = { id: eintrag.id, name: aktuell[0], preis: aktuell[1], menge: menge };
+      if (Number(eintrag.preis) !== aktuell[1]) hinweise.push("Neuer Preis f\\u00FCr " + aktuell[0] + ": " + euro(aktuell[1]) + ".");
+    });
+    warenkorbHinweis = hinweise.join(" ");
+  }
+
+  /** Auf der Speisekarte: kurz best\\u00E4tigen statt den Warenkorb \\u00FCber die Karte zu legen. */
+  function meldeHinzugefuegt(name) {
+    var status = byId("cart-status");
+    if (status) status.textContent = name + " liegt im Warenkorb (" + anzahl() + " insgesamt).";
+    var fab = byId("cart-fab");
+    fab.classList.remove("gerade");
+    void fab.offsetWidth;
+    fab.classList.add("gerade");
   }
 
   function changeQty(id, delta) {
@@ -672,10 +735,17 @@ const PAGE_SCRIPT = `
   }
 
   function addToCart(id, name, preis) {
+    if (speicher) {
+      // Nur, was die Karte als bestellbar f\\u00FChrt \\u2013 zum Preis der Karte.
+      if (!speicher.karte[id]) return;
+      name = speicher.karte[id][0];
+      preis = speicher.karte[id][1];
+    }
     if (!cart[id]) cart[id] = { id: id, name: name, preis: preis, menge: 0 };
     cart[id].menge += 1;
     renderCart();
-    openDrawer();
+    if (data.seite === "karte") meldeHinzugefuegt(name);
+    else openDrawer();
   }
 
   function openDrawer() {
@@ -1015,8 +1085,9 @@ const PAGE_SCRIPT = `
     var barOrder = byId("bar-order");
     if (barOrder) {
       barOrder.addEventListener("click", function () {
-        if (lines().length === 0) byId("karte").scrollIntoView({ behavior: "smooth" });
-        else openDrawer();
+        if (lines().length > 0) openDrawer();
+        else if (data.karteUrl) window.location.href = data.karteUrl;
+        else byId("karte").scrollIntoView({ behavior: "smooth" });
       });
     }
     byId("drawer-close").addEventListener("click", closeDrawer);
@@ -1026,13 +1097,16 @@ const PAGE_SCRIPT = `
       if (event.key === "Escape") { closeDrawer(); closeConfirm(); }
     });
 
+    // Die Reservierung steht auf der Startseite; die Speisekarten-Seite hat sie nicht.
     var dateInput = byId("res-datum");
     var today = new Date();
     var iso = today.getFullYear() + "-" +
       String(today.getMonth() + 1).padStart(2, "0") + "-" +
       String(today.getDate()).padStart(2, "0");
-    dateInput.min = iso;
-    dateInput.value = iso;
+    if (dateInput) {
+      dateInput.min = iso;
+      dateInput.value = iso;
+    }
 
     byId("order-form").addEventListener("submit", function (event) {
       event.preventDefault();
@@ -1120,7 +1194,7 @@ const PAGE_SCRIPT = `
       });
     });
 
-    byId("reservation-form").addEventListener("submit", function (event) {
+    if (byId("reservation-form")) byId("reservation-form").addEventListener("submit", function (event) {
       event.preventDefault();
       var form = event.target;
       if (!validate(form, ["datum", "uhrzeit", "personen", "name", "telefon"])) return;
@@ -1174,6 +1248,7 @@ const PAGE_SCRIPT = `
 
     beobachteAbholzeiten();
     ladeAbholKonfig();
+    stelleWarenkorbWiederHer();
     renderCart();
   });
 })();

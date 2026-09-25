@@ -50,7 +50,7 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
     },
     ctaBestellen: direkt ? "Jetzt vorbestellen" : "Zur Abholung bestellen",
     ctaReservieren: kurz ? "Tisch anfragen" : "Tisch reservieren",
-    nav: { highlights: "Empfehlungen", karte: "Karte", reservierung: "Reservieren", kontakt: "Anfahrt" },
+    nav: { highlights: "Empfehlungen", karte: "Karte", reservierung: "Reservieren", kontakt: "Anfahrt", speisekarte: "Speisekarte", start: "Startseite" },
     heuteEmpfohlen: kurz ? "Heute Abend" : "Heute empfohlen",
 
     usps: [...(menu.usps ?? [])],
@@ -78,6 +78,30 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
         : "Jedes Gericht können Sie direkt zur Abholung vorbestellen.",
       vegetarisch: "vegetarisch",
       gerichteEinheit: "Gerichte",
+      fussnote: "Alle Preise in Euro inklusive Mehrwertsteuer. Fragen zu Allergenen und Zusatzstoffen beantworten wir gern.",
+    },
+
+    // Eigene Speisekarten-Seite (nur Seiten mit Ausdruck): Startseite zeigt eine
+    // kleine Auswahl, die ganze Karte steht unter speisekarte/.
+    speisekarte: {
+      rubrik: "Speisekarte",
+      titel: "Speisekarte",
+      intro: direkt ? "Alle Gerichte auf einen Blick. Hinzufügen, Abholzeit im Warenkorb wählen, fertig." : "Alle Gerichte auf einen Blick – zum Abholen vorbestellen oder am Tisch bestellen.",
+      introOhneBestellung: "Alle Gerichte auf einen Blick. Bestellungen nehmen wir telefonisch oder vor Ort an.",
+      auswahlRubrik: kurz ? "Aus der Küche" : "Aus der Karte",
+      auswahlTitel: kurz ? "Ein Blick in die Karte" : "Eine kleine Auswahl",
+      auswahlIntro: "Ein paar Gerichte aus der Karte. Die ganze Karte steht auf einer eigenen Seite.",
+      aufDerKarte: "Auf der Karte",
+      ganzeKarte: "Gesamte Speisekarte ansehen",
+      zumGericht: "auf der Speisekarte ansehen",
+      hinzufuegen: "Hinzufügen",
+      ausverkauft: "Heute ausverkauft",
+      extras: "Extras",
+      kategorien: "Kategorien der Speisekarte",
+      zurueck: "Zur Startseite",
+      probeHinweis: "Probebestellung: Gerichte lassen sich in den Warenkorb legen und bis zur Abholzeit durchspielen – verschickt wird nichts.",
+      tischHinweis: "Lieber am Tisch essen?",
+      ohneSkript: "Zum Bestellen braucht diese Seite JavaScript. Die Karte bleibt lesbar – bestellen Sie gern telefonisch.",
     },
 
     ambiente: {
@@ -154,6 +178,7 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
       noShowFehler: "Bitte stimmen Sie zu, um die Bestellung abzuschicken.",
       warenkorb: "Warenkorb",
       bestellen: "Bestellen",
+      probe: "Probebestellung",
       reservieren: "Reservieren",
       mailBestaetigung: "Bestätigung per E-Mail senden",
       vorschauHinweis: "Vorschau: Auf dieser Seite wird nichts verschickt. Auf der fertigen Website geht die Anfrage direkt an das Restaurant.",

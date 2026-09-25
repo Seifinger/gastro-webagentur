@@ -11,24 +11,54 @@ import { bewertung } from "./kopf.js";
 
 const e = escapeHtml;
 
-/** Aktionen in der Rangfolge des Ausdrucks – nur solche mit Ziel (aktionsziele.js). */
-function aktionsListe({ ausdruck, aktionen, texte }) {
+/**
+ * Aktionen in der Rangfolge des Ausdrucks – nur solche mit Ziel (aktionsziele.js).
+ * Mit Speisekarten-Seite (aktionen.karte) heißt Bestellen nur "Bestellen", wenn
+ * wirklich bestellt wird (live); sonst ehrlich "Probebestellung". Auf der
+ * Speisekarten-Seite selbst entfällt der Knopf – der Warenkorb ist dort.
+ */
+function aktionsListe({ ausdruck, aktionen, texte, seite = "start" }) {
   const liste = [];
   if (aktionen?.reservieren) liste.push({ id: "reservieren", href: aktionen.reservieren.href, text: texte.ctaReservieren, kurz: texte.bestellung.reservieren });
-  if (aktionen?.bestellen) liste.push({ id: "bestellen", href: aktionen.bestellen.href, text: texte.ctaBestellen, kurz: texte.bestellung.bestellen });
+  if (aktionen?.bestellen && seite !== "karte") {
+    const probe = aktionen.karte && aktionen.bestellen.art !== "live";
+    liste.push({ id: "bestellen", href: aktionen.bestellen.href, text: probe ? texte.bestellung.probe : texte.ctaBestellen, kurz: probe ? texte.bestellung.probe : texte.bestellung.bestellen });
+  }
   return liste.sort((a, b) => (a.id === ausdruck.hauptaktion ? -1 : b.id === ausdruck.hauptaktion ? 1 : 0));
+}
+
+/** Hauptnavigation: ohne Speisekarten-Seite wie bisher (nur Anker), mit ihr als Seitenlink. */
+function navLinks({ texte, aktionen, seite = "start", mitTisch = true }) {
+  if (!aktionen?.karte) {
+    return [
+      ["#karte", texte.nav.karte],
+      ["#highlights", texte.nav.highlights],
+      ["#reservierung", texte.nav.reservierung],
+      ["#kontakt", texte.nav.kontakt],
+    ];
+  }
+  if (seite === "karte") {
+    return [
+      ["./index.html", texte.nav.speisekarte, true],
+      [aktionen.start.href, texte.nav.start],
+      [`${aktionen.start.href}#reservierung`, texte.nav.reservierung],
+      [`${aktionen.start.href}#kontakt`, texte.nav.kontakt],
+    ];
+  }
+  return [
+    [aktionen.karte.href, texte.nav.speisekarte],
+    [mitTisch ? "#highlights" : "#karte", texte.nav.highlights],
+    ["#reservierung", texte.nav.reservierung],
+    ["#kontakt", texte.nav.kontakt],
+  ];
 }
 
 export function renderKopfAusdruck(ctx) {
   const { texte } = ctx;
   const [erste, zweite] = aktionsListe(ctx);
-  const links = [
-    ["#karte", texte.nav.karte],
-    ["#highlights", texte.nav.highlights],
-    ["#reservierung", texte.nav.reservierung],
-    ["#kontakt", texte.nav.kontakt],
-  ];
-  const nav = links.map(([href, text]) => `<a href="${href}">${e(text)}</a>`).join("");
+  const links = navLinks({ ...ctx, mitTisch: ctx.ausdruck?.abfolge?.includes("tisch") });
+  const nav = links.map(([href, text, aktuell]) => `<a href="${e(href)}"${aktuell ? ' aria-current="page"' : ""}>${e(text)}</a>`).join("");
+  const marke = ctx.seite === "karte" ? ctx.aktionen.start.href : "#";
   const aktion = (a, klasse) => (a ? `<a class="btn ${klasse}" href="${e(a.href)}" data-aktion="${a.id}">${e(a.kurz)}</a>` : "");
   // Grundzustand im Markup ist "fest" (Fläche): Ohne Skript bleibt die Schrift
   // auf jedem Untergrund lesbar. Das Skript schaltet über der Bühne auf transparent.
@@ -36,7 +66,7 @@ export function renderKopfAusdruck(ctx) {
   return `<header class="kopf" id="topbar" data-zustand="fest" data-ueber="${e(ctx.ausdruck?.kopfzeile?.ueberHero ?? "transparent")}">
   ${ctx.hinweis ?? ""}
   <div class="kopf-innen">
-    <a class="kopf-marke" href="#">${e(texte.name)}</a>
+    <a class="kopf-marke" href="${e(marke)}">${e(texte.name)}</a>
     <nav class="kopf-nav" aria-label="Hauptnavigation">${nav}</nav>
     <div class="kopf-aktionen">${aktion(zweite, "btn-ghost kopf-zweit")}${aktion(erste, "btn-primary kopf-erst")}</div>
     <a class="kopf-menue-knopf" href="#kopf-menue" aria-controls="kopf-menue" aria-expanded="false"><span class="kopf-menue-linien" aria-hidden="true"></span><span class="nur-vorleser">Menü</span></a>

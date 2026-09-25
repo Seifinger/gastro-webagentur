@@ -6,6 +6,19 @@
 
 import { demoEinstellungen } from "../../src/demoEinstellungen.js";
 import { loadLeadEdits } from "../../src/leadEdits.js";
+import { menuForCuisine } from "../../src/menuCatalog.js";
+
+/**
+ * Die Karte des Betriebs, sofern im Dashboard/als Datei hinterlegt
+ * (lead-edits.speisekarte = { kategorien: [...] }, Format siehe
+ * v2/build/speisekarte.js). Ohne sie bleibt es bei der gekennzeichneten
+ * Musterkarte der Küche.
+ */
+export function karteDesBetriebs(edits, kueche) {
+  const k = edits?.speisekarte;
+  if (!k || !Array.isArray(k.kategorien) || k.kategorien.length === 0) return null;
+  return { ...menuForCuisine(kueche), kategorien: k.kategorien, quelle: "betrieb" };
+}
 
 /**
  * Welche Angaben über den Betrieb auf die Demo dürfen: nur bestätigte Werte
@@ -23,6 +36,8 @@ export function leadFuerBau(e) {
 }
 
 export function bauParameter(e, { apiUrl = "", buildId = "", kontaktEmail = "" } = {}) {
+  const edits = loadLeadEdits(e.slug);
+  const menu = karteDesBetriebs(edits, e.kueche);
   return {
     lead: leadFuerBau(e),
     kueche: e.kueche,
@@ -34,7 +49,10 @@ export function bauParameter(e, { apiUrl = "", buildId = "", kontaktEmail = "" }
       veroeffentlicht: true,
       apiUrl,
       kontaktEmail,
-      editUebersteuerung: loadLeadEdits(e.slug),
+      editUebersteuerung: edits,
+      ...(menu ? { menu } : {}),
+      // Bestellung über die Website abgeschaltet: Speisekarte ohne Warenkorb.
+      ...(edits.bestellung?.aktiv === false ? { bestellung: false } : {}),
       googleMapsUrl: e.googleMapsUrl,
       ...(buildId ? { buildId } : {}),
     },

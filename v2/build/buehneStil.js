@@ -20,7 +20,10 @@ section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 .kopf .entwurf-hinweis { position: relative; }
 .kopf-innen { position: relative; display: flex; align-items: center; gap: var(--s-2); min-height: var(--kopf-hoehe-mobil); padding-inline: var(--rand); }
 .kopf-marke { margin-right: auto; font-family: var(--f-display); font-weight: var(--f-display-gewicht); text-transform: var(--f-display-transform);
-  letter-spacing: var(--f-display-sperrung); font-size: var(--t-basis); line-height: 1.15; text-decoration: none; color: inherit; }
+  letter-spacing: var(--f-display-sperrung); font-size: var(--t-basis); line-height: 1.15; text-decoration: none; color: inherit;
+  min-width: 0; overflow-wrap: anywhere; }
+.kopf-aktionen { min-width: 0; }
+.kopf-aktionen .btn { white-space: nowrap; }
 .kopf-nav { display: none; gap: var(--s-3); }
 .kopf-nav a { color: inherit; text-decoration: none; font-size: var(--t-basis); }
 .kopf-nav a:hover { text-decoration: underline; }
