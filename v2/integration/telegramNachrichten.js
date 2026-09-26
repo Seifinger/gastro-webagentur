@@ -22,7 +22,8 @@ import { datumIn, ZEITZONE_STANDARD } from "../../src/abholzeiten.js";
 import { referenzVon } from "../../src/gastStatus.js";
 import { kuechenStatusVon, KUECHEN_STATUS_LABEL } from "./wirtAdapter.js";
 
-const API = "https://api.telegram.org";
+// TELEGRAM_API_BASIS lenkt auf einen Test-Bot-Server um (lokale End-to-End-Tests).
+const API = String(process.env.TELEGRAM_API_BASIS || "https://api.telegram.org").replace(/\/+$/, "");
 
 /** Ist mindestens ein Bot eingerichtet? */
 export function telegramKonfiguriert() {

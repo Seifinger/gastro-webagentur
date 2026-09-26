@@ -21,13 +21,11 @@
 // dem Host. Dieses Modul greift nicht auf das Endgerät zu (TDDDG § 25) –
 // es wertet nur Anfragen aus, die der Server ohnehin beantwortet.
 
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { datenPfad, ladeJson, speichereJson } from "./datenPfad.js";
 import { tagIn } from "./statistik.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const SEITENAUFRUFE_DIR = path.join(__dirname, "..", "data", "seitenaufrufe");
+export const SEITENAUFRUFE_DIR = datenPfad("seitenaufrufe");
 
 export const QUELLEN = ["keine", "host-aggregat"];
 export const SEITENTYPEN = ["start", "speisekarte", "rechtliches", "sonstige"];
@@ -37,16 +35,11 @@ function datei(slug) {
 }
 
 function lade(slug) {
-  try {
-    return JSON.parse(readFileSync(datei(slug), "utf-8"));
-  } catch {
-    return { tage: {} };
-  }
+  return ladeJson(datei(slug), () => ({ tage: {} }));
 }
 
 function speichere(slug, stand) {
-  mkdirSync(SEITENAUFRUFE_DIR, { recursive: true });
-  writeFileSync(datei(slug), `${JSON.stringify(stand, null, 2)}\n`, "utf-8");
+  speichereJson(datei(slug), stand);
 }
 
 /** Welche Quelle ein Betrieb nutzt. Ohne Eintrag: keine. */

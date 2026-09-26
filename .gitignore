@@ -38,3 +38,6 @@ v2/briefings/*
 # Lokale Umgebungsdateien jeder Art
 .env.*
 !.env.example
+
+# Veröffentlichungspakete von Kundenfassungen (npm run kunde -- paket)
+v2/output/pakete/

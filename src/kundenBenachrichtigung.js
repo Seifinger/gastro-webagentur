@@ -35,7 +35,9 @@ export const emailHook = { aktuell: null };
 // Für Tests der Resend-Anbindung selbst (ohne echten Netzwerkaufruf).
 export const fetchHook = { aktuell: (...args) => fetch(...args) };
 
-const RESEND_API = "https://api.resend.com/emails";
+// RESEND_API_BASIS lenkt auf eine Sandbox bzw. einen Test-Empfänger um (lokale
+// End-to-End-Tests ohne echten Versand). Ohne Angabe: der echte Dienst.
+const RESEND_API = `${String(process.env.RESEND_API_BASIS || "https://api.resend.com").replace(/\/+$/, "")}/emails`;
 
 function smsKonfiguriert() {
   return typeof smsHook.aktuell === "function";

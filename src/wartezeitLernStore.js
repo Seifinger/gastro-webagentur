@@ -1,6 +1,5 @@
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { datenPfad, ladeJson, speichereJson } from "./datenPfad.js";
 import { gesamtPlaetze, freiePlaetze, verfuegbareAbholzeiten } from "./betriebStore.js";
 
 // Lernt je Betrieb, wie viel länger eine Abholung im Schnitt wirklich dauert
@@ -10,8 +9,7 @@ import { gesamtPlaetze, freiePlaetze, verfuegbareAbholzeiten } from "./betriebSt
 // Werte. Default aus (siehe wartezeitLernenAktiv in betriebStore.js) – ohne
 // Aktivierung verhält sich alles exakt wie zuvor.
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const lernDir = path.join(__dirname, "..", "data", "wartezeitLernen");
+const lernDir = datenPfad("wartezeitLernen");
 
 export const MINDEST_BEOBACHTUNGEN = 5;
 export const MAX_GLEITENDER_DURCHSCHNITT = 20;
@@ -22,17 +20,11 @@ function datei(slug) {
 }
 
 export function ladeLernTabelle(slug) {
-  try {
-    return JSON.parse(readFileSync(datei(slug), "utf-8"));
-  } catch {
-    return {};
-  }
+  return ladeJson(datei(slug), () => ({}));
 }
 
 export function speichereLernTabelle(slug, tabelle) {
-  mkdirSync(lernDir, { recursive: true });
-  writeFileSync(datei(slug), `${JSON.stringify(tabelle, null, 2)}\n`, "utf-8");
-  return tabelle;
+  return speichereJson(datei(slug), tabelle);
 }
 
 function aendere(slug, fn) {

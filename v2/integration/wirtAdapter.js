@@ -19,6 +19,7 @@
 
 import { readdirSync, existsSync } from "node:fs";
 import path from "node:path";
+import { datenPfad } from "../../src/datenPfad.js";
 import { fileURLToPath } from "node:url";
 import { randomInt } from "node:crypto";
 import {
@@ -32,7 +33,7 @@ import {
 import { telegramEinstellungen, botFuerArt, zielFuer, kanalLink, botName, VORGANG_ARTEN } from "../../src/telegramRegeln.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-export const BETRIEB_DIR = path.join(__dirname, "..", "..", "data", "betrieb");
+export const BETRIEB_DIR = datenPfad("betrieb");
 
 export const KUECHEN_STATUS = ["neu", "in-zubereitung", "bereit", "abgeholt", "abgelehnt", "storniert"];
 export const KUECHEN_STATUS_LABEL = {

@@ -83,6 +83,15 @@ function beiSignal(signal) {
   alleFreigeben();
   process.exit(signal === "SIGINT" ? 130 : 143);
 }
+/**
+ * Der Prozess beendet sich selbst geordnet (scripts/wirtStart.mjs: erst
+ * Server schließen, dann Sperren freigeben). Dann keine eigenen Handler,
+ * die sofort process.exit() aufrufen würden.
+ */
+export function signaleSelbstBehandeln() {
+  signaleAktiv = true;
+}
+
 export function aufSignaleAchten() {
   if (signaleAktiv) return;
   signaleAktiv = true;

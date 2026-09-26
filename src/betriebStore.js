@@ -32,6 +32,7 @@ import {
   pruefeNoShowParameter,
 } from "./rechtstexte.js";
 import { QUELLEN as SEITENAUFRUF_QUELLEN } from "./seitenaufrufe.js";
+import { datenPfad, schreibeAtomar } from "./datenPfad.js";
 import { pruefeEmpfehlungsRegeln, regelnMitStandard, erkannteRolle, ROLLEN } from "./empfehlungen.js";
 import { preisermittlung, pruefeAktion, zustand as aktionsZustand, PreisGeaendert, oeffentlichePreise } from "./rabattaktionen.js";
 
@@ -40,7 +41,8 @@ import { preisermittlung, pruefeAktion, zustand as aktionsZustand, PreisGeaender
 // Reservierungen am Tag und bleibt ohne Datenbank nachvollziehbar.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const betriebeDir = path.join(__dirname, "..", "data", "betrieb");
+// Auf dem Host das persistente Volume (GASTRO_DATEN_DIR, siehe datenPfad.js).
+const betriebeDir = datenPfad("betrieb");
 
 // Wie lange ein Tisch als belegt gilt. Zwei Stunden sind in der Gastronomie
 // der übliche Ansatz für einen Durchgang.
@@ -125,29 +127,6 @@ export function ladeBetrieb(slug) {
   } catch {
     console.error(`⛔ Betriebsdatei ${datei(slug)} ist beschädigt – es wird nichts überschrieben. Letzte Sicherung einspielen.`);
     throw new BetriebsdatenBeschaedigt(slug, "json");
-  }
-}
-
-/**
- * Schreibt erst eine Nachbardatei und benennt sie dann um: Ein Absturz oder
- * eine volle Platte mitten im Schreiben hinterlässt die alte, vollständige
- * Datei statt einer halben.
- */
-function schreibeAtomar(ziel, inhalt) {
-  const tmp = `${ziel}.${process.pid}-${randomBytes(4).toString("hex")}.tmp`;
-  try {
-    const fd = openSync(tmp, "w", 0o600);
-    try {
-      const bytes = Buffer.from(inhalt, "utf-8");
-      for (let geschrieben = 0; geschrieben < bytes.length; ) geschrieben += writeSync(fd, bytes, geschrieben);
-      fsyncSync(fd);
-    } finally {
-      closeSync(fd);
-    }
-    renameSync(tmp, ziel);
-  } catch (fehler) {
-    rmSync(tmp, { force: true });
-    throw fehler;
   }
 }
 

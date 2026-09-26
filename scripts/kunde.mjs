@@ -13,6 +13,7 @@
 //   npm run kunde -- gericht   --kunde k-… --gericht g-… [--name …] [--preis 12,50] [--beschreibung …] [--allergene …]
 //   npm run kunde -- zeiten    --kunde k-… --zeile "Mo–Fr | 11:30–14:00 & 17:00–22:00" [--zeile …] [--ausnahme "24.12. | geschlossen"]
 //   npm run kunde -- bauen     --kunde k-…
+//   npm run kunde -- paket     --kunde k-… [--noindex]   (nur freigegeben: statische Seite + Übergabe an die Wirt-App)
 //
 // Veröffentlicht wird dabei nichts.
 
@@ -20,6 +21,7 @@ import { readFileSync } from "node:fs";
 import { FELDER, alleProjekte, aendereProjekt, legeMediumVor, mediumAktion } from "../src/kundenProjekt.js";
 import { fuehreAktionAus, kundenAnsicht, projektAusDemo, projektAusBeispiel } from "../v2/integration/kundenDashboard.js";
 import { baueKundenfassung } from "../v2/integration/kundenBau.js";
+import { erstellePaket } from "../v2/integration/kundenPaket.js";
 
 const VON = "Chat (Claude Code)";
 const [befehl, ...rest] = process.argv.slice(2);
@@ -90,6 +92,12 @@ try {
   } else if (befehl === "bauen") {
     const r = await baueKundenfassung(kunde());
     console.log(`Lokal gebaut: ${r.ordner}${r.sync?.synchronisiert ? ` · Karte an Wirt-Betrieb ${r.sync.betrieb}` : ""}`);
+  } else if (befehl === "paket") {
+    const r = await erstellePaket(kunde(), { noindex: hat("noindex") });
+    console.log(`Paket: ${r.paketDir}`);
+    console.log(`  site/                 → auf den statischen Host (${r.protokoll.dateien.length} Dateien, Wirt-Adresse ${r.protokoll.apiUrl})`);
+    console.log(`  wirt-uebergabe.json   → an die Wirt-App „${r.uebergabe.betrieb}“ (docs-intern/PILOT-BETRIEB.md)`);
+    console.log("  intern/               → nicht hochladen");
   } else {
     console.log(readFileSync(new URL(import.meta.url), "utf-8").split("\n").filter((z) => z.startsWith("//")).join("\n"));
     process.exitCode = befehl ? 1 : 0;

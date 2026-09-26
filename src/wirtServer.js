@@ -1,6 +1,8 @@
 import { createServer } from "node:http";
 import { timingSafeEqual, createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { readFileSync, accessSync, constants as fsConstants } from "node:fs";
+import { DATEN_DIR, datenPfad } from "./datenPfad.js";
+import { uebernimmUebergabe } from "./wirtUebergabe.js";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { dashboardHost } from "./config.js";
@@ -169,18 +171,40 @@ function json(res, status, daten, extra = {}) {
 
 // Die Landingpage liegt auf einer anderen Adresse als dieser Server, deshalb
 // müssen die öffentlichen Endpunkte den Zugriff ausdrücklich erlauben.
+// Access-Control-Allow-Origin setzt corsFuer() je Anfrage (siehe unten):
+// ohne WIRT_ERLAUBTE_ORIGINS wie bisher "*", sonst nur die Kundendomain(s).
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function koerper(req) {
+/**
+ * Welche Websites Gastanfragen schicken dürfen: WIRT_ERLAUBTE_ORIGINS, z. B.
+ * "https://www.trattoria-beispiel.de,https://trattoria-beispiel.pages.dev".
+ * Ohne Angabe jede (bisheriges Verhalten, nur für lokale Tests gedacht).
+ */
+export function erlaubteOrigins() {
+  return String(process.env.WIRT_ERLAUBTE_ORIGINS ?? "")
+    .split(",")
+    .map((o) => o.trim().replace(/\/+$/, ""))
+    .filter(Boolean);
+}
+
+/** null = fremde Origin (Browser einer anderen Seite); "" = keine Origin (curl, Server). */
+function corsFuer(req) {
+  const liste = erlaubteOrigins();
+  const origin = String(req.headers.origin ?? "");
+  if (!liste.length) return "*";
+  if (!origin) return "";
+  return liste.includes(origin) ? origin : null;
+}
+
+function koerper(req, max = 20_000) {
   return new Promise((resolve, reject) => {
     let roh = "";
     req.on("data", (teil) => {
       roh += teil;
-      if (roh.length > 20_000) reject(new Error("Anfrage zu groß"));
+      if (roh.length > max) reject(new Error("Anfrage zu groß"));
     });
     req.on("end", () => {
       try {
@@ -366,7 +390,30 @@ function oeffentlicherBetrieb() {
 }
 
 export function istOeffentlicheRoute(pathname, method) {
-  return method === "OPTIONS" || pathname.startsWith("/oeffentlich/") || pathname === "/status" || pathname === "/sw.js" || pathname.startsWith("/rechtstexte/");
+  return method === "OPTIONS" || pathname.startsWith("/oeffentlich/") || pathname === "/status" || pathname === "/sw.js" || pathname.startsWith("/rechtstexte/") || pathname === "/gesund";
+}
+
+/** Health-Check: ok nur, wenn die Betriebsdatei lesbar und das Datenverzeichnis beschreibbar ist. */
+export function gesundheit() {
+  const pruefungen = { betriebsdaten: "ok", schreibbar: "ok" };
+  try {
+    ladeBetrieb(slug);
+  } catch (fehler) {
+    pruefungen.betriebsdaten = fehler.code === "BETRIEBSDATEN_BESCHAEDIGT" ? "beschaedigt" : "fehler";
+  }
+  try {
+    accessSync(datenPfad("betrieb"), fsConstants.W_OK);
+  } catch (fehler) {
+    // Vor der ersten Anfrage gibt es den Ordner noch nicht – dann zählt das Datenverzeichnis.
+    try {
+      if (fehler.code !== "ENOENT") throw fehler;
+      accessSync(DATEN_DIR, fsConstants.W_OK);
+    } catch {
+      pruefungen.schreibbar = "nein";
+    }
+  }
+  const ok = Object.values(pruefungen).every((w) => w === "ok");
+  return { ok, ...pruefungen, version: process.env.GIT_COMMIT || "", zeit: new Date().toISOString() };
 }
 
 export function verweigereZugang(res) {
@@ -477,9 +524,33 @@ const routen = async (req, res) => {
 
   if (!istOeffentlicheRoute(pathname, req.method) && !pruefeWirtZugang(req, res)) return;
 
+  // Hinter dem HTTPS-Proxy des Hosts (Fly): Browser sollen nur noch HTTPS nutzen.
+  if (process.env.VERTRAUTER_PROXY && req.headers["x-forwarded-proto"] === "https") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000");
+  }
+
+  // Gastrouten: nur für die eigene(n) Kundendomain(s) per CORS freigegeben.
+  if (istOeffentlicheRoute(pathname, req.method)) {
+    const erlaubt = corsFuer(req);
+    if (erlaubt) res.setHeader("Access-Control-Allow-Origin", erlaubt);
+    if (erlaubteOrigins().length) res.setHeader("Vary", "Origin");
+    if (erlaubt === null && (req.method === "OPTIONS" || (req.method === "POST" && pathname.startsWith("/oeffentlich/")))) {
+      json(res, 403, { ok: false, fehler: "Diese Website darf keine Anfragen an dieses Restaurant schicken." });
+      return;
+    }
+  }
+
   if (req.method === "OPTIONS") {
     res.writeHead(204, CORS);
     res.end();
+    return;
+  }
+
+  // Zustand für den Host (Fly-Health-Check): Betriebsdatei lesbar und
+  // Datenverzeichnis beschreibbar. Keine Gast- oder Betriebsdaten.
+  if (pathname === "/gesund" && (req.method === "GET" || req.method === "HEAD")) {
+    const zustand = gesundheit();
+    json(res, zustand.ok ? 200 : 503, zustand, { "Cache-Control": "no-store" });
     return;
   }
 
@@ -799,7 +870,8 @@ const routen = async (req, res) => {
 
   if (req.method === "POST") {
     try {
-      const eingabe = await koerper(req);
+      // Die Übergabe bringt die ganze Bestellkarte mit – nur sie darf größer sein.
+      const eingabe = await koerper(req, pathname === "/intern/uebergabe" ? 2_000_000 : 20_000);
 
       if (pathname === "/api/tisch") {
         json(res, 200, { ok: true, tisch: legeTischAn(slug, eingabe) });
@@ -851,6 +923,13 @@ const routen = async (req, res) => {
 
         await stelleGastMeldungenZu(slug);
         json(res, 200, { ok: true, bestellung, gast: gastHinweisFuer("bestellung", bestellung.id) });
+        return;
+      }
+
+      /* ----- Intern: Übergabe freigegebener Kundendaten aus dem Agentur-Dashboard ----- */
+
+      if (pathname === "/intern/uebergabe") {
+        json(res, 200, { ok: true, ...uebernimmUebergabe(slug, eingabe) });
         return;
       }
 

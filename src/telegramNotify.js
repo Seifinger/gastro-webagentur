@@ -1,4 +1,4 @@
-const TELEGRAM_API_BASIS = "https://api.telegram.org";
+const TELEGRAM_API_BASIS = String(process.env.TELEGRAM_API_BASIS || "https://api.telegram.org").replace(/\/+$/, "");
 
 function telegramKonfiguriert() {
   return Boolean(process.env.TELEGRAM_BOT_TOKEN);

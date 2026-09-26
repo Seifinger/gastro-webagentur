@@ -1,0 +1,55 @@
+# Fly.io-Konfiguration der WIRT-APP (ein Pilotbetrieb). Nicht verwechseln mit
+# fly.toml (Agentur-Dashboard). Anleitung: docs-intern/PILOT-BETRIEB.md
+#
+#   fly apps create <app-name>
+#   fly volumes create wirt_daten --region fra --size 1 --app <app-name>
+#   fly secrets set … --app <app-name>          (Namen: .env.wirt.example)
+#   deploy/wirt/release.sh <commit> <app-name>
+app = "gastro-wirt-pilot"
+primary_region = "fra"
+kill_signal = "SIGTERM"
+kill_timeout = 15
+
+[build]
+  dockerfile = "deploy/wirt/Dockerfile"
+
+[env]
+  GASTRO_DATEN_DIR = "/data"
+  WIRT_PORT = "8080"
+  DASHBOARD_HOST = "0.0.0.0"
+  NODE_ENV = "production"
+  TZ = "Europe/Berlin"
+  # Die echte Adresse der Gäste steht in Fly-Client-IP (Anfragebremsen je Gast).
+  VERTRAUTER_PROXY = "fly"
+  BACKUP_UHRZEIT = "03:30"
+  BACKUP_BEHALTEN_TAGE = "30"
+  BACKUP_MINDESTENS = "7"
+
+# Genau ein Volume, genau eine Maschine: alle Laufzeitdaten liegen hier.
+[[mounts]]
+  source = "wirt_daten"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Immer an: Telegram-Abruf, Erinnerungen und die nächtliche Sicherung laufen im Prozess.
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 50
+    hard_limit = 100
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"
+    method = "GET"
+    path = "/gesund"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

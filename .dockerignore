@@ -1,2 +1,20 @@
+# Gemeinsam für beide Images (Build-Kontext = Repository):
+#   Dockerfile            Agentur-Dashboard – kopiert nur deploy/start.sh
+#   deploy/wirt/Dockerfile Wirt-App – kopiert Code, nie Laufzeitdaten
+# Alles ist ausgeschlossen, was nicht ausdrücklich freigegeben ist.
 *
-!deploy/start.sh
+!package.json
+!package-lock.json
+!src/**
+!public/**
+!scripts/**
+!v2/build/**
+!v2/integration/**
+!v2/assets-pipeline/**
+!v2/designsysteme/**
+!v2/output/assets/fonts/**
+!deploy/**
+# nie ins Image: Laufzeitdaten, Uploads, Umgebungsdateien
+public/uploads
+**/.env
+**/.env.*
