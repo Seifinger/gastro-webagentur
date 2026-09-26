@@ -509,6 +509,10 @@ Nach dem Absenden bekommt jeder Gast Referenznummer, den ehrlichen Stand „eing
 
 Die vorhandene Bearbeiten-Ansicht hat zwei Modi. Unter „Konzept-Demo“ bleibt die Lead-Demo, wie sie ist. „Kundenwebsite“ legt aus der Demo eine eigene Kundenfassung an. Darin lassen sich Logo, Hero-Medien (Desktop/Mobile), Texte, das Haus-Bild, die Speisekarte mit Preisen, Allergenen und Gerichtbildern sowie die Betriebsangaben pflegen. Danach wird nur diese Seite lokal gebaut, in der Vorschau auf Desktop und Mobil geprüft und freigegeben. Layout und Designsystem bleiben gesperrt, veröffentlicht wird noch nichts. Dashboard und Claude-Code-Chat (`npm run kunde -- …`) arbeiten auf demselben Speicher unter `data/kunden/`. Details: [docs-intern/KUNDENWEBSITES.md](docs-intern/KUNDENWEBSITES.md).
 
+### „Passt gut dazu“: Empfehlungen im Warenkorb
+
+In der Bestellübersicht (Warenkorb vor dem Absenden) zeigen Seiten mit Speisekarten-Seite höchstens zwei passende Ergänzungen aus der Karte des Hauses – zur Pizza etwa eine Vorspeise oder ein Dessert, nie eine zweite Pizza. Nichts wird automatisch hinzugefügt; hinzugefügt wird über den bestehenden Warenkorb, der Server prüft Preise wie bisher. Der Wirt steuert die Funktion im Reiter **„Empfehlungen“** (an/aus, Standardregeln, bevorzugte und ausgeschlossene Produkte, Kombinationen, Vorschau, aggregierte Wirkung). Keine KI pro Warenkorb, keine Cookies, keine Gästehistorie. Details: [docs-intern/PASST-GUT-DAZU.md](docs-intern/PASST-GUT-DAZU.md).
+
 ### Statistik und Rechtstexte
 
 Das Wirt-Dashboard hat zwei weitere Reiter:

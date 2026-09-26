@@ -80,7 +80,10 @@ test("Bestellen: live → 'Bestellen' zur Karte; Vorschau → ehrlich 'Probebest
 
 test("Plus auf der Startseite: Link zum Gericht auf der Speisekarte, kein Hinzufügen", () => {
   const { html, seiten } = bau();
-  assert.ok(!html.includes("data-add="), "die Startseite legt nichts in den Warenkorb");
+  // Die Auswahl der Startseite legt nichts in den Warenkorb. (Im Warenkorb
+  // selbst stehen die beiden Plätze von „Passt gut dazu“ – siehe empfehlungen.test.js.)
+  const ohneWarenkorb = html.replace(/<div class="passt-dazu"[\s\S]*?<\/ul>/, "");
+  assert.ok(!ohneWarenkorb.includes("data-add="), "die Startseite legt nichts in den Warenkorb");
   const links = [...html.matchAll(/href="speisekarte\/index\.html#(gericht-[a-z0-9-]+)"/g)].map((m) => m[1]);
   assert.ok(links.length >= 4, `zu wenige Gericht-Links: ${links.length}`);
   for (const id of links) assert.match(seiten[KARTE_PFAD], new RegExp(`<li class="karte-gericht[^"]*" id="${id}">`), id);
@@ -205,7 +208,8 @@ test("Große Karte (12 × 20): baut durch alle Gates, Navigation mobil scrollbar
   const k = seiten[KARTE_PFAD];
   assert.equal(bericht.speisekarte.gerichte, 240);
   assert.equal((k.match(/<nav class="karten-sprung[^"]*"[^>]*>(.*?)<\/nav>/s)[1].match(/<a /g) || []).length, 12);
-  assert.equal((k.match(/data-add="/g) || []).length, 240);
+  // Je Gericht ein Hinzufügen-Knopf (die leeren Plätze von „Passt gut dazu“ zählen nicht).
+  assert.equal((k.match(/data-add="[^"]/g) || []).length, 240);
   assert.match(k, /\.karten-sprung--fest \{ position: sticky; top: var\(--kopf-ist, var\(--kopf-hoehe-mobil\)\); z-index: 30; flex-wrap: nowrap; overflow-x: auto;/);
   assert.match(k, /\.karten-sprung--seite a \{ gap: var\(--s-1\); min-height: var\(--s-6\); \}/);
   assert.match(k, /\.karte-gericht-kopf h3 \{[^}]*overflow-wrap: anywhere;/, "lange Namen brechen um");

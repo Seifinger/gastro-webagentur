@@ -165,11 +165,11 @@ export const MENUS = {
       {
         name: "Pasta & Dolci",
         gerichte: [
-          { name: "Tagliatelle al Ragù", beschreibung: "Klassisches Ragù, 4 Stunden geschmort", preis: 14.9, bild: "photo-1551183053-bf91a1d81141" },
-          { name: "Farfalle al Pesto", beschreibung: "Basilikumpesto, Kirschtomaten, Pinienkerne", preis: 13.9, vegetarisch: true, bild: "photo-1473093295043-cdd812d0e601" },
-          { name: "Penne all'Arrabbiata", beschreibung: "Tomate, Knoblauch, Chili, Parmesan", preis: 12.9, vegetarisch: true, bild: "photo-1621996346565-e3dbc646d9a9" },
-          { name: "Panna cotta mit Feigen", beschreibung: "Mit karamellisierten Feigen und Beeren", preis: 8.5, vegetarisch: true, bild: "photo-1544510808-91bcbee1df55" },
-          { name: "Tiramisù", beschreibung: "Hausgemacht, nach Familienrezept", preis: 7.5, vegetarisch: true },
+          { name: "Tagliatelle al Ragù", beschreibung: "Klassisches Ragù, 4 Stunden geschmort", preis: 14.9, bild: "photo-1551183053-bf91a1d81141", empfehlungsrolle: "hauptgericht" },
+          { name: "Farfalle al Pesto", beschreibung: "Basilikumpesto, Kirschtomaten, Pinienkerne", preis: 13.9, vegetarisch: true, bild: "photo-1473093295043-cdd812d0e601", empfehlungsrolle: "hauptgericht" },
+          { name: "Penne all'Arrabbiata", beschreibung: "Tomate, Knoblauch, Chili, Parmesan", preis: 12.9, vegetarisch: true, bild: "photo-1621996346565-e3dbc646d9a9", empfehlungsrolle: "hauptgericht" },
+          { name: "Panna cotta mit Feigen", beschreibung: "Mit karamellisierten Feigen und Beeren", preis: 8.5, vegetarisch: true, bild: "photo-1544510808-91bcbee1df55", empfehlungsrolle: "dessert" },
+          { name: "Tiramisù", beschreibung: "Hausgemacht, nach Familienrezept", preis: 7.5, vegetarisch: true, empfehlungsrolle: "dessert" },
         ],
       },
     ],
@@ -203,8 +203,8 @@ export const MENUS = {
       {
         name: "Sushi & Dessert",
         gerichte: [
-          { name: "Sushi-Box (12 Stück)", beschreibung: "Gemischte Auswahl, mit Wasabi und Ingwer", preis: 18.9, bild: "photo-1553621042-f6e147245754" },
-          { name: "Gebackene Banane", beschreibung: "Mit Honig und Vanilleeis", preis: 6.5, vegetarisch: true },
+          { name: "Sushi-Box (12 Stück)", beschreibung: "Gemischte Auswahl, mit Wasabi und Ingwer", preis: 18.9, bild: "photo-1553621042-f6e147245754", empfehlungsrolle: "hauptgericht" },
+          { name: "Gebackene Banane", beschreibung: "Mit Honig und Vanilleeis", preis: 6.5, vegetarisch: true, empfehlungsrolle: "dessert" },
         ],
       },
     ],
@@ -380,9 +380,9 @@ export const MENUS = {
       {
         name: "Wok & Dessert",
         gerichte: [
-          { name: "Pad Thai mit Hähnchen", beschreibung: "Reisnudeln, Ei, Erdnüsse, Limette", preis: 14.5, bild: "photo-1559314809-0d155014e29e" },
-          { name: "Pad Krapao", beschreibung: "Hackfleisch mit Thai-Basilikum und Spiegelei", preis: 14.9 },
-          { name: "Mango mit Klebreis", beschreibung: "Mit Kokossoße und Sesam", preis: 7.5, vegetarisch: true },
+          { name: "Pad Thai mit Hähnchen", beschreibung: "Reisnudeln, Ei, Erdnüsse, Limette", preis: 14.5, bild: "photo-1559314809-0d155014e29e", empfehlungsrolle: "hauptgericht" },
+          { name: "Pad Krapao", beschreibung: "Hackfleisch mit Thai-Basilikum und Spiegelei", preis: 14.9, empfehlungsrolle: "hauptgericht" },
+          { name: "Mango mit Klebreis", beschreibung: "Mit Kokossoße und Sesam", preis: 7.5, vegetarisch: true, empfehlungsrolle: "dessert" },
         ],
       },
     ],
@@ -406,6 +406,7 @@ export const MENUS = {
       },
       {
         name: "Phở & Suppen",
+        empfehlungsrolle: "hauptgericht",
         gerichte: [
           { name: "Phở Bò", beschreibung: "Rinderbrühe, Reisbandnudeln, Rinderfilet, Thai-Basilikum", preis: 15.5, bild: "photo-1597345637412-9fd611e758f3" },
           { name: "Phở Gà", beschreibung: "Hühnerbrühe, Reisbandnudeln, Hähnchen, Frühlingszwiebel", preis: 14.5, bild: "photo-1589570658214-002314b1520f" },
@@ -418,7 +419,7 @@ export const MENUS = {
           { name: "Bánh Mì mit Schweinebauch", beschreibung: "Baguette, eingelegtes Gemüse, Koriander, Chili", preis: 9.9, bild: "photo-1710532774170-9844f837ae54" },
           { name: "Bánh Mì mit Zitronengras-Tofu", beschreibung: "Baguette, Gurke, eingelegte Karotte", preis: 8.9, vegetarisch: true, bild: "photo-1677354469642-3e4fc5dbbb4a" },
           { name: "Bún Bowl mit gegrilltem Schwein", beschreibung: "Reisnudeln, Kräuter, Erdnüsse, Fischsoßen-Dressing", preis: 14.9 },
-          { name: "Vietnamesischer Eiskaffee", beschreibung: "Mit gesüßter Kondensmilch", preis: 4.5, vegetarisch: true },
+          { name: "Vietnamesischer Eiskaffee", beschreibung: "Mit gesüßter Kondensmilch", preis: 4.5, vegetarisch: true, empfehlungsrolle: "getraenk" },
         ],
       },
     ],
@@ -490,10 +491,10 @@ export const MENUS = {
       {
         name: "Tandoor, Biryani & Beilagen",
         gerichte: [
-          { name: "Chicken Biryani", beschreibung: "Basmati mit Safran, Röstzwiebeln und Raita", preis: 16.9, bild: "photo-1565557623262-b51c2513a641" },
-          { name: "Tandoori-Hähnchen (halb)", beschreibung: "Über Nacht in Joghurt und Gewürzen eingelegt", preis: 17.5 },
-          { name: "Naan mit Knoblauch", beschreibung: "Frisch aus dem Tandoor", preis: 3.9, vegetarisch: true },
-          { name: "Mango-Lassi", beschreibung: "Joghurtgetränk, gekühlt", preis: 4.5, vegetarisch: true },
+          { name: "Chicken Biryani", beschreibung: "Basmati mit Safran, Röstzwiebeln und Raita", preis: 16.9, bild: "photo-1565557623262-b51c2513a641", empfehlungsrolle: "hauptgericht" },
+          { name: "Tandoori-Hähnchen (halb)", beschreibung: "Über Nacht in Joghurt und Gewürzen eingelegt", preis: 17.5, empfehlungsrolle: "hauptgericht" },
+          { name: "Naan mit Knoblauch", beschreibung: "Frisch aus dem Tandoor", preis: 3.9, vegetarisch: true, empfehlungsrolle: "beilage" },
+          { name: "Mango-Lassi", beschreibung: "Joghurtgetränk, gekühlt", preis: 4.5, vegetarisch: true, empfehlungsrolle: "getraenk" },
         ],
       },
     ],

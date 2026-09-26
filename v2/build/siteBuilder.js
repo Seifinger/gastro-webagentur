@@ -55,6 +55,7 @@ import { liegtInDocs } from "../../src/oeffentlichkeit.js";
 import { medienStatus } from "../assets-pipeline/mediaGenerator.js";
 import { karteAusDaten, gerichtZuIndex, gerichtLink, auswahlFuerStartseite, KARTE_PFAD, START_PFAD } from "./speisekarte.js";
 import { renderAuswahl, renderKarteSeite, kategorieBilder, KARTE_CSS, KARTE_SEITE_SKRIPT } from "./sektionen/speisekarte.js";
+import { passtDazuDaten, renderPasstDazu, passtDazuSkript, PASST_DAZU_CSS } from "./sektionen/passtDazu.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const OUTPUT_DIR = path.join(__dirname, "..", "output");
@@ -343,6 +344,16 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
     ? ausdruck.abfolge.filter((id) => ausdruckSektionen[id]).map((id) => ausdruckSektionen[id]()).filter(Boolean).join("\n\n")
     : reihenfolge.map((id, i) => sektionen[id](i % 2 === 1)).join("\n\n");
 
+  // „Passt gut dazu“ (sektionen/passtDazu.js): nur mit Speisekarten-Seite und
+  // Bestellweg – dort gibt es den Katalog der Karte, mit dem der Warenkorb rechnet.
+  const mitPasstDazu = Boolean(karte && bestellung && Object.keys(karte.katalog).length);
+  const passtDazuFuer = (seite) => (mitPasstDazu ? passtDazuDaten({ karte, medien, texte, fiktiv, kundenfassung, apiUrl, seite }) : null);
+  const passtDazu = passtDazuFuer("start");
+  for (const [rolle, medium] of passtDazu?.medien ?? []) {
+    if (!genutzt.some(([r]) => r === rolle)) genutzt.push([rolle, medium]);
+  }
+  const passtDazuHtml = passtDazu ? renderPasstDazu({ texte, muster: passtDazu.daten.muster }) : "";
+
   // telefon nur mit echter Nummer: Die Vorschau-Bestätigung nennt sie als echten Weg zum Lokal.
   const pageDataBasis = { name: texte.name, kontaktEmail: optionen.kontaktEmail ?? "", apiUrl, ...(aktionen.anrufen ? { telefon: aktionen.anrufen.text } : {}) };
   // Mit Speisekarten-Seite: derselbe Warenkorb auf beiden Seiten (sessionStorage,
@@ -350,7 +361,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
   const warenkorb = karte && bestellung
     ? { schluessel: createHash("sha256").update(`${lead.placeId ?? ""}|${texte.name}|${gestaltung.cuisine}`).digest("hex").slice(0, 12), karte: karte.katalog }
     : null;
-  const pageData = jsonForScript(karte ? { ...pageDataBasis, seite: "start", ...(bestellung ? { karteUrl: KARTE_PFAD } : {}), ...(warenkorb ? { warenkorb } : {}) } : pageDataBasis);
+  const pageData = jsonForScript(karte ? { ...pageDataBasis, seite: "start", ...(bestellung ? { karteUrl: KARTE_PFAD } : {}), ...(warenkorb ? { warenkorb } : {}), ...(passtDazu ? { passtDazu: passtDazu.daten } : {}) } : pageDataBasis);
 
   const familien = [ds.typografie.display.familie, ds.typografie.text.familie, ds.typografie.label?.familie].filter(Boolean);
   const fontCss = optionen.fontCss ?? schriftCss(familien, optionen.fontsDir ?? FONTS_DIR, optionen.fontsPfad ?? "../../assets/fonts");
@@ -396,7 +407,7 @@ ${fontCss}
 ${cssVariablen(ds)}
 ${STIL}
 ${BEWEGUNG_CSS}
-${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}\n${ABFOLGE_CSS}\n${ATMOSPHAERE_CSS}\n${KARTE_CSS}` : ""}${apiUrl ? RECHTLICHES_CSS : ""}${medien.logo ? LOGO_CSS : ""}
+${darstellungsCss}${ausdruck ? `\n${ausdruckVariablen(ausdruck, ds)}\n${BUEHNE_CSS}\n${ABFOLGE_CSS}\n${ATMOSPHAERE_CSS}\n${KARTE_CSS}` : ""}${passtDazu ? PASST_DAZU_CSS : ""}${apiUrl ? RECHTLICHES_CSS : ""}${medien.logo ? LOGO_CSS : ""}
 </style>
 </head>
 <body class="${bodyKlassen}">
@@ -407,11 +418,11 @@ ${ausdruck ? `${renderErsterBildschirm(ctx)}\n${renderEinladung(ctx)}` : renderH
 ${ausdruck ? "" : renderLeiste(ctx)}
 ${hauptteil}
 </main>
-${renderBestellweg({ ...(ausdruck ? { ...ctx, ds: { ...ds, layout: { ...ds.layout, primaerAktion: ausdruck.hauptaktion === "reservieren" ? "reservation" : "order" } } } : ctx), oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS, ...(konzept ? { abholHinweis: texte.kontakt.abholzeitBeispiel } : {}) })}
+${renderBestellweg({ ...(ausdruck ? { ...ctx, ds: { ...ds, layout: { ...ds.layout, primaerAktion: ausdruck.hauptaktion === "reservieren" ? "reservation" : "order" } } } : ctx), oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS, ...(konzept ? { abholHinweis: texte.kontakt.abholzeitBeispiel } : {}), ...(passtDazuHtml ? { passtDazu: passtDazuHtml } : {}) })}
 ${ausdruck ? renderFussAusdruck(ctx) : renderFuss(ctx)}
 <script>window.PAGE_DATA = ${pageData};</script>
 <script>${abholzeitSkript()}</script>
-<script>${seitenSkript()}</script>
+<script>${seitenSkript()}</script>${passtDazu ? `\n<script>${passtDazuSkript()}</script>` : ""}
 <script>${BEWEGUNG_SKRIPT}</script>
 ${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</script>\n<script>${ABFOLGE_SKRIPT}</script>\n` : ""}</body>
 </html>
@@ -435,7 +446,8 @@ ${ausdruck ? `<script>${BUEHNE_SKRIPT}</script>\n<script>${ATMOSPHAERE_SKRIPT}</
     const fontCssKarte = optionen.fontCss ?? schriftCss(familien, optionen.fontsDir ?? FONTS_DIR, unterPfad(optionen.fontsPfad ?? "../../assets/fonts"));
     const titelKarte = `${texte.speisekarte.titel} – ${texte.name}${konzept ? " – Konzept-Demo" : ""}`;
     const beschreibungKarte = `${texte.name}: ${texte.speisekarte.titel}. ${bestellung ? texte.speisekarte.intro : texte.speisekarte.introOhneBestellung}`;
-    const pageDataKarte = jsonForScript({ ...pageDataBasis, seite: "karte", ...(warenkorb ? { warenkorb } : {}) });
+    const passtDazuKarte = passtDazuFuer("karte");
+    const pageDataKarte = jsonForScript({ ...pageDataBasis, seite: "karte", ...(warenkorb ? { warenkorb } : {}), ...(passtDazuKarte ? { passtDazu: passtDazuKarte.daten } : {}) });
     const karteHtml = `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -458,7 +470,7 @@ ${darstellungsCss}
 ${ausdruckVariablen(ausdruck, ds)}
 ${BUEHNE_CSS}
 ${ABFOLGE_CSS}
-${KARTE_CSS}${medien.logo ? LOGO_CSS : ""}${apiUrl ? RECHTLICHES_CSS : ""}
+${KARTE_CSS}${passtDazuKarte ? PASST_DAZU_CSS : ""}${medien.logo ? LOGO_CSS : ""}${apiUrl ? RECHTLICHES_CSS : ""}
 </style>
 </head>
 <body class="${bodyKlassen} seite-karte">
@@ -466,11 +478,11 @@ ${renderKopfAusdruck({ ...ctxKarte, hinweis: optionen.veroeffentlicht || konzept
 <main id="inhalt">
 ${renderKarteSeite({ ...ctxKarte, karte, bilder: karteBilder, bestellbar: bestellung, probe: aktionen.modus !== "live" })}
 </main>
-${renderBestellweg({ ...ctxKarte, ds: { ...ds, layout: { ...ds.layout, primaerAktion: bestellung ? "order" : "reservation" } }, oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS, ...(konzept ? { abholHinweis: texte.kontakt.abholzeitBeispiel } : {}) })}
+${renderBestellweg({ ...ctxKarte, ds: { ...ds, layout: { ...ds.layout, primaerAktion: bestellung ? "order" : "reservation" } }, oeffnungszeiten: optionen.oeffnungszeiten ?? DEFAULT_OPENING_HOURS, ...(konzept ? { abholHinweis: texte.kontakt.abholzeitBeispiel } : {}), ...(passtDazuHtml ? { passtDazu: passtDazuHtml } : {}) })}
 ${renderFussAusdruck(ctxKarte)}
 <script>window.PAGE_DATA = ${pageDataKarte};</script>
 <script>${abholzeitSkript()}</script>
-<script>${seitenSkript()}</script>
+<script>${seitenSkript()}</script>${passtDazuKarte ? `\n<script>${passtDazuSkript()}</script>` : ""}
 <script>${BEWEGUNG_SKRIPT}</script>
 <script>${BUEHNE_SKRIPT}</script>
 <script>${ABFOLGE_SKRIPT}</script>
@@ -510,6 +522,7 @@ ${renderFussAusdruck(ctxKarte)}
               bestellbar: Object.keys(karte.katalog).length,
               bestellung: bestellung ? aktionen.modus : "aus",
               startseite: auswahl.map((g) => g.schluessel),
+              passtDazu: passtDazu ? { produkte: passtDazu.daten.produkte.length, muster: passtDazu.daten.muster, live: passtDazu.daten.live } : "aus",
             },
           }
         : {}),

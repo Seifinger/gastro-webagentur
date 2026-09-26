@@ -32,6 +32,7 @@ import {
   pruefeNoShowParameter,
 } from "./rechtstexte.js";
 import { QUELLEN as SEITENAUFRUF_QUELLEN } from "./seitenaufrufe.js";
+import { pruefeEmpfehlungsRegeln, regelnMitStandard, erkannteRolle, ROLLEN } from "./empfehlungen.js";
 
 // Datenhaltung eines Betriebs: Tischplan, Reservierungen, Bestellungen.
 // Eine JSON-Datei je Betrieb – das reicht für ein Haus mit ein paar Dutzend
@@ -655,11 +656,15 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
   for (const p of positionen) pruefeLaenge(p?.name, GAST_FELD_MAX.gericht, "Ein Gerichtname");
   const email = pruefeEmail(eingabe.email);
 
-  const sauber = positionen.map((p) => ({
-    name: String(p.name ?? "").trim(),
-    menge: Math.max(1, Math.min(99, Number(p.menge) || 1)),
-    preis: Number(p.preis) || 0,
-  }));
+  const sauber = positionen.map((p) => {
+    const menge = Math.max(1, Math.min(99, Number(p.menge) || 1));
+    return {
+      name: String(p.name ?? "").trim(),
+      menge,
+      preis: Number(p.preis) || 0,
+      ...empfohlenAngabe(p, menge),
+    };
+  });
 
   return aendere(slug, (daten) => {
     // Mit hinterlegter Bestellkarte (Kundenfassung, setzeBestellkarte) gilt
@@ -744,8 +749,21 @@ function pruefePositionenGegenKarte(karte, roh, sauber) {
     if (Math.round(Number(p.preis) * 100) !== Math.round(preis * 100)) {
       throw new Error(`Der Preis für „${name}“ hat sich geändert (jetzt ${preis.toFixed(2).replace(".", ",")} €). Bitte die Seite neu laden.`);
     }
-    return { id, name, menge: sauber[i].menge, preis };
+    const { menge, empfohlen, empfohlenMenge } = sauber[i];
+    return { id, name, menge, preis, ...(empfohlen ? { empfohlen, empfohlenMenge } : {}) };
   });
+}
+
+/**
+ * „Passt gut dazu“: Die Seite markiert eine Position, die der Gast über die
+ * Empfehlung in den Warenkorb gelegt hat (nur diese Angabe – kein Klickprofil).
+ * Gespeichert wird sie an der Position der Bestellung, für die aggregierte
+ * Auswertung im Wirt-Dashboard (empfehlungsStatistik).
+ */
+function empfohlenAngabe(p, menge) {
+  if (p?.empfohlen !== true) return {};
+  const anzahl = Math.floor(Number(p.empfohlenMenge));
+  return { empfohlen: true, empfohlenMenge: anzahl >= 1 ? Math.min(anzahl, menge) : menge };
 }
 
 /**
@@ -764,9 +782,123 @@ export function setzeBestellkarte(slug, karte) {
       if (!Array.isArray(eintrag) || !String(eintrag[0] ?? "").trim() || !(Number(eintrag[1]) >= 0)) throw new Error(`Ungültiger Karteneintrag "${id}".`);
       katalog[id] = [String(eintrag[0]), Math.round(Number(eintrag[1]) * 100) / 100];
     }
-    daten.bestellkarte = { katalog, version: String(karte.version ?? ""), quelle: String(karte.quelle ?? ""), gesetzt: uhrHook.jetzt().toISOString() };
+    daten.bestellkarte = {
+      katalog,
+      ...(Array.isArray(karte.produkte) ? { produkte: bestellkartenProdukte(karte.produkte, katalog) } : {}),
+      version: String(karte.version ?? ""),
+      quelle: String(karte.quelle ?? ""),
+      gesetzt: uhrHook.jetzt().toISOString(),
+    };
     return daten.bestellkarte;
   });
+}
+
+/**
+ * Produkte der Bestellkarte für „Passt gut dazu“ (Rolle, Kategorie,
+ * Varianten) – nur, was der Katalog kennt, Preise aus dem Katalog.
+ */
+function bestellkartenProdukte(liste, katalog) {
+  const text = (w, max) => String(w ?? "").slice(0, max);
+  return liste.slice(0, 500).flatMap((p) => {
+    const id = String(p?.id ?? "");
+    const varianten = (Array.isArray(p?.varianten) ? p.varianten : [])
+      .filter((v) => katalog[String(v?.id ?? "")])
+      .map((v) => ({ id: String(v.id), name: text(v.name, 60), preis: katalog[String(v.id)][1] }));
+    if (!varianten.length && !katalog[id]) return [];
+    if (!id || !String(p?.name ?? "").trim()) return [];
+    return [{
+      id,
+      name: text(p.name, 200),
+      kategorie: text(p.kategorie, 120),
+      ...(p.gruppe ? { gruppe: text(p.gruppe, 120) } : {}),
+      ...(ROLLEN.includes(p.rolle) ? { rolle: p.rolle } : {}),
+      preis: varianten.length ? Math.min(...varianten.map((v) => v.preis)) : katalog[id][1],
+      varianten,
+      ...(p.vegetarisch === true ? { vegetarisch: true } : {}),
+      ...(p.signatur === true ? { signatur: true } : {}),
+      ...(p.empfehlbar === false ? { empfehlbar: false } : {}),
+    }];
+  });
+}
+
+/* ---------- „Passt gut dazu“: Einstellungen des Wirts ---------- */
+
+/** Produkte, die der Wirt für Empfehlungen einstellen kann (aus der Bestellkarte). */
+export function empfehlungsProdukteDesBetriebs(daten) {
+  return daten.bestellkarte?.produkte ?? [];
+}
+
+/** Einstellungen mit Standardwerten: ohne Angaben sind Funktion und Standardregeln an. */
+export function empfehlungsEinstellungen(daten) {
+  return regelnMitStandard(daten.empfehlungen);
+}
+
+/**
+ * Speichert die Einstellungen aus dem Wirt-Dashboard. Geprüft gegen die
+ * Produkte der hinterlegten Karte – unbekannte Produkte werden abgelehnt.
+ */
+export function setzeEmpfehlungen(slug, eingabe = {}) {
+  return aendere(slug, (daten) => {
+    const regeln = pruefeEmpfehlungsRegeln(eingabe, empfehlungsProdukteDesBetriebs(daten));
+    daten.empfehlungen = { ...regeln, geaendertAm: uhrHook.jetzt().toISOString() };
+    return empfehlungsEinstellungen(daten);
+  });
+}
+
+/**
+ * Was die Seite des Restaurants braucht: die Einstellungen und – falls
+ * hinterlegt – den Katalog, gegen den beim Absenden geprüft wird. Nichts
+ * Personenbezogenes.
+ */
+export function oeffentlicheEmpfehlungen(daten) {
+  const r = empfehlungsEinstellungen(daten);
+  return {
+    regeln: r.aktiv ? r : { aktiv: false },
+    katalog: daten.bestellkarte?.katalog ?? null,
+  };
+}
+
+/** Erkannte Rolle eines Produkts der Bestellkarte (ohne Einstellung des Wirts). */
+export function erkannteProduktRolle(p) {
+  return ROLLEN.includes(p?.rolle) ? p.rolle : erkannteRolle(p);
+}
+
+/**
+ * Aggregierte Wirkung von „Passt gut dazu“: wie oft über die Empfehlung
+ * gewählte Produkte Teil abgeschickter Bestellungen waren und welchen
+ * Bestellwert sie hatten. Abgelehnte und stornierte Bestellungen zählen
+ * nicht. Keine Namen, keine Einzelbestellungen.
+ */
+export function empfehlungsStatistik(daten, { seit = null } = {}) {
+  const ab = seit ? new Date(seit).getTime() : -Infinity;
+  const zaehlend = (daten.bestellungen ?? []).filter((b) => !["abgelehnt", "storniert"].includes(b.status) && new Date(b.eingegangen).getTime() >= ab);
+  const jeProdukt = new Map();
+  let mitEmpfehlung = 0;
+  let stueck = 0;
+  let wert = 0;
+  for (const b of zaehlend) {
+    const empfohlen = (b.positionen ?? []).filter((p) => p.empfohlen === true);
+    if (!empfohlen.length) continue;
+    mitEmpfehlung += 1;
+    for (const p of empfohlen) {
+      const menge = Math.min(Number(p.empfohlenMenge) || Number(p.menge) || 0, Number(p.menge) || 0);
+      const betrag = menge * (Number(p.preis) || 0);
+      stueck += menge;
+      wert += betrag;
+      const eintrag = jeProdukt.get(p.name) ?? { name: p.name, stueck: 0, wert: 0 };
+      eintrag.stueck += menge;
+      eintrag.wert += betrag;
+      jeProdukt.set(p.name, eintrag);
+    }
+  }
+  const runde = (x) => Math.round(x * 100) / 100;
+  return {
+    bestellungen: zaehlend.length,
+    mitEmpfehlung,
+    stueck,
+    wert: runde(wert),
+    produkte: [...jeProdukt.values()].map((e) => ({ ...e, wert: runde(e.wert) })).sort((a, b) => b.wert - a.wert || a.name.localeCompare(b.name)).slice(0, 5),
+  };
 }
 
 /**

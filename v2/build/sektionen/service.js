@@ -112,7 +112,7 @@ export function renderKontakt({ texte, lead, oeffnungszeiten, tief }) {
  * welchen Öffnungszeiten gerechnet wird. Fest eingebaute Zeiten wären beim
  * ersten Aufruf schon veraltet.
  */
-export function renderBestellweg({ ds, texte, aktionen, oeffnungszeiten, abholHinweis = "", seite = "start" }) {
+export function renderBestellweg({ ds, texte, aktionen, oeffnungszeiten, abholHinweis = "", seite = "start", passtDazu = "" }) {
   const b = texte.bestellung;
   // Mit Speisekarten-Seite (aktionen.karte): Bei leerem Warenkorb führt der
   // Knopf auf der Startseite zur Karte (PAGE_DATA.karteUrl, data-leer); ohne
@@ -141,7 +141,7 @@ ${leiste}
     <button class="icon-btn" id="drawer-close" type="button" aria-label="${e(b.schliessen)}">×</button>
   </div>
   <div class="drawer-body">
-    <div id="cart-lines"></div>
+    <div id="cart-lines"></div>${passtDazu}
     <form id="order-form" novalidate>
       <div class="field-grid field-grid--eins">
         ${feld({ id: "ord-abholzeit", name: "abholzeit", label: b.abholzeit, pflicht: true, fehler: b.fehlerAbholzeit, optionen: `<option value="">${e(texte.reservierung.felder.bitteWaehlen)}</option>`, extra: abholzeitAttribute({ oeffnungszeiten }, e) })}${abholHinweis ? `\n        <p class="hint abholzeit-beispiel">${e(abholHinweis)}</p>` : ""}

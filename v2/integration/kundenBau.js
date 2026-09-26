@@ -25,6 +25,7 @@ import {
 } from "../../src/kundenProjekt.js";
 import { betriebExistiert, setzeBestellkarte, ladeBetrieb, speichereBetrieb, setzeGastKontakt } from "../../src/betriebStore.js";
 import { karteAusDaten } from "../build/speisekarte.js";
+import { empfehlungsProdukte } from "../../src/empfehlungen.js";
 import { menuForCuisine } from "../../src/menuCatalog.js";
 import { OUTPUT_DIR } from "../build/siteBuilder.js";
 
@@ -96,6 +97,14 @@ export function bestellkatalog(projekt) {
 }
 
 /**
+ * Produkte derselben Karte mit Kategorie und Rolle – damit der Wirt „Passt
+ * gut dazu“ im Dashboard steuern kann. Empfohlen wird nur Bestätigtes.
+ */
+export function bestellProdukte(projekt) {
+  return empfehlungsProdukte(karteAusDaten(karteFuerBau(projekt)), { nurBestaetigt: true });
+}
+
+/**
  * Übergibt Karte, Öffnungszeiten und Rückfragenummer an den verknüpften
  * Wirt-Betrieb. Nur solange die Kundenfassung noch nie live war – danach
  * gehört das zum Veröffentlichen, damit eine Vorschau nie den Bestellweg
@@ -105,7 +114,7 @@ export function synchronisiereBetrieb(projekt) {
   const slug = projekt.felder.betriebSlug?.wert;
   if (!slug || projekt.live) return { synchronisiert: false, grund: slug ? "Kundenfassung ist live – Übergabe erst beim Veröffentlichen." : "Kein Wirt-Betrieb verknüpft." };
   if (!betriebExistiert(slug)) return { synchronisiert: false, grund: `Wirt-Betrieb „${slug}“ gibt es auf diesem Rechner nicht.` };
-  setzeBestellkarte(slug, projekt.bestellung.aktiv ? { katalog: bestellkatalog(projekt), version: inhaltHash(projekt).slice(0, 16), quelle: `kunde:${projekt.id}` } : null);
+  setzeBestellkarte(slug, projekt.bestellung.aktiv ? { katalog: bestellkatalog(projekt), produkte: bestellProdukte(projekt), version: inhaltHash(projekt).slice(0, 16), quelle: `kunde:${projekt.id}` } : null);
   if (projekt.oeffnungszeiten.wert.length) {
     const daten = ladeBetrieb(slug);
     speichereBetrieb(slug, { ...daten, oeffnungszeiten: projekt.oeffnungszeiten.wert });

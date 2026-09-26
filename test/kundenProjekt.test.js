@@ -213,6 +213,28 @@ test("Speisekarte: stabile IDs; Name/Preis konsistent auf Startseite, Speisekart
   assert.equal(store.ladeBetrieb(BETRIEB).bestellkarte.katalog[g.id], undefined);
 });
 
+test("„Passt gut dazu“: Bau übergibt Produkte an den Wirt-Betrieb; Mustergerichte erst nach Bestätigung empfehlbar", async () => {
+  const p = neu();
+  aktion(p.id, { aktion: "feld", feld: "betriebSlug", wert: BETRIEB });
+  aktion(p.id, { aktion: "feld", feld: "apiUrl", wert: "http://127.0.0.1:3200" });
+  const projekt = kp.ladeProjekt(p.id);
+  const alle = projekt.speisekarte.kategorien.flatMap((k) => k.gerichte);
+  const dessert = alle.find((x) => x.name === "Tiramisù");
+  aktion(p.id, { aktion: "gerichtBestaetigen", id: dessert.id });
+  await baueKundenfassung(p.id);
+
+  const produkte = store.ladeBetrieb(BETRIEB).bestellkarte.produkte;
+  assert.deepEqual(produkte.map((x) => x.id).sort(), Object.keys(store.ladeBetrieb(BETRIEB).bestellkarte.katalog).sort(), "dieselbe Karte wie der Katalog");
+  assert.equal(produkte.find((x) => x.id === dessert.id).rolle, "dessert", "Rolle aus der Musterkarte übernommen");
+  assert.deepEqual(produkte.filter((x) => x.empfehlbar !== false).map((x) => x.name), ["Tiramisù"], "nur Bestätigtes");
+
+  const seite = readFileSync(path.join(KUNDEN_AUSGABE, p.id, "speisekarte", "index.html"), "utf-8");
+  const pd = JSON.parse(/window\.PAGE_DATA = (\{.*?\});<\/script>/s.exec(seite)[1]).passtDazu;
+  assert.equal(pd.muster, false);
+  assert.equal(pd.live, true);
+  assert.deepEqual(pd.produkte.filter((x) => x.empfehlbar !== false).map((x) => x.name), ["Tiramisù"]);
+});
+
 test("Bau: nur Kundenmedien, keine Konzept-/Stockbilder, keine Editor-Spuren, Logo und Texte in vorhandenen Plätzen", async () => {
   const p = neu();
   hochladen(p.id, "logo", png(400, 160));

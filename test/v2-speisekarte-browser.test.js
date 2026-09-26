@@ -92,7 +92,8 @@ test("Speisekarte im Browser: Plus, Hinzufügen, Seitenwechsel, Preisänderung, 
     await tab.goto(`${seite.url}${BASIS}/live/`, { waitUntil: "load" });
 
     // 1. Startseite: kein Hinzufügen-Knopf, das Plus öffnet das Gericht auf der Speisekarte.
-    assert.equal(await tab.locator("[data-add]").count(), 0);
+    // (Die beiden Plätze von „Passt gut dazu“ im Warenkorb zählen nicht – empfehlungen-browser.test.js.)
+    assert.equal(await tab.locator("main [data-add]").count(), 0);
     const plus = tab.locator("#karte a.mini-add").first();
     const ziel = await plus.getAttribute("href");
     assert.equal(ziel, "speisekarte/index.html#gericht-margherita");

@@ -248,6 +248,8 @@ export function karteAlsProjekt(menu, { herkunft = "muster" } = {}) {
       id: neueKategorieId(),
       name: String(k.name ?? ""),
       beschreibung: String(k.beschreibung ?? ""),
+      // Optionale Rolle für „Passt gut dazu“ (src/empfehlungen.js) – nur, wo die Karte sie trägt.
+      ...(k.empfehlungsrolle ? { empfehlungsrolle: String(k.empfehlungsrolle) } : {}),
       gerichte: [...(k.gerichte ?? []), ...(k.gruppen ?? []).flatMap((g) => g.gerichte ?? [])].map((g) => ({
         id: neueGerichtId(),
         name: String(g.name ?? ""),
@@ -257,6 +259,7 @@ export function karteAlsProjekt(menu, { herkunft = "muster" } = {}) {
         extras: (g.extras ?? []).map((x) => ({ name: String(x.name), ...(Number.isFinite(Number(x.preis)) && x.preis !== undefined ? { preis: Number(x.preis) } : {}) })),
         vegetarisch: Boolean(g.vegetarisch),
         signatur: Boolean(g.signatur),
+        ...(g.empfehlungsrolle ? { empfehlungsrolle: String(g.empfehlungsrolle) } : {}),
         verfuegbar: true,
         sichtbar: true,
         allergene: "",
@@ -486,6 +489,7 @@ export function karteFuerBau(projekt) {
       .map((k) => ({
         name: k.name,
         beschreibung: k.beschreibung,
+        ...(k.empfehlungsrolle ? { empfehlungsrolle: k.empfehlungsrolle } : {}),
         gerichte: k.gerichte.map((g) => ({
           // Die Projekt-ID ist die öffentliche, stabile Kennung (Anker, Warenkorb, Server).
           id: g.id,
@@ -498,6 +502,11 @@ export function karteFuerBau(projekt) {
           vegetarisch: g.vegetarisch,
           signatur: g.signatur,
           ...(g.allergene ? { allergene: g.allergene } : {}),
+          ...(g.empfehlungsrolle ? { empfehlungsrolle: g.empfehlungsrolle } : {}),
+          // Für „Passt gut dazu“: Empfohlen wird nur, was der Kunde bestätigt hat –
+          // nie ein Mustergericht, nie ein unbestätigtes Bild.
+          bestaetigt: g.status === "bestaetigt",
+          bildBestaetigt: projekt.medien[`gericht:${g.id}`]?.status === "bestaetigt",
           ...(g.verfuegbar === false ? { ausverkauft: true } : {}),
           ...(g.sichtbar === false ? { aktiv: false } : {}),
           // Nur Gerichte mit eigenem Bild kommen als Bildkachel in Frage.
