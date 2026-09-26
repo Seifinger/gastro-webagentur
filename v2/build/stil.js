@@ -56,7 +56,7 @@ section[id] { scroll-margin-top: var(--s-10); }
 
 /* Kleine Marken: das einzige, was rund sein darf */
 .marke-klein { display: inline-block; vertical-align: middle; font-family: var(--f-text); font-size: var(--t-klein); font-weight: var(--f-text-stark);
-  line-height: 1.3; color: var(--text-leise); border: 1px solid var(--linie-stark); border-radius: var(--r-marke); padding: 0 var(--s-1); }
+  line-height: 1.3; color: var(--text-leise); border: 1px solid var(--linie-stark); border-radius: var(--r-marke); padding: 0 var(--s-1); white-space: nowrap; }
 .marke-klein--signal { color: var(--signal-text); border-color: var(--signal-text); }
 .marke { width: 1.6em; height: 1.6em; flex: none; vertical-align: -.4em; margin-right: var(--s-1); }
 .ikon { width: 1.25em; height: 1.25em; flex: none; }
@@ -193,7 +193,9 @@ figure { position: relative; }
 .leseliste-zeilen li { padding-block: var(--s-3); border-bottom: 1px solid var(--linie); }
 .leseliste-zeilen li:first-child { border-top: 1px solid var(--linie); }
 .zeile-kopf { display: flex; align-items: baseline; gap: var(--s-2); min-width: 0; }
-.zeile-kopf .karten-name, .zeile-kopf h3 { min-width: 0; overflow-wrap: anywhere; }
+/* Name und Schild ("vegetarisch") fließen gemeinsam: Wird es eng, rutscht das
+   Schild als Ganzes in die nächste Zeile – der Name bricht nie mitten im Wort. */
+.zeile-kopf .karten-name, .zeile-kopf h3 { min-width: 0; overflow-wrap: break-word; hyphens: auto; }
 .tafel-kategorie > *, .karte-liste > *, .karte-spalten > *, .leseliste > *, .treppe > *, .haus-raster > *, .stimmen > *, .reservierung-raster > *, .kontakt-raster > * { min-width: 0; }
 .zeile-kopf h3 { font-size: var(--t-gross); }
 

@@ -142,7 +142,7 @@ section[id] { scroll-margin-top: var(--s-10); }
 
 /* Kleine Marken: das einzige, was rund sein darf */
 .marke-klein { display: inline-block; vertical-align: middle; font-family: var(--f-text); font-size: var(--t-klein); font-weight: var(--f-text-stark);
-  line-height: 1.3; color: var(--text-leise); border: 1px solid var(--linie-stark); border-radius: var(--r-marke); padding: 0 var(--s-1); }
+  line-height: 1.3; color: var(--text-leise); border: 1px solid var(--linie-stark); border-radius: var(--r-marke); padding: 0 var(--s-1); white-space: nowrap; }
 .marke-klein--signal { color: var(--signal-text); border-color: var(--signal-text); }
 .marke { width: 1.6em; height: 1.6em; flex: none; vertical-align: -.4em; margin-right: var(--s-1); }
 .ikon { width: 1.25em; height: 1.25em; flex: none; }
@@ -279,7 +279,9 @@ figure { position: relative; }
 .leseliste-zeilen li { padding-block: var(--s-3); border-bottom: 1px solid var(--linie); }
 .leseliste-zeilen li:first-child { border-top: 1px solid var(--linie); }
 .zeile-kopf { display: flex; align-items: baseline; gap: var(--s-2); min-width: 0; }
-.zeile-kopf .karten-name, .zeile-kopf h3 { min-width: 0; overflow-wrap: anywhere; }
+/* Name und Schild ("vegetarisch") fließen gemeinsam: Wird es eng, rutscht das
+   Schild als Ganzes in die nächste Zeile – der Name bricht nie mitten im Wort. */
+.zeile-kopf .karten-name, .zeile-kopf h3 { min-width: 0; overflow-wrap: break-word; hyphens: auto; }
 .tafel-kategorie > *, .karte-liste > *, .karte-spalten > *, .leseliste > *, .treppe > *, .haus-raster > *, .stimmen > *, .reservierung-raster > *, .kontakt-raster > * { min-width: 0; }
 .zeile-kopf h3 { font-size: var(--t-gross); }
 
@@ -838,6 +840,25 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   .karte-gerichte { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: calc(var(--rinne) * 2); }
 }
 
+/* „Passt gut dazu“: ruhig, unter den gewählten Positionen, vor dem Absenden */
+.passt-dazu { margin: var(--s-3) 0 var(--s-4); }
+.passt-dazu[hidden], .passt-dazu-produkt[hidden], .passt-dazu [hidden] { display: none; }
+.passt-dazu-titel { font-family: var(--f-text); font-size: var(--t-basis); font-weight: var(--f-text-stark); text-transform: none; letter-spacing: 0; }
+.passt-dazu-muster { margin-top: var(--s-halb); }
+.passt-dazu-liste { list-style: none; margin: var(--s-1) 0 0; padding: 0; display: grid; gap: var(--s-1); }
+.passt-dazu-produkt { display: flex; gap: var(--s-2); align-items: flex-start; padding: var(--s-2); background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--r-karte); }
+.passt-dazu-bild { width: var(--s-8); height: var(--s-8); flex: none; object-fit: cover; border-radius: var(--r-bild); background: var(--flaeche-tief); }
+.passt-dazu-text { flex: 1; min-width: 0; display: grid; gap: var(--s-halb); }
+.passt-dazu-name { font-weight: var(--f-text-stark); overflow-wrap: anywhere; }
+.passt-dazu-beschreibung { font-size: var(--t-klein); color: var(--text-leise); overflow-wrap: anywhere; }
+.passt-dazu-aktion { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1); margin-top: var(--s-halb); }
+.passt-dazu-variante { flex: 1 1 100%; min-height: var(--s-5); }
+.passt-dazu-preis { margin-right: auto; font-variant-numeric: tabular-nums; }
+.passt-dazu-add { flex: none; }
+.passt-dazu-status { margin-top: var(--s-1); font-size: var(--t-klein); color: var(--text-leise); }
+.passt-dazu-status:empty { display: none; }
+.passt-dazu-status:focus { outline: none; }
+
 </style>
 </head>
 <body class="a-hell schema-hell rubrik-mono moment-highlights ausdruck-editorial">
@@ -906,19 +927,19 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     </header>
     <div class="auswahl-raster">
       <ul class="karten-liste auswahl-liste"><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Frühstück Klassik</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">11,50 €</span><a class="mini-add" href="speisekarte/index.html#gericht-fruehstueck-klassik" aria-label="Frühstück Klassik auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
+          <div class="zeile-kopf"><span class="karten-name">Frühstück Klassik <span class="marke-klein">vegetarisch</span></span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">11,50 €</span><a class="mini-add" href="speisekarte/index.html#gericht-fruehstueck-klassik" aria-label="Frühstück Klassik auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Semmeln, Butter, Marmelade, Ei, Aufschnitt</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Apfelkuchen mit Sahne</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">5,50 €</span><a class="mini-add" href="speisekarte/index.html#gericht-apfelkuchen-mit-sahne" aria-label="Apfelkuchen mit Sahne auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
+          <div class="zeile-kopf"><span class="karten-name">Apfelkuchen mit Sahne <span class="marke-klein">vegetarisch</span></span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">5,50 €</span><a class="mini-add" href="speisekarte/index.html#gericht-apfelkuchen-mit-sahne" aria-label="Apfelkuchen mit Sahne auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Nach Omas Rezept gebacken</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Cappuccino</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">3,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-cappuccino" aria-label="Cappuccino auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
+          <div class="zeile-kopf"><span class="karten-name">Cappuccino <span class="marke-klein">vegetarisch</span></span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">3,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-cappuccino" aria-label="Cappuccino auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Aus regional gerösteten Bohnen</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Pancakes mit Ahornsirup</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">9,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-pancakes-mit-ahornsirup" aria-label="Pancakes mit Ahornsirup auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
+          <div class="zeile-kopf"><span class="karten-name">Pancakes mit Ahornsirup <span class="marke-klein">vegetarisch</span></span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">9,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-pancakes-mit-ahornsirup" aria-label="Pancakes mit Ahornsirup auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Mit frischer Banane und Puderzucker</p>
         </li><li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">Käsesahnetorte</span> <span class="marke-klein">vegetarisch</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">5,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-kaesesahnetorte" aria-label="Käsesahnetorte auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
+          <div class="zeile-kopf"><span class="karten-name">Käsesahnetorte <span class="marke-klein">vegetarisch</span></span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">5,90 €</span><a class="mini-add" href="speisekarte/index.html#gericht-kaesesahnetorte" aria-label="Käsesahnetorte auf der Speisekarte ansehen"><svg class="ikon ikon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 4.6v14.8"/><path d="M4.6 12h14.8"/></svg></a></div>
           <p class="gericht-desc">Luftig-frisch</p>
         </li></ul>
       <nav class="auswahl-karte" aria-label="Kategorien der Speisekarte">
@@ -1013,6 +1034,35 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   </div>
   <div class="drawer-body">
     <div id="cart-lines"></div>
+    <div class="passt-dazu" id="passt-dazu" role="group" aria-labelledby="passt-dazu-titel" hidden>
+      <h4 class="passt-dazu-titel" id="passt-dazu-titel">Passt gut dazu</h4>
+      <p class="hint passt-dazu-muster">Vorschau mit Beispielgerichten – auf der fertigen Website stehen hier bestätigte Produkte des Restaurants.</p>
+      <ul class="passt-dazu-liste">
+      <li class="passt-dazu-produkt" data-passt-slot hidden>
+        <div class="passt-dazu-text">
+          <p class="passt-dazu-name"><span data-passt="name"></span> <span class="marke-klein" data-passt="muster">Muster</span></p>
+          <p class="passt-dazu-beschreibung" data-passt="beschreibung"></p>
+          <div class="passt-dazu-aktion">
+            <select class="passt-dazu-variante" data-passt="variante" aria-label="Auswahl" hidden></select>
+            <span class="passt-dazu-preis" data-passt="preis"></span>
+            <button class="btn btn-ghost btn-klein passt-dazu-add" type="button" data-add="" data-name="" data-preis="0">Hinzufügen</button>
+          </div>
+        </div>
+      </li>
+      <li class="passt-dazu-produkt" data-passt-slot hidden>
+        <div class="passt-dazu-text">
+          <p class="passt-dazu-name"><span data-passt="name"></span> <span class="marke-klein" data-passt="muster">Muster</span></p>
+          <p class="passt-dazu-beschreibung" data-passt="beschreibung"></p>
+          <div class="passt-dazu-aktion">
+            <select class="passt-dazu-variante" data-passt="variante" aria-label="Auswahl" hidden></select>
+            <span class="passt-dazu-preis" data-passt="preis"></span>
+            <button class="btn btn-ghost btn-klein passt-dazu-add" type="button" data-add="" data-name="" data-preis="0">Hinzufügen</button>
+          </div>
+        </div>
+      </li>
+      </ul>
+    </div>
+    <p class="passt-dazu-status" id="passt-dazu-status" role="status" aria-live="polite" tabindex="-1"></p>
     <form id="order-form" novalidate>
       <div class="field-grid field-grid--eins">
         <div class="field">
@@ -1082,7 +1132,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     <p class="fuss-hinweis">Unverbindlicher Gestaltungsentwurf. Was als Platzhalter gekennzeichnet ist – Gerichte, Preise, Öffnungszeiten, Angaben zu Herkunft und Geschichte des Hauses –, ist ein Vorschlag und noch nicht vom Haus bestätigt. Fotos stammen aus einer Bilddatenbank oder sind KI-generiert und entsprechend markiert.</p>
   </div>
 </footer>
-<script>window.PAGE_DATA = {"name":"Café Morgenrot","kontaktEmail":"","apiUrl":"","seite":"start","karteUrl":"speisekarte/index.html","warenkorb":{"schluessel":"dd303902c3ba","karte":{"fruehstueck-klassik":["Frühstück Klassik",11.5],"pancakes-mit-ahornsirup":["Pancakes mit Ahornsirup",9.9],"lachs-bowl":["Lachs-Bowl",13.9],"apfelkuchen-mit-sahne":["Apfelkuchen mit Sahne",5.5],"kaesesahnetorte":["Käsesahnetorte",5.9],"schokoladenkuchen":["Schokoladenkuchen",5.5],"cappuccino":["Cappuccino",3.9],"heisse-schokolade":["Heiße Schokolade",4.5],"frisch-gepresster-orangensaft":["Frisch gepresster Orangensaft",4.9]}}};</script>
+<script>window.PAGE_DATA = {"name":"Café Morgenrot","kontaktEmail":"","apiUrl":"","seite":"start","karteUrl":"speisekarte/index.html","warenkorb":{"schluessel":"dd303902c3ba","karte":{"fruehstueck-klassik":["Frühstück Klassik",11.5],"pancakes-mit-ahornsirup":["Pancakes mit Ahornsirup",9.9],"lachs-bowl":["Lachs-Bowl",13.9],"apfelkuchen-mit-sahne":["Apfelkuchen mit Sahne",5.5],"kaesesahnetorte":["Käsesahnetorte",5.9],"schokoladenkuchen":["Schokoladenkuchen",5.5],"cappuccino":["Cappuccino",3.9],"heisse-schokolade":["Heiße Schokolade",4.5],"frisch-gepresster-orangensaft":["Frisch gepresster Orangensaft",4.9]}},"passtDazu":{"muster":true,"live":false,"produkte":[{"id":"fruehstueck-klassik","name":"Frühstück Klassik","beschreibung":"Semmeln, Butter, Marmelade, Ei, Aufschnitt","preis":11.5,"kategorie":"Frühstück","rolle":"hauptgericht","varianten":[],"vegetarisch":true,"bild":{"src":"https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&h=600&fit=crop&crop=entropy&q=72&fm=jpg","alt":"Frühstück Klassik"}},{"id":"pancakes-mit-ahornsirup","name":"Pancakes mit Ahornsirup","beschreibung":"Mit frischer Banane und Puderzucker","preis":9.9,"kategorie":"Frühstück","rolle":"hauptgericht","varianten":[],"vegetarisch":true,"bild":{"src":"https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=600&fit=crop&crop=entropy&q=72&fm=jpg","alt":"Pancakes mit Ahornsirup"}},{"id":"lachs-bowl","name":"Lachs-Bowl","beschreibung":"Mit Ei, Avocado, Gurke und frischem Gemüse","preis":13.9,"kategorie":"Frühstück","rolle":"hauptgericht","varianten":[],"bild":{"src":"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=600&fit=crop&crop=entropy&q=72&fm=jpg","alt":"Lachs-Bowl"}},{"id":"apfelkuchen-mit-sahne","name":"Apfelkuchen mit Sahne","beschreibung":"Nach Omas Rezept gebacken","preis":5.5,"kategorie":"Kuchen & Torten","rolle":"dessert","varianten":[],"vegetarisch":true},{"id":"kaesesahnetorte","name":"Käsesahnetorte","beschreibung":"Luftig-frisch","preis":5.9,"kategorie":"Kuchen & Torten","rolle":"dessert","varianten":[],"vegetarisch":true},{"id":"schokoladenkuchen","name":"Schokoladenkuchen","beschreibung":"Saftig, mit Zartbitterschokolade","preis":5.5,"kategorie":"Kuchen & Torten","rolle":"dessert","varianten":[],"vegetarisch":true},{"id":"cappuccino","name":"Cappuccino","beschreibung":"Aus regional gerösteten Bohnen","preis":3.9,"kategorie":"Kaffee & Getränke","rolle":"getraenk","varianten":[],"vegetarisch":true,"bild":{"src":"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop&crop=entropy&q=72&fm=jpg","alt":"Cappuccino"}},{"id":"heisse-schokolade","name":"Heiße Schokolade","beschreibung":"Mit Sahnehaube","preis":4.5,"kategorie":"Kaffee & Getränke","rolle":"getraenk","varianten":[],"vegetarisch":true},{"id":"frisch-gepresster-orangensaft","name":"Frisch gepresster Orangensaft","beschreibung":"0,3 l","preis":4.9,"kategorie":"Kaffee & Getränke","rolle":"getraenk","varianten":[],"vegetarisch":true}],"texte":{"hinzufuegen":"Hinzufügen","hinzugefuegt":"liegt jetzt im Warenkorb.","variante":"Auswahl"}}};</script>
 <script>window.Abholzeiten = (function abholzeitKern() {
   var MINUTE = 60000;
   var ASAP_VORLAUF_MINUTEN = 20;
@@ -2189,6 +2239,525 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     stelleWarenkorbWiederHer();
     renderCart();
   });
+})();
+</script>
+<script>window.Empfehlungen = (function empfehlungsKern() {
+  var ROLLEN = ["vorspeise", "salat", "beilage", "hauptgericht", "dessert", "getraenk"];
+  var ROLLEN_ANZEIGE = {
+    vorspeise: "Vorspeise",
+    salat: "Salat",
+    beilage: "Beilage",
+    hauptgericht: "Hauptgericht",
+    dessert: "Dessert",
+    getraenk: "Getränk"
+  };
+  var PLATZ = { vorspeise: "ergaenzung", salat: "ergaenzung", beilage: "ergaenzung", dessert: "dessert", getraenk: "getraenk" };
+  var PLAETZE = ["ergaenzung", "dessert", "getraenk"];
+  var MAX = 2;
+
+  // Wortanfänge nach Normalisierung (klein, ä→ae, ohne Akzente). Längere
+  // Stämme dürfen auch mitten im Wort stehen („Blattsalate“, „Heißgetränke“).
+  // "=" heißt: nur das ganze Wort („Eis“, aber nicht „Eisbein“; „Bier“, aber
+  // nicht „Biergarten“).
+  var STICHWORTE = {
+    getraenk: ["getraenk", "drink", "=wein", "=weine", "rotwein", "weisswein", "=bier", "=biere", "fassbier", "flaschenbier", "softdrink", "limonade", "=limo", "=saft", "saefte", "schorle", "kaffee", "espresso", "=tee", "cocktail", "spirituose", "aperitif", "aperitivo", "digestif", "wasser", "bevande", "=vini", "birre", "alkoholfrei"],
+    dessert: ["dessert", "nachspeise", "nachtisch", "suess", "dolci", "dolce", "kuchen", "torten", "=eis", "eisbecher", "gelato", "sweets", "patisserie"],
+    salat: ["salat", "insalat", "salad"],
+    beilage: ["beilage", "contorn", "sides"],
+    vorspeise: ["vorspeise", "antipast", "mezze", "=meze", "starter", "anfangen", "vorweg", "kleinigkeit", "appetizer", "tapas", "=dim", "suppe", "zuppa"],
+    hauptgericht: ["hauptgericht", "hauptspeise", "hauptgang", "pizza", "pizze", "pasta", "nudel", "grill", "=wok", "curry", "sushi", "=maki", "ramen", "=pho", "bowl", "burger", "schnitzel", "braten", "fleisch", "fisch", "tandoor", "biryani", "=ente", "spiess", "doener", "fruehstueck", "secondi", "primi", "=banh", "pinsa", "flammkuchen", "steak", "gyros", "kebab", "spezialitaet", "tagesgericht", "mittagstisch"]
+  };
+  // Reihenfolge der Prüfung: Innerhalb des Platzes „ergaenzung“ gewinnt die erste.
+  var PRUEFREIHENFOLGE = ["getraenk", "dessert", "hauptgericht", "vorspeise", "salat", "beilage"];
+
+  function normiere(text) {
+    var t = String(text == null ? "" : text).toLowerCase()
+      .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss");
+    if (t.normalize) t = t.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    return t;
+  }
+
+  function gueltigeRolle(r) {
+    return ROLLEN.indexOf(r) !== -1 ? r : null;
+  }
+
+  function trifft(woerter, stichwort) {
+    var ganz = stichwort.charAt(0) === "=";
+    if (ganz) stichwort = stichwort.slice(1);
+    for (var i = 0; i < woerter.length; i += 1) {
+      var w = woerter[i];
+      if (ganz) { if (w === stichwort) return true; continue; }
+      if (w.indexOf(stichwort) === 0) return true;
+      if (stichwort.length >= 5 && w.indexOf(stichwort) !== -1) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Rolle aus einem Kategorie- oder Gruppennamen. null, wenn nichts passt
+   * oder der Name zu zwei verschiedenen Plätzen passt („Pasta & Dolci“).
+   */
+  function rolleAusName(name) {
+    var woerter = normiere(name).split(/[^a-z0-9]+/).filter(Boolean);
+    if (!woerter.length) return null;
+    var gefunden = [];
+    for (var i = 0; i < PRUEFREIHENFOLGE.length; i += 1) {
+      var rolle = PRUEFREIHENFOLGE[i];
+      var liste = STICHWORTE[rolle];
+      for (var j = 0; j < liste.length; j += 1) {
+        if (trifft(woerter, liste[j])) { gefunden.push(rolle); break; }
+      }
+    }
+    if (!gefunden.length) return null;
+    var platz = PLATZ[gefunden[0]] || gefunden[0];
+    for (var k = 1; k < gefunden.length; k += 1) {
+      if ((PLATZ[gefunden[k]] || gefunden[k]) !== platz) return null;
+    }
+    // Innerhalb von „ergaenzung“: Vorspeise vor Salat vor Beilage.
+    if (platz === "ergaenzung") {
+      var ordnung = ["vorspeise", "salat", "beilage"];
+      for (var m = 0; m < ordnung.length; m += 1) if (gefunden.indexOf(ordnung[m]) !== -1) return ordnung[m];
+    }
+    return gefunden[0];
+  }
+
+  /** Rolle eines Gerichts ohne Einstellung des Wirts. */
+  function erkannteRolle(g) {
+    return gueltigeRolle(g && g.empfehlungsrolle) ||
+      gueltigeRolle(g && g.gruppenRolle) ||
+      gueltigeRolle(g && g.kategorieRolle) ||
+      (g && g.gruppe ? rolleAusName(g.gruppe) : null) ||
+      rolleAusName(g && g.kategorie);
+  }
+
+  // Empfohlen wird nur, was einen echten Preis hat (0 € ist meist ein leeres Preisfeld).
+  function preisOk(p) {
+    return typeof p === "number" && isFinite(p) && p > 0;
+  }
+
+  function cent(p) {
+    return Math.round(Number(p) * 100);
+  }
+
+  function liste(x) {
+    return Array.isArray(x) ? x : [];
+  }
+
+  /** Regeln mit Standardwerten: ohne Einstellungen gelten die Standardregeln. */
+  function regelnMitStandard(r) {
+    r = r || {};
+    return {
+      aktiv: r.aktiv !== false,
+      standard: r.standard !== false,
+      ausgeschlossen: liste(r.ausgeschlossen),
+      priorisiert: liste(r.priorisiert),
+      mehrfach: liste(r.mehrfach),
+      rollen: r.rollen && typeof r.rollen === "object" ? r.rollen : {},
+      kombinationen: liste(r.kombinationen)
+    };
+  }
+
+  /**
+   * Wählt höchstens zwei Ergänzungen.
+   *
+   * e.produkte   – [{ id, name, preis, rolle?, kategorie, gruppe?, varianten: [{ id, preis }],
+   *                   vegetarisch?, signatur?, empfehlbar? }] in Reihenfolge der Karte; nur
+   *                   bestellbare. empfehlbar: false zählt im Korb mit, wird aber nie vorgeschlagen.
+   * e.warenkorb  – [{ id, menge }] mit Warenkorb-Kennungen (Gericht oder Variante)
+   * e.regeln     – Einstellungen des Wirts (fehlend = Standard)
+   * e.bestellbar – optional { id: preis } bzw. { id: [name, preis] }: was der
+   *                Betriebsserver annimmt; ohne Angabe gilt die Karte der Seite
+   * Ergebnis: [{ id, grund: "kombination"|"bevorzugt"|"standard", platz, varianten: [ids] }]
+   */
+  function waehle(e) {
+    var regeln = regelnMitStandard(e && e.regeln);
+    if (!regeln.aktiv) return [];
+    var max = Math.min(MAX, Math.max(0, Number(e.max) || MAX));
+    var bestellbar = e.bestellbar || null;
+
+    var produkte = liste(e.produkte);
+    var nachId = {};
+    var zuGericht = {};
+    produkte.forEach(function (p) {
+      if (!p || typeof p.id !== "string" || nachId[p.id]) return;
+      nachId[p.id] = p;
+      zuGericht[p.id] = p.id;
+      liste(p.varianten).forEach(function (v) { if (v && typeof v.id === "string") zuGericht[v.id] = p.id; });
+    });
+
+    function rolle(p) {
+      if (Object.prototype.hasOwnProperty.call(regeln.rollen, p.id)) {
+        var r = regeln.rollen[p.id];
+        return r === "keine" ? null : gueltigeRolle(r) || erkannteRolle(p);
+      }
+      return gueltigeRolle(p.rolle) || erkannteRolle(p);
+    }
+
+    function serverPreis(id) {
+      if (!bestellbar) return null;
+      var eintrag = bestellbar[id];
+      if (eintrag === undefined) return undefined;
+      return Array.isArray(eintrag) ? eintrag[1] : eintrag;
+    }
+
+    /** Bestellbare Kennungen eines Produkts (Gericht oder seine Varianten). */
+    function bestellbareIds(p) {
+      var varianten = liste(p.varianten);
+      var kandidaten = varianten.length ? varianten : [{ id: p.id, preis: p.preis }];
+      return kandidaten.filter(function (v) {
+        if (!v || typeof v.id !== "string" || !preisOk(v.preis)) return false;
+        if (!bestellbar) return true;
+        var s = serverPreis(v.id);
+        return s !== undefined && s !== null && cent(s) === cent(v.preis);
+      }).map(function (v) { return v.id; });
+    }
+
+    // Was liegt im Korb?
+    var imKorb = {};
+    var reihenfolgeKorb = [];
+    liste(e.warenkorb).forEach(function (zeile) {
+      if (!zeile || !(Number(zeile.menge) > 0)) return;
+      var gid = zuGericht[String(zeile.id)];
+      if (!gid || imKorb[gid]) return;
+      imKorb[gid] = true;
+      reihenfolgeKorb.push(nachId[gid]);
+    });
+    if (!reihenfolgeKorb.length) return [];
+
+    var rollenImKorb = {};
+    var nurVegetarisch = true;
+    var speisen = 0;
+    reihenfolgeKorb.forEach(function (p) {
+      var r = rolle(p);
+      if (r) rollenImKorb[r] = (rollenImKorb[r] || []).concat([p.id]);
+      if (r !== "getraenk") {
+        speisen += 1;
+        if (p.vegetarisch !== true) nurVegetarisch = false;
+      }
+    });
+    var vegetarischZuerst = speisen > 0 && nurVegetarisch;
+    var hatHaupt = Boolean(rollenImKorb.hauptgericht);
+
+    function belegt(platz, ohne) {
+      for (var r in rollenImKorb) {
+        if (!Object.prototype.hasOwnProperty.call(rollenImKorb, r)) continue;
+        if ((PLATZ[r] || r) !== platz) continue;
+        var andere = rollenImKorb[r].filter(function (id) { return id !== ohne; });
+        if (andere.length) return true;
+      }
+      return false;
+    }
+
+    /** Offen nach den Standardregeln (für Standard und bevorzugte Produkte). */
+    function offen(platz, ohne) {
+      if (platz === "getraenk") return !belegt("getraenk", ohne);
+      if (platz === "ergaenzung" || platz === "dessert") return hatHaupt && !belegt(platz, ohne);
+      return false;
+    }
+
+    function zulaessig(p) {
+      if (!p || p.empfehlbar === false) return false;
+      if (regeln.ausgeschlossen.indexOf(p.id) !== -1) return false;
+      if (imKorb[p.id] && regeln.mehrfach.indexOf(p.id) === -1) return false;
+      if (rolle(p) === "hauptgericht" && hatHaupt) return false;
+      return bestellbareIds(p).length > 0;
+    }
+
+    var gewaehlt = [];
+    var plaetze = {};
+    function nimm(p, grund) {
+      if (gewaehlt.length >= max) return;
+      for (var i = 0; i < gewaehlt.length; i += 1) if (gewaehlt[i].id === p.id) return;
+      var r = rolle(p);
+      var platz = r ? PLATZ[r] || r : "eigen:" + p.id;
+      if (plaetze[platz]) return;
+      plaetze[platz] = true;
+      gewaehlt.push({ id: p.id, grund: grund, platz: platz, rolle: r, varianten: bestellbareIds(p) });
+    }
+
+    // 1. Kombinationen des Wirts: Auslöser im Korb → genannte Produkte, in
+    //    genannter Reihenfolge; ein ausverkauftes fällt still auf das nächste.
+    regeln.kombinationen.forEach(function (k) {
+      if (!k || typeof k.zu !== "string") return;
+      var ausgeloest = reihenfolgeKorb.some(function (p) {
+        if (k.zu.indexOf("kat:") === 0) return p.kategorie === k.zu.slice(4);
+        if (k.zu.indexOf("rolle:") === 0) return rolle(p) === k.zu.slice(6);
+        return p.id === k.zu;
+      });
+      if (!ausgeloest) return;
+      liste(k.produkte).forEach(function (id) {
+        var p = nachId[id];
+        if (!zulaessig(p)) return;
+        var r = rolle(p);
+        // Liegt vom selben Platz schon etwas im Korb, ist die Ergänzung erledigt.
+        if (r && PLATZ[r] && belegt(PLATZ[r], p.id)) return;
+        nimm(p, "kombination");
+      });
+    });
+
+    // 2. Bevorzugte Produkte – wenn ihr Platz nach den Standardregeln offen ist.
+    regeln.priorisiert.forEach(function (id) {
+      var p = nachId[id];
+      if (!zulaessig(p)) return;
+      var r = rolle(p);
+      if (!r || !PLATZ[r] || !offen(PLATZ[r], p.id)) return;
+      nimm(p, "bevorzugt");
+    });
+
+    // 3. Standardregeln: je offenem Platz das erste passende Produkt der Karte.
+    if (regeln.standard) {
+      PLAETZE.forEach(function (platz) {
+        if (plaetze[platz] || gewaehlt.length >= max) return;
+        var passend = produkte.filter(function (p) {
+          if (!nachId[p.id] || nachId[p.id] !== p) return false;
+          var r = rolle(p);
+          return r && PLATZ[r] === platz && offen(platz, p.id) && zulaessig(p);
+        });
+        passend = passend.map(function (p, i) { return { p: p, i: i }; });
+        passend.sort(function (a, b) {
+          if (vegetarischZuerst) {
+            var va = a.p.vegetarisch === true ? 0 : 1;
+            var vb = b.p.vegetarisch === true ? 0 : 1;
+            if (va !== vb) return va - vb;
+          }
+          var sa = a.p.signatur === true ? 0 : 1;
+          var sb = b.p.signatur === true ? 0 : 1;
+          if (sa !== sb) return sa - sb;
+          return a.i - b.i;
+        });
+        if (passend.length) nimm(passend[0].p, "standard");
+      });
+    }
+
+    return gewaehlt;
+  }
+
+  return {
+    ROLLEN: ROLLEN,
+    ROLLEN_ANZEIGE: ROLLEN_ANZEIGE,
+    PLATZ: PLATZ,
+    MAX: MAX,
+    normiere: normiere,
+    rolleAusName: rolleAusName,
+    erkannteRolle: erkannteRolle,
+    regelnMitStandard: regelnMitStandard,
+    waehle: waehle
+  };
+})();
+
+(function () {
+  var data = window.PAGE_DATA || {};
+  var pd = data.passtDazu;
+  var E = window.Empfehlungen;
+  var box = document.getElementById("passt-dazu");
+  var meldung = document.getElementById("passt-dazu-status");
+  if (!pd || !E || !box || !data.warenkorb) return;
+
+  var plaetze = box.querySelectorAll("[data-passt-slot]");
+  var produkte = pd.produkte || [];
+  var nachId = {};
+  produkte.forEach(function (p) { nachId[p.id] = p; });
+  // Ohne Betriebsserver gelten die Standardregeln; mit ihm erst dessen Einstellungen.
+  var regeln = pd.live ? null : {};
+  var serverKarte = null;
+  var geladenUm = 0;
+  var angezeigt = "";
+  var gerade = "";
+  var KORB = "warenkorb:" + data.warenkorb.schluessel;
+  var MARKEN = "passt-dazu:" + data.warenkorb.schluessel;
+
+  function euro(wert) { return wert.toFixed(2).replace(".", ",") + " \u20AC"; }
+  function lies(schluessel) {
+    try { return JSON.parse(window.sessionStorage.getItem(schluessel) || "null"); } catch (e) { return undefined; }
+  }
+  function schreibe(schluessel, wert) {
+    try { window.sessionStorage.setItem(schluessel, JSON.stringify(wert)); } catch (e) { /* ohne Speicher keine Markierung */ }
+  }
+  /** Der Warenkorb, wie PAGE_SCRIPT ihn zuletzt gespeichert hat – oder null. */
+  function warenkorb() {
+    var k = lies(KORB);
+    if (k === undefined) return null;
+    return Array.isArray(k) ? k : [];
+  }
+  /** { Warenkorb-Kennung: Menge vor dem Hinzufügen über „Passt gut dazu“ } */
+  function marken() {
+    var m = lies(MARKEN);
+    return m && typeof m === "object" && !Array.isArray(m) ? m : {};
+  }
+  function feld(platz, name) { return platz.querySelector('[data-passt="' + name + '"]'); }
+
+  function setzeAuswahl(platz, p, v) {
+    var knopf = platz.querySelector("[data-add]");
+    var id = v ? v.id : p.id;
+    var name = v ? p.name + " (" + v.name + ")" : p.name;
+    var preis = v ? v.preis : p.preis;
+    knopf.setAttribute("data-add", id);
+    knopf.setAttribute("data-name", name);
+    knopf.setAttribute("data-preis", String(preis));
+    knopf.setAttribute("aria-label", name + ", " + euro(preis) + ": " + pd.texte.hinzufuegen);
+    feld(platz, "preis").textContent = euro(preis);
+  }
+
+  function fuelle(liste) {
+    Array.prototype.forEach.call(plaetze, function (platz, i) {
+      var eintrag = liste[i];
+      if (!eintrag) { platz.hidden = true; return; }
+      var p = nachId[eintrag.id];
+      var varianten = (p.varianten || []).filter(function (v) { return eintrag.varianten.indexOf(v.id) !== -1; });
+      feld(platz, "name").textContent = varianten.length === 1 ? p.name + " (" + varianten[0].name + ")" : p.name;
+      var text = feld(platz, "beschreibung");
+      text.textContent = p.beschreibung || "";
+      text.hidden = !p.beschreibung;
+
+      var bild = platz.querySelector(".passt-dazu-bild");
+      if (p.bild) {
+        if (!bild) {
+          bild = document.createElement("img");
+          bild.className = "passt-dazu-bild";
+          bild.width = 64;
+          bild.height = 64;
+          bild.loading = "lazy";
+          bild.decoding = "async";
+          // Lädt ein Bild nicht, fällt es weg statt als kaputtes Symbol zu stehen.
+          bild.onerror = function () { if (bild.parentNode) bild.parentNode.removeChild(bild); };
+          platz.insertBefore(bild, platz.firstChild);
+        }
+        bild.src = p.bild.src;
+        bild.alt = p.bild.alt || "";
+      } else if (bild) {
+        bild.parentNode.removeChild(bild);
+      }
+
+      var wahl = feld(platz, "variante");
+      wahl.innerHTML = "";
+      if (varianten.length > 1) {
+        varianten.forEach(function (v) {
+          var o = document.createElement("option");
+          o.value = v.id;
+          o.textContent = v.name + " \u2013 " + euro(v.preis);
+          wahl.appendChild(o);
+        });
+        wahl.setAttribute("aria-label", pd.texte.variante + ": " + p.name);
+        wahl.hidden = false;
+        wahl.onchange = function () {
+          for (var j = 0; j < varianten.length; j += 1) if (varianten[j].id === wahl.value) setzeAuswahl(platz, p, varianten[j]);
+        };
+      } else {
+        wahl.hidden = true;
+        wahl.onchange = null;
+      }
+      setzeAuswahl(platz, p, varianten[0] || null);
+      platz.hidden = false;
+    });
+  }
+
+  function zeige() {
+    var korb = warenkorb();
+    if (!korb || !regeln) { box.hidden = true; angezeigt = ""; return; }
+    // Markierungen gelten nur für Positionen, die noch im Warenkorb liegen.
+    var m = marken();
+    var bleibt = {};
+    var geaendert = false;
+    var imKorb = {};
+    korb.forEach(function (z) { if (z && typeof z.id === "string") imKorb[z.id] = true; });
+    for (var id in m) {
+      if (!Object.prototype.hasOwnProperty.call(m, id)) continue;
+      if (imKorb[id]) bleibt[id] = m[id];
+      else geaendert = true;
+    }
+    if (geaendert) schreibe(MARKEN, bleibt);
+
+    var liste = E.waehle({ produkte: produkte, warenkorb: korb, regeln: regeln, bestellbar: serverKarte, max: 2 });
+    if (!liste.length) { box.hidden = true; angezeigt = ""; return; }
+    var stand = liste.map(function (x) { return x.id + ":" + x.varianten.join(","); }).join("|");
+    if (stand !== angezeigt) { fuelle(liste); angezeigt = stand; }
+    box.hidden = false;
+  }
+
+  function ladeRegeln() {
+    if (!pd.live || !data.apiUrl || Date.now() - geladenUm < 60000) return;
+    geladenUm = Date.now();
+    fetch(data.apiUrl + "/oeffentlich/empfehlungen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    })
+      .then(function (antwort) { return antwort.json(); })
+      .then(function (ergebnis) {
+        if (!ergebnis || !ergebnis.ok) return;
+        regeln = ergebnis.regeln || {};
+        serverKarte = ergebnis.katalog || null;
+        angezeigt = "";
+        zeige();
+      })
+      .catch(function () {
+        // Ohne Antwort des Betriebs keine Empfehlung – bestellen geht trotzdem.
+        geladenUm = 0;
+      });
+  }
+
+  Array.prototype.forEach.call(plaetze, function (platz) {
+    var knopf = platz.querySelector("[data-add]");
+    // Läuft vor dem Hinzufügen durch PAGE_SCRIPT (früher registriert).
+    knopf.addEventListener("click", function () {
+      var id = knopf.getAttribute("data-add");
+      if (!id) return;
+      var korb = warenkorb() || [];
+      var vorher = 0;
+      korb.forEach(function (z) { if (z && z.id === id) vorher = Number(z.menge) || 0; });
+      var m = marken();
+      if (!Object.prototype.hasOwnProperty.call(m, id)) m[id] = vorher;
+      schreibe(MARKEN, m);
+      gerade = knopf.getAttribute("data-name");
+    });
+  });
+
+  // Jede Änderung am Warenkorb schreibt PAGE_SCRIPT neu in #cart-lines.
+  var zeilen = document.getElementById("cart-lines");
+  if (zeilen && "MutationObserver" in window) {
+    new MutationObserver(function () {
+      zeige();
+      if (gerade) {
+        meldung.textContent = gerade + " " + pd.texte.hinzugefuegt;
+        gerade = "";
+        // Der Knopf zeigt jetzt etwas anderes (oder ist weg): Fokus nicht verlieren.
+        meldung.focus();
+      } else {
+        meldung.textContent = "";
+      }
+    }).observe(zeilen, { childList: true });
+  }
+  var drawer = document.getElementById("drawer");
+  if (drawer && "MutationObserver" in window) {
+    new MutationObserver(function () { if (drawer.classList.contains("open")) ladeRegeln(); })
+      .observe(drawer, { attributes: true, attributeFilter: ["class"] });
+  }
+
+  // Markierung „empfohlen“ an der Bestellung: nur an der einen Anfrage, die
+  // PAGE_SCRIPT beim Absenden an den eigenen Betriebsserver schickt.
+  if (data.apiUrl && typeof window.fetch === "function") {
+    var senden = window.fetch;
+    var ziel = data.apiUrl + "/oeffentlich/bestellung";
+    window.fetch = function (url, init) {
+      try {
+        if (url === ziel && init && typeof init.body === "string") {
+          var m = marken();
+          var nutzlast = JSON.parse(init.body);
+          if (nutzlast && Array.isArray(nutzlast.positionen)) {
+            nutzlast.positionen.forEach(function (p) {
+              if (!p || !Object.prototype.hasOwnProperty.call(m, p.id)) return;
+              var dazu = (Number(p.menge) || 0) - (Number(m[p.id]) || 0);
+              if (dazu > 0) { p.empfohlen = true; p.empfohlenMenge = dazu; }
+            });
+            init = Object.assign({}, init, { body: JSON.stringify(nutzlast) });
+          }
+        }
+      } catch (e) { /* im Zweifel unverändert senden */ }
+      return senden.call(window, url, init);
+    };
+  }
+
+  ladeRegeln();
 })();
 </script>
 <script>

@@ -51,7 +51,7 @@ function preisText(g) {
 export function renderAuswahl({ ds, texte, karte, auswahl, aktionen }) {
   const t = texte.speisekarte;
   const zeile = (g) => `<li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">${e(g.name)}</span>${veg(g, texte)}<span class="menue-punkte" aria-hidden="true"></span><span class="preis">${preisText(g)}</span><a class="mini-add" href="${e(gerichtLink(g))}" aria-label="${e(g.name)} ${e(t.zumGericht)}">${plus()}</a></div>
+          <div class="zeile-kopf"><span class="karten-name">${e(g.name)}${veg(g, texte)}</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">${preisText(g)}</span><a class="mini-add" href="${e(gerichtLink(g))}" aria-label="${e(g.name)} ${e(t.zumGericht)}">${plus()}</a></div>
           ${g.beschreibung ? `<p class="gericht-desc">${e(g.beschreibung)}</p>` : ""}
         </li>`;
   const kategorien = karte.kategorien

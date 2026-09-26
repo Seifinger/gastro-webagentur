@@ -138,7 +138,7 @@ test("Kategorien kommen aus den Daten: italienische Betriebskarte mit Pizza/Past
   // Ohne Fotos in der Karte: kein Bild, kein leerer Bildrahmen
   assert.ok(!k.includes(`<figure class="karte-kategorie-bild">`));
   // Signatur-Gericht steht in der Auswahl der Startseite (mit "ab"-Preis)
-  assert.match(html, /<span class="karten-name">Margherita<\/span>.*?<span class="preis">ab 8,50 €<\/span>/s);
+  assert.match(html, /<span class="karten-name">Margherita(?: <span class="marke-klein">vegetarisch<\/span>)?<\/span>.*?<span class="preis">ab 8,50 €<\/span>/s);
   assert.equal(lint(k).ok, true);
 });
 

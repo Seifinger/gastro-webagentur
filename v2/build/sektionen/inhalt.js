@@ -85,7 +85,7 @@ export function renderHighlights({ ds, texte, highlights, medien, cuisine, beton
 
 function kartenZeile(g, texte) {
   return `<li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">${e(g.name)}</span>${veg(g, texte)}<span class="menue-punkte" aria-hidden="true"></span><span class="preis">${formatPrice(g.preis)}</span>${hinzufuegen(g, texte, { klein: true })}</div>
+          <div class="zeile-kopf"><span class="karten-name">${e(g.name)}${veg(g, texte)}</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">${formatPrice(g.preis)}</span>${hinzufuegen(g, texte, { klein: true })}</div>
           ${g.beschreibung ? `<p class="gericht-desc">${e(g.beschreibung)}</p>` : ""}
         </li>`;
 }
