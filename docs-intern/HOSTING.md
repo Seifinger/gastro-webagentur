@@ -2,6 +2,8 @@
 
 **Stand:** 24.09.2026. Die Preise stammen aus Suchergebnissen und sind vor der Buchung auf der Anbieterseite zu prüfen.
 
+**Nur das Agentur-Dashboard.** Die Wirt-App eines Pilotbetriebs ist eine eigene Fly-App mit eigenem Volume: `docs-intern/PILOT-BETRIEB.md`.
+
 GitHub Pages liefert nur die **fiktiven Beispielseiten** aus (`main:/docs`); Konzept-Demos echter Betriebe werden seit 25.09.2026 nicht mehr veröffentlicht (`src/oeffentlichkeit.js`, README „Was öffentlich ist“). Das Dashboard ist ein Node-Server mit Dateispeicher (`data/`), Git-Push und API-Schlüsseln. Es braucht einen eigenen Host, auf dem es serverseitig geschützt läuft.
 
 ## Architekturvergleich

@@ -3,7 +3,7 @@
 **Stand:** 25.09.2026. Gehört zu `SECURITY-AUDIT.md` und `DATENFLUSS.md`.
 **Achtung:** Diese Liste ist keine Rechtsberatung. Ein vorhandenes Impressum oder eine Checkbox ist noch keine rechtliche Freigabe.
 
-**Launch-Blocker** sind mit ⛔ markiert. Die Prüfliste im Wirt-Dashboard (Reiter „Rechtstexte“ → Launch) zeigt einen Teil davon live an.
+**Launch-Blocker** sind mit ⛔ markiert. Für den Fly-Piloten mit einem Restaurant: Launch-Gate und Schritt-für-Schritt-Anleitung in `docs-intern/PILOT-BETRIEB.md`. Die Prüfliste im Wirt-Dashboard (Reiter „Rechtstexte“ → Launch) zeigt einen Teil davon live an.
 
 ## A. Technisch überprüfbar – nach dem Einrichten des Hosts dort wiederholen
 
@@ -16,7 +16,7 @@
 | ⛔ | Hinter einem Proxy: `VERTRAUTER_PROXY` passend gesetzt (`1` für Caddy/nginx auf demselben Rechner, `fly` auf Fly) | Zwei Geräte in verschiedenen Netzen reservieren nacheinander, beide ohne 429. Eine selbst gesetzte `X-Forwarded-For`-Zeile ändert nichts |
 | ⛔ | Interne Routen von außen gesperrt | Ohne Anmeldung: `/`, `/api/betrieb`, `/api/statistik`, `/intern/wartezeit` → 401. Mit Anmeldung von fremder Seite (`Origin: https://example.org`) → 403 |
 | ⛔ | Gastseite → Reservierung und Bestellung kommen an (Testbetrieb, synthetische Daten), Statusseite lädt | im Browser auf dem Handy |
-| ⛔ | Sicherung eingerichtet und **Wiederherstellung einmal geprobt** | `npm run sicherung -- erstellen --ziel <ort>`, dann `npm run sicherung -- pruefen <datei>` → „Wiederherstellungsprobe bestanden“; Archiv verschlüsselt an einen zweiten Ort (z. B. `age`/`gpg`), Zeitplan (cron/Host-Snapshots) |
+| ⛔ | Sicherung eingerichtet und **Wiederherstellung einmal geprobt** | Wirt-App auf Fly: `fly ssh console -C "wirt-befehl sicherung erstellen"`, dann `… sicherung probe` → „✅ Wiederherstellungsprobe“; verschlüsselt (AES-256-GCM) nach R2, täglich 03:30, 30 Tage/mindestens 7 (`docs-intern/PILOT-BETRIEB.md`, Abschnitt 5). Lokal ohne Host weiterhin `npm run sicherung` |
 | | Betriebsdatei nur für den Server-Benutzer lesbar | `ls -l data/betrieb` → `-rw-------` |
 | | Dashboard (Agentur) online nur mit Anmeldung | `https://<dashboard>/api/leads` → 401; 11. falsches Passwort → 429 |
 | | Dashboard-Host ohne Schreib-Token für GitHub (O-05) | `fly secrets list` |
@@ -87,7 +87,7 @@
 
 ## Was ich nicht prüfen konnte
 
-- **Hosting:** Keine echte Hosting-Umgebung, kein Deploy, kein TLS, keine Proxy-Konfiguration. Alle Prüfungen in Teil A sind nach dem Einrichten dort zu wiederholen.
+- **Hosting:** Keine echte Hosting-Umgebung, kein Deploy, kein TLS, keine Proxy-Konfiguration. Lokal geprüft sind Container, Browser-E2E mit laufender Wirt-App, Neustart, Sicherung und Wiederherstellung (Stand 26.09.2026, `docs-intern/PILOT-BETRIEB.md`). Alle Prüfungen in Teil A sind nach dem Einrichten auf dem Host zu wiederholen.
 - **Google-Schlüssel:** Ob er noch gültig ist oder schon missbraucht wurde, habe ich bewusst nicht gegen Google getestet.
 - **Mail-Dienst:** Echter Versand über Resend nur mit deinen Zugangsdaten; in den Tests läuft ein Mock.
 - **Rechtliches:** Rechtliche Wirksamkeit von Texten, Fristen und Abläufen (Teil D).

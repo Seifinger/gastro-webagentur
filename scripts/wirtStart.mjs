@@ -104,7 +104,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(im
   if (env.TELEGRAM_BOT_TOKEN) {
     try {
       const { starteDienst } = await import("../v2/integration/telegramBot.js");
-      stopTelegram = starteDienst();
+      // Nur dieser eine Betrieb – auch wenn auf dem Volume weitere Dateien lägen.
+      stopTelegram = starteDienst({ betriebe: () => [slug] });
       console.log(`🤖 Telegram-Bot läuft im selben Prozess (${stopTelegram.abrufe.join(", ") || "kein Abruf"}).`);
     } catch (e) {
       console.error(`⚠️  Telegram nicht gestartet: ${e.message}`);

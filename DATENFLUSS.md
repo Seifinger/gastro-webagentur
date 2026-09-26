@@ -15,6 +15,8 @@
 | Resonanz-Sammler | `npm run resonanz` (`src/resonanzServer.js`) | Standard `127.0.0.1:3300` | Aufrufzähler veröffentlichter Entwürfe (derzeit ohne veröffentlichte Lead-Demos kaum genutzt) | nur existierende Entwürfe, Bremse, keine Adresse auf der Platte |
 | Öffentliche Beispielseiten | `npm run publish-site` → `docs/` → GitHub Pages | `seifinger.github.io/gastro-webagentur` | fiktive Beispielseiten der Agentur | statisch; Prüfung `src/oeffentlichkeit.js` verhindert Lead-Demos |
 | Kundenseite (später) | `baueKundenfassung` → `v2/output/kunden/<id>/` | noch nicht veröffentlicht | Website des Restaurants | Veröffentlichen ist nicht implementiert (`veroeffentlichungsPlan`) |
+| Kundenseite (Pilot) | `npm run kunde -- paket` → `v2/output/pakete/<id>/site/` | statischer Host, z. B. Cloudflare Pages (**noch nicht eingerichtet**) | Website eines Pilotbetriebs | nur freigegebene Fassung; `_headers` mit CSP (`connect-src` nur Wirt-App), HSTS, `nosniff` |
+| Wirt-App (Pilot) | `node scripts/wirtStart.mjs` im Container (`deploy/wirt/Dockerfile`, `fly.wirt.toml`) – eigene Fly-App, **nicht** die des Agentur-Dashboards | `0.0.0.0:8080` hinter dem Fly-Proxy (HTTPS) | wie Wirt-Server, dazu Telegram und tägliche Sicherung im selben Prozess; Daten nur auf dem Volume `/data` | wie Wirt-Server; Pflicht-Secrets sonst kein Start; CORS nur `WIRT_ERLAUBTE_ORIGINS` + eigene Adresse (`docs-intern/PILOT-BETRIEB.md`) |
 
 ## 2. Datenarten und wo sie liegen
 
@@ -38,6 +40,7 @@
 | Seitenaufruf-Zähler | nein | `data/seitenaufrufe/` | Wirt | ignoriert | – |
 | Dashboard-Sitzungen, Bremsen, Fehlversuche | IP-Adressen | **nur Arbeitsspeicher** | – | – | Neustart / Zeitfenster; höchstens 10 000 Adressen je Bremse |
 | Sicherungen | alles oben | `data/sicherung/*.tar.gz` (0600) oder `--ziel` | wer das Archiv hat | ignoriert | manuell |
+| Externe Sicherungen der Wirt-App (Pilot) | alle Wirt-Daten oben | S3-kompatibler Speicher (Vorschlag Cloudflare R2), **verschlüsselt** mit `BACKUP_SCHLUESSEL` (nur beim Betreiber) | wer Speicher **und** Schlüssel hat | – | 30 Tage, mindestens die neuesten 7 |
 
 ## 3. Wege zu Dritten
 
@@ -50,6 +53,8 @@
 | Web-Push-Dienste (Google FCM, Mozilla, Apple) | verschlüsselte Nachricht mit Gastname/Termin an das Wirt-Gerät | neue Anfrage | `VAPID_*` | USA |
 | GitHub (Repo, Pages) | Code, fiktive Beispielseiten | `git push`, `publish-site` | – | USA; **Repo öffentlich** |
 | Fly.io (Dashboard-Host, wenn eingerichtet) | alle Dashboard-Daten auf dem Volume | Betrieb | `fly.toml` | USA-Firma, Region `fra` |
+| Fly.io (Wirt-App des Pilotbetriebs, eigene App) | alle Gastdaten des Betriebs auf dem Volume | Betrieb | `fly.wirt.toml` | USA-Firma, Region `fra` |
+| Cloudflare (Pages, R2) | Pages: IP-Adressen der Seitenbesucher; R2: nur verschlüsselte Sicherungen | Seitenaufruf bzw. tägliche Sicherung | Pages-Projekt, `BACKUP_S3_*` | USA-Firma, R2-Standort EU wählbar |
 | Unsplash | IP-Adresse der Besucher der **öffentlichen Beispielseiten** (Bilder werden direkt von images.unsplash.com geladen) | Seitenaufruf | – | USA (Befund O-03). Kundenfassungen laden keine Unsplash-Bilder (Test in `test/kundenProjekt.test.js`) |
 | Google Maps | nur ein Link, kein eingebettetes Element | Klick des Besuchers | – | – |
 
@@ -59,7 +64,7 @@ Schriften sind lokal eingebunden, auf den Seiten gibt es keine Tracker und keine
 
 1. Der Gast füllt das Formular auf der Restaurantseite aus: Name, Telefon, optional E-Mail, Wunsch bzw. Karte. Er bestätigt die freigegebenen Rechtstexte, sofern welche vorhanden sind.
 2. Der Browser schickt einen `POST` an `https://<wirt-server>/oeffentlich/reservierung` bzw. `/bestellung`.
-   - **CORS:** `*`
+   - **CORS:** ohne `WIRT_ERLAUBTE_ORIGINS` `*`; mit Liste nur diese Adressen und die eigene Adresse der Wirt-App (Statusseite), fremde Seiten 403
    - **Bremse:** 20 schreibende Anfragen je Adresse und Minute; hinter einem Proxy gilt die Adresse nur mit `VERTRAUTER_PROXY`.
 3. Der Server prüft:
    - Pflichtfelder und Feldlängen

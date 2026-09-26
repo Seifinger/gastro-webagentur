@@ -1,11 +1,9 @@
 import { test, after } from "node:test";
 import assert from "node:assert/strict";
-import { createServer } from "node:http";
+import { starte, freierPort, resendAttrappe, telegramAttrappe, warteBis, starteWirtApp, cli, IMAGE } from "./hilfen/prozesse.js";
 import { chmodSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { spawn } from "node:child_process";
-import { fileURLToPath } from "node:url";
 import { randomBytes } from "node:crypto";
 
 // Pilot-Probelauf Ende zu Ende mit ECHT laufenden Prozessen (Chromium; ohne
@@ -24,8 +22,6 @@ import { randomBytes } from "node:crypto";
 // (…@example.com) sind synthetisch. Die Uhr der Wirt-App steht über
 // test/hilfen/uhrVorlauf.mjs auf demselben Startzeitpunkt wie der Browser.
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO = path.join(__dirname, "..");
 const SLUG = "pilot-e2e";
 const PASSWORT = `probe-${randomBytes(9).toString("hex")}`;
 const STATUS_GEHEIMNIS = randomBytes(36).toString("base64");
@@ -55,18 +51,6 @@ const minuten = (hhmm) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5
 const START_MIN = minuten(berlin(START, { hour: "2-digit", minute: "2-digit" }));
 const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
-function starte(h) {
-  const server = createServer(h);
-  return new Promise((fertig) => server.listen(0, "127.0.0.1", () => fertig({ server, url: `http://127.0.0.1:${server.address().port}`, port: server.address().port })));
-}
-
-async function freierPort() {
-  const s = await starte((q, a) => a.end());
-  const { port } = s;
-  await new Promise((r) => s.server.close(r));
-  return port;
-}
-
 const TYPEN = { ".html": "text/html; charset=utf-8", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".woff2": "font/woff2", ".css": "text/css", ".js": "text/javascript", ".json": "application/json", ".svg": "image/svg+xml" };
 
 /** Statischer Host wie Cloudflare Pages: Dateien aus site/ und die Köpfe aus _headers. */
@@ -90,128 +74,6 @@ function statischerHost(site) {
   };
 }
 
-/** Test-Empfänger statt Resend: nimmt Mails an, verschickt nichts. */
-function resendAttrappe(mails) {
-  return async (req, res) => {
-    let body = "";
-    for await (const c of req) body += c;
-    mails.push({ pfad: req.url, auth: req.headers.authorization, ...JSON.parse(body || "{}") });
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ id: `lokal-${mails.length}` }));
-  };
-}
-
-/** Test-Bot-Server statt api.telegram.org: Long Polling, gesendete Nachrichten, Knopf-Quittungen. */
-function telegramAttrappe() {
-  const gesendet = [];
-  const warteschlange = [];
-  let naechsteId = 1;
-  let messageId = 100;
-  const handler = async (req, res) => {
-    let body = "";
-    for await (const c of req) body += c;
-    const daten = JSON.parse(body || "{}");
-    const m = /^\/bot([^/]+)\/(\w+)$/.exec(new URL(req.url, "http://x").pathname);
-    const antwort = (result) => {
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ ok: true, result }));
-    };
-    if (!m || m[1] !== TG_TOKEN) {
-      res.writeHead(401, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ ok: false, error_code: 401, description: "Unauthorized" }));
-      return;
-    }
-    if (m[2] === "getUpdates") {
-      for (let i = 0; i < 20 && !warteschlange.length; i += 1) await new Promise((r) => setTimeout(r, 50));
-      antwort(warteschlange.splice(0));
-      return;
-    }
-    messageId += 1;
-    gesendet.push({ methode: m[2], ...daten, message_id: messageId });
-    antwort(m[2] === "answerCallbackQuery" ? true : { message_id: messageId, chat: { id: daten.chat_id } });
-  };
-  return {
-    handler,
-    gesendet,
-    schicke: (update) => warteschlange.push({ update_id: naechsteId++, ...update }),
-  };
-}
-
-async function warteBis(fn, { ms = 15_000, was = "Bedingung" } = {}) {
-  const ende = Date.now() + ms;
-  for (;;) {
-    const r = await fn();
-    if (r) return r;
-    if (Date.now() > ende) throw new Error(`Zeitüberschreitung: ${was}`);
-    await new Promise((x) => setTimeout(x, 100));
-  }
-}
-
-// Optional gegen das gebaute Image statt gegen den Node-Prozess des Checkouts:
-//   PILOT_E2E_IMAGE=gastro-wirt:<commit> node --test test/pilot-e2e.test.js
-// (Image aus deploy/wirt/lokal-test.sh bzw. docker build -f deploy/wirt/Dockerfile .)
-const IMAGE = process.env.PILOT_E2E_IMAGE ?? "";
-const UHR = path.join(REPO, "test", "hilfen", "uhrVorlauf.mjs");
-
-/**
- * Startet die Wirt-App als eigenen Prozess – wie im Container
- * (node scripts/wirtStart.mjs) oder, mit PILOT_E2E_IMAGE, als Container
- * mit eingehängten Ordnern (Volume, Sicherungsziel).
- */
-async function starteWirtApp(env, log, { mounts = [] } = {}) {
-  const name = `pilot-e2e-${env.WIRT_PORT}-${Date.now()}`;
-  const kind = IMAGE
-    ? spawn("docker", [
-        "run", "--rm", "--init", "--name", name, "--network", "host",
-        ...mounts.flatMap(([host, ziel]) => ["-v", `${host}:${ziel}`]),
-        "-v", `${UHR}:/app/test/hilfen/uhrVorlauf.mjs:ro`,
-        ...Object.entries({ ...env, NODE_OPTIONS: "--import=/app/test/hilfen/uhrVorlauf.mjs" }).flatMap(([k, v]) => ["-e", `${k}=${v}`]),
-        IMAGE,
-      ], { stdio: ["ignore", "pipe", "pipe"] })
-    : spawn(process.execPath, ["--import", UHR, path.join(REPO, "scripts", "wirtStart.mjs")], {
-        cwd: REPO,
-        env: { PATH: process.env.PATH, ...env },
-        stdio: ["ignore", "pipe", "pipe"],
-      });
-  kind.stdout.on("data", (d) => log.push(String(d)));
-  kind.stderr.on("data", (d) => log.push(String(d)));
-  const basis = env.WIRT_OEFFENTLICHE_URL;
-  await warteBis(async () => {
-    if (kind.exitCode !== null) throw new Error(`Wirt-App beendet (Exit ${kind.exitCode}):\n${log.join("")}`);
-    try {
-      return (await fetch(`${basis}/gesund`)).ok;
-    } catch {
-      return false;
-    }
-  }, { ms: IMAGE ? 40_000 : 15_000, was: "Wirt-App bereit" });
-  return {
-    env,
-    name,
-    stop: async () => {
-      if (kind.exitCode !== null) return kind.exitCode;
-      const ende = new Promise((r) => kind.once("exit", (code) => r(code)));
-      kind.kill("SIGTERM");
-      return ende;
-    },
-  };
-}
-
-/** CLI-Aufruf im Umfeld der laufenden App (auf Fly: fly ssh console -C "node scripts/…"). */
-function cli(app, skript, args, log, extra = {}) {
-  return new Promise((fertig) => {
-    const kind = IMAGE
-      ? spawn("docker", ["exec", "--user", "node", ...Object.entries(extra).flatMap(([k, v]) => ["-e", `${k}=${v}`]), app.name, "node", `scripts/${skript}`, ...args])
-      : spawn(process.execPath, [path.join(REPO, "scripts", skript), ...args], { cwd: REPO, env: { PATH: process.env.PATH, ...app.env, ...extra } });
-    let aus = "";
-    kind.stdout.on("data", (d) => (aus += d));
-    kind.stderr.on("data", (d) => (aus += d));
-    kind.on("exit", (code) => {
-      log.push(aus);
-      fertig({ code, aus });
-    });
-  });
-}
-
 const text = (loc) => loc.evaluate((el) => el.innerText.replace(/\s+/g, " ").trim());
 
 test("Pilot-Probelauf: Paket → statischer Host → Bestellung/Reservierung → Dashboard, Mail, Telegram → Neustart → Sicherung und Wiederherstellung", { timeout: 300_000 }, async (t) => {
@@ -223,7 +85,7 @@ test("Pilot-Probelauf: Paket → statischer Host → Bestellung/Reservierung →
   }
   const log = [];
   const mails = [];
-  const tg = telegramAttrappe();
+  const tg = telegramAttrappe(TG_TOKEN);
   const resend = await starte(resendAttrappe(mails));
   const telegram = await starte(tg.handler);
   const wirtPort = await freierPort();
@@ -337,6 +199,24 @@ test("Pilot-Probelauf: Paket → statischer Host → Bestellung/Reservierung →
     assert.match(await gast.title(), /Trattoria Probelauf/);
     assert.equal(await gast.locator("text=Platzhalter").count(), 0);
     assert.ok(await gast.evaluate(() => [...document.fonts].some((f) => f.status === "loaded")), "lokale Schriften geladen");
+
+    // Handy: eigenes Hochformat-Bild, kein seitliches Scrollen.
+    const handy = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: "reduce", locale: "de-DE" });
+    const ht = await handy.newPage();
+    const bilder = [];
+    ht.on("requestfinished", (r) => bilder.push(new URL(r.url()).pathname));
+    await ht.goto(`${SEITE}/`, { waitUntil: "networkidle" });
+    assert.ok(bilder.includes("/medien/heroMobil.png"), bilder.filter((b) => b.startsWith("/medien/")).join());
+    assert.ok(await ht.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "kein seitlicher Überlauf");
+    await handy.close();
+
+    // Rechtstexte kommen live von der Wirt-App (dort freigegeben), nicht aus dem Paket.
+    const rechtslinks = await gast.locator('a[href*="/rechtstexte/"]').evaluateAll((els) => [...new Set(els.map((a) => a.href))]);
+    assert.ok(rechtslinks.length >= 2, rechtslinks.join());
+    for (const link of rechtslinks) {
+      assert.ok(link.startsWith(`${WIRT}/rechtstexte/`), link);
+      assert.equal((await fetch(link)).status, 200, link);
+    }
 
     await gast.goto(`${SEITE}/speisekarte/`, { waitUntil: "networkidle" });
     await gast.locator(`[data-preis-fuer="${TIRAMISU}"].preis--aktion, #gericht-${TIRAMISU} .preis--aktion`).first().waitFor();
@@ -487,10 +367,23 @@ test("Pilot-Probelauf: Paket → statischer Host → Bestellung/Reservierung →
     await gast.goto(`${SEITE}/speisekarte/`, { waitUntil: "networkidle" });
     await gast.locator(`#gericht-${TIRAMISU} .preis--aktion`).first().waitFor();
 
+    // Keine Secrets in dem, was Browser zu sehen bekommen (Dashboard, APIs, Seite).
+    const sichtbar = [];
+    for (const pfad of ["/", "/api/betrieb", "/v2/api/telegram", "/api/telegram/benachrichtigung", "/api/rabattaktionen", "/gesund", "/status", "/sw.js"]) {
+      sichtbar.push(await (await fetch(`${WIRT}${pfad}`, { headers: { Authorization: auth } })).text());
+    }
+    for (const datei of readdirSync(paket.siteDir, { recursive: true })) {
+      const voll = path.join(paket.siteDir, datei);
+      if (statSync(voll).isFile()) sichtbar.push(readFileSync(voll, "latin1"));
+    }
+    for (const g of GEHEIMNISSE) assert.ok(!sichtbar.some((x) => x.includes(g)), "Secret in Antwort oder Seite");
+
     /* ---------- 10. Verschlüsselte Sicherung, Probe, echte Wiederherstellung ---------- */
     const erstellt = await cli(wirtApp, "wirtSicherung.mjs", ["erstellen"], log);
     assert.equal(erstellt.code, 0, erstellt.aus);
     assert.match(erstellt.aus, new RegExp(`${SLUG}: 1 Reservierungen, \\d+ Bestellungen, 1 Rabattaktionen`));
+    // Im Container als root aufgerufen (wie fly ssh console) – die Dateien gehören trotzdem der App.
+    if (IMAGE) assert.equal(statSync(path.join(volume, "sicherung", "stand.json")).uid, statSync(path.join(volume, "betrieb", `${SLUG}.json`)).uid);
     const [datei] = readdirSync(backupZiel);
     assert.match(datei, /^gastro-wirt-pilot-e2e-.*\.gbk$/);
     const roh = readFileSync(path.join(backupZiel, datei));

@@ -526,6 +526,10 @@ Das Wirt-Dashboard hat zwei weitere Reiter:
 
 Details, Bestandsaufnahme, Checkliste der zu liefernden Angaben und Launch-Blocker: [docs-intern/STATISTIK-UND-RECHTSTEXTE.md](docs-intern/STATISTIK-UND-RECHTSTEXTE.md).
 
+### Pilot: eine Wirt-App auf Fly.io
+
+Für einen Produktiv-Piloten mit einem Restaurant läuft die Wirt-App als **eigene Fly-App** (`fly.wirt.toml`, `deploy/wirt/Dockerfile`), getrennt vom Agentur-Dashboard (`fly.toml`). Ein Prozess (`scripts/wirtStart.mjs`) bedient Gastanfragen, Dashboard, Telegram und die tägliche verschlüsselte Sicherung; alle Daten liegen auf dem Volume `/data`. Freigegebene Inhalte kommen per geprüftem Übergabe-Paket (`npm run kunde -- paket`) in die Wirt-App, die Kundenseite als statisches Paket auf einen Host wie Cloudflare Pages. Lokal nachweisbar: `npm run pilot:e2e` (Browser gegen die laufende App, optional gegen das Image) und `npm run wirt:container-test`. Launch-Gate, Secrets (nur Namen), Kosten und die Schritte nach dem Fly-Abschluss: [docs-intern/PILOT-BETRIEB.md](docs-intern/PILOT-BETRIEB.md).
+
 Sobald der Wirt-Server öffentlich erreichbar ist, **`WIRT_PASSWORT` setzen** (mindestens 12 Zeichen; schützt Dashboard und Wirt-Aktionen). Ohne Passwort ist das Wirt-Dashboard nur direkt über `http://localhost` erreichbar. Hinter einem Proxy zusätzlich `VERTRAUTER_PROXY` setzen (`.env.example`).
 
 **Vor dem ersten Launch:** [SECURITY-AUDIT.md](SECURITY-AUDIT.md) (Befunde und Migrationswirkung), [DATENFLUSS.md](DATENFLUSS.md) (welche Daten wo liegen und wohin sie gehen), [LAUNCH-CHECKLISTE.md](LAUNCH-CHECKLISTE.md). Sicherung der Laufzeitdaten: `npm run sicherung -- erstellen [--ziel <ordner>]`, Wiederherstellungsprobe: `npm run sicherung -- pruefen <datei.tar.gz>`. Einrichtung, Umgebungsvariablen, Sicherheit, Datenschutz-Baustein und der sichere Versandtest an die eigene Adresse (`npm run gast:mailtest -- --an …`): [docs-intern/GASTBENACHRICHTIGUNG.md](docs-intern/GASTBENACHRICHTIGUNG.md).

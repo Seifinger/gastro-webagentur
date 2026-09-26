@@ -35,7 +35,8 @@ COPY v2/assets-pipeline ./v2/assets-pipeline
 COPY v2/designsysteme ./v2/designsysteme
 COPY v2/output/assets/fonts ./v2/output/assets/fonts
 COPY deploy/wirt/entrypoint.sh /usr/local/bin/wirt-entrypoint
-RUN chmod 0755 /usr/local/bin/wirt-entrypoint && rm -rf /app/public/uploads
+COPY deploy/wirt/wirt-befehl.sh /usr/local/bin/wirt-befehl
+RUN chmod 0755 /usr/local/bin/wirt-entrypoint /usr/local/bin/wirt-befehl && rm -rf /app/public/uploads
 
 ARG GIT_COMMIT=unbekannt
 ENV GIT_COMMIT=${GIT_COMMIT}

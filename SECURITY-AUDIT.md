@@ -1,6 +1,6 @@
 # Sicherheits-Audit vor dem Launch
 
-**Stand:** 25.09.2026
+**Stand:** 25.09.2026, Ergänzung 26.09.2026 (Fly-Pilot der Wirt-App: S-15 bis S-18)
 **Umfang:** dieses Repository, lokale Testinstanzen, synthetische Daten. Keine fremden Websites, keine Produktivsysteme, keine echten Konten.
 **Was dieses Audit nicht ist:** kein externer Penetrationstest und keine Rechtsberatung. Es sagt weder „sicher“ noch „DSGVO-konform“. Ein grüner `npm test` ist keine Sicherheitsfreigabe.
 
@@ -35,7 +35,10 @@ Prioritäten:
 | S-12 | P2 | Lokales Dashboard ohne Anmeldung: DNS-Rebinding und CSRF aus dem Browser des Betreibers | behoben | L |
 | S-13 | P2 | Wirt-Dashboard einbettbar (Klick-Falle) und zwischenspeicherbar | behoben | L |
 | S-14 | P2 | Bremsen merken sich unbegrenzt viele Adressen (Speicher) | behoben | L |
-| S-15 | P2 | Keine Sicherung und keine Wiederherstellungsprobe | Werkzeug gebaut (`npm run sicherung`); Betrieb offen | L |
+| S-15 | P2 | Keine Sicherung und keine Wiederherstellungsprobe | Wirt-App: verschlüsselte externe Sicherung (AES-256-GCM, S3/R2-Adapter), täglicher Zeitplan, Aufräumregel, Probe und Wiederherstellung lokal bestanden (auch im Container); **echter R2-Upload und Probe auf Fly offen** | L |
+| S-16 | P1 | Mit `WIRT_ERLAUBTE_ORIGINS` wies die Wirt-App ihre eigene Statusseite ab – jeder Gast-Status-Link zeigte „Status nicht verfügbar“ | behoben (26.09.2026, gefunden im Browser-E2E) | L, Chromium |
+| S-17 | P2 | Der Telegram-Dienst im Pilotprozess bediente jede Betriebsdatei auf dem Volume, nicht nur `BETRIEB` | behoben | L |
+| S-18 | P2 | Wartungsbefehle über `fly ssh console` laufen als root und hätten root-eigene Dateien auf dem Volume hinterlassen (App läuft als `node`) | behoben (`wirt-befehl`) | L (Container) |
 | O-01 … O-13 | P2–P3 | offene Punkte mit Entscheidungsbedarf | siehe unten | C / offen |
 
 ---
@@ -196,7 +199,10 @@ Prioritäten:
 | S-12 | `src/dashboardServer.js` | Lokal ohne Anmeldung: Eine fremde Seite im Browser des Betreibers konnte über DNS-Rebinding Leads lesen oder per Formular Schreibaktionen und Anthropic-Kosten auslösen | Bei Bindung an Loopback nur `localhost`-Host (sonst 421); schreibende Anfragen fremder Herkunft 403 | „Dashboard lokal ohne Anmeldung …“ |
 | S-13 | `src/wirtServer.js` | Dashboard in fremder Seite einbettbar; Gastdaten im Browser-Cache geteilter Geräte | `X-Frame-Options: DENY`, `frame-ancestors 'none'`, `nosniff`, `Cache-Control: no-store`, `Referrer-Policy` | „Wirt-Dashboard: nicht einbettbar …“ |
 | S-14 | alle Bremsen | Die Maps behielten jede Adresse für immer (viele IPv6-Adressen → Speicher) | `Bremse` mit höchstens 10 000 Adressen, alte zuerst | „Bremse: begrenzt …“ |
-| S-15 | – | Keine Sicherung, kein Wiederherstellungstest | `npm run sicherung -- erstellen` (tar.gz, 0600, nur lesend) und `-- pruefen <datei>` (entpackt in einen Temp-Ordner, prüft jedes JSON, zählt Vorgänge je Betrieb) | `test/sicherung.test.js` |
+| S-15 | – | Keine Sicherung, kein Wiederherstellungstest | Lokal: `npm run sicherung -- erstellen` / `-- pruefen <datei>`. Wirt-App (Pilot): `src/sicherungExtern.js` – verschlüsselt vor dem Verlassen des Hosts, Adapter `s3` (R2, B2, AWS; eigene SigV4) und `datei:`, täglich `BACKUP_UHRZEIT`, 30 Tage/mindestens 7, Fehler in `sicherung/stand.json` und im Dashboard, Probe und vorbereitete Wiederherstellung beim Start (`docs-intern/PILOT-BETRIEB.md`) | `test/sicherung.test.js`, `test/wirtSicherung.test.js`, `test/pilot-e2e.test.js` |
+| S-16 | `src/wirtServer.js` (`corsFuer`) | Die Statusseite liegt auf der Wirt-App und fragt `/oeffentlich/status` mit deren eigener Origin ab. Mit gesetzter Origin-Liste bekam sie 403 | Eigene Origin (`WIRT_OEFFENTLICHE_URL`) ist immer erlaubt | `test/sicherheit.test.js` („WIRT_ERLAUBTE_ORIGINS …“), `test/pilot-e2e.test.js` |
+| S-17 | `scripts/wirtStart.mjs` | `starteDienst()` las alle Betriebsdateien; ein versehentlich mitkopierter Betrieb wäre per Telegram-Knopf änderbar gewesen | `starteDienst({ betriebe: () => [slug] })` | `test/betriebTrennung.test.js` |
+| S-18 | `deploy/wirt/` | root-eigene `sicherung/stand.json` nach manueller Sicherung → spätere automatische Sicherungen hätten ihren Stand nicht mehr schreiben können | `wirt-befehl` wechselt zu `node` (`setpriv`) | `PILOT_E2E_IMAGE=… test/pilot-e2e.test.js` (Dateibesitzer geprüft) |
 
 ---
 

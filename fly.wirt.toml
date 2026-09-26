@@ -3,7 +3,7 @@
 #
 #   fly apps create <app-name>
 #   fly volumes create wirt_daten --region fra --size 1 --app <app-name>
-#   fly secrets set … --app <app-name>          (Namen: .env.wirt.example)
+#   fly secrets set … --app <app-name>          (Namen: deploy/wirt/wirt.env.example)
 #   deploy/wirt/release.sh <commit> <app-name>
 app = "gastro-wirt-pilot"
 primary_region = "fra"
