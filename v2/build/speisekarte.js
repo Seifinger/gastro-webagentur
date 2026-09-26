@@ -11,7 +11,9 @@
 //
 // Ein Gericht: { name, beschreibung?, preis, id?, varianten?: [{ name, preis }],
 //   extras?: [{ name, preis? }], vegetarisch?, bild?, signatur?,
-//   ausverkauft? | verfuegbar: false, aktiv: false | freigegeben: false }
+//   ausverkauft? | verfuegbar: false, aktiv: false | freigegeben: false,
+//   empfehlungsrolle? }  – Kategorien und Gruppen dürfen ebenfalls eine
+//   "empfehlungsrolle" tragen (für „Passt gut dazu“, src/empfehlungen.js).
 //
 // Regeln:
 //   - Kategorien und Gruppen erscheinen nur, wenn sie freigegebene Gerichte haben.
@@ -81,7 +83,9 @@ export function karteAusDaten(menu, { beschreibungen = {} } = {}) {
   const kategorien = [];
   (menu?.kategorien ?? []).forEach((k, ki) => {
     let gi = 0;
-    const gericht = (g, kategorie) => {
+    // Optionale Empfehlungsrolle der Kategorie bzw. Gruppe (src/empfehlungen.js).
+    const kategorieRolle = k?.empfehlungsrolle ? { kategorieRolle: String(k.empfehlungsrolle) } : {};
+    const gericht = (g, kategorie, gruppe) => {
       const index = `${ki}-${gi}`;
       gi += 1;
       if (!g?.name || ausgeblendet(g)) return null;
@@ -94,6 +98,9 @@ export function karteAusDaten(menu, { beschreibungen = {} } = {}) {
         schluessel,
         anker: `gericht-${schluessel}`,
         kategorie,
+        ...kategorieRolle,
+        ...(gruppe?.name ? { gruppe: String(gruppe.name) } : {}),
+        ...(gruppe?.empfehlungsrolle ? { gruppenRolle: String(gruppe.empfehlungsrolle) } : {}),
         name: String(g.name),
         beschreibung: beschreibungen[index] ?? g.beschreibung ?? "",
         preis: varianten.length ? Math.min(...varianten.map((v) => v.preis)) : Number(g.preis),
@@ -106,7 +113,7 @@ export function karteAusDaten(menu, { beschreibungen = {} } = {}) {
     };
     const direkt = (k.gerichte ?? []).map((g) => gericht(g, k.name)).filter(Boolean);
     const gruppen = (k.gruppen ?? [])
-      .map((gr) => ({ name: String(gr?.name ?? ""), gerichte: (gr?.gerichte ?? []).map((g) => gericht(g, k.name)).filter(Boolean) }))
+      .map((gr) => ({ name: String(gr?.name ?? ""), gerichte: (gr?.gerichte ?? []).map((g) => gericht(g, k.name, gr)).filter(Boolean) }))
       .filter((gr) => gr.gerichte.length > 0);
     const anzahl = direkt.length + gruppen.reduce((s, gr) => s + gr.gerichte.length, 0);
     if (!k?.name || anzahl === 0) return;

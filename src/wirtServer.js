@@ -43,7 +43,14 @@ import {
   rechtsdokumentFassung,
   setzeReservierungsNoShow,
   setzeLaunchVermerk,
+  setzeEmpfehlungen,
+  empfehlungsEinstellungen,
+  empfehlungsProdukteDesBetriebs,
+  oeffentlicheEmpfehlungen,
+  empfehlungsStatistik,
+  erkannteProduktRolle,
 } from "./betriebStore.js";
+import { waehle as waehleEmpfehlungen, pruefeEmpfehlungsRegeln, ROLLEN_ANZEIGE } from "./empfehlungen.js";
 import {
   DOKUMENT_ARTEN,
   gueltigeFassung,
@@ -116,7 +123,7 @@ function zuSchnell(adresse, { lesend = false } = {}) {
   return lesend ? lesezugriffe.zaehle(adresse) > BREMSE_MAX_LESEN : zugriffe.zaehle(adresse) > BREMSE_MAX;
 }
 
-const LESENDE_PFADE = new Set(["/oeffentlich/abholzeiten", "/oeffentlich/rechtstexte", "/oeffentlich/no-show-einstellungen", "/oeffentlich/verfuegbarkeit"]);
+const LESENDE_PFADE = new Set(["/oeffentlich/abholzeiten", "/oeffentlich/rechtstexte", "/oeffentlich/no-show-einstellungen", "/oeffentlich/verfuegbarkeit", "/oeffentlich/empfehlungen"]);
 
 // Falsche Status-Links: eigene, strengere Bremse gegen Durchprobieren.
 const FEHLVERSUCHE_MAX = 10;
@@ -552,6 +559,12 @@ const routen = async (req, res) => {
         return;
       }
 
+      // „Passt gut dazu“: Einstellungen des Wirts und Katalog für die Seite.
+      if (pathname === "/oeffentlich/empfehlungen") {
+        json(res, 200, { ok: true, ...oeffentlicheEmpfehlungen(ladeBetrieb(slug)) }, CORS);
+        return;
+      }
+
       const stornierenTreffer = STORNIEREN.exec(pathname);
       if (stornierenTreffer) {
         const id = decodeURIComponent(stornierenTreffer[1]);
@@ -660,6 +673,22 @@ const routen = async (req, res) => {
     return;
   }
 
+  // Reiter „Empfehlungen“: Einstellungen, Produkte der Karte, Wirkung (aggregiert).
+  if (pathname === "/api/empfehlungen") {
+    const daten = ladeBetrieb(slug);
+    const vor30Tagen = new Date(uhrHook.jetzt().getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    json(res, 200, {
+      ok: true,
+      regeln: empfehlungsEinstellungen(daten),
+      produkte: empfehlungsProdukteDesBetriebs(daten).map((p) => ({ ...p, erkannteRolle: erkannteProduktRolle(p) })),
+      rollen: ROLLEN_ANZEIGE,
+      karte: daten.bestellkarte ? { version: daten.bestellkarte.version, gesetzt: daten.bestellkarte.gesetzt, quelle: daten.bestellkarte.quelle } : null,
+      statistik: { gesamt: empfehlungsStatistik(daten), tage30: empfehlungsStatistik(daten, { seit: vor30Tagen }) },
+      geaendertAm: daten.empfehlungen?.geaendertAm ?? "",
+    }, PRIVAT);
+    return;
+  }
+
   // Reiter „Telegram“: Einstellungen, berechnete Zeiten, Warnungen, Probleme.
   if (pathname === "/api/telegram/benachrichtigung") {
     json(res, 200, { ok: true, ...telegramStand(ladeBetrieb(slug), { jetzt: uhrHook.jetzt() }) }, PRIVAT);
@@ -728,6 +757,31 @@ const routen = async (req, res) => {
 
         await stelleGastMeldungenZu(slug);
         json(res, 200, { ok: true, bestellung, gast: gastHinweisFuer("bestellung", bestellung.id) });
+        return;
+      }
+
+      /* ----- Intern: „Passt gut dazu“ ----- */
+
+      if (pathname === "/intern/empfehlungen") {
+        json(res, 200, { ok: true, regeln: setzeEmpfehlungen(slug, eingabe) });
+        return;
+      }
+
+      // Vorschau: dieselbe Auswahl, die der Gast sehen würde – auch mit noch
+      // nicht gespeicherten Einstellungen aus dem Formular.
+      if (pathname === "/api/empfehlungen/vorschau") {
+        const daten = ladeBetrieb(slug);
+        const produkte = empfehlungsProdukteDesBetriebs(daten);
+        const regeln = eingabe.regeln ? pruefeEmpfehlungsRegeln(eingabe.regeln, produkte) : empfehlungsEinstellungen(daten);
+        const korb = (Array.isArray(eingabe.warenkorb) ? eingabe.warenkorb : []).slice(0, 30).map((id) => ({ id: String(id), menge: 1 }));
+        const nachId = Object.fromEntries(produkte.map((p) => [p.id, p]));
+        const vorschlaege = waehleEmpfehlungen({ produkte, warenkorb: korb, regeln, bestellbar: daten.bestellkarte?.katalog ?? null }).map((v) => ({
+          ...v,
+          name: nachId[v.id].name,
+          preis: nachId[v.id].preis,
+          varianten: nachId[v.id].varianten.filter((x) => v.varianten.includes(x.id)),
+        }));
+        json(res, 200, { ok: true, vorschlaege });
         return;
       }
 

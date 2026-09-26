@@ -206,6 +206,15 @@ export function texteFuer({ ds, menu, lead, eigeneTexte = {} }) {
       vorschauHinweis: "Vorschau: Auf dieser Seite wird nichts verschickt. Auf der fertigen Website geht die Anfrage direkt an das Restaurant.",
       statusHinweis: STATUS_LINK_HINWEIS,
       fehlerAbholzeit: "Bitte wählen Sie eine Abholzeit.",
+      // „Passt gut dazu“ in der Bestellübersicht (sektionen/passtDazu.js).
+      passtDazu: {
+        titel: "Passt gut dazu",
+        hinzufuegen: "Hinzufügen",
+        variante: "Auswahl",
+        muster: "Muster",
+        musterHinweis: "Vorschau mit Beispielgerichten – auf der fertigen Website stehen hier bestätigte Produkte des Restaurants.",
+        hinzugefuegt: "liegt jetzt im Warenkorb.",
+      },
     },
 
     platzhalter: "Platzhalter",

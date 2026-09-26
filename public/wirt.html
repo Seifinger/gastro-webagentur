@@ -181,6 +181,28 @@
   .warnbox li + li { margin-top: 7px; }
   .warnbox .wann { font-weight: 700; }
 
+  /* Reiter „Empfehlungen“ („Passt gut dazu“) */
+  .em-produkte { display: grid; gap: 0; margin-top: 8px; }
+  .em-zeile { display: grid; gap: 8px; grid-template-columns: 1fr; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: center; }
+  @media (min-width: 780px) { .em-zeile { grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.2fr) minmax(0, 1.2fr) 7rem; } }
+  .em-zeile .name { font-weight: 600; }
+  .em-zeile .meta { color: var(--muted); font-size: .82rem; }
+  .em-zeile select { width: 100%; }
+  .em-zeile label.tg-schalter { margin: 0; font-size: .85rem; }
+  .em-kopf { display: none; }
+  @media (min-width: 780px) { .em-kopf { display: grid; font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 0 0 6px; } }
+  .em-kombi { display: grid; gap: 8px; grid-template-columns: 1fr; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+  @media (min-width: 780px) { .em-kombi { grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)) auto; align-items: end; } }
+  .em-kombi select { width: 100%; }
+  .em-reihe { list-style: decimal; margin: 8px 0 0; padding-left: 22px; }
+  .em-reihe li { padding: 4px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .em-reihe li span { flex: 1; min-width: 160px; }
+  .em-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .em-chip { display: inline-flex; gap: 6px; align-items: center; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 4px 8px; font-size: .88rem; background: var(--bg); }
+  .em-chip button { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 0 2px; }
+  .em-vorschlag { border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 8px; background: var(--bg); }
+  .em-vorschlag .grund { color: var(--muted); font-size: .82rem; }
+
   /* Reiter „Telegram“ */
   .tg-gruppe { border: none; padding: 0; margin: 16px 0 0; }
   .tg-gruppe legend { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 4px; padding: 0; }
@@ -221,6 +243,7 @@
   <nav>
     <button data-tab="reservierungen" class="aktiv">Reservierungen</button>
     <button data-tab="bestellungen">Bestellungen</button>
+    <button data-tab="empfehlungen">Empfehlungen</button>
     <button data-tab="tischplan">Tischplan</button>
     <button data-tab="statistik">Statistik</button>
     <button data-tab="rechtstexte">Rechtstexte</button>
@@ -438,6 +461,66 @@
       </div>
 
       <div class="balken" id="tg-probleme"></div>
+    </section>
+
+    <section id="tab-empfehlungen" hidden>
+      <div class="balken">
+        <strong>Empfehlungen im Warenkorb („Passt gut dazu“)</strong>
+        <div class="tg-leise">
+          Kurz vor dem Absenden sehen Gäste höchstens zwei passende Ergänzungen aus Ihrer Karte – etwa zur Pizza
+          eine Vorspeise oder ein Dessert, nie eine zweite Pizza. Nichts wird automatisch hinzugefügt, nichts ist
+          vorausgewählt; wer nicht reagiert, bestellt wie bisher. Keine Cookies, keine Auswertung einzelner Gäste.
+        </div>
+        <label class="tg-schalter" style="margin-top:12px"><input type="checkbox" id="em-aktiv"> Empfehlungen auf der Website anzeigen</label>
+        <label class="tg-schalter"><input type="checkbox" id="em-standard"> Standardregeln verwenden</label>
+        <p class="tg-leise">
+          Standardregeln: Liegt ein Hauptgericht im Warenkorb, aber noch keine Vorspeise, kein Salat und keine Beilage,
+          wird eines davon vorgeschlagen; fehlt ein Dessert, ein Dessert; fehlt ein Getränk, ein Getränk. Nie ein
+          zweites Hauptgericht, nie Ausverkauftes, nie etwas, das schon im Warenkorb liegt. Ihre Kombinationen und
+          bevorzugten Produkte haben Vorrang.
+        </p>
+      </div>
+
+      <div id="em-hinweis"></div>
+
+      <div class="balken">
+        <label style="margin-bottom:4px">Kombinationen (Vorrang vor allem anderen)</label>
+        <div class="tg-leise">Beispiel: „Zu Pizza: Tiramisù oder kleiner Salat“. Ist ein Produkt ausverkauft oder schon im Warenkorb, kommt das nächste der Zeile – oder die Standardregel.</div>
+        <div id="em-kombinationen"></div>
+        <button class="knopf klein stumm" type="button" id="em-kombi-neu" style="margin-top:10px">Kombination hinzufügen</button>
+      </div>
+
+      <div class="balken">
+        <label style="margin-bottom:4px">Bevorzugt empfehlen (Reihenfolge)</label>
+        <div class="tg-leise">Bevorzugte Produkte kommen vor den Standardvorschlägen – sofern sie zum Warenkorb passen (z. B. ein Dessert nur, wenn noch keines darin liegt).</div>
+        <ol class="em-reihe" id="em-reihe"></ol>
+      </div>
+
+      <div class="balken">
+        <label style="margin-bottom:4px">Produkte Ihrer Karte</label>
+        <div class="tg-leise">Rolle: wofür das Produkt steht (automatisch aus der Kategorie erkannt). „Mehrfach“: darf auch vorgeschlagen werden, wenn es schon im Warenkorb liegt.</div>
+        <div class="em-produkte" id="em-produkte"><p class="leer">Wird geladen …</p></div>
+      </div>
+
+      <button class="knopf" type="button" id="em-speichern">Einstellungen speichern</button>
+      <span class="tg-leise" id="em-stand" style="margin-left:10px"></span>
+
+      <div class="balken" style="margin-top:20px">
+        <label style="margin-bottom:4px">Vorschau Ihrer Regeln</label>
+        <div class="tg-leise">Stellen Sie einen Beispiel-Warenkorb zusammen – so sieht ein Gast die Empfehlungen (mit den Einstellungen oben, auch ungespeichert).</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px">
+          <select id="em-test-wahl" aria-label="Produkt für den Beispiel-Warenkorb" style="width:100%;max-width:320px"></select>
+          <button class="knopf klein stumm" type="button" id="em-test-dazu">In den Beispiel-Warenkorb</button>
+        </div>
+        <div class="em-chips" id="em-test-korb"></div>
+        <div id="em-test-ergebnis"></div>
+      </div>
+
+      <div class="balken">
+        <label style="margin-bottom:4px">Wirkung</label>
+        <div class="tg-leise">Nur zusammengezählt aus abgeschickten Bestellungen (ohne abgelehnte und stornierte): Positionen, die Gäste über „Passt gut dazu“ hinzugefügt haben.</div>
+        <div id="em-wirkung"></div>
+      </div>
     </section>
 
     <section id="tab-tischplan" hidden>
@@ -881,12 +964,13 @@ async function lade() {
 document.querySelectorAll("nav button").forEach((knopf) => {
   knopf.addEventListener("click", () => {
     document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("aktiv", b === knopf));
-    ["reservierungen", "bestellungen", "tischplan", "statistik", "rechtstexte", "telegram"].forEach((name) => {
+    ["reservierungen", "bestellungen", "empfehlungen", "tischplan", "statistik", "rechtstexte", "telegram"].forEach((name) => {
       document.getElementById(`tab-${name}`).hidden = name !== knopf.dataset.tab;
     });
     if (knopf.dataset.tab === "statistik") ladeStatistik();
     if (knopf.dataset.tab === "rechtstexte") ladeRechtstexte();
     if (knopf.dataset.tab === "telegram") ladeTelegram();
+    if (knopf.dataset.tab === "empfehlungen") ladeEmpfehlungen();
   });
 });
 
@@ -1634,6 +1718,220 @@ setInterval(() => {
   lade();
   if (!$("tab-telegram").hidden) ladeTelegram();
 }, 20000);
+</script>
+
+<script>
+/* ---------- Empfehlungen im Warenkorb („Passt gut dazu“) ---------- */
+
+let em = null;          // Stand vom Server (Produkte, Rollen, Wirkung)
+let emRegeln = null;    // Formularstand (noch nicht gespeichert)
+let emTestKorb = [];
+
+const EM_GRUND = { kombination: "Ihre Kombination", bevorzugt: "Bevorzugt", standard: "Standardregel" };
+
+function emProdukt(id) {
+  return em.produkte.find((p) => p.id === id);
+}
+
+function emRolle(p) {
+  const r = emRegeln.rollen[p.id];
+  if (r === "keine") return null;
+  return r || p.erkannteRolle || null;
+}
+
+function emProduktOptionen(gewaehlt, { leer = "–" } = {}) {
+  return `<option value="">${esc(leer)}</option>` + em.produkte
+    .map((p) => `<option value="${esc(p.id)}"${p.id === gewaehlt ? " selected" : ""}>${esc(p.name)} · ${esc(euro(p.preis))}</option>`)
+    .join("");
+}
+
+function emZuOptionen(gewaehlt) {
+  const kategorien = [...new Set(em.produkte.map((p) => p.kategorie))];
+  const rollen = Object.entries(em.rollen);
+  return `<option value="">Wozu?</option>
+    <optgroup label="Kategorie">${kategorien.map((k) => `<option value="kat:${esc(k)}"${gewaehlt === `kat:${k}` ? " selected" : ""}>Zu ${esc(k)}</option>`).join("")}</optgroup>
+    <optgroup label="Rolle">${rollen.map(([r, n]) => `<option value="rolle:${esc(r)}"${gewaehlt === `rolle:${r}` ? " selected" : ""}>Zu jedem Produkt der Rolle ${esc(n)}</option>`).join("")}</optgroup>
+    <optgroup label="Produkt">${em.produkte.map((p) => `<option value="${esc(p.id)}"${gewaehlt === p.id ? " selected" : ""}>Zu ${esc(p.name)}</option>`).join("")}</optgroup>`;
+}
+
+function renderEmpfehlungen() {
+  $("em-aktiv").checked = emRegeln.aktiv;
+  $("em-standard").checked = emRegeln.standard;
+  $("em-standard").disabled = !emRegeln.aktiv;
+  $("em-stand").textContent = em.geaendertAm ? `Zuletzt gespeichert: ${tgZeitpunkt(em.geaendertAm)}` : "Noch keine eigenen Einstellungen – es gelten die Standardregeln.";
+
+  $("em-hinweis").innerHTML = em.produkte.length ? "" : `<div class="tg-warn">
+    Für diesen Betrieb ist noch keine Speisekarte hinterlegt. Sie wird beim Bau der Website übergeben.
+    Bis dahin gelten auf der Website nur die Standardregeln (an- und abschaltbar oben).</div>`;
+
+  $("em-kombinationen").innerHTML = emRegeln.kombinationen.length
+    ? emRegeln.kombinationen.map((k, i) => `<div class="em-kombi">
+        <div><label for="em-zu-${i}">Wenn im Warenkorb</label><select id="em-zu-${i}" data-em-zu="${i}">${emZuOptionen(k.zu)}</select></div>
+        ${[0, 1, 2].map((j) => `<div><label for="em-kp-${i}-${j}">${j === 0 ? "dann empfehlen" : "oder"}</label><select id="em-kp-${i}-${j}" data-em-kp="${i}" data-em-pos="${j}">${emProduktOptionen(k.produkte[j] || "")}</select></div>`).join("")}
+        <button class="knopf klein gefahr" type="button" data-em-kombi-weg="${i}">Entfernen</button>
+      </div>`).join("")
+    : '<p class="tg-leise" style="margin:8px 0 0">Noch keine Kombination.</p>';
+
+  $("em-reihe").innerHTML = emRegeln.priorisiert.length
+    ? emRegeln.priorisiert.map((id, i) => {
+        const p = emProdukt(id);
+        return `<li><span>${esc(p ? p.name : id)}</span>
+          <button class="knopf klein stumm" type="button" data-em-hoch="${i}"${i === 0 ? " disabled" : ""} aria-label="${esc(p ? p.name : id)} weiter nach vorn">▲</button>
+          <button class="knopf klein stumm" type="button" data-em-runter="${i}"${i === emRegeln.priorisiert.length - 1 ? " disabled" : ""} aria-label="${esc(p ? p.name : id)} weiter nach hinten">▼</button></li>`;
+      }).join("")
+    : '<li style="list-style:none;margin-left:-22px" class="tg-leise">Keine – in der Liste unten „bevorzugt“ wählen.</li>';
+
+  $("em-produkte").innerHTML = em.produkte.length
+    ? `<div class="em-zeile em-kopf"><span>Produkt</span><span>Rolle</span><span>Empfehlen</span><span></span></div>` + em.produkte.map((p) => {
+        const status = emRegeln.ausgeschlossen.includes(p.id) ? "nie" : emRegeln.priorisiert.includes(p.id) ? "bevorzugt" : "normal";
+        const rolle = emRegeln.rollen[p.id] || "";
+        const erkannt = p.erkannteRolle ? em.rollen[p.erkannteRolle] : "keine erkannt";
+        return `<div class="em-zeile">
+          <div><div class="name">${esc(p.name)}</div><div class="meta">${esc(p.kategorie)}${p.gruppe ? ` · ${esc(p.gruppe)}` : ""} · ${esc(p.varianten.length > 1 ? `ab ${euro(p.preis)}` : euro(p.preis))}${p.empfehlbar === false ? " · noch nicht bestätigt, wird nicht empfohlen" : ""}</div></div>
+          <select data-em-rolle="${esc(p.id)}" aria-label="Rolle von ${esc(p.name)}">
+            <option value=""${rolle === "" ? " selected" : ""}>Automatisch (${esc(erkannt)})</option>
+            ${Object.entries(em.rollen).map(([r, n]) => `<option value="${esc(r)}"${rolle === r ? " selected" : ""}>${esc(n)}</option>`).join("")}
+            <option value="keine"${rolle === "keine" ? " selected" : ""}>Keine Rolle (nur über Kombinationen)</option>
+          </select>
+          <select data-em-status="${esc(p.id)}" aria-label="${esc(p.name)} empfehlen"${p.empfehlbar === false ? " disabled" : ""}>
+            <option value="normal"${status === "normal" ? " selected" : ""}>Nach Regeln</option>
+            <option value="bevorzugt"${status === "bevorzugt" ? " selected" : ""}>Bevorzugt</option>
+            <option value="nie"${status === "nie" ? " selected" : ""}>Nie empfehlen</option>
+          </select>
+          <label class="tg-schalter"><input type="checkbox" data-em-mehrfach="${esc(p.id)}"${emRegeln.mehrfach.includes(p.id) ? " checked" : ""}> mehrfach</label>
+        </div>`;
+      }).join("")
+    : '<p class="leer">Noch keine Produkte.</p>';
+
+  $("em-test-wahl").innerHTML = emProduktOptionen("", { leer: "Produkt wählen …" });
+  renderEmTestKorb();
+  renderEmWirkung();
+}
+
+function renderEmTestKorb() {
+  $("em-test-korb").innerHTML = emTestKorb.map((id, i) => {
+    const p = emProdukt(id);
+    return `<span class="em-chip">${esc(p ? p.name : id)}<button type="button" data-em-test-weg="${i}" aria-label="${esc(p ? p.name : id)} aus dem Beispiel-Warenkorb nehmen">×</button></span>`;
+  }).join("");
+}
+
+function renderEmWirkung() {
+  const kachel = (titel, s) => `<div class="kachel"><h3>${esc(titel)}</h3>
+    <div class="gross">${s.mitEmpfehlung}<span class="leise" style="font-size:1rem;font-weight:600;color:var(--muted)"> von ${s.bestellungen}</span></div>
+    <p>Bestellungen mit mindestens einem empfohlenen Produkt</p>
+    <ul><li><span>Stück über Empfehlung</span><span>${s.stueck}</span></li><li><span>Bestellwert dieser Produkte</span><span>${esc(euro(s.wert))}</span></li></ul>
+    ${s.produkte.length ? `<ul style="margin-top:10px">${s.produkte.map((p) => `<li><span>${esc(p.name)} (${p.stueck})</span><span>${esc(euro(p.wert))}</span></li>`).join("")}</ul>` : ""}
+  </div>`;
+  $("em-wirkung").innerHTML = `<div class="kacheln">${kachel("Letzte 30 Tage", em.statistik.tage30)}${kachel("Seit Beginn", em.statistik.gesamt)}</div>`;
+}
+
+async function ladeEmpfehlungen() {
+  try {
+    const antwort = await fetch("/api/empfehlungen");
+    em = await antwort.json();
+    if (!antwort.ok || !em.ok) throw new Error(em.fehler || "Empfehlungen konnten nicht geladen werden.");
+    emRegeln = structuredClone(em.regeln);
+    emTestKorb = emTestKorb.filter((id) => emProdukt(id));
+    renderEmpfehlungen();
+    await emVorschau();
+  } catch (fehler) {
+    $("em-produkte").innerHTML = `<p class="fehler">${esc(fehler.message)}</p>`;
+  }
+}
+
+async function emVorschau() {
+  const ziel = $("em-test-ergebnis");
+  if (!emTestKorb.length) {
+    ziel.innerHTML = '<p class="tg-leise">Beispiel-Warenkorb ist leer – dann erscheint auf der Website nichts.</p>';
+    return;
+  }
+  try {
+    const r = await ruf("/api/empfehlungen/vorschau", { warenkorb: emTestKorb, regeln: emRegeln });
+    ziel.innerHTML = r.vorschlaege.length
+      ? r.vorschlaege.map((v) => `<div class="em-vorschlag"><strong>${esc(v.name)}</strong> · ${esc(v.varianten.length > 1 ? `ab ${euro(v.preis)}` : euro(v.preis))}
+          <div class="grund">${esc(EM_GRUND[v.grund] || v.grund)}${v.rolle ? ` · ${esc(em.rollen[v.rolle])}` : ""}</div></div>`).join("")
+      : '<p class="tg-leise">Keine passende Ergänzung – das Feld „Passt gut dazu“ ist für diesen Warenkorb ausgeblendet.</p>';
+  } catch (fehler) {
+    ziel.innerHTML = `<p class="fehler">${esc(fehler.message)}</p>`;
+  }
+}
+
+// Nach dem Neuzeichnen bleibt der Fokus auf demselben Bedienelement (Tastatur).
+function emNeuZeichnen() {
+  const a = document.activeElement;
+  let wahl = null;
+  if (a && $("tab-empfehlungen").contains(a)) {
+    if (a.id) wahl = `#${CSS.escape(a.id)}`;
+    else {
+      const [schluessel] = Object.keys(a.dataset);
+      if (schluessel) wahl = `[data-${schluessel.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)}="${CSS.escape(a.dataset[schluessel])}"]`;
+    }
+  }
+  renderEmpfehlungen();
+  const ziel = wahl ? document.querySelector(wahl) : null;
+  if (ziel && !ziel.disabled) ziel.focus();
+  emVorschau();
+}
+
+$("tab-empfehlungen").addEventListener("change", (e) => {
+  const t = e.target;
+  if (!emRegeln) return;
+  if (t.id === "em-aktiv") emRegeln.aktiv = t.checked;
+  else if (t.id === "em-standard") emRegeln.standard = t.checked;
+  else if (t.dataset.emRolle !== undefined) {
+    if (t.value) emRegeln.rollen[t.dataset.emRolle] = t.value;
+    else delete emRegeln.rollen[t.dataset.emRolle];
+  } else if (t.dataset.emStatus !== undefined) {
+    const id = t.dataset.emStatus;
+    emRegeln.ausgeschlossen = emRegeln.ausgeschlossen.filter((x) => x !== id);
+    emRegeln.priorisiert = emRegeln.priorisiert.filter((x) => x !== id);
+    if (t.value === "nie") emRegeln.ausgeschlossen.push(id);
+    if (t.value === "bevorzugt") emRegeln.priorisiert.push(id);
+  } else if (t.dataset.emMehrfach !== undefined) {
+    const id = t.dataset.emMehrfach;
+    emRegeln.mehrfach = emRegeln.mehrfach.filter((x) => x !== id);
+    if (t.checked) emRegeln.mehrfach.push(id);
+  } else if (t.dataset.emZu !== undefined) {
+    emRegeln.kombinationen[Number(t.dataset.emZu)].zu = t.value;
+  } else if (t.dataset.emKp !== undefined) {
+    const k = emRegeln.kombinationen[Number(t.dataset.emKp)];
+    const liste = [0, 1, 2].map((j) => (j === Number(t.dataset.emPos) ? t.value : k.produkte[j] || ""));
+    k.produkte = liste.filter(Boolean);
+  } else {
+    return;
+  }
+  emNeuZeichnen();
+});
+
+$("tab-empfehlungen").addEventListener("click", async (e) => {
+  const k = e.target.closest("button");
+  if (!k || !emRegeln) return;
+  const d = k.dataset;
+  if (k.id === "em-kombi-neu") emRegeln.kombinationen.push({ zu: "", produkte: [] });
+  else if (d.emKombiWeg !== undefined) emRegeln.kombinationen.splice(Number(d.emKombiWeg), 1);
+  else if (d.emHoch !== undefined || d.emRunter !== undefined) {
+    const i = Number(d.emHoch ?? d.emRunter);
+    const j = d.emHoch !== undefined ? i - 1 : i + 1;
+    [emRegeln.priorisiert[i], emRegeln.priorisiert[j]] = [emRegeln.priorisiert[j], emRegeln.priorisiert[i]];
+  } else if (k.id === "em-test-dazu") {
+    const id = $("em-test-wahl").value;
+    if (!id) return;
+    emTestKorb.push(id);
+  } else if (d.emTestWeg !== undefined) emTestKorb.splice(Number(d.emTestWeg), 1);
+  else if (k.id === "em-speichern") {
+    try {
+      // Unvollständige Kombinationen (ohne „Wozu“ oder ohne Produkt) nicht mitschicken.
+      const regeln = { ...emRegeln, kombinationen: emRegeln.kombinationen.filter((x) => x.zu && x.produkte.length) };
+      await ruf("/intern/empfehlungen", regeln);
+      melde("Empfehlungen gespeichert – sie gelten ab sofort auf der Website.");
+      await ladeEmpfehlungen();
+    } catch (fehler) {
+      melde(fehler.message, true);
+    }
+    return;
+  } else return;
+  emNeuZeichnen();
+});
 </script>
 
 </body>
