@@ -1,3 +1,4 @@
+import { ladeEigeneMedien } from "../v2/assets-pipeline/mediaGenerator.js";
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
@@ -77,12 +78,19 @@ test("Demo-Panel: speichern übersteht Reload, lokaler Bau mit Vorschau Desktop/
     await tab.frameLocator(".demo-rahmen").first().locator(".buehne-slogan").waitFor();
     await tab.frameLocator(".demo-rahmen--mobil").locator(".buehne-slogan").waitFor();
 
-    // Medienstatus: Video Desktop und beide Poster aus dem Konzeptmaterial, Video Mobil fehlt – mit Hinweis.
+    // Medienstatus: alles aus dem Konzeptmaterial der Küche. Video Mobil genau
+    // dann, wenn die Küche eines geliefert hat – sonst mit Hinweis.
     const medien = await tab.locator("#demo-medien").textContent();
     assert.match(medien, /Video Desktop \(quer\)vorhanden \(einmal\)Konzeptmaterial/);
-    assert.match(medien, /Video Mobil \(hoch\)fehlt/);
     assert.match(medien, /Poster hochvorhanden/);
-    assert.match(await tab.locator(".demo-vorschau").textContent(), /Video Mobil fehlt – auf dem Handy steht das Hochformat-Poster/);
+    // Der Test-Lead ist bayerisch (siehe Designsystem oben).
+    if (ladeEigeneMedien()["beispiel-bayerisch"]?.heroVideoMobil) {
+      assert.match(medien, /Video Mobil \(hoch\)vorhanden \(einmal\)Konzeptmaterial/);
+      assert.doesNotMatch(await tab.locator(".demo-vorschau").textContent(), /Video Mobil fehlt/);
+    } else {
+      assert.match(medien, /Video Mobil \(hoch\)fehlt/);
+      assert.match(await tab.locator(".demo-vorschau").textContent(), /Video Mobil fehlt – auf dem Handy steht das Hochformat-Poster/);
+    }
 
     // Präsentation im WLAN: QR auf die Präsentationsadresse, erreichbar vom "Handy".
     await tab.locator("#demo-praes-start").click();

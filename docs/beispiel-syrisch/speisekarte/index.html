@@ -564,6 +564,9 @@ section[id] { scroll-margin-top: var(--kopf-ist, var(--kopf-hoehe)); }
 .buehne-poster, .buehne-video { object-position: var(--fokus, 50% 50%); }
 @media (max-width: 767px) { .buehne-poster, .buehne-video { object-position: var(--fokus-mobil, var(--fokus, 50% 50%)); } }
 .buehne-video { opacity: 0; object-position: var(--fokus-video, var(--fokus, 50% 50%)); }
+/* Hochformat-Video auf dem Handy: derselbe Ausschnitt wie das Hochformat-Standbild,
+   damit der Wechsel vom Standbild zum ersten Videobild nicht springt. */
+@media (max-width: 767px) { .buehne-video[data-src-mobil] { object-position: var(--fokus-video-mobil, var(--fokus-mobil, var(--fokus, 50% 50%))); } }
 .buehne-video.laeuft { opacity: 1; }
 .buehne-schleier { position: absolute; inset: 0; background: var(--schleier); }
 .buehne-text { position: absolute; left: 0; right: 0; top: 28%; bottom: 38%; display: flex; align-items: center; justify-content: center;
@@ -973,18 +976,25 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
             <span class="error">Bitte geben Sie eine Telefonnummer an.</span>
           </div>
         <div class="field">
+            <label for="ord-email">E-Mail-Adresse für Bestätigung und Änderungen <span class="hint">(optional)</span></label>
+            <input type="email" id="ord-email" name="email" autocomplete="email" inputmode="email" maxlength="254">
+            <span class="hint">Nur für Nachrichten zu dieser Anfrage – kein Newsletter, keine Werbung.</span>
+            
+          </div>
+        <div class="field">
             <label for="ord-hinweis">Hinweis <span class="hint">(optional)</span></label>
             <textarea id="ord-hinweis" name="hinweis" placeholder="Allergien, Sonderwünsche …"></textarea>
             
           </div>
       </div>
+      
       <div class="field noshow" id="ord-noshow-feld" style="display:none">
         <label class="noshow-label"><input type="checkbox" id="ord-noshow" name="noShowZustimmung"><span id="ord-noshow-text"></span></label>
         <span class="error">Bitte stimmen Sie zu, um die Bestellung abzuschicken.</span>
       </div>
       <div class="drawer-foot">
         <div class="totals"><span>Gesamt</span><span id="cart-total">0,00 €</span></div>
-        <button class="btn btn-primary btn-block" id="order-submit" type="submit">Abholung verbindlich bestellen</button>
+        <button class="btn btn-primary btn-block" id="order-submit" type="submit">Probebestellung absenden</button>
         <p class="hint drawer-hinweis">Bezahlung bei Abholung, bar oder mit Karte.</p>
         <p class="hint vorschau-hinweis">Vorschau: Auf dieser Seite wird nichts verschickt. Auf der fertigen Website geht die Anfrage direkt an das Restaurant.</p>
       </div>
@@ -1363,7 +1373,6 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 (function () {
   var data = window.PAGE_DATA;
   var cart = {};
-  var noShowEinstellungen = null;
   // Warenkorb über mehrere Seiten (Startseite ↔ Speisekarte): nur, wenn
   // die Seite ihre Karte mitliefert (PAGE_DATA.warenkorb). Name und Preis
   // kommen dann immer aus dieser Karte, nie aus einem alten Speicherstand.
@@ -1532,7 +1541,48 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     if (!byId("confirm").classList.contains("open")) byId("overlay").classList.remove("open");
   }
 
-  function showConfirm(title, text, rows, mailto, fehler) {
+  /**
+   * Der persönliche Status-Link: nur, wenn der Betriebsserver einen
+   * Zugriffsschlüssel zurückgegeben hat (nie in der Vorschau). Der
+   * Schlüssel steht im Fragment (#) und geht so an keinen Server-Log.
+   */
+  function statusUrl(teil) {
+    return data.apiUrl && teil && teil.statusToken ? data.apiUrl + "/status#" + teil.statusToken : "";
+  }
+
+  function zeigeStatusLink(url) {
+    var link = byId("confirm-status");
+    if (!link && url) {
+      link = document.createElement("a");
+      link.id = "confirm-status";
+      link.className = "btn btn-ghost btn-block";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Status später erneut ansehen";
+      link.style.marginTop = "10px";
+      byId("confirm-mail").parentNode.insertBefore(link, byId("confirm-mail"));
+    }
+    if (!link) return;
+    link.href = url || "#";
+    link.style.display = url ? "inline-flex" : "none";
+  }
+
+  /** Was nach dem Absenden über E-Mail und Status-Link gesagt wird – ehrlich. */
+  function kanalSatz(email, teil) {
+    if (email && teil.emailVersand === "aktiv") {
+      return " Bestätigung und Änderungen schicken wir an " + email + ".";
+    }
+    if (email && teil.emailVersand === "fehlgeschlagen") {
+      return " Die E-Mail an " + email + " konnte gerade nicht verschickt werden – den aktuellen Stand sehen Sie über Ihren Status-Link.";
+    }
+    if (email) {
+      return " Der E-Mail-Versand ist bei diesem Restaurant noch nicht eingerichtet – den aktuellen Stand sehen Sie über Ihren Status-Link.";
+    }
+    return " Ohne E-Mail-Adresse sehen Sie Änderungen nur, wenn Sie Ihren Status-Link erneut öffnen. Bei Rückfragen rufen wir Sie an.";
+  }
+
+  function showConfirm(title, text, rows, mailto, fehler, status) {
+    zeigeStatusLink(fehler ? "" : status);
     byId("confirm-title").textContent = title;
     byId("confirm-text").textContent = text;
     byId("confirm").className = fehler ? "confirm-box hat-fehler" : "confirm-box";
@@ -1645,35 +1695,69 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   }
 
   /**
-   * Holt beim Laden der Seite die aktuellen No-Show-Einstellungen des
-   * Betriebs (falls das Lokal die Funktion eingeschaltet hat) und zeigt bei
-   * Bedarf die Zustimmungs-Checkbox mit dem exakten, serverseitig
-   * mitgeführten Text an. Ohne apiUrl (Vorschau) oder ohne aktivierten
-   * Schutz bleibt das Formular unverändert wie zuvor.
+   * Rechtstexte des Restaurants (nur mit Betriebsserver). Der Server nennt
+   * die aktuell g\u00FCltigen, freigegebenen Fassungen: Bedingungen und
+   * No-Show-Regel bekommen je ein eigenes, nicht vorangekreuztes Feld mit
+   * Link zum Volltext. Ohne freigegebene Fassung bleibt das Feld weg \u2013
+   * und der Server verlangt dann auch nichts. Mitgeschickt wird nur die
+   * Version, die der Gast gesehen hat; passt sie nicht mehr, lehnt der
+   * Server ab und die Felder werden neu geladen.
    */
-  function ladeNoShowEinstellungen() {
-    if (!data.apiUrl) return;
+  function zeigeBestaetigung(feldId, textId, dok, linkText) {
+    var feld = byId(feldId);
+    if (!feld) return;
+    var box = feld.querySelector("input[type=checkbox]");
+    if (!dok) {
+      feld.hidden = true;
+      feld.style.display = "none";
+      feld.removeAttribute("data-version");
+      if (box) box.checked = false;
+      return;
+    }
+    var text = byId(textId);
+    text.textContent = dok.zustimmungstext + " ";
+    var link = document.createElement("a");
+    link.href = data.apiUrl + dok.pfad;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = "(" + linkText + ", Fassung " + dok.version + ")";
+    text.appendChild(link);
+    // Eine neue Fassung muss neu best\u00E4tigt werden.
+    if (box && feld.getAttribute("data-version") !== dok.version) box.checked = false;
+    feld.setAttribute("data-version", dok.version);
+    feld.hidden = false;
+    feld.style.display = "block";
+  }
 
-    fetch(data.apiUrl + "/oeffentlich/no-show-einstellungen", {
+  function ladeRechtslage() {
+    if (!data.apiUrl) return;
+    fetch(data.apiUrl + "/oeffentlich/rechtstexte", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: "{}"
     })
       .then(function (antwort) { return antwort.json(); })
-      .then(function (ergebnis) {
-        if (!ergebnis || !ergebnis.aktiv) return;
-        noShowEinstellungen = ergebnis;
-
-        var betrag = Number(ergebnis.gebuehrBetrag || 0).toFixed(2).replace(".", ",");
-        byId("ord-noshow-text").textContent =
-          "Ich stimme zu: Bei Nichtabholung ohne Stornierung bis " + ergebnis.stornofensterMinuten +
-          " Minuten vor der Abholzeit wird eine Ausfallpauschale von " + betrag + " \u20AC in Rechnung gestellt.";
-        byId("ord-noshow-feld").style.display = "block";
+      .then(function (lage) {
+        if (!lage || !lage.ok) return;
+        zeigeBestaetigung("ord-bedingungen-feld", "ord-bedingungen-text", lage.bestellung.bedingungen, "Bestellbedingungen lesen");
+        zeigeBestaetigung("ord-noshow-feld", "ord-noshow-text", lage.bestellung.noShow, "No-Show-Regel lesen");
+        zeigeBestaetigung("res-bedingungen-feld", "res-bedingungen-text", lage.reservierung.bedingungen, "Reservierungsbedingungen lesen");
+        zeigeBestaetigung("res-noshow-feld", "res-noshow-text", lage.reservierung.noShow, "No-Show-Regel lesen");
       })
       .catch(function () {
-        // Ohne Antwort bleibt die Checkbox einfach aus - keine Bestellung
-        // darf an einem nicht erreichbaren Einstellungs-Abruf scheitern.
+        // Ohne Antwort bleiben die Felder aus. Verlangt der Server eine
+        // Best\u00E4tigung, lehnt er ab \u2013 dann wird hier neu geladen.
       });
+  }
+
+  /** Gibt die best\u00E4tigte Version zur\u00FCck ("" = nicht n\u00F6tig) oder null, wenn ein Pflichtfeld fehlt. */
+  function bestaetigteVersion(feldId) {
+    var feld = byId(feldId);
+    if (!feld || !feld.getAttribute("data-version")) return "";
+    var box = feld.querySelector("input[type=checkbox]");
+    var ok = Boolean(box && box.checked);
+    feld.classList.toggle("invalid", !ok);
+    return ok ? feld.getAttribute("data-version") : null;
   }
 
   /*
@@ -1836,7 +1920,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    ladeNoShowEinstellungen();
+    ladeRechtslage();
     Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function (button) {
       button.addEventListener("click", function () {
         addToCart(button.getAttribute("data-add"), button.getAttribute("data-name"), Number(button.getAttribute("data-preis")));
@@ -1890,13 +1974,11 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       aktualisiereAbholzeiten();
       if (!validate(form, ["name", "telefon", "abholzeit"])) return;
 
-      var noShowFeld = byId("ord-noshow-feld");
-      var noShowAktiv = noShowEinstellungen && noShowEinstellungen.aktiv;
-      if (noShowAktiv) {
-        var angehakt = byId("ord-noshow").checked;
-        noShowFeld.className = angehakt ? "field" : "field invalid";
-        if (!angehakt) return;
-      }
+      // Bedingungen und No-Show-Regel: getrennt, beide nur, wenn der Betrieb
+      // sie freigegeben hat.
+      var bedingungenVersion = bestaetigteVersion("ord-bedingungen-feld");
+      var noShowVersion = bestaetigteVersion("ord-noshow-feld");
+      if (bedingungenVersion === null || noShowVersion === null) return;
 
       var nummer = referenz("AB");
       var abholWahl = form.elements.abholzeit.options[form.elements.abholzeit.selectedIndex];
@@ -1917,10 +1999,13 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
         (form.elements.hinweis.value ? "\nHinweis: " + form.elements.hinweis.value : "");
 
       var positionen = lines().map(function (line) {
-        return { name: line.name, menge: line.menge, preis: line.preis };
+        // Die ID lässt den Server Name und Preis aus seiner Karte prüfen.
+        return { id: line.id, name: line.name, menge: line.menge, preis: line.preis };
       });
       var summe = euro(total());
       var stueck = String(anzahl());
+      // Ältere Seiten haben im Bestellformular kein E-Mail-Feld.
+      var bestellEmail = form.elements.email ? String(form.elements.email.value).trim() : "";
 
       sende("/oeffentlich/bestellung", {
         positionen: positionen,
@@ -1929,29 +2014,38 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
         abholZeitpunkt: abholArt ? form.elements.abholzeit.value : "",
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
+        email: bestellEmail,
         hinweis: form.elements.hinweis.value,
-        noShowZustimmung: noShowAktiv ? true : false
+        bestaetigungen: { bedingungen: bedingungenVersion, noShow: noShowVersion },
+        noShowZustimmung: noShowVersion ? true : false
       }, byId("order-submit")).then(function (ergebnis) {
         // Die Abholzeit ist zun\u00E4chst nur ein Wunsch: ob sie machbar ist,
         // best\u00E4tigt die K\u00FCche.
         var echteNummer = ergebnis.demo ? nummer : ergebnis.bestellung.nummer;
         // Ohne Betriebsserver (Beispielseite, Entwurf) ist nichts passiert \u2013
         // die Best\u00E4tigung sagt das ehrlich, statt Erfolg vorzut\u00E4uschen.
+        var teil = ergebnis.demo ? {} : ergebnis.bestellung;
         var text = ergebnis.demo
           ? "Das ist eine Vorschau: Ihre Bestellung wurde nicht verschickt und wird nicht zubereitet. Auf der fertigen Website landet sie direkt in der K\u00FCche des Restaurants." + telefonSatz("Zum Bestellen")
-          : "Ihre Bestellung liegt in der K\u00FCche. Die Abholzeit best\u00E4tigen wir Ihnen gleich \u2013 falls es knapp wird, melden wir uns telefonisch.";
+          : "Anfrage eingegangen \u2013 wartet noch auf Best\u00E4tigung durch das Restaurant. Die Abholzeit gilt erst, wenn das Restaurant sie best\u00E4tigt." + kanalSatz(bestellEmail, teil);
         var zeilen = [
           [ergebnis.demo ? "Abholung" : "Abholung (gew\u00FCnscht)", zeit],
           ["Positionen", stueck],
           ["Gesamt", summe],
         ];
-        if (!ergebnis.demo) zeilen.unshift(["Bestellnummer", echteNummer]);
+        if (!ergebnis.demo) {
+          zeilen.unshift(["Status", teil.statusText || "Eingegangen \u2013 noch nicht best\u00E4tigt"]);
+          zeilen.unshift(["Bestellnummer", echteNummer]);
+          if (teil.rueckfrageTelefon || data.telefon) zeilen.push(["R\u00FCckfragen", teil.rueckfrageTelefon || data.telefon]);
+        }
 
         showConfirm(
           ergebnis.demo ? "Vorschau \u2013 nichts bestellt" : "Bestellung eingegangen",
           text,
           zeilen,
-          mailtoLink("Abholbestellung " + echteNummer + " \u2013 " + data.name, body)
+          mailtoLink("Abholbestellung " + echteNummer + " \u2013 " + data.name, body),
+          false,
+          statusUrl(teil)
         );
 
         cart = {};
@@ -1963,6 +2057,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
         abhol.geladenUm = 0;
         ladeAbholKonfig();
         aktualisiereAbholzeiten();
+        ladeRechtslage();
         zeigeFehler(fehler.message);
       });
     });
@@ -1971,6 +2066,9 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       event.preventDefault();
       var form = event.target;
       if (!validate(form, ["datum", "uhrzeit", "personen", "name", "telefon"])) return;
+      var resBedingungen = bestaetigteVersion("res-bedingungen-feld");
+      var resNoShow = bestaetigteVersion("res-noshow-feld");
+      if (resBedingungen === null || resNoShow === null) return;
 
       var nummer = referenz("RES");
       var datum = form.elements.datum.value.split("-").reverse().join(".");
@@ -1985,6 +2083,7 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
 
       var uhrzeit = form.elements.uhrzeit.value;
       var personenText = form.elements.personen.value;
+      var resEmail = String(form.elements.email.value).trim();
       // "4 Personen" -> 4, damit das Lokal eine Zahl bekommt.
       var personenZahl = parseInt(personenText, 10) || 1;
 
@@ -1994,27 +2093,38 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
         personen: personenZahl,
         name: form.elements.name.value,
         telefon: form.elements.telefon.value,
-        email: form.elements.email.value,
-        wunsch: form.elements.wunsch.value
+        email: resEmail,
+        wunsch: form.elements.wunsch.value,
+        bestaetigungen: { bedingungen: resBedingungen, noShow: resNoShow }
       }, form.querySelector("button[type=submit]")).then(function (ergebnis) {
+        var teil = ergebnis.demo ? {} : ergebnis.reservierung;
+        // Die Referenz vergibt der Server \u2013 dieselbe steht in E-Mail und Statusseite.
+        var echteNummer = teil.nummer || nummer;
         var zeilen = [
           ["Datum", datum],
           ["Uhrzeit", uhrzeit],
           ["Personen", personenText],
         ];
-        if (!ergebnis.demo) zeilen.unshift(["Reservierungsnr.", nummer]);
+        if (!ergebnis.demo) {
+          zeilen.unshift(["Status", teil.statusText || "Anfrage eingegangen \u2013 noch nicht best\u00E4tigt"]);
+          zeilen.unshift(["Reservierungsnr.", echteNummer]);
+          if (teil.rueckfrageTelefon || data.telefon) zeilen.push(["R\u00FCckfragen", teil.rueckfrageTelefon || data.telefon]);
+        }
         showConfirm(
           ergebnis.demo ? "Vorschau \u2013 nichts gesendet" : "Anfrage eingegangen",
           ergebnis.demo
             ? "Das ist eine Vorschau: Ihre Anfrage wurde nicht verschickt, es ist kein Tisch reserviert. Auf der fertigen Website geht sie direkt an das Restaurant." + telefonSatz("Zum Reservieren")
-            : "Vielen Dank! Wir haben Ihren Tisch vorgemerkt und best\u00E4tigen Ihnen die Reservierung in K\u00FCrze.",
+            : "Anfrage eingegangen \u2013 wartet noch auf Best\u00E4tigung durch das Restaurant. Ihr Tisch ist erst reserviert, wenn das Restaurant best\u00E4tigt." + kanalSatz(resEmail, teil),
           zeilen,
-          mailtoLink("Tischreservierung " + nummer + " \u2013 " + data.name, body)
+          mailtoLink("Tischreservierung " + echteNummer + " \u2013 " + data.name, body),
+          false,
+          statusUrl(teil)
         );
 
         form.reset();
         dateInput.value = iso;
       }).catch(function (fehler) {
+        ladeRechtslage();
         zeigeFehler(fehler.message);
       });
     });
@@ -2132,26 +2242,47 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
     rechne();
   }
 
-  // 4. Video: erst nach dem Laden, nie bei reduzierter Bewegung, Save-Data
-  //    oder langsamem Netz. Das Poster bleibt stehen, bis der erste Frame läuft.
+  // 4. Video: erst nach dem Laden, nie bei reduzierter Bewegung, Save-Data,
+  //    reduzierten Daten oder langsamem Netz. Das Poster bleibt stehen, bis der
+  //    erste Frame läuft – und ganz, wenn das Video nicht in STARTFRIST_MS
+  //    anläuft (Browser ohne Netz-Auskunft wie Safari, Stromsparmodus).
   var video = document.querySelector(".buehne-video");
   var netz = navigator.connection || {};
-  var langsam = Boolean(netz.saveData) || /(^|-)2g$|^3g$/.test(netz.effectiveType || "");
+  var datenSparen = window.matchMedia && window.matchMedia("(prefers-reduced-data: reduce)").matches;
+  // Die Bandbreiten-Schätzung (downlink) ist ohne Messung ein Pauschalwert und
+  // taugt nicht als Schwelle; was wirklich ankommt, misst die Startfrist.
+  var langsam = Boolean(netz.saveData) || datenSparen || /(^|-)2g$|^3g$/.test(netz.effectiveType || "");
+  var STARTFRIST_MS = 4000;
   if (video && !reduziert && !langsam) {
     var starte = function () {
       var schmal = window.matchMedia("(max-width: 767px)").matches;
       // Hochformat-Poster ohne Hochformat-Video: auf dem Handy bleibt das Poster.
       if (schmal && video.hasAttribute("data-nur-breit")) return;
+      // Auf dem Handy das Hochformat-Video; ohne H.264 jeweils die WebM-Fassung.
       var mobil = schmal && video.getAttribute("data-src-mobil");
       var h264 = video.canPlayType('video/mp4; codecs="avc1.4d401f"');
-      var webm = video.getAttribute("data-src-webm");
-      var quelle = mobil ? video.getAttribute("data-src-mobil") : !h264 && webm && video.canPlayType('video/webm; codecs="vp9"') ? webm : video.getAttribute("data-src");
-      video.addEventListener("playing", function () { video.classList.add("laeuft"); });
+      var vp9 = video.canPlayType('video/webm; codecs="vp9"');
+      var mp4 = mobil ? video.getAttribute("data-src-mobil") : video.getAttribute("data-src");
+      var webm = video.getAttribute(mobil ? "data-src-mobil-webm" : "data-src-webm");
+      var quelle = !h264 && webm && vp9 ? webm : mp4;
+      var gestartet = false;
+      var abgebrochen = false;
+      video.addEventListener("playing", function () { if (abgebrochen) return; gestartet = true; video.classList.add("laeuft"); });
       video.addEventListener("error", function () { video.classList.remove("laeuft"); });
       video.src = quelle;
+      // Läuft das Video nicht rechtzeitig an, ist das Netz zu langsam: Laden
+      // abbrechen, das Standbild bleibt – kein spätes Umspringen, kein Datenverbrauch.
+      window.setTimeout(function () {
+        if (gestartet) return;
+        abgebrochen = true;
+        video.classList.remove("laeuft");
+        video.pause();
+        video.removeAttribute("src");
+        video.load();
+      }, STARTFRIST_MS);
       // "einmal": nach dem Ende bleibt das letzte Bild stehen, kein Neustart beim Zurückscrollen.
       var einmal = video.hasAttribute("data-einmal");
-      var spielen = function () { if (einmal && video.ended) return; var p = video.play(); if (p && p.catch) p.catch(function () {}); };
+      var spielen = function () { if (abgebrochen || (einmal && video.ended)) return; var p = video.play(); if (p && p.catch) p.catch(function () {}); };
       spielen();
       if ("IntersectionObserver" in window) {
         new IntersectionObserver(function (eintraege) {
