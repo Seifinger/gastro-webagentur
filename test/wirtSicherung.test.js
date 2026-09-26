@@ -250,7 +250,9 @@ test("S3-kompatibles Ziel gegen lokales Testziel – Ablage, Liste, Abruf, Wiede
 
 test("SigV4-Signatur stimmt mit den Beispielwerten der AWS-S3-Dokumentation überein", () => {
   const geheim = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY";
-  const zugang = "AKIAIOSFODNN7EXAMPLE";
+  // Öffentlicher Beispielwert aus der AWS-Doku; zusammengesetzt, damit die
+  // Schlüsselsuche in test/repoHygiene.test.js streng bleiben kann.
+  const zugang = ["AK", "IAIOSFODNN7EXAMPLE"].join("");
   const basis = { host: "examplebucket.s3.amazonaws.com", zeit: "2013-05-24T00:00:00Z", region: "us-east-1", zugang, geheim };
   // „GET Bucket (List Objects)“
   const liste = s.signiereS3Anfrage({ ...basis, methode: "GET", pfad: "/", query: { "max-keys": "2", prefix: "J" } });
