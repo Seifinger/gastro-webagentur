@@ -2233,21 +2233,35 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
   }
 
   // 4. Video: erst nach dem Laden, nie bei reduzierter Bewegung, Save-Data,
-  //    reduzierten Daten oder langsamem Netz. Das Poster bleibt stehen, bis der
-  //    erste Frame läuft – und ganz, wenn das Video nicht in STARTFRIST_MS
-  //    anläuft (Browser ohne Netz-Auskunft wie Safari, Stromsparmodus).
+  //    reduzierten Daten oder eindeutig langsamem Netz. Das Poster bleibt stehen,
+  //    bis der erste Frame läuft. Poster = erstes Videobild, deshalb ist auch ein
+  //    später Start nahtlos; die Startfrist verhindert nur endloses Laden.
+  //    Mit ?video=diagnose zeigt die Seite unten, was passiert (für Tests am Handy).
   var video = document.querySelector(".buehne-video");
+  var protokoll = function () {};
+  if (/[?&]video=diagnose(&|$)/.test(window.location.search)) {
+    var tafel = document.createElement("pre");
+    tafel.setAttribute("style", "position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;max-height:45vh;overflow:auto;margin:0;padding:8px;background:rgba(0,0,0,.88);color:#fff;font:12px/1.4 monospace;white-space:pre-wrap");
+    document.body.appendChild(tafel);
+    var beginn = Date.now();
+    protokoll = function (text) { tafel.textContent += ((Date.now() - beginn) / 1000).toFixed(1) + " s  " + text + "\n"; };
+  }
+  var stand = function (wert) { if (video) video.setAttribute("data-stand", wert); protokoll("Stand: " + wert); };
   var netz = navigator.connection || {};
+  var typ = netz.effectiveType || "";
   var datenSparen = window.matchMedia && window.matchMedia("(prefers-reduced-data: reduce)").matches;
-  // Die Bandbreiten-Schätzung (downlink) ist ohne Messung ein Pauschalwert und
-  // taugt nicht als Schwelle; was wirklich ankommt, misst die Startfrist.
-  var langsam = Boolean(netz.saveData) || datenSparen || /(^|-)2g$|^3g$/.test(netz.effectiveType || "");
-  var STARTFRIST_MS = 4000;
-  if (video && !reduziert && !langsam) {
+  // "3g" meldet Chrome schon bei hoher Latenz im Mobilfunk – langsam nur, wenn
+  // auch die gemessene Bandbreite gering ist. 2G ist immer zu langsam.
+  var langsam = Boolean(netz.saveData) || datenSparen || /(^|-)2g$/.test(typ) || (typ === "3g" && !(netz.downlink >= 1.5));
+  var STARTFRIST_MS = 10000;
+  protokoll("Breite " + window.innerWidth + " px, Bewegung reduziert: " + (reduziert ? "ja" : "nein") + ", Netz: " + (typ || "keine Auskunft") + (netz.downlink ? " / " + netz.downlink + " Mbit/s" : "") + (netz.saveData ? ", Datensparen" : ""));
+  if (video && reduziert) stand("reduziert");
+  else if (video && langsam) stand("langsam");
+  else if (video) {
     var starte = function () {
       var schmal = window.matchMedia("(max-width: 767px)").matches;
       // Hochformat-Poster ohne Hochformat-Video: auf dem Handy bleibt das Poster.
-      if (schmal && video.hasAttribute("data-nur-breit")) return;
+      if (schmal && video.hasAttribute("data-nur-breit")) { stand("nur-breit"); return; }
       // Auf dem Handy das Hochformat-Video; ohne H.264 jeweils die WebM-Fassung.
       var mobil = schmal && video.getAttribute("data-src-mobil");
       var h264 = video.canPlayType('video/mp4; codecs="avc1.4d401f"');
@@ -2255,28 +2269,66 @@ section[id^="karte-"] { scroll-margin-top: calc(var(--kopf-ist, var(--kopf-hoehe
       var mp4 = mobil ? video.getAttribute("data-src-mobil") : video.getAttribute("data-src");
       var webm = video.getAttribute(mobil ? "data-src-mobil-webm" : "data-src-webm");
       var quelle = !h264 && webm && vp9 ? webm : mp4;
+      protokoll("Quelle: " + quelle + " (MP4: " + (h264 || "nein") + ", WebM: " + (vp9 || "nein") + ")");
       var gestartet = false;
       var abgebrochen = false;
-      video.addEventListener("playing", function () { if (abgebrochen) return; gestartet = true; video.classList.add("laeuft"); });
-      video.addEventListener("error", function () { video.classList.remove("laeuft"); });
-      video.src = quelle;
-      // Läuft das Video nicht rechtzeitig an, ist das Netz zu langsam: Laden
-      // abbrechen, das Standbild bleibt – kein spätes Umspringen, kein Datenverbrauch.
-      window.setTimeout(function () {
+      var wartetAufTippen = false;
+      var frist = 0;
+      // Läuft das Video in der Frist nicht an: Laden abbrechen, Standbild bleibt.
+      var abbrechen = function () {
         if (gestartet) return;
         abgebrochen = true;
         video.classList.remove("laeuft");
         video.pause();
         video.removeAttribute("src");
         video.load();
-      }, STARTFRIST_MS);
+        stand("abgebrochen");
+      };
+      var fristStarten = function () { window.clearTimeout(frist); frist = window.setTimeout(abbrechen, STARTFRIST_MS); };
+      video.addEventListener("playing", function () {
+        if (abgebrochen) return;
+        gestartet = true;
+        window.clearTimeout(frist);
+        video.classList.add("laeuft");
+        stand("laeuft");
+      });
+      video.addEventListener("error", function () { video.classList.remove("laeuft"); if (!abgebrochen) stand("fehler " + (video.error ? video.error.code : "")); });
+      ["loadstart", "loadedmetadata", "canplay", "waiting", "stalled"].forEach(function (name) { video.addEventListener(name, function () { protokoll(name); }); });
+      // Stummschaltung auch als Eigenschaft – Voraussetzung für Autoplay auf iOS.
+      video.muted = true;
+      video.defaultMuted = true;
       // "einmal": nach dem Ende bleibt das letzte Bild stehen, kein Neustart beim Zurückscrollen.
       var einmal = video.hasAttribute("data-einmal");
-      var spielen = function () { if (abgebrochen || (einmal && video.ended)) return; var p = video.play(); if (p && p.catch) p.catch(function () {}); };
+      var spielen = function () {
+        if (abgebrochen || (einmal && video.ended)) return;
+        var p = video.play();
+        if (!p || !p.catch) return;
+        p.catch(function (fehler) {
+          protokoll("play() abgelehnt: " + fehler.name);
+          if (fehler.name !== "NotAllowedError" || gestartet || abgebrochen || wartetAufTippen) return;
+          // Autoplay gesperrt (iPhone im Stromsparmodus, „Video-Vorschauen
+          // automatisch abspielen“ aus): nichts wird geladen, das Standbild
+          // bleibt – beim ersten Antippen startet das Video.
+          window.clearTimeout(frist);
+          wartetAufTippen = true;
+          stand("blockiert");
+          var nachTippen = function () {
+            document.removeEventListener("touchend", nachTippen, true);
+            document.removeEventListener("click", nachTippen, true);
+            wartetAufTippen = false;
+            fristStarten();
+            spielen();
+          };
+          document.addEventListener("touchend", nachTippen, true);
+          document.addEventListener("click", nachTippen, true);
+        });
+      };
+      video.src = quelle;
+      fristStarten();
       spielen();
       if ("IntersectionObserver" in window) {
         new IntersectionObserver(function (eintraege) {
-          if (eintraege[0].isIntersecting) spielen(); else video.pause();
+          if (eintraege[0].isIntersecting) { if (!wartetAufTippen) spielen(); } else video.pause();
         }).observe(video);
       }
     };
