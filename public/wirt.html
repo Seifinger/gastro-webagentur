@@ -181,6 +181,29 @@
   .warnbox li + li { margin-top: 7px; }
   .warnbox .wann { font-weight: 700; }
 
+  /* Reiter „Rabattaktionen“ */
+  .ra-klein { color: var(--muted); font-size: .8rem; }
+  .ra-form { display: grid; gap: 14px; grid-template-columns: 1fr; }
+  @media (min-width: 780px) { .ra-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .ra-form .weit { grid-column: 1 / -1; }
+  .ra-form input, .ra-form select { width: 100%; }
+  .ra-form input[type="checkbox"], .ra-form input[type="radio"] { width: auto; }
+  .ra-wahl { display: grid; gap: 4px 16px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); max-height: 320px; overflow-y: auto; padding: 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--bg); }
+  .ra-wahl label, .ra-art label { display: flex; gap: 8px; align-items: flex-start; text-transform: none; letter-spacing: 0; font-weight: 400; font-size: .92rem; color: var(--text); margin: 0; }
+  .ra-wahl label.aus { color: var(--muted); }
+  .ra-wahl input, .ra-art input { width: auto; margin-top: 4px; }
+  .ra-wahl h4 { grid-column: 1 / -1; margin: 6px 0 0; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .ra-art { display: flex; gap: 18px; flex-wrap: wrap; }
+  .ra-tabelle { width: 100%; font-size: .9rem; margin-top: 8px; }
+  .ra-tabelle td, .ra-tabelle th { padding: 6px 8px; }
+  .ra-tabelle s { color: var(--muted); }
+  .ra-karte { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin-top: 12px; background: var(--bg); }
+  .ra-karte h3 { margin: 0 0 4px; font-size: 1rem; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ra-zustand { font-size: .72rem; font-weight: 700; border-radius: 4px; padding: 1px 8px; }
+  .ra-zustand.aktiv { background: color-mix(in srgb, var(--green) 20%, transparent); color: var(--green); }
+  .ra-zustand.geplant, .ra-zustand.pausiert { background: color-mix(in srgb, var(--warn) 22%, transparent); color: var(--warn); }
+  .ra-zustand.abgelaufen, .ra-zustand.beendet { background: color-mix(in srgb, #fff 12%, transparent); color: var(--muted); }
+
   /* Reiter „Empfehlungen“ („Passt gut dazu“) */
   .em-produkte { display: grid; gap: 0; margin-top: 8px; }
   .em-zeile { display: grid; gap: 8px; grid-template-columns: 1fr; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: center; }
@@ -244,6 +267,7 @@
     <button data-tab="reservierungen" class="aktiv">Reservierungen</button>
     <button data-tab="bestellungen">Bestellungen</button>
     <button data-tab="empfehlungen">Empfehlungen</button>
+    <button data-tab="rabattaktionen">Rabattaktionen</button>
     <button data-tab="tischplan">Tischplan</button>
     <button data-tab="statistik">Statistik</button>
     <button data-tab="rechtstexte">Rechtstexte</button>
@@ -523,6 +547,51 @@
       </div>
     </section>
 
+    <section id="tab-rabattaktionen" hidden>
+      <div class="balken">
+        <strong>Rabattaktionen für Abholbestellungen</strong>
+        <div class="tg-leise">
+          Zwei Arten: ein <strong>allgemeiner Abholrabatt</strong> in Prozent (z. B. „10 % auf Abholung“) und ein
+          <strong>Rabatt auf einzelne Gerichte</strong> in Prozent oder Euro (z. B. „Margherita diese Woche 2 € günstiger“).
+          Aktionen gelten nur für Online-Bestellungen zur Abholung, nie für Reservierungen. Ob eine Aktion gilt, entscheidet
+          der Zeitpunkt, zu dem der Gast bestellt – nicht die Abholzeit.
+        </div>
+        <p class="tg-leise" id="ra-regel"><strong>Überschneidung:</strong> Rabatte werden nicht addiert. Treffen auf ein Gericht
+          mehrere Aktionen zu, zahlt der Gast den günstigeren Endpreis. Beispiel: 12,00 € – allgemein 10 % → 10,80 €,
+          Gericht-Rabatt 2,00 € → 10,00 €. Der Gast zahlt 10,00 € (nicht 9,00 €).</p>
+        <p class="tg-leise">Die Website zeigt eine Aktion ohne neue Veröffentlichung, sobald Ihr Bestellserver sie bestätigt.
+          Ist er nicht erreichbar, zeigt sie die regulären Preise. Beim Bestellen rechnet der Server den Endpreis immer selbst.</p>
+      </div>
+
+      <div id="ra-hinweis"></div>
+
+      <form class="balken" id="ra-form" novalidate>
+        <label style="margin-bottom:10px">Neue Aktion</label>
+        <div class="ra-form">
+          <div class="weit"><label for="ra-name">Name der Aktion (sieht auch der Gast)</label><input id="ra-name" maxlength="80" placeholder="z. B. Abholwoche"></div>
+          <fieldset class="tg-gruppe weit" style="margin:0"><legend>Art</legend>
+            <div class="ra-art">
+              <label><input type="radio" name="ra-art" value="abholung" checked> Allgemeiner Abholrabatt (Prozent)</label>
+              <label><input type="radio" name="ra-art" value="gericht"> Rabatt auf einzelne Gerichte</label>
+            </div>
+          </fieldset>
+          <div><label for="ra-typ">Rabatt</label>
+            <select id="ra-typ"><option value="prozent">Prozent</option><option value="betrag">Euro-Betrag (nur einzelne Gerichte)</option></select></div>
+          <div><label for="ra-wert">Wert</label><input id="ra-wert" inputmode="decimal" placeholder="z. B. 10 oder 2,00"></div>
+          <div><label for="ra-start">Start</label><input type="datetime-local" id="ra-start"></div>
+          <div><label for="ra-ende">Ende (leer = ohne Enddatum)</label><input type="datetime-local" id="ra-ende"></div>
+          <div class="weit" id="ra-ziel"></div>
+          <div class="weit"><label class="tg-schalter"><input type="checkbox" id="ra-pausiert"> pausiert anlegen (noch nicht auf der Website)</label></div>
+        </div>
+        <p class="ra-klein" id="ra-zeitzone"></p>
+        <div id="ra-vorschau"></div>
+        <button class="knopf" type="submit" style="margin-top:14px">Aktion speichern</button>
+      </form>
+
+      <div class="balken"><label style="margin-bottom:4px">Laufende, geplante und pausierte Aktionen</label><div id="ra-liste"><p class="leer">Wird geladen …</p></div></div>
+      <div class="balken"><label style="margin-bottom:4px">Abgelaufene und beendete Aktionen</label><div id="ra-archiv"></div></div>
+    </section>
+
     <section id="tab-tischplan" hidden>
       <div class="balken" id="plan-summe"></div>
       <div id="tisch-liste"></div>
@@ -725,7 +794,8 @@ function renderBestellungen() {
       <h3>${esc(b.nummer)} <span class="marke ${esc(b.status)}">${beschriftung[b.status]}</span></h3>
       <div class="meta">${esc(b.name)}${b.telefon ? ` · <a href="tel:${esc(b.telefon.replace(/[^\\d+]/g, ""))}">${esc(b.telefon)}</a>` : ""}</div>
       ${b.unzuverlaessig ? `<p class="hinweis-gast" style="color:var(--danger)">⚠️ Diese Nummer ist mehrfach nicht erschienen.</p>` : ""}
-      <ul>${b.positionen.map((p) => `<li><span>${p.menge} × ${esc(p.name)}</span><span>${euro(p.preis * p.menge)}</span></li>`).join("")}</ul>
+      <ul>${b.positionen.map((p) => `<li><span>${p.menge} × ${esc(p.name)}${p.aktion ? `<br><span class="ra-klein">Aktion „${esc(p.aktion.name)}“ ${esc(p.aktion.text)} · regulär ${euro(p.regulaerPreis)}</span>` : ""}</span><span>${euro(p.preis * p.menge)}</span></li>`).join("")}</ul>
+      ${b.preisermittlung?.ersparnisCent ? `<div class="ra-klein" style="display:flex;justify-content:space-between"><span>Vor Rabatt</span><span>${euro(b.preisermittlung.zwischensummeCent / 100)}</span></div><div class="ra-klein" style="display:flex;justify-content:space-between"><span>Ersparnis durch Aktionen</span><span>−${euro(b.preisermittlung.ersparnisCent / 100)}</span></div>` : ""}
       <div class="summe"><span>Gesamt</span><span>${euro(b.gesamt)}</span></div>
       ${b.hinweis ? `<p class="hinweis-gast">Hinweis: ${esc(b.hinweis)}</p>` : ""}
       ${b.noShowBestaetigtAm ? `<p class="hinweis-gast">Ausfallpauschale bestätigt: ${euro(b.noShowBetrag)}</p>` : ""}
@@ -964,13 +1034,14 @@ async function lade() {
 document.querySelectorAll("nav button").forEach((knopf) => {
   knopf.addEventListener("click", () => {
     document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("aktiv", b === knopf));
-    ["reservierungen", "bestellungen", "empfehlungen", "tischplan", "statistik", "rechtstexte", "telegram"].forEach((name) => {
+    ["reservierungen", "bestellungen", "empfehlungen", "rabattaktionen", "tischplan", "statistik", "rechtstexte", "telegram"].forEach((name) => {
       document.getElementById(`tab-${name}`).hidden = name !== knopf.dataset.tab;
     });
     if (knopf.dataset.tab === "statistik") ladeStatistik();
     if (knopf.dataset.tab === "rechtstexte") ladeRechtstexte();
     if (knopf.dataset.tab === "telegram") ladeTelegram();
     if (knopf.dataset.tab === "empfehlungen") ladeEmpfehlungen();
+    if (knopf.dataset.tab === "rabattaktionen") ladeRabattaktionen();
   });
 });
 
@@ -1303,7 +1374,7 @@ function renderStatistik(d) {
       <ul><li><span>neu</span><span>${zahl(b.status.neu)}</span></li><li><span>bestätigt / in Zubereitung</span><span>${zahl(b.status.bestaetigt)}</span></li><li><span>bereit</span><span>${zahl(b.status.bereit)}</span></li><li><span>abgeholt</span><span>${zahl(b.status.abgeholt)}</span></li><li><span>abgelehnt</span><span>${zahl(b.status.abgelehnt)}</span></li><li><span>storniert</span><span>${zahl(b.status.storniert)}</span></li></ul>
       ${b.unbekannteQuelle ? `<p>Zusätzlich ${zahl(b.unbekannteQuelle)} ältere Bestellung(en) ohne gesicherte Quelle (in den Status enthalten).</p>` : ""}</div>
     <div class="kachel"><h3>${esc(w.bezeichnung)} (kein bezahlter Umsatz)</h3><div class="gross">${euro(w.summe)}</div>
-      <ul><li><span>Durchschnitt je Bestellung</span><span>${w.durchschnitt === null ? "–" : euro(w.durchschnitt)}</span></li><li><span>davon abgeholt</span><span>${euro(w.davonAbgeholt)}</span></li></ul><p>${esc(w.erklaerung)}</p></div>
+      <ul><li><span>Durchschnitt je Bestellung</span><span>${w.durchschnitt === null ? "–" : euro(w.durchschnitt)}</span></li><li><span>davon abgeholt</span><span>${euro(w.davonAbgeholt)}</span></li>${w.rabatt > 0 ? `<li><span>vor Rabatt (nur zur Einordnung)</span><span>${euro(w.vorRabatt)}</span></li><li><span>gewährte Rabatte</span><span>−${euro(w.rabatt)}</span></li>` : ""}</ul><p>${esc(w.erklaerung)}</p></div>
     <div class="kachel"><h3>Website-Aufrufe</h3>${aufrufe}</div>
     ${d.verhaeltnis ? `<div class="kachel"><h3>${esc(d.verhaeltnis.bezeichnung)}</h3><div class="gross">${String(d.verhaeltnis.wert).replace(".", ",")}</div><p>${esc(d.verhaeltnis.erklaerung)}</p></div>` : ""}
   </div>
@@ -1931,6 +2002,133 @@ $("tab-empfehlungen").addEventListener("click", async (e) => {
     return;
   } else return;
   emNeuZeichnen();
+});
+</script>
+
+<script>
+/* ---------- Rabattaktionen ---------- */
+
+let ra = null;
+
+function raEntwurf() {
+  const art = document.querySelector('input[name="ra-art"]:checked')?.value;
+  const e = {
+    name: $("ra-name").value,
+    art,
+    rabatt: { typ: $("ra-typ").value, wert: $("ra-wert").value },
+    start: $("ra-start").value,
+    ende: $("ra-ende").value,
+    pausiert: $("ra-pausiert").checked,
+  };
+  if (art === "gericht") e.gerichte = [...document.querySelectorAll("[data-ra-gericht]:checked")].map((x) => x.value);
+  else e.ausgenommeneKategorien = [...document.querySelectorAll("[data-ra-kategorie]")].filter((x) => !x.checked).map((x) => x.value);
+  return e;
+}
+
+function raZielfeld() {
+  const art = document.querySelector('input[name="ra-art"]:checked')?.value;
+  const typ = $("ra-typ");
+  typ.querySelector('option[value="betrag"]').disabled = art !== "gericht";
+  if (art !== "gericht" && typ.value === "betrag") typ.value = "prozent";
+  const gewaehlt = new Set([...document.querySelectorAll("[data-ra-gericht]:checked")].map((x) => x.value));
+  if (art === "gericht") {
+    const nachKategorie = {};
+    for (const p of ra.produkte) (nachKategorie[p.kategorie] ??= []).push(p);
+    $("ra-ziel").innerHTML = `<label>Gerichte aus Ihrer Karte</label><div class="ra-wahl">${Object.entries(nachKategorie).map(([k, liste]) => `<h4>${esc(k)}</h4>${liste.map((p) =>
+      `<label class="${p.freigegeben ? "" : "aus"}"><input type="checkbox" data-ra-gericht value="${esc(p.id)}"${gewaehlt.has(p.id) ? " checked" : ""}${p.freigegeben ? "" : " disabled"}> <span>${esc(p.name)} <span class="ra-klein">${esc(p.preisText)}${p.freigegeben ? "" : " · noch nicht freigegeben"}</span></span></label>`).join("")}`).join("")}</div>`;
+  } else {
+    $("ra-ziel").innerHTML = `<label>Gilt für (Kategorien Ihrer Karte)</label>
+      <div class="ra-wahl">${ra.kategorien.map((k) => `<label><input type="checkbox" data-ra-kategorie value="${esc(k)}" checked> <span>${esc(k)}</span></label>`).join("")}</div>
+      <p class="ra-klein">Gilt für alle online bestellbaren Produkte der angehakten Kategorien – nur für Abholbestellungen, nicht für Reservierungen. Hat ein Gericht einen günstigeren Einzelrabatt, gilt dort dieser.</p>`;
+  }
+}
+
+function raKarte(a) {
+  const knoepfe = a.zustand === "abgelaufen" || a.zustand === "beendet" ? "" : `<div class="aktionen" style="margin-top:10px">
+    ${a.status === "pausiert" ? `<button class="knopf klein" type="button" data-ra-status="aktiv" data-id="${esc(a.id)}">Fortsetzen</button>` : `<button class="knopf klein stumm" type="button" data-ra-status="pausiert" data-id="${esc(a.id)}">Pausieren</button>`}
+    <button class="knopf klein gefahr" type="button" data-ra-status="beendet" data-id="${esc(a.id)}">Beenden</button></div>`;
+  const zeilen = (a.zeilen ?? []);
+  return `<div class="ra-karte" data-ra-aktion="${esc(a.id)}">
+    <h3>${esc(a.name)} <span class="ra-zustand ${esc(a.zustand)}">${esc(a.zustandText)}</span></h3>
+    <div class="ra-klein">${esc(a.artText)} · ${esc(a.rabattText)} · ${esc(a.zeitraumText)}</div>
+    <div style="font-size:.88rem;margin-top:6px">Gilt für: ${esc(a.giltFuer)}</div>
+    ${zeilen.length ? `<details style="margin-top:8px"><summary class="ra-klein">Preise (${zeilen.length})</summary>${raTabelle(zeilen)}</details>` : ""}
+    <div class="ra-klein" style="margin-top:6px">Angelegt ${esc(tgZeitpunkt(a.erstellt))} · geändert ${esc(tgZeitpunkt(a.geaendert))} · ID ${esc(a.id)}</div>
+    ${knoepfe}
+  </div>`;
+}
+
+function raTabelle(zeilen) {
+  return `<table class="ra-tabelle"><thead><tr><th>Produkt</th><th>Regulär</th><th>Mit dieser Aktion</th><th>Der Gast zahlt</th></tr></thead><tbody>${zeilen.map((z) =>
+    `<tr><td>${esc(z.name)}${z.stattdessen ? `<div class="ra-klein">${esc(z.stattdessen)}</div>` : ""}</td><td><s>${euro(z.regulaer)}</s></td><td>${euro(z.mitAktion)}</td><td><strong>${euro(z.tatsaechlich)}</strong></td></tr>`).join("")}</tbody></table>`;
+}
+
+async function raVorschau() {
+  const ziel = $("ra-vorschau");
+  try {
+    const r = await ruf("/api/rabattaktionen/vorschau", raEntwurf());
+    ziel.innerHTML = r.zeilen.length
+      ? `<label style="margin-top:12px">Vorschau: alter und neuer Preis</label>${raTabelle(r.zeilen)}`
+      : '<p class="ra-klein">Diese Aktion würde keinen Preis senken.</p>';
+  } catch (fehler) {
+    ziel.innerHTML = `<p class="ra-klein">Vorschau: ${esc(fehler.message)}</p>`;
+  }
+}
+
+async function ladeRabattaktionen() {
+  try {
+    const antwort = await fetch("/api/rabattaktionen");
+    ra = await antwort.json();
+    if (!antwort.ok || !ra.ok) throw new Error(ra.fehler || "Rabattaktionen konnten nicht geladen werden.");
+  } catch (fehler) {
+    $("ra-liste").innerHTML = `<p class="fehler">${esc(fehler.message)}</p>`;
+    return;
+  }
+  $("ra-hinweis").innerHTML = ra.karte ? "" : `<div class="tg-warn">Für diesen Betrieb ist noch keine Speisekarte hinterlegt. Sie wird beim Bau der Website übergeben – erst dann kennt der Server die Preise, die er rabattieren darf.</div>`;
+  $("ra-form").hidden = !ra.karte;
+  $("ra-zeitzone").textContent = `Zeiten in der Zeitzone des Betriebs (${ra.zeitzone}). Start gilt ab der Minute, das Ende ab der Minute nicht mehr.`;
+  if (!$("ra-start").value) $("ra-start").value = ra.jetztWanduhr;
+  if (ra.karte) raZielfeld();
+  const laufend = ra.aktionen.filter((a) => !["abgelaufen", "beendet"].includes(a.zustand));
+  const vorbei = ra.aktionen.filter((a) => ["abgelaufen", "beendet"].includes(a.zustand));
+  $("ra-liste").innerHTML = laufend.length ? laufend.map(raKarte).join("") : '<p class="tg-leise" style="margin:0">Keine – ohne Aktion gelten die regulären Preise.</p>';
+  $("ra-archiv").innerHTML = vorbei.length ? vorbei.reverse().map(raKarte).join("") : '<p class="tg-leise" style="margin:0">Noch keine.</p>';
+}
+
+$("ra-form").addEventListener("change", (e) => {
+  if (e.target.name === "ra-art") raZielfeld();
+  raVorschau();
+});
+$("ra-form").addEventListener("input", (e) => {
+  if (e.target.id === "ra-wert" || e.target.id === "ra-name") raVorschau();
+});
+$("ra-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    const { aktion } = await ruf("/intern/rabattaktionen", raEntwurf());
+    melde(`Aktion „${aktion.name}“ gespeichert${aktion.status === "pausiert" ? " (pausiert)" : ""}.`);
+    $("ra-name").value = "";
+    $("ra-wert").value = "";
+    $("ra-ende").value = "";
+    $("ra-start").value = "";
+    $("ra-vorschau").innerHTML = "";
+    await ladeRabattaktionen();
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
+});
+$("tab-rabattaktionen").addEventListener("click", async (e) => {
+  const k = e.target.closest("button[data-ra-status]");
+  if (!k) return;
+  const status = k.dataset.raStatus;
+  if (status === "beendet" && !confirm("Aktion jetzt beenden? Sie gilt dann sofort nicht mehr und kann nicht fortgesetzt werden.")) return;
+  try {
+    await ruf("/intern/rabattaktionen/status", { id: k.dataset.id, status });
+    melde(status === "pausiert" ? "Aktion pausiert – die Website zeigt wieder reguläre Preise." : status === "aktiv" ? "Aktion fortgesetzt." : "Aktion beendet.");
+    await ladeRabattaktionen();
+  } catch (fehler) {
+    melde(fehler.message, true);
+  }
 });
 </script>
 

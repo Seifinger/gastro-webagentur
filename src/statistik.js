@@ -156,7 +156,7 @@ const rund2 = (x) => Math.round(x * 100) / 100;
 export const BESTELLWERT_STATUS = ["bestaetigt", "bereit", "abgeholt"];
 
 export const BESTELLWERT_ERKLAERUNG =
-  "Summe der Bestellbeträge angenommener Bestellungen (bestätigt/in Zubereitung, bereit, abgeholt). " +
+  "Summe der Bestellbeträge angenommener Bestellungen (bestätigt/in Zubereitung, bereit, abgeholt), nach Abzug von Rabattaktionen. " +
   "Kein bezahlter Umsatz: bezahlt wird vor Ort, eine Online-Zahlung gibt es nicht. Neue, abgelehnte und stornierte Bestellungen sind nicht enthalten.";
 
 function verlaufRaster(z) {
@@ -204,6 +204,9 @@ export function auswertung(daten, z) {
   for (const b of bestellungen) status[bestellStatus(b)] += 1;
   const angenommen = bestellungen.filter((b) => BESTELLWERT_STATUS.includes(bestellStatus(b)));
   const summe = angenommen.reduce((s, b) => s + (Number(b.gesamt) || 0), 0);
+  // Rabattaktionen: gesamt ist der vereinbarte Betrag nach Rabatt. Der Wert
+  // vor Rabatt kommt aus dem gespeicherten Preisnachweis der Bestellung.
+  const vorRabatt = angenommen.reduce((s, b) => s + (b.preisermittlung ? b.preisermittlung.zwischensummeCent / 100 : Number(b.gesamt) || 0), 0);
   const abgeholt = bestellungen.filter((b) => bestellStatus(b) === "abgeholt");
 
   const raster = verlaufRaster(z);
@@ -242,6 +245,9 @@ export function auswertung(daten, z) {
         enthalteneStatus: BESTELLWERT_STATUS,
         erklaerung: BESTELLWERT_ERKLAERUNG,
         davonAbgeholt: rund2(abgeholt.reduce((s, b) => s + (Number(b.gesamt) || 0), 0)),
+        // Nur zur Einordnung – nicht der vereinbarte Bestellwert.
+        vorRabatt: rund2(vorRabatt),
+        rabatt: rund2(vorRabatt - summe),
       },
     },
     verlauf: { raster, punkte: verlauf },

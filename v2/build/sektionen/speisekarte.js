@@ -44,16 +44,32 @@ function preisText(g) {
   return g.varianten.length > 1 ? `ab ${formatPrice(g.preis)}` : formatPrice(g.preis);
 }
 
+/**
+ * Warenkorb-Kennungen eines bestellbaren Gerichts (das Gericht selbst oder
+ * seine lieferbaren Varianten). Daran hängen Preisfelder, die PAGE_SCRIPT mit
+ * live bestätigten Aktionspreisen des Betriebsservers ergänzt (Rabattaktionen).
+ */
+export function preisKennungen(g) {
+  return g.varianten.length ? g.varianten.filter((v) => !v.ausverkauft).map((v) => v.id) : [g.schluessel];
+}
+
+const preisAnker = (ids, { ab = false } = {}) => (ids ? ` data-preis-fuer="${e(ids.join(" "))}"${ab ? " data-preis-ab" : ""}` : "");
+const aktionsAnker = (ids) => (ids ? `<p class="karte-aktion" data-aktion-fuer="${e(ids.join(" "))}" hidden></p>` : "");
+
 /* ------------------------------------------------------------------ */
 /* Startseite: kleine Auswahl                                          */
 /* ------------------------------------------------------------------ */
 
-export function renderAuswahl({ ds, texte, karte, auswahl, aktionen }) {
+export function renderAuswahl({ ds, texte, karte, auswahl, aktionen, bestellbar = false }) {
   const t = texte.speisekarte;
-  const zeile = (g) => `<li class="karten-zeile">
-          <div class="zeile-kopf"><span class="karten-name">${e(g.name)}</span>${veg(g, texte)}<span class="menue-punkte" aria-hidden="true"></span><span class="preis">${preisText(g)}</span><a class="mini-add" href="${e(gerichtLink(g))}" aria-label="${e(g.name)} ${e(t.zumGericht)}">${plus()}</a></div>
-          ${g.beschreibung ? `<p class="gericht-desc">${e(g.beschreibung)}</p>` : ""}
+  const zeile = (g) => {
+    const ids = bestellbar && !g.ausverkauft ? preisKennungen(g) : null;
+    return `<li class="karten-zeile">
+          <div class="zeile-kopf"><span class="karten-name">${e(g.name)}</span>${veg(g, texte)}<span class="menue-punkte" aria-hidden="true"></span><span class="preis"${preisAnker(ids, { ab: g.varianten.length > 1 })}>${preisText(g)}</span><a class="mini-add" href="${e(gerichtLink(g))}" aria-label="${e(g.name)} ${e(t.zumGericht)}">${plus()}</a></div>
+          ${g.beschreibung ? `<p class="gericht-desc">${e(g.beschreibung)}</p>` : ""}${ids ? `
+          ${aktionsAnker(ids)}` : ""}
         </li>`;
+  };
   const kategorien = karte.kategorien
     .map((k) => `<li><a href="${e(aktionen.karte.href)}#${e(k.anker)}">${e(k.name)}</a><span class="anzahl">${k.anzahl}</span></li>`)
     .join("");
@@ -92,6 +108,7 @@ function hinzufuegen(id, name, preis, label, texte, { klein = false } = {}) {
 function gerichtZeile(g, { texte, bestellbar }) {
   const t = texte.speisekarte;
   const mitVarianten = g.varianten.length > 0;
+  const ids = bestellbar && !g.ausverkauft ? preisKennungen(g) : null;
   const marken = [
     g.vegetarisch ? `<span class="marke-klein">${e(texte.karte.vegetarisch)}</span>` : "",
     g.ausverkauft ? `<span class="marke-klein marke-klein--signal">${e(t.ausverkauft)}</span>` : "",
@@ -101,14 +118,14 @@ function gerichtZeile(g, { texte, bestellbar }) {
     : "";
   const varianten = mitVarianten
     ? `<ul class="karte-varianten">${g.varianten
-        .map((v) => `<li${v.ausverkauft ? ' class="aus"' : ""}><span class="karte-variante-name">${e(v.name)}</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis">${formatPrice(v.preis)}</span>${bestellbar && !g.ausverkauft && !v.ausverkauft ? hinzufuegen(v.id, `${g.name} (${v.name})`, v.preis, `${g.name}, ${v.name}`, texte, { klein: true }) : ""}</li>`)
+        .map((v) => `<li${v.ausverkauft ? ' class="aus"' : ""}><span class="karte-variante-name">${e(v.name)}</span><span class="menue-punkte" aria-hidden="true"></span><span class="preis"${preisAnker(ids && !v.ausverkauft ? [v.id] : null)}>${formatPrice(v.preis)}</span>${bestellbar && !g.ausverkauft && !v.ausverkauft ? hinzufuegen(v.id, `${g.name} (${v.name})`, v.preis, `${g.name}, ${v.name}`, texte, { klein: true }) : ""}</li>`)
         .join("")}</ul>`
     : "";
   const aktion = !mitVarianten && bestellbar && !g.ausverkauft ? hinzufuegen(g.schluessel, g.name, g.preis, g.name, texte) : "";
   return `<li class="karte-gericht${g.ausverkauft ? " karte-gericht--aus" : ""}" id="${e(g.anker)}">
-          <div class="karte-gericht-kopf"><h3>${e(g.name)}</h3>${mitVarianten ? "" : `<span class="menue-punkte" aria-hidden="true"></span><span class="preis">${formatPrice(g.preis)}</span>`}</div>
+          <div class="karte-gericht-kopf"><h3>${e(g.name)}</h3>${mitVarianten ? "" : `<span class="menue-punkte" aria-hidden="true"></span><span class="preis"${preisAnker(ids)}>${formatPrice(g.preis)}</span>`}</div>
           ${g.beschreibung ? `<p class="gericht-desc">${e(g.beschreibung)}</p>` : ""}
-          ${marken ? `<p class="karte-marken">${marken}</p>` : ""}${g.allergene ? `<p class="karte-extras"><span>Allergene/Zusatzstoffe:</span> ${e(g.allergene)}</p>` : ""}${extras}${varianten}${aktion ? `\n          <div class="karte-gericht-aktion">${aktion}</div>` : ""}
+          ${marken ? `<p class="karte-marken">${marken}</p>` : ""}${ids ? aktionsAnker(ids) : ""}${g.allergene ? `<p class="karte-extras"><span>Allergene/Zusatzstoffe:</span> ${e(g.allergene)}</p>` : ""}${extras}${varianten}${aktion ? `\n          <div class="karte-gericht-aktion">${aktion}</div>` : ""}
         </li>`;
 }
 
@@ -258,6 +275,15 @@ export const KARTE_CSS = `
 /* Sprung von der Startseite (Plus): das Gericht ist markiert – auch ohne Skript (:target). */
 .karte-gericht:target { margin-inline: calc(var(--s-2) * -1); padding-inline: var(--s-2); background: var(--flaeche); box-shadow: inset 4px 0 0 var(--akzent); border-radius: var(--r-klein); }
 .karte-fuss { margin-top: var(--s-6); color: var(--text-leise); font-size: var(--t-klein); max-width: var(--text-breite); }
+
+/* Rabattaktionen: nur live bestätigte Aktionspreise (PAGE_SCRIPT, /oeffentlich/preise) */
+.preis--aktion .preis-neu { color: var(--akzent-text); }
+.preis-statt { color: var(--text-leise); font-size: var(--t-klein); font-family: var(--f-text); font-weight: 400; white-space: nowrap; }
+.karte-aktion, .cart-line-aktion { color: var(--akzent-text); font-size: var(--t-klein); font-weight: var(--f-text-stark); }
+.cart-line-price .preis-statt { font-size: inherit; }
+.cart-aufstellung { display: grid; gap: var(--s-halb); margin-bottom: var(--s-1); font-size: var(--t-klein); color: var(--text-leise); }
+.cart-aufstellung div { display: flex; justify-content: space-between; gap: var(--s-2); }
+.cart-aufstellung[hidden] { display: none; }
 
 /* Status nach dem Hinzufügen: kurz sichtbar, für Vorleser als Live-Region */
 .cart-status { position: fixed; left: var(--rand); right: var(--rand); bottom: calc(var(--s-10) + var(--s-6)); z-index: 60; margin: 0 auto; max-width: 28rem;

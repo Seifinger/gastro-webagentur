@@ -46,7 +46,9 @@ export function erzeugeNoShowRechnung({ betrieb, bestellung, betrag, bankverbind
 
     doc.text("Bestelldetails");
     for (const position of bestellung.positionen) {
-      doc.text(`${position.menge} × ${position.name} – ${euro(position.preis * position.menge)}`);
+      // Preise aus dem unveränderlichen Nachweis der Bestellung (Rabattaktion inklusive).
+      const aktion = position.aktion ? ` (Aktion „${position.aktion.name}“, regulär ${euro(position.regulaerPreis)} je Stück)` : "";
+      doc.text(`${position.menge} × ${position.name} – ${euro(position.preis * position.menge)}${aktion}`);
     }
     doc.text(`Gesamt der Bestellung: ${euro(bestellung.gesamt)}`);
     doc.moveDown();

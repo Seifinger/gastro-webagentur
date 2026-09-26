@@ -176,8 +176,26 @@ const PASST_DAZU_UI = `
     knopf.setAttribute("data-add", id);
     knopf.setAttribute("data-name", name);
     knopf.setAttribute("data-preis", String(preis));
-    knopf.setAttribute("aria-label", name + ", " + euro(preis) + ": " + pd.texte.hinzufuegen);
-    feld(platz, "preis").textContent = euro(preis);
+    // Rabattaktion: derselbe live bestätigte Preis wie auf der Karte und im Warenkorb.
+    var aktion = aktionspreisFuer(id);
+    var gilt = aktion ? aktion.p / 100 : preis;
+    knopf.setAttribute("aria-label", name + ", " + euro(gilt) + ": " + pd.texte.hinzufuegen);
+    var ziel = feld(platz, "preis");
+    ziel.textContent = euro(gilt);
+    if (aktion) {
+      var statt = document.createElement("span");
+      statt.className = "preis-statt";
+      statt.appendChild(document.createTextNode(" statt "));
+      var alt = document.createElement("s");
+      alt.textContent = euro(preis);
+      statt.appendChild(alt);
+      ziel.appendChild(statt);
+    }
+    ziel.title = aktion ? window.Aktionspreise.text(aktion) : "";
+  }
+
+  function aktionspreisFuer(id) {
+    return window.Aktionspreise ? window.Aktionspreise.fuer(id) : null;
   }
 
   function fuelle(liste) {
@@ -216,7 +234,8 @@ const PASST_DAZU_UI = `
         varianten.forEach(function (v) {
           var o = document.createElement("option");
           o.value = v.id;
-          o.textContent = v.name + " \\u2013 " + euro(v.preis);
+          var va = aktionspreisFuer(v.id);
+          o.textContent = v.name + " \\u2013 " + euro(va ? va.p / 100 : v.preis) + (va ? " (Aktion)" : "");
           wahl.appendChild(o);
         });
         wahl.setAttribute("aria-label", pd.texte.variante + ": " + p.name);
@@ -338,6 +357,9 @@ const PASST_DAZU_UI = `
       return senden.call(window, url, init);
     };
   }
+
+  // Neue Aktionspreise vom Betriebsserver (PAGE_SCRIPT): Vorschläge neu beschriften.
+  document.addEventListener("aktionspreise", function () { angezeigt = ""; zeige(); });
 
   ladeRegeln();
 })();

@@ -54,7 +54,7 @@ import { konzeptLead, konzeptTexte } from "./konzept.js";
 import { liegtInDocs } from "../../src/oeffentlichkeit.js";
 import { medienStatus } from "../assets-pipeline/mediaGenerator.js";
 import { karteAusDaten, gerichtZuIndex, gerichtLink, auswahlFuerStartseite, KARTE_PFAD, START_PFAD } from "./speisekarte.js";
-import { renderAuswahl, renderKarteSeite, kategorieBilder, KARTE_CSS, KARTE_SEITE_SKRIPT } from "./sektionen/speisekarte.js";
+import { renderAuswahl, renderKarteSeite, kategorieBilder, preisKennungen, KARTE_CSS, KARTE_SEITE_SKRIPT } from "./sektionen/speisekarte.js";
 import { passtDazuDaten, renderPasstDazu, passtDazuSkript, PASST_DAZU_CSS } from "./sektionen/passtDazu.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -275,7 +275,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
     .flatMap((g) => {
       if (!karte) return [g];
       const k = gerichtZuIndex(karte, g.id);
-      return k && !k.ausverkauft ? [{ ...g, preis: k.preis, schluessel: k.schluessel, link: gerichtLink(k) }] : [];
+      return k && !k.ausverkauft ? [{ ...g, preis: k.preis, schluessel: k.schluessel, link: gerichtLink(k), ...(bestellung ? { preisIds: preisKennungen(k) } : {}) }] : [];
     });
   const start = gestaltung.seed % Math.max(1, kandidaten.length);
   const anzahl = highlightAnzahl(ds.layout.highlights, kandidaten.length);
@@ -332,7 +332,7 @@ export function baueSite({ lead, kueche, stimmung, optionen = {} }) {
     : [];
   const ausdruckSektionen = {
     tisch: () => (mitTisch ? renderTisch(ctx) : ""),
-    karte: () => renderAuswahl({ ...ctx, karte, auswahl }),
+    karte: () => renderAuswahl({ ...ctx, karte, auswahl, bestellbar: bestellung }),
     haus: () => renderHausBand(ctx),
     raum: () => renderHausBand(ctx),
     herkunft: () => renderHausBand(ctx),

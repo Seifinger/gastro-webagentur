@@ -49,7 +49,12 @@ import {
   oeffentlicheEmpfehlungen,
   empfehlungsStatistik,
   erkannteProduktRolle,
+  rabattaktionen,
+  oeffentlicherPreisstand,
+  legeRabattaktionAn,
+  setzeRabattaktionStatus,
 } from "./betriebStore.js";
+import { zustand as aktionsZustand, preisFuer, kartenIndex, pruefeAktion, rabattText, euroText, zeitText, alsWanduhr, ARTEN as RABATT_ARTEN } from "./rabattaktionen.js";
 import { waehle as waehleEmpfehlungen, pruefeEmpfehlungsRegeln, ROLLEN_ANZEIGE } from "./empfehlungen.js";
 import {
   DOKUMENT_ARTEN,
@@ -123,7 +128,7 @@ function zuSchnell(adresse, { lesend = false } = {}) {
   return lesend ? lesezugriffe.zaehle(adresse) > BREMSE_MAX_LESEN : zugriffe.zaehle(adresse) > BREMSE_MAX;
 }
 
-const LESENDE_PFADE = new Set(["/oeffentlich/abholzeiten", "/oeffentlich/rechtstexte", "/oeffentlich/no-show-einstellungen", "/oeffentlich/verfuegbarkeit", "/oeffentlich/empfehlungen"]);
+const LESENDE_PFADE = new Set(["/oeffentlich/abholzeiten", "/oeffentlich/rechtstexte", "/oeffentlich/no-show-einstellungen", "/oeffentlich/verfuegbarkeit", "/oeffentlich/empfehlungen", "/oeffentlich/preise"]);
 
 // Falsche Status-Links: eigene, strengere Bremse gegen Durchprobieren.
 const FEHLVERSUCHE_MAX = 10;
@@ -254,6 +259,80 @@ function uebersicht() {
     heute,
     zeitzone: daten.zeitzone || ZEITZONE_STANDARD,
     jetztIso: new Date().toISOString(),
+  };
+}
+
+/* ---------- Rabattaktionen: Aufbereitung fürs Dashboard ---------- */
+
+const ZUSTAND_TEXT = { aktiv: "gilt jetzt", geplant: "geplant", pausiert: "pausiert", abgelaufen: "abgelaufen", beendet: "beendet" };
+
+/**
+ * Je betroffenem Produkt: regulär, mit dieser Aktion, tatsächlich (mit allen
+ * gerade gültigen Aktionen des Betriebs) und – offen benannt – wenn eine
+ * andere, günstigere Aktion stattdessen greift.
+ */
+function rabattZeilen(daten, aktion, jetzt) {
+  const bestellkarte = daten.bestellkarte;
+  const index = kartenIndex(bestellkarte);
+  const andere = rabattaktionen(daten).filter((a) => a.id !== aktion.id);
+  const zeilen = [];
+  for (const p of bestellkarte?.produkte ?? []) {
+    const ids = p.varianten?.length ? p.varianten.map((v) => v.id) : [p.id];
+    for (const id of ids) {
+      const nur = preisFuer(id, { bestellkarte, aktionen: [aktion], jetzt, index });
+      if (!nur?.aktion) continue;
+      const gesamt = preisFuer(id, { bestellkarte, aktionen: [...andere, aktion], jetzt, index });
+      const variante = p.varianten?.find((v) => v.id === id);
+      zeilen.push({
+        id,
+        name: variante ? `${p.name} (${variante.name})` : p.name,
+        kategorie: p.kategorie,
+        regulaer: nur.regulaerCent / 100,
+        mitAktion: nur.preisCent / 100,
+        tatsaechlich: gesamt.preisCent / 100,
+        ...(gesamt.aktion && gesamt.aktion.id !== aktion.id ? { stattdessen: `Hier gilt die günstigere Aktion „${gesamt.aktion.name}“ (${rabattText(gesamt.aktion.rabatt)}).` } : {}),
+      });
+    }
+  }
+  return zeilen;
+}
+
+function rabattUebersicht(daten) {
+  const jetzt = uhrHook.jetzt();
+  const zeitzone = daten.zeitzone || ZEITZONE_STANDARD;
+  const produkte = daten.bestellkarte?.produkte ?? [];
+  const katalog = daten.bestellkarte?.katalog ?? {};
+  const aktionen = rabattaktionen(daten).map((a) => {
+    const z = aktionsZustand(a, jetzt);
+    const vorbei = z === "abgelaufen" || z === "beendet";
+    const namen = a.art === "gericht" ? a.gerichte.map((id) => produkte.find((p) => p.id === id)?.name ?? `${id} (nicht mehr auf der Karte)`) : [];
+    return {
+      ...a,
+      zustand: z,
+      zustandText: ZUSTAND_TEXT[z],
+      rabattText: rabattText(a.rabatt),
+      artText: RABATT_ARTEN[a.art],
+      zeitraumText: `${zeitText(Date.parse(a.start), zeitzone)} – ${a.ende ? zeitText(Date.parse(a.ende), zeitzone) : "ohne Enddatum"}`,
+      giltFuer: a.art === "gericht"
+        ? namen.join(", ")
+        : `alle online bestellbaren Produkte der Karte${a.ausgenommeneKategorien?.length ? ` außer ${a.ausgenommeneKategorien.map((k) => `„${k}“`).join(", ")}` : ""} – nur Abholbestellungen, nicht Reservierungen`,
+      ...(vorbei ? {} : { zeilen: rabattZeilen(daten, { ...a, status: "aktiv", start: new Date(Math.min(Date.parse(a.start), jetzt.getTime())).toISOString() }, jetzt) }),
+    };
+  });
+  return {
+    zeitzone,
+    jetzt: jetzt.toISOString(),
+    jetztWanduhr: alsWanduhr(jetzt.getTime(), zeitzone),
+    karte: Boolean(Object.keys(katalog).length),
+    produkte: produkte.map((p) => ({
+      id: p.id,
+      name: p.name,
+      kategorie: p.kategorie,
+      freigegeben: p.empfehlbar !== false,
+      preisText: p.varianten?.length > 1 ? `ab ${euroText(Math.round(p.preis * 100))}` : euroText(Math.round(p.preis * 100)),
+    })),
+    kategorien: [...new Set(produkte.map((p) => p.kategorie))],
+    aktionen,
   };
 }
 
@@ -519,13 +598,20 @@ const routen = async (req, res) => {
         return;
       }
 
+      // Rabattaktionen: gerade gültige Preise, vom Server berechnet (nie aus dem HTML).
+      if (pathname === "/oeffentlich/preise") {
+        json(res, 200, { ok: true, ...oeffentlicherPreisstand(ladeBetrieb(slug)) }, { ...CORS, "Cache-Control": "no-store" });
+        return;
+      }
+
       if (pathname === "/oeffentlich/bestellung") {
         const b = legeBestellungAn(slug, daten);
         const text = `Neue Bestellung ${b.nummer} · Abholung gewünscht um ${b.abholzeit}, ${b.name}`;
         const push = await benachrichtigeBetrieb(slug, { titel: "Neue Bestellung", text });
         if (!push.versucht) await telegramRueckkanal("bestellung", b);
         await stelleGastMeldungenZu(slug);
-        json(res, 200, { ok: true, bestellung: { id: b.id, gesamt: b.gesamt, ...gastAntwort("bestellung", b) } }, { ...CORS, ...PRIVAT });
+        const ermittlung = b.preisermittlung;
+        json(res, 200, { ok: true, bestellung: { id: b.id, gesamt: b.gesamt, ...(ermittlung?.ersparnisCent ? { zwischensumme: ermittlung.zwischensummeCent / 100, ersparnis: ermittlung.ersparnisCent / 100 } : {}), ...gastAntwort("bestellung", b) } }, { ...CORS, ...PRIVAT });
         return;
       }
 
@@ -608,7 +694,9 @@ const routen = async (req, res) => {
         return;
       }
     } catch (fehler) {
-      json(res, 400, { ok: false, fehler: fehler.message }, CORS);
+      // Geänderter Preis: 409 mit dem neuen Stand, damit die Seite ihn zeigt.
+      const preis = fehler.code === "PREIS_GEAENDERT";
+      json(res, preis ? 409 : 400, { ok: false, fehler: fehler.message, ...(preis ? { code: fehler.code, preisstand: fehler.preisstand, endbetrag: fehler.endbetragCent / 100 } : {}) }, CORS);
       return;
     }
     // Unbekannter öffentlicher Pfad: Der Körper ist schon gelesen – nicht
@@ -670,6 +758,12 @@ const routen = async (req, res) => {
         jetzt,
       }),
     }, PRIVAT);
+    return;
+  }
+
+  // Reiter „Rabattaktionen“: alle Aktionen dieses Betriebs mit Zustand, Karte, Vorschau.
+  if (pathname === "/api/rabattaktionen") {
+    json(res, 200, { ok: true, ...rabattUebersicht(ladeBetrieb(slug)) }, PRIVAT);
     return;
   }
 
@@ -757,6 +851,28 @@ const routen = async (req, res) => {
 
         await stelleGastMeldungenZu(slug);
         json(res, 200, { ok: true, bestellung, gast: gastHinweisFuer("bestellung", bestellung.id) });
+        return;
+      }
+
+      /* ----- Intern: Rabattaktionen ----- */
+
+      if (pathname === "/intern/rabattaktionen") {
+        json(res, 200, { ok: true, aktion: legeRabattaktionAn(slug, eingabe) });
+        return;
+      }
+      if (pathname === "/intern/rabattaktionen/status") {
+        json(res, 200, { ok: true, aktion: setzeRabattaktionStatus(slug, String(eingabe.id ?? ""), String(eingabe.status ?? "")) });
+        return;
+      }
+      // Vorschau alter/neuer Preise für einen Entwurf – gleiche Prüfung und
+      // Rechnung wie beim Speichern und beim Bestellen, gespeichert wird nichts.
+      if (pathname === "/api/rabattaktionen/vorschau") {
+        const daten = ladeBetrieb(slug);
+        const jetzt = uhrHook.jetzt();
+        const entwurf = pruefeAktion({ ...eingabe, pausiert: false }, { bestellkarte: daten.bestellkarte, zeitzone: daten.zeitzone || ZEITZONE_STANDARD, jetzt });
+        // Für die Vorschau gilt der Entwurf ab sofort – so sieht man, was er bewirkt.
+        const probe = { ...entwurf, start: new Date(jetzt).toISOString(), ende: null };
+        json(res, 200, { ok: true, zeilen: rabattZeilen(daten, probe, jetzt) });
         return;
       }
 

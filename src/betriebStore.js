@@ -33,6 +33,7 @@ import {
 } from "./rechtstexte.js";
 import { QUELLEN as SEITENAUFRUF_QUELLEN } from "./seitenaufrufe.js";
 import { pruefeEmpfehlungsRegeln, regelnMitStandard, erkannteRolle, ROLLEN } from "./empfehlungen.js";
+import { preisermittlung, pruefeAktion, zustand as aktionsZustand, PreisGeaendert, oeffentlichePreise } from "./rabattaktionen.js";
 
 // Datenhaltung eines Betriebs: Tischplan, Reservierungen, Bestellungen.
 // Eine JSON-Datei je Betrieb – das reicht für ein Haus mit ein paar Dutzend
@@ -697,6 +698,12 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
       : null;
     const noShowGebuehrBetragVereinbart = rechtliches.noShow ? rechtliches.noShow.parameter.betrag : null;
 
+    // Rabattaktionen (rabattaktionen.js): Der Server rechnet den Endpreis selbst –
+    // zum Zeitpunkt dieser Bestellabgabe, nie zur Abholzeit. Weicht er von dem
+    // Betrag ab, den der Gast gesehen hat, wird nichts angenommen: Der Gast
+    // bekommt den neuen Stand und bestätigt ihn bewusst mit erneutem Absenden.
+    const preis = daten.bestellkarte?.katalog ? bepreise(daten, positionenGeprueft, eingabe, jetzt) : null;
+
     const bestellung = {
       id: randomUUID(),
       nummer: `AB-${randomInt(1000, 10000)}`,
@@ -704,8 +711,11 @@ export function legeBestellungAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
       // (/oeffentlich/bestellung). Ältere Datensätze ohne dieses Feld
       // gelten in der Statistik als "unbekannt".
       quelle: "online",
-      positionen: positionenGeprueft,
-      gesamt: Math.round(positionenGeprueft.reduce((summe, p) => summe + p.preis * p.menge, 0) * 100) / 100,
+      positionen: preis ? preis.positionen : positionenGeprueft,
+      gesamt: preis ? preis.ermittlung.endbetragCent / 100 : Math.round(positionenGeprueft.reduce((summe, p) => summe + p.preis * p.menge, 0) * 100) / 100,
+      // Unveränderlicher Preisnachweis: reguläre Preise, angewendete Aktion,
+      // Ersparnis, Endbetrag, Zeitpunkt. Wird nie neu berechnet.
+      ...(preis ? { preisermittlung: preis.ermittlung } : {}),
       ...(daten.bestellkarte ? { bestellkarteVersion: daten.bestellkarte.version } : {}),
       // Wunsch des Gastes; was tatsächlich gilt, bestätigt der Wirt. Die
       // Uhrzeit kommt aus dem geprüften Zeitpunkt, nicht aus dem Text des Browsers.
@@ -752,6 +762,32 @@ function pruefePositionenGegenKarte(karte, roh, sauber) {
     const { menge, empfohlen, empfohlenMenge } = sauber[i];
     return { id, name, menge, preis, ...(empfohlen ? { empfohlen, empfohlenMenge } : {}) };
   });
+}
+
+/**
+ * Endpreise einer Bestellung mit Bestellkarte. Positionen tragen danach den
+ * tatsächlich vereinbarten Einzelpreis; bei Rabatt zusätzlich regulären Preis
+ * und Aktion. Wirft PreisGeaendert, wenn der Gast einen anderen Betrag gesehen hat.
+ * Seiten ohne Angabe (ältere Fassungen) haben die regulären Preise gezeigt.
+ */
+function bepreise(daten, positionen, eingabe, jetzt) {
+  const zeitzone = daten.zeitzone || ZEITZONE_STANDARD;
+  const ermittlung = preisermittlung(positionen, { bestellkarte: daten.bestellkarte, aktionen: daten.rabattaktionen ?? [], jetzt, zeitzone });
+  const erwartetCent = Number.isInteger(eingabe.erwarteterBetragCent) ? eingabe.erwarteterBetragCent : ermittlung.zwischensummeCent;
+  if (erwartetCent !== ermittlung.endbetragCent) {
+    throw new PreisGeaendert({ endbetragCent: ermittlung.endbetragCent, erwartetCent, preisstand: oeffentlicherPreisstand(daten, jetzt) });
+  }
+  return {
+    ermittlung,
+    positionen: positionen.map((p, i) => {
+      const z = ermittlung.positionen[i];
+      return {
+        ...p,
+        preis: z.preisCent / 100,
+        ...(z.aktion ? { regulaerPreis: z.regulaerCent / 100, aktion: { id: z.aktion.id, name: z.aktion.name, text: z.aktion.text } } : {}),
+      };
+    }),
+  };
 }
 
 /**
@@ -818,6 +854,51 @@ function bestellkartenProdukte(liste, katalog) {
       ...(p.signatur === true ? { signatur: true } : {}),
       ...(p.empfehlbar === false ? { empfehlbar: false } : {}),
     }];
+  });
+}
+
+/* ---------- Rabattaktionen (rabattaktionen.js) ---------- */
+
+/** Aktionen des Betriebs – ohne Einstellung keine. */
+export function rabattaktionen(daten) {
+  return daten.rabattaktionen ?? [];
+}
+
+/** Was die Seite live bekommt: gültige Preise, Serverzeit, nächster Wechsel. */
+export function oeffentlicherPreisstand(daten, jetzt = uhrHook.jetzt()) {
+  return oeffentlichePreise({ bestellkarte: daten.bestellkarte, aktionen: rabattaktionen(daten), jetzt, zeitzone: daten.zeitzone || ZEITZONE_STANDARD });
+}
+
+/** Legt eine Aktion an (geprüft gegen die eigene Karte). */
+export function legeRabattaktionAn(slug, eingabe, jetzt = uhrHook.jetzt()) {
+  return aendere(slug, (daten) => {
+    const aktion = pruefeAktion(eingabe, { bestellkarte: daten.bestellkarte, zeitzone: daten.zeitzone || ZEITZONE_STANDARD, jetzt });
+    daten.rabattaktionen = [...rabattaktionen(daten), aktion];
+    return aktion;
+  });
+}
+
+/**
+ * Pausieren, fortsetzen, beenden. Beenden ist endgültig: Die Aktion bleibt
+ * mit ihrem Ende als Nachweis stehen (Bestellungen verweisen auf ihre ID).
+ */
+export function setzeRabattaktionStatus(slug, id, status, jetzt = uhrHook.jetzt()) {
+  if (!["aktiv", "pausiert", "beendet"].includes(status)) throw new Error("Unbekannter Status.");
+  return aendere(slug, (daten) => {
+    const aktion = rabattaktionen(daten).find((a) => a.id === id);
+    if (!aktion) throw new Error("Aktion nicht gefunden.");
+    const vorher = aktionsZustand(aktion, jetzt);
+    if (vorher === "beendet" || vorher === "abgelaufen") throw new Error("Die Aktion ist bereits vorbei und kann nicht mehr geändert werden.");
+    const zeit = new Date(jetzt).toISOString();
+    if (status === "beendet") {
+      aktion.status = "beendet";
+      aktion.beendetAm = zeit;
+      if (!aktion.ende || Date.parse(aktion.ende) > Date.parse(zeit)) aktion.ende = zeit;
+    } else {
+      aktion.status = status;
+    }
+    aktion.geaendert = zeit;
+    return aktion;
   });
 }
 

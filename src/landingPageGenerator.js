@@ -596,15 +596,35 @@ const PAGE_SCRIPT = `
   // kommen dann immer aus dieser Karte, nie aus einem alten Speicherstand.
   var speicher = data.warenkorb && data.warenkorb.karte ? data.warenkorb : null;
   var warenkorbHinweis = "";
+  // Rabattaktionen: Aktionspreise kommen nur live vom Betriebsserver
+  // (/oeffentlich/preise), nie aus dem HTML. Ohne Antwort gelten die
+  // regul\\u00E4ren Preise; beim Absenden rechnet der Server ohnehin selbst.
+  var aktionspreise = { daten: {}, geladenUm: 0, uhr: null };
 
   function euro(value) { return value.toFixed(2).replace(".", ",") + " \\u20AC"; }
   function byId(id) { return document.getElementById(id); }
+  function cent(wert) { return Math.round(wert * 100); }
   function lines() {
     return Object.keys(cart).map(function (id) { return cart[id]; })
       .filter(function (line) { return line.menge > 0; });
   }
+  /** Gültiger Aktionspreis f\\u00FCr eine Kennung – nur, wenn der regul\\u00E4re Preis \\u00FCbereinstimmt. */
+  function aktionFuer(id, regulaerCent) {
+    var a = aktionspreise.daten[id];
+    return a && a.r === regulaerCent && a.p < a.r ? a : null;
+  }
+  function stueckCent(line) {
+    var a = aktionFuer(line.id, cent(line.preis));
+    return a ? a.p : cent(line.preis);
+  }
+  function aktionsText(a) {
+    return "Aktion \\u201E" + a.n + "\\u201C " + a.t + (a.b ? " \\u00B7 " + a.b : "");
+  }
   function total() {
-    return lines().reduce(function (sum, line) { return sum + line.preis * line.menge; }, 0);
+    return lines().reduce(function (sum, line) { return sum + stueckCent(line) * line.menge; }, 0) / 100;
+  }
+  function regulaerTotal() {
+    return lines().reduce(function (sum, line) { return sum + cent(line.preis) * line.menge; }, 0) / 100;
   }
   function anzahl() {
     return lines().reduce(function (sum, line) { return sum + line.menge; }, 0);
@@ -640,9 +660,18 @@ const PAGE_SCRIPT = `
         nameEl.textContent = line.name;
         var priceEl = document.createElement("div");
         priceEl.className = "cart-line-price";
-        priceEl.textContent = line.menge + " \\u00D7 " + euro(line.preis);
+        priceEl.textContent = line.menge + " \\u00D7 " + euro(stueckCent(line) / 100);
         body.appendChild(nameEl);
         body.appendChild(priceEl);
+        var aktion = aktionFuer(line.id, cent(line.preis));
+        if (aktion) {
+          priceEl.appendChild(document.createTextNode(" "));
+          priceEl.appendChild(stattPreis(euro(line.preis)));
+          var marke = document.createElement("div");
+          marke.className = "cart-line-aktion";
+          marke.textContent = aktionsText(aktion);
+          body.appendChild(marke);
+        }
 
         var qty = document.createElement("div");
         qty.className = "qty";
@@ -669,6 +698,7 @@ const PAGE_SCRIPT = `
     }
 
     byId("cart-total").textContent = euro(total());
+    zeigeAufstellung(regulaerTotal(), total());
     byId("fab-total").textContent = euro(total());
     byId("fab-count").textContent = String(anzahl());
     byId("order-submit").disabled = current.length === 0;
@@ -678,6 +708,134 @@ const PAGE_SCRIPT = `
     if (current.length === 0) warenkorbHinweis = "";
     speichere();
   }
+
+  function stattPreis(text) {
+    var statt = document.createElement("span");
+    statt.className = "preis-statt";
+    statt.appendChild(document.createTextNode("statt "));
+    var alt = document.createElement("s");
+    alt.textContent = text;
+    statt.appendChild(alt);
+    return statt;
+  }
+
+  /** Zwischensumme (regul\\u00E4r) und Ersparnis \\u00FCber dem Gesamtbetrag – nur mit Rabatt. */
+  function zeigeAufstellung(regulaer, gesamt) {
+    var box = byId("cart-aufstellung");
+    var ersparnis = cent(regulaer) - cent(gesamt);
+    if (!box && ersparnis <= 0) return;
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "cart-aufstellung";
+      box.className = "cart-aufstellung";
+      var summenZeile = byId("cart-total").parentNode;
+      summenZeile.parentNode.insertBefore(box, summenZeile);
+    }
+    box.innerHTML = "";
+    box.hidden = ersparnis <= 0;
+    if (ersparnis <= 0) return;
+    [["Zwischensumme (regul\\u00E4r)", euro(regulaer)], ["Ersparnis durch Aktionen", "\\u2212" + euro(ersparnis / 100)]].forEach(function (z) {
+      var zeile = document.createElement("div");
+      var a = document.createElement("span");
+      a.textContent = z[0];
+      var b = document.createElement("span");
+      b.textContent = z[1];
+      zeile.appendChild(a);
+      zeile.appendChild(b);
+      box.appendChild(zeile);
+    });
+  }
+
+  /**
+   * Preise auf der Seite (Speisekarte, Auswahl, Tisch): Felder mit
+   * data-preis-fuer zeigen den gerade g\\u00FCltigen Aktionspreis neben dem
+   * regul\\u00E4ren; data-aktion-fuer nennt die Aktion. Ohne Aktion bleibt
+   * der gebaute Text stehen.
+   */
+  function zeigeAktionspreise() {
+    if (!speicher) return;
+    Array.prototype.forEach.call(document.querySelectorAll("[data-preis-fuer]"), function (feld) {
+      if (!feld.hasAttribute("data-preis-text")) feld.setAttribute("data-preis-text", feld.textContent);
+      var ab = feld.hasAttribute("data-preis-ab") ? "ab " : "";
+      var regulaer = null;
+      var aktuell = null;
+      feld.getAttribute("data-preis-fuer").split(" ").forEach(function (id) {
+        var eintrag = speicher.karte[id];
+        if (!eintrag) return;
+        var r = cent(eintrag[1]);
+        var a = aktionFuer(id, r);
+        var p = a ? a.p : r;
+        if (regulaer === null || r < regulaer) regulaer = r;
+        if (aktuell === null || p < aktuell) aktuell = p;
+      });
+      feld.textContent = "";
+      if (regulaer !== null && aktuell < regulaer) {
+        var neu = document.createElement("span");
+        neu.className = "preis-neu";
+        neu.textContent = ab + euro(aktuell / 100);
+        feld.appendChild(neu);
+        feld.appendChild(document.createTextNode(" "));
+        feld.appendChild(stattPreis(ab + euro(regulaer / 100)));
+        feld.classList.add("preis--aktion");
+      } else {
+        feld.textContent = feld.getAttribute("data-preis-text");
+        feld.classList.remove("preis--aktion");
+      }
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-aktion-fuer]"), function (marke) {
+      var gefunden = null;
+      marke.getAttribute("data-aktion-fuer").split(" ").forEach(function (id) {
+        var eintrag = speicher.karte[id];
+        var a = eintrag ? aktionFuer(id, cent(eintrag[1])) : null;
+        if (a && !gefunden) gefunden = a;
+      });
+      marke.textContent = gefunden ? aktionsText(gefunden) : "";
+      marke.hidden = !gefunden;
+    });
+  }
+
+  function uebernehmeAktionspreise(stand) {
+    aktionspreise.daten = stand && stand.preise ? stand.preise : {};
+    clearTimeout(aktionspreise.uhr);
+    // Beginnt oder endet eine Aktion, fragt die Seite zu diesem Zeitpunkt neu.
+    if (stand && stand.naechsteAenderung && stand.jetzt) {
+      var warte = Date.parse(stand.naechsteAenderung) - Date.parse(stand.jetzt);
+      if (warte > 0 && warte < 86400000) aktionspreise.uhr = setTimeout(function () { ladeAktionspreise(true); }, warte + 1000);
+    }
+    zeigeAktionspreise();
+    renderCart();
+    try { document.dispatchEvent(new CustomEvent("aktionspreise")); } catch (e) { /* \\u00E4ltere Browser */ }
+  }
+
+  function ladeAktionspreise(sofort) {
+    if (!data.apiUrl || !speicher) return;
+    if (!sofort && Date.now() - aktionspreise.geladenUm < 60000) return;
+    aktionspreise.geladenUm = Date.now();
+    fetch(data.apiUrl + "/oeffentlich/preise", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}"
+    })
+      .then(function (antwort) { return antwort.json(); })
+      .then(function (ergebnis) {
+        if (!ergebnis || !ergebnis.ok) throw new Error("keine Preise");
+        uebernehmeAktionspreise(ergebnis);
+      })
+      .catch(function () {
+        // Ohne best\\u00E4tigten Stand kein Sonderpreis: regul\\u00E4re Preise zeigen.
+        aktionspreise.geladenUm = 0;
+        if (Object.keys(aktionspreise.daten).length) uebernehmeAktionspreise(null);
+      });
+  }
+
+  /** F\\u00FCr weitere Skripte der Seite (z. B. \\u201EPasst gut dazu\\u201C). */
+  window.Aktionspreise = {
+    fuer: function (id) {
+      var eintrag = speicher && speicher.karte[id];
+      return eintrag ? aktionFuer(id, cent(eintrag[1])) : null;
+    },
+    text: aktionsText
+  };
 
   function speicherSchluessel() { return "warenkorb:" + speicher.schluessel; }
 
@@ -751,6 +909,7 @@ const PAGE_SCRIPT = `
   function openDrawer() {
     byId("drawer").classList.add("open");
     byId("overlay").classList.add("open");
+    ladeAktionspreise();
     ladeAbholKonfig();
     aktualisiereAbholzeiten();
   }
@@ -886,6 +1045,8 @@ const PAGE_SCRIPT = `
       .then(function (antwort) {
         return antwort.json().then(function (ergebnis) {
           if (!antwort.ok || ergebnis.ok === false) {
+            // Ge\\u00E4nderter Preis: den neuen Stand sofort zeigen, der Gast best\\u00E4tigt ihn bewusst neu.
+            if (ergebnis && ergebnis.preisstand) uebernehmeAktionspreise(ergebnis.preisstand);
             throw new Error(ergebnis.fehler || "Die Anfrage konnte nicht angenommen werden.");
           }
           return ergebnis;
@@ -1206,7 +1367,7 @@ const PAGE_SCRIPT = `
         ? "so schnell wie m\u00F6glich (ca. " + abholUhrzeit + " Uhr)"
         : abholUhrzeit + " Uhr";
       var summary = lines().map(function (line) {
-        return line.menge + " \\u00D7 " + line.name + " (" + euro(line.preis * line.menge) + ")";
+        return line.menge + " \\u00D7 " + line.name + " (" + euro(stueckCent(line) * line.menge / 100) + ")";
       }).join("\\n");
 
       var body = "Abholbestellung " + nummer + "\\n\\n" + summary +
@@ -1235,7 +1396,10 @@ const PAGE_SCRIPT = `
         email: bestellEmail,
         hinweis: form.elements.hinweis.value,
         bestaetigungen: { bedingungen: bedingungenVersion, noShow: noShowVersion },
-        noShowZustimmung: noShowVersion ? true : false
+        noShowZustimmung: noShowVersion ? true : false,
+        // Nicht verbindlich: der Betrag, den der Gast gesehen hat. Der Server
+        // rechnet selbst und lehnt ab, wenn sein Endbetrag davon abweicht.
+        erwarteterBetragCent: cent(total())
       }, byId("order-submit")).then(function (ergebnis) {
         // Die Abholzeit ist zun\\u00E4chst nur ein Wunsch: ob sie machbar ist,
         // best\\u00E4tigt die K\\u00FCche.
@@ -1249,8 +1413,9 @@ const PAGE_SCRIPT = `
         var zeilen = [
           [ergebnis.demo ? "Abholung" : "Abholung (gew\\u00FCnscht)", zeit],
           ["Positionen", stueck],
-          ["Gesamt", summe],
+          ["Gesamt", ergebnis.demo || typeof teil.gesamt !== "number" ? summe : euro(teil.gesamt)],
         ];
+        if (teil.ersparnis) zeilen.push(["Ersparnis durch Aktionen", "\\u2212" + euro(teil.ersparnis)]);
         if (!ergebnis.demo) {
           zeilen.unshift(["Status", teil.statusText || "Eingegangen \\u2013 noch nicht best\\u00E4tigt"]);
           zeilen.unshift(["Bestellnummer", echteNummer]);
@@ -1276,6 +1441,7 @@ const PAGE_SCRIPT = `
         ladeAbholKonfig();
         aktualisiereAbholzeiten();
         ladeRechtslage();
+        renderCart();
         zeigeFehler(fehler.message);
       });
     });
@@ -1351,6 +1517,7 @@ const PAGE_SCRIPT = `
     ladeAbholKonfig();
     stelleWarenkorbWiederHer();
     renderCart();
+    ladeAktionspreise(true);
   });
 })();
 `;

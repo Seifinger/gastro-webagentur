@@ -38,7 +38,8 @@ export function renderTisch({ texte, highlights, medien, fiktiv, aktionen }) {
       <div class="teller-text">
         <h3>${e(g.name)}</h3>
         <p class="teller-desc">${e(g.beschreibung)}</p>
-        <div class="teller-fuss"><span class="preis">${formatPrice(g.preis)}</span>${vorbestellen(g, texte, aktionen)}</div>
+        <div class="teller-fuss"><span class="preis"${g.preisIds ? ` data-preis-fuer="${e(g.preisIds.join(" "))}"` : ""}>${formatPrice(g.preis)}</span>${vorbestellen(g, texte, aktionen)}</div>${g.preisIds ? `
+        <p class="karte-aktion" data-aktion-fuer="${e(g.preisIds.join(" "))}" hidden></p>` : ""}
       </div>
     </article>`;
   return `<section class="sektion tisch" id="highlights" data-atmosphaere="an">

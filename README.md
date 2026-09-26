@@ -513,6 +513,10 @@ Die vorhandene Bearbeiten-Ansicht hat zwei Modi. Unter „Konzept-Demo“ bleibt
 
 In der Bestellübersicht (Warenkorb vor dem Absenden) zeigen Seiten mit Speisekarten-Seite höchstens zwei passende Ergänzungen aus der Karte des Hauses – zur Pizza etwa eine Vorspeise oder ein Dessert, nie eine zweite Pizza. Nichts wird automatisch hinzugefügt; hinzugefügt wird über den bestehenden Warenkorb, der Server prüft Preise wie bisher. Der Wirt steuert die Funktion im Reiter **„Empfehlungen“** (an/aus, Standardregeln, bevorzugte und ausgeschlossene Produkte, Kombinationen, Vorschau, aggregierte Wirkung). Keine KI pro Warenkorb, keine Cookies, keine Gästehistorie. Details: [docs-intern/PASST-GUT-DAZU.md](docs-intern/PASST-GUT-DAZU.md).
 
+### Rabattaktionen für Abholbestellungen
+
+Im Wirt-Dashboard legt der Wirt unter **„Rabattaktionen“** einen allgemeinen Abholrabatt (z. B. 10 %) oder Rabatte auf einzelne Gerichte an (Prozent oder Euro). Jede Aktion hat Start und Ende und lässt sich pausieren, fortsetzen und beenden; eine Vorschau zeigt alten und neuen Preis. Rabatte werden nicht addiert, der Gast zahlt jeweils den günstigeren Endpreis. Die gebaute Kundenseite zeigt Aktionspreise live vom Wirt-Server, ohne neu veröffentlicht zu werden. Der Server rechnet den Endpreis beim Bestellen selbst und speichert einen unveränderlichen Preisnachweis. Details und offene Prüfpunkte zur Preiswerbung: [docs-intern/RABATTAKTIONEN.md](docs-intern/RABATTAKTIONEN.md).
+
 ### Statistik und Rechtstexte
 
 Das Wirt-Dashboard hat zwei weitere Reiter:

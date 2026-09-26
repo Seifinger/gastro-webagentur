@@ -130,7 +130,8 @@ test("Kategorien kommen aus den Daten: italienische Betriebskarte mit Pizza/Past
   assert.ok(!k.includes(">Fisch<"), "leere Kategorie erscheint nicht");
   assert.match(k, /<nav class="karten-sprung karten-sprung--fest karten-sprung--seite" aria-label="Kategorien der Speisekarte"><a href="#kat-vorspeisen">Vorspeisen<span class="anzahl">2<\/span><\/a><a href="#kat-pizza">Pizza<span class="anzahl">3<\/span>/);
   assert.match(k, /<h3 class="karte-gruppe-name">Alkoholfrei<\/h3>/);
-  assert.match(k, /<span class="karte-variante-name">Ø 26 cm<\/span><span class="menue-punkte" aria-hidden="true"><\/span><span class="preis">8,50 €<\/span><button class="mini-add" type="button" data-add="margherita--26-cm" data-name="Margherita \(Ø 26 cm\)" data-preis="8.5"/);
+  // Preisfeld mit Warenkorb-Kennung: dort ergänzt PAGE_SCRIPT live bestätigte Aktionspreise.
+  assert.match(k, /<span class="karte-variante-name">Ø 26 cm<\/span><span class="menue-punkte" aria-hidden="true"><\/span><span class="preis" data-preis-fuer="margherita--26-cm">8,50 €<\/span><button class="mini-add" type="button" data-add="margherita--26-cm" data-name="Margherita \(Ø 26 cm\)" data-preis="8.5"/);
   assert.match(k, /<p class="karte-extras"><span>Extras:<\/span> Büffelmozzarella \(\+ 2,50 €\) · Scharfes Öl<\/p>/);
   const tartufo = k.slice(k.indexOf('id="gericht-tartufo"'), k.indexOf("</li>", k.indexOf('id="gericht-tartufo"')));
   assert.match(tartufo, /Heute ausverkauft/);
@@ -138,7 +139,7 @@ test("Kategorien kommen aus den Daten: italienische Betriebskarte mit Pizza/Past
   // Ohne Fotos in der Karte: kein Bild, kein leerer Bildrahmen
   assert.ok(!k.includes(`<figure class="karte-kategorie-bild">`));
   // Signatur-Gericht steht in der Auswahl der Startseite (mit "ab"-Preis)
-  assert.match(html, /<span class="karten-name">Margherita<\/span>.*?<span class="preis">ab 8,50 €<\/span>/s);
+  assert.match(html, /<span class="karten-name">Margherita<\/span>.*?<span class="preis" data-preis-fuer="margherita--26-cm margherita--32-cm" data-preis-ab>ab 8,50 €<\/span>/s);
   assert.equal(lint(k).ok, true);
 });
 
