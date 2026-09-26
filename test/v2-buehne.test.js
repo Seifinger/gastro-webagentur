@@ -137,9 +137,15 @@ test("Hochformat-Video auf dem Handy: eigene Quelle (MP4 + WebM), Ausschnitt wie
   for (const d of ["medien/heroVideoMobil.mp4", "medien/heroVideoMobil.webm"]) assert.ok(dateien.some((x) => x.src === d), `${d} wird mitkopiert`);
   // Langsames Netz, Datensparen und nicht rechtzeitig startendes Video → Standbild
   assert.match(html, /prefers-reduced-data: reduce/);
-  assert.match(html, /\/\(\^\|-\)2g\$\|\^3g\$\/\.test\(netz\.effectiveType/);
-  assert.match(html, /var STARTFRIST_MS = 4000;/);
+  // "3g" allein reicht nicht (Chrome meldet es schon bei hoher Latenz) – nur mit geringer Bandbreite.
+  assert.match(html, /\(typ === "3g" && !\(netz\.downlink >= 1\.5\)\)/);
+  assert.match(html, /var STARTFRIST_MS = 10000;/);
   assert.match(html, /video\.removeAttribute\("src"\);/);
+  // Autoplay gesperrt (Stromsparmodus): Start beim ersten Antippen; Diagnose per ?video=diagnose
+  assert.match(html, /fehler\.name !== "NotAllowedError"/);
+  assert.match(html, /document\.addEventListener\("touchend", nachTippen, true\);/);
+  assert.match(html, /video=diagnose/);
+  assert.match(html, /video\.muted = true;/);
 });
 
 test("handwerk: Kopfzeile immer fest, Slogan unter dem Medium, kein Rückzug", () => {
