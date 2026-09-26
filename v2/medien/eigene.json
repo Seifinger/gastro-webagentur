@@ -316,9 +316,9 @@
     "heroMobil": {
       "datei": "v2/medien/eigene/beispiel-chinesisch/heroMobil.jpg",
       "herkunft": "ki",
-      "quelle": "Hochformat vom Inhaber im Chat geliefert (KI-generiert), 24.09.2026",
-      "fokus": "55% 70%",
-      "eingetragen": "2026-09-24T19:08:20.334Z"
+      "quelle": "Erstes Bild des Hochformat-Zuschnitts aus dem vom Inhaber gelieferten Video (KI-generiert), damit Standbild und Video auf dem Handy nahtlos ineinander übergehen, 26.09.2026",
+      "fokus": "50% 70%",
+      "eingetragen": "2026-09-26T17:24:21.215Z"
     },
     "heroVideo": {
       "datei": "v2/medien/eigene/beispiel-chinesisch/heroVideo.mp4",
@@ -328,6 +328,15 @@
       "wiedergabe": "einmal",
       "webm": "v2/medien/eigene/beispiel-chinesisch/heroVideo.webm",
       "eingetragen": "2026-09-24T19:08:20.343Z"
+    },
+    "heroVideoMobil": {
+      "datei": "v2/medien/eigene/beispiel-chinesisch/heroVideoMobil.mp4",
+      "herkunft": "ki",
+      "quelle": "Hochformat-Zuschnitt (540×900, ohne Ton) aus dem vom Inhaber gelieferten Querformat-Video (KI-generiert), 26.09.2026 – einmalige Wiedergabe",
+      "fokus": "50% 70%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-chinesisch/heroVideoMobil.webm",
+      "eingetragen": "2026-09-26T17:24:21.228Z"
     }
   },
   "beispiel-vietnamesisch": {
@@ -341,9 +350,9 @@
     "heroMobil": {
       "datei": "v2/medien/eigene/beispiel-vietnamesisch/heroMobil.jpg",
       "herkunft": "ki",
-      "quelle": "Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026",
-      "fokus": "55% 70%",
-      "eingetragen": "2026-09-24T19:16:45.933Z"
+      "quelle": "Erstes Bild des Hochformat-Zuschnitts aus dem vom Inhaber gelieferten Video (KI-generiert), damit Standbild und Video auf dem Handy nahtlos ineinander übergehen, 26.09.2026",
+      "fokus": "50% 70%",
+      "eingetragen": "2026-09-26T17:24:21.231Z"
     },
     "heroVideo": {
       "datei": "v2/medien/eigene/beispiel-vietnamesisch/heroVideo.mp4",
@@ -353,6 +362,15 @@
       "wiedergabe": "einmal",
       "webm": "v2/medien/eigene/beispiel-vietnamesisch/heroVideo.webm",
       "eingetragen": "2026-09-24T19:16:45.940Z"
+    },
+    "heroVideoMobil": {
+      "datei": "v2/medien/eigene/beispiel-vietnamesisch/heroVideoMobil.mp4",
+      "herkunft": "ki",
+      "quelle": "Hochformat-Zuschnitt (540×900, ohne Ton) aus dem vom Inhaber gelieferten Querformat-Video (KI-generiert), 26.09.2026 – einmalige Wiedergabe",
+      "fokus": "50% 70%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-vietnamesisch/heroVideoMobil.webm",
+      "eingetragen": "2026-09-26T17:24:21.232Z"
     }
   },
   "beispiel-asiatisch": {
@@ -366,9 +384,9 @@
     "heroMobil": {
       "datei": "v2/medien/eigene/beispiel-asiatisch/heroMobil.jpg",
       "herkunft": "ki",
-      "quelle": "Übergangsweise die Medien von beispiel-chinesisch (vom Inhaber geliefert, KI-generiert), bis eigene Medien kommen, 24.09.2026",
-      "fokus": "55% 70%",
-      "eingetragen": "2026-09-24T19:16:45.941Z"
+      "quelle": "Erstes Bild des Hochformat-Zuschnitts aus dem vom Inhaber gelieferten Video (KI-generiert), damit Standbild und Video auf dem Handy nahtlos ineinander übergehen, 26.09.2026",
+      "fokus": "50% 70%",
+      "eingetragen": "2026-09-26T17:24:21.229Z"
     },
     "heroVideo": {
       "datei": "v2/medien/eigene/beispiel-asiatisch/heroVideo.mp4",
@@ -378,6 +396,15 @@
       "wiedergabe": "einmal",
       "webm": "v2/medien/eigene/beispiel-asiatisch/heroVideo.webm",
       "eingetragen": "2026-09-24T19:16:45.943Z"
+    },
+    "heroVideoMobil": {
+      "datei": "v2/medien/eigene/beispiel-asiatisch/heroVideoMobil.mp4",
+      "herkunft": "ki",
+      "quelle": "Hochformat-Zuschnitt (540×900, ohne Ton) aus dem vom Inhaber gelieferten Querformat-Video (KI-generiert), 26.09.2026 – einmalige Wiedergabe",
+      "fokus": "50% 70%",
+      "wiedergabe": "einmal",
+      "webm": "v2/medien/eigene/beispiel-asiatisch/heroVideoMobil.webm",
+      "eingetragen": "2026-09-26T17:24:21.230Z"
     }
   }
 }
