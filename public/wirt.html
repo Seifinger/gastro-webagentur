@@ -1014,7 +1014,8 @@ async function lade() {
   document.getElementById("zaehler").innerHTML = `
     <span class="pill${stand.offeneReservierungen ? " aktiv" : ""}">${stand.offeneReservierungen} neue Reservierung(en)</span>
     <span class="pill${stand.offeneBestellungen ? " aktiv" : ""}">${stand.offeneBestellungen} offene Bestellung(en)</span>${
-      stand.telegramHinweis ? `<span class="pill aktiv" title="${esc(stand.telegramHinweis)}">⚠ Telegram</span>` : ""}`;
+      stand.telegramHinweis ? `<span class="pill aktiv" title="${esc(stand.telegramHinweis)}">⚠ Telegram</span>` : ""}${
+      stand.sicherung?.hinweis ? `<span class="pill aktiv" title="${esc(stand.sicherung.hinweis)}">⚠ Sicherung</span>` : ""}`;
   document.querySelector('nav button[data-tab="telegram"]').textContent = stand.telegramHinweis ? "Telegram ⚠" : "Telegram";
 
   if (!document.getElementById("tag").value) document.getElementById("tag").value = stand.heute;

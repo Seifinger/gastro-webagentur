@@ -75,14 +75,16 @@ export function pruefePaket(siteDir, { apiUrl }) {
     const pd = /window\.PAGE_DATA = (\{.*?\});<\/script>/s.exec(html);
     if (!pd) fehler.push(`${rel}: PAGE_DATA fehlt`);
     else if (JSON.parse(pd[1]).apiUrl !== apiUrl.replace(/\/+$/, "")) fehler.push(`${rel}: falsche Wirt-Adresse ${JSON.parse(pd[1]).apiUrl}`);
+    // Sichtbarer Inhalt (Body ohne Skripte) und Kopf getrennt: CSS-Klassennamen zählen nicht.
     const body = html.replace(/^[\s\S]*?<body/, "<body").replace(/<script>[\s\S]*?<\/script>/g, "");
-    for (const [muster, grund] of [
-      [/entwurf-hinweis|Konzept-Demo|Beispielseite|frei erfunden/, "Demo- oder Konzept-Hinweis"],
-      [/name="demo-art"|name="robots" content="noindex/, "Demo-Kennzeichnung im Kopf"],
-      [/\/intern\/|lead-edits|data\/kunden|bearbeiten\.html|v2\/output/, "Agentur-Pfad"],
-    ]) if (muster.test(rel.endsWith(".html") ? html.replace(/<script>[\s\S]*?<\/script>/g, "") : body)) fehler.push(`${rel}: ${grund}`);
+    const kopf = html.slice(0, html.indexOf("<style>") === -1 ? html.indexOf("<body") : html.indexOf("<style>"));
+    for (const [muster, text, grund] of [
+      [/class="entwurf-hinweis|Konzept-Demo|Beispielseite|frei erfunden|Platzhalter/, body, "Demo- oder Konzept-Hinweis"],
+      [/name="demo-art"|name="robots" content="noindex/, kopf, "Demo-Kennzeichnung im Kopf"],
+      [/\/intern\/|lead-edits|data\/kunden|bearbeiten\.html|v2\/output/, body + kopf, "Agentur-Pfad"],
+    ]) if (muster.test(text)) fehler.push(`${rel}: ${grund}`);
     // Alle lokalen Verweise (src, href, url()) müssen im Paket liegen.
-    const verweise = [...html.matchAll(/(?:src|href)="([^"#?]+)[^"]*"|url\("?([^")]+)"?\)/g)].map((m) => m[1] ?? m[2]);
+    const verweise = [...html.matchAll(/(?:src|href)="([^"#?]+)[^"]*"|url\((['"]?)([^'")]+)\2\)/g)].map((m) => m[1] ?? m[3]);
     for (const v of verweise) {
       if (!v || /^(?:[a-z]+:|\/\/|#|data:)/i.test(v)) continue;
       if (v.startsWith("/")) {
@@ -127,7 +129,7 @@ export async function erstellePaket(id, { basis = KUNDEN_DIR, zielDir = PAKETE_D
   // Schriften: genau die, auf die die Seiten verweisen.
   const schriften = new Set();
   for (const datei of alleDateien(siteDir).filter((d) => d.endsWith(".html"))) {
-    for (const m of readFileSync(datei, "utf-8").matchAll(/url\("?(?:\.\.\/)?assets\/fonts\/([^")]+)"?\)/g)) schriften.add(m[1]);
+    for (const m of readFileSync(datei, "utf-8").matchAll(/url\((['"]?)(?:\.\.\/)?assets\/fonts\/([^'")]+)\1\)/g)) schriften.add(m[2]);
   }
   mkdirSync(path.join(siteDir, "assets", "fonts"), { recursive: true });
   for (const f of schriften) {

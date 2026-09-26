@@ -93,6 +93,27 @@ const hmac = (schluessel, daten) => createHmac("sha256", schluessel).update(date
 const enc = (s) => encodeURIComponent(s).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
 
 /**
+ * AWS Signature Version 4 für eine S3-Anfrage (Kopf-Variante). Rein und ohne
+ * Netz – geprüft gegen die Beispielwerte der AWS-S3-Dokumentation.
+ * @returns {{ kopf: object, qs: string, signatur: string }}
+ */
+export function signiereS3Anfrage({ methode, host, pfad, query = {}, body = Buffer.alloc(0), zeit, region, zugang, geheim, weitereKoepfe = {}, dienst = "s3" }) {
+  const amzDatum = new Date(zeit).toISOString().replace(/[:-]|\.\d{3}/g, "");
+  const tag = amzDatum.slice(0, 8);
+  const qs = Object.keys(query).sort().map((k) => `${enc(k)}=${enc(query[k])}`).join("&");
+  const nutzlastHash = sha(body);
+  const kopf = { host, ...Object.fromEntries(Object.entries(weitereKoepfe).map(([k, v]) => [k.toLowerCase(), String(v).trim()])), "x-amz-content-sha256": nutzlastHash, "x-amz-date": amzDatum };
+  const namen = Object.keys(kopf).sort();
+  const kanonisch = [methode, pfad, qs, namen.map((n) => `${n}:${kopf[n]}\n`).join(""), namen.join(";"), nutzlastHash].join("\n");
+  const bereich = `${tag}/${region}/${dienst}/aws4_request`;
+  const zuSignieren = ["AWS4-HMAC-SHA256", amzDatum, bereich, sha(kanonisch)].join("\n");
+  const k = hmac(hmac(hmac(hmac(`AWS4${geheim}`, tag), region), dienst), "aws4_request");
+  const signatur = createHmac("sha256", k).update(zuSignieren).digest("hex");
+  const { host: _host, ...ohneHost } = kopf;
+  return { kopf: { ...ohneHost, Authorization: `AWS4-HMAC-SHA256 Credential=${zugang}/${bereich}, SignedHeaders=${namen.join(";")}, Signature=${signatur}` }, qs, signatur };
+}
+
+/**
  * S3-kompatibles Ziel mit AWS Signature V4 (path-style). Getestet gegen ein
  * lokales S3-kompatibles Testziel; Cloudflare R2: endpoint
  * https://<account-id>.r2.cloudflarestorage.com, region "auto".
@@ -103,21 +124,11 @@ export function s3Ziel({ endpoint, bucket, region = "auto", zugang, geheim, prae
   const pre = praefix ? `${praefix.replace(/^\/+|\/+$/g, "")}/` : "";
 
   async function anfrage(methode, schluessel, { query = {}, body = Buffer.alloc(0) } = {}) {
-    const zeit = jetzt().toISOString().replace(/[:-]|\.\d{3}/g, "");
-    const tag = zeit.slice(0, 8);
     const pfad = `${basis.pathname.replace(/\/+$/, "")}/${enc(bucket)}${schluessel ? `/${schluessel.split("/").map(enc).join("/")}` : ""}`;
-    const qs = Object.keys(query).sort().map((k) => `${enc(k)}=${enc(query[k])}`).join("&");
-    const nutzlastHash = sha(body);
-    const kopf = { host: basis.host, "x-amz-content-sha256": nutzlastHash, "x-amz-date": zeit };
-    const namen = Object.keys(kopf).sort();
-    const kanonisch = [methode, pfad, qs, namen.map((n) => `${n}:${kopf[n]}\n`).join(""), namen.join(";"), nutzlastHash].join("\n");
-    const bereich = `${tag}/${region}/s3/aws4_request`;
-    const zuSignieren = ["AWS4-HMAC-SHA256", zeit, bereich, sha(kanonisch)].join("\n");
-    const k = hmac(hmac(hmac(hmac(`AWS4${geheim}`, tag), region), "s3"), "aws4_request");
-    const signatur = createHmac("sha256", k).update(zuSignieren).digest("hex");
+    const { kopf, qs } = signiereS3Anfrage({ methode, host: basis.host, pfad, query, body, zeit: jetzt(), region, zugang, geheim });
     const antwort = await fetchFn(`${basis.origin}${pfad}${qs ? `?${qs}` : ""}`, {
       method: methode,
-      headers: { ...kopf, Authorization: `AWS4-HMAC-SHA256 Credential=${zugang}/${bereich}, SignedHeaders=${namen.join(";")}, Signature=${signatur}` },
+      headers: kopf,
       ...(methode === "PUT" ? { body } : {}),
       signal: AbortSignal.timeout(60_000),
     });

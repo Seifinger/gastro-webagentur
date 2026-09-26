@@ -31,7 +31,7 @@ SECRET_ARG=""
 [ -n "${BUILD_CA:-}" ] && SECRET_ARG="--secret id=build_ca,src=$BUILD_CA"
 # shellcheck disable=SC2086
 docker build --network host $SECRET_ARG -f "$ARBEIT/quelle/deploy/wirt/Dockerfile" \
-  --build-arg GIT_COMMIT="$SHA" -t "gastro-wirt:$SHA" "$ARBEIT/quelle" >/dev/null
+  --build-arg GIT_COMMIT="$SHA" -t "gastro-wirt:$SHA" -q "$ARBEIT/quelle" >/dev/null
 echo "✅ Image gastro-wirt:$SHA ($(docker image inspect "gastro-wirt:$SHA" --format '{{.Size}}' | awk '{printf "%.0f MB", $1/1048576}'))"
 
 umgebung() {

@@ -3,6 +3,7 @@ import { timingSafeEqual, createHash } from "node:crypto";
 import { readFileSync, accessSync, constants as fsConstants } from "node:fs";
 import { DATEN_DIR, datenPfad } from "./datenPfad.js";
 import { uebernimmUebergabe } from "./wirtUebergabe.js";
+import { sicherungsStand } from "./sicherungExtern.js";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { dashboardHost } from "./config.js";
@@ -190,13 +191,22 @@ export function erlaubteOrigins() {
     .filter(Boolean);
 }
 
+/** Eigene Adresse (WIRT_OEFFENTLICHE_URL): Statusseite und Rechtstexte liegen hier selbst. */
+function eigeneOrigin() {
+  try {
+    return new URL(String(process.env.WIRT_OEFFENTLICHE_URL ?? "")).origin;
+  } catch {
+    return "";
+  }
+}
+
 /** null = fremde Origin (Browser einer anderen Seite); "" = keine Origin (curl, Server). */
 function corsFuer(req) {
   const liste = erlaubteOrigins();
   const origin = String(req.headers.origin ?? "");
   if (!liste.length) return "*";
   if (!origin) return "";
-  return liste.includes(origin) ? origin : null;
+  return liste.includes(origin) || origin === eigeneOrigin() ? origin : null;
 }
 
 function koerper(req, max = 20_000) {
@@ -251,7 +261,10 @@ function uebersicht() {
   }));
   const reservierungenMitHinweis = daten.reservierungen.map((r) => ({ ...r, gast: wirtGastHinweis("reservierung", r, meldungen) }));
 
+  // Externe Sicherung (scripts/wirtStart.mjs): nur Metadaten, nie Schlüssel.
+  const sicherung = sicherungsHinweis();
   return {
+    sicherung,
     betrieb: slug,
     tische: daten.tische,
     plaetzeGesamt: gesamtPlaetze(daten),
@@ -358,6 +371,15 @@ function rabattUebersicht(daten) {
     kategorien: [...new Set(produkte.map((p) => p.kategorie))],
     aktionen,
   };
+}
+
+/** Warnung fürs Dashboard, wenn die eingerichtete Sicherung fehlschlägt oder zu alt ist. */
+function sicherungsHinweis() {
+  if (!process.env.BACKUP_ZIEL) return { eingerichtet: false, hinweis: "" };
+  const stand = sicherungsStand() ?? {};
+  const alt = !stand.letzterErfolg || Date.now() - Date.parse(stand.letzterErfolg) > 36 * 3600 * 1000;
+  const hinweis = stand.fehler ? `Letzte Sicherung fehlgeschlagen: ${stand.fehler}` : alt && stand.letzterVersuch ? "Seit über 36 Stunden keine erfolgreiche Sicherung." : "";
+  return { eingerichtet: true, letzterErfolg: stand.letzterErfolg ?? "", hinweis };
 }
 
 /**

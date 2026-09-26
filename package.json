@@ -38,7 +38,13 @@
     "v2:art-audit": "node v2/build/artDirectionAudit.js",
     "v2:snapshot": "node v2/build/unveraendert.js",
     "v2:baseline": "node v2/build/artDirectionScreenshots.js --docs",
-    "v2:sequenz": "node v2/build/scrollSequenz.js"
+    "v2:sequenz": "node v2/build/scrollSequenz.js",
+    "wirt:start": "node scripts/wirtStart.mjs",
+    "wirt:sicherung": "node scripts/wirtSicherung.mjs",
+    "wirt:uebergabe": "node scripts/wirtUebergabe.mjs",
+    "wirt:container-test": "sh deploy/wirt/lokal-test.sh",
+    "pilot:testkunde": "node v2/integration/pilotTestkunde.js",
+    "pilot:e2e": "node --test test/pilot-e2e.test.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.126.0",

@@ -21,7 +21,7 @@ const { handler: dashboard } = await import("../src/dashboardServer.js");
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATEI = path.join(__dirname, "..", "data", "betrieb", `${SLUG}.json`);
-const ENV = ["WIRT_PASSWORT", "WIRT_OEFFENTLICHE_URL", "VERTRAUTER_PROXY", "NODE_ENV", "DASHBOARD_TOKEN", "DASHBOARD_PASSWORT_HASH"];
+const ENV = ["WIRT_PASSWORT", "WIRT_OEFFENTLICHE_URL", "WIRT_ERLAUBTE_ORIGINS", "VERTRAUTER_PROXY", "NODE_ENV", "DASHBOARD_TOKEN", "DASHBOARD_PASSWORT_HASH"];
 const altEnv = Object.fromEntries(ENV.map((k) => [k, process.env[k]]));
 const PASSWORT = "ein-langes-wirt-passwort";
 const ANMELDUNG = `Basic ${Buffer.from(`wirt:${PASSWORT}`).toString("base64")}`;
@@ -354,4 +354,24 @@ test("Betriebsdatei wird atomar und nur für den Besitzer lesbar geschrieben", (
   const ordner = path.dirname(DATEI);
   assert.deepEqual(readdirSync(ordner).filter((d) => d.startsWith(`${SLUG}.json.`)), [], "keine Zwischendatei bleibt liegen");
   if (process.platform !== "win32") assert.equal(statSync(DATEI).mode & 0o777, 0o600);
+});
+
+test("WIRT_ERLAUBTE_ORIGINS: Kundendomain und die eigene Statusseite dürfen, fremde Seiten nicht", async () => {
+  process.env.WIRT_ERLAUBTE_ORIGINS = "https://trattoria-probe.pages.dev";
+  process.env.WIRT_OEFFENTLICHE_URL = "https://pilot-wirt.example";
+  const kunde = await reservieren({ Origin: "https://trattoria-probe.pages.dev" });
+  assert.equal(kunde.status, 200);
+  assert.equal(kunde.headers.get("access-control-allow-origin"), "https://trattoria-probe.pages.dev");
+  assert.equal(kunde.headers.get("vary"), "Origin");
+  // Die Statusseite liegt auf der Wirt-App selbst und fragt von dort ab.
+  const token = (await kunde.json()).reservierung.statusToken ?? "unbekannt";
+  const eigen = await fetch(`${basis}/oeffentlich/status`, { method: "POST", headers: { "Content-Type": "application/json", Origin: "https://pilot-wirt.example" }, body: JSON.stringify({ token }) });
+  assert.notEqual(eigen.status, 403);
+  assert.equal(eigen.headers.get("access-control-allow-origin"), "https://pilot-wirt.example");
+  const fremd = await reservieren({ Origin: "https://boese.example" });
+  assert.equal(fremd.status, 403);
+  assert.equal(fremd.headers.get("access-control-allow-origin"), null);
+  assert.equal(store.ladeBetrieb(SLUG).reservierungen.length, 1, "fremde Anfrage legt nichts an");
+  const vorab = await fetch(`${basis}/oeffentlich/bestellung`, { method: "OPTIONS", headers: { Origin: "https://boese.example" } });
+  assert.equal(vorab.status, 403);
 });
